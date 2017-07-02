@@ -1,0 +1,18 @@
+{
+  "name": "alttpbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "discord.js": "^11.1.0",
+    "irc": "^0.5.2",
+    "node-opus": "^0.2.6",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "greenham",
+  "license": "MIT"
+}
