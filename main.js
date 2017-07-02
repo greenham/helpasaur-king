@@ -120,7 +120,7 @@ client.on('ready', () => {
     client.addListener('message#speedrunslive', function (from, message) {
       if (from === 'RaceBot')
       {
-        console.log(message);
+        //console.log(message);
 
         // @todo link to race on SRL website
 
