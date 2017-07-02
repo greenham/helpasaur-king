@@ -12,7 +12,13 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 // The token of your bot - https://discordapp.com/developers/applications/me
-const token = 'MzMwNzgwOTYyODMxMjA0MzU0.DDl_wQ.DpHi2WusYtMKYyyo24o1HgqFHdg';
+// Should be placed in discord_token file for security purposes
+var fs = require('fs'),
+  path = require('path'),
+  filePath = path.join(__dirname, 'discord_token');
+
+// read synchronously
+var token = fs.readFileSync(filePath, 'utf-8');
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
@@ -24,6 +30,7 @@ client.on('ready', () => {
   alertsChannel.send('Bot has connected. :white_check_mark:');
 
   // Update and Output the intial list of live streams, then set a timer to update
+  // @todo pull these in from the file/DB
   var liveStreamIds = [];
 
   setInterval(updateStreams, 60000);
@@ -49,6 +56,7 @@ client.on('ready', () => {
       // @todo eventually check for title differences and edit previous message
     }
     liveStreamIds = newLiveStreamIds;
+    // @todo store these to a separate file so when the bot restarts it doesn't spam the channel
   }
 
   // Connect to Twitch to pull a list of currently live streams for ALttP
@@ -114,6 +122,8 @@ client.on('ready', () => {
       {
         console.log(message);
 
+        // @todo link to race on SRL website
+
         var raceChannel = message.match(/srl\-([a-z0-9]{5})/);
         if (message.startsWith('Race initiated for ' + gameName + '. Join'))
         {
@@ -144,25 +154,40 @@ client.on('ready', () => {
 
 // Create an event listener for messages
 client.on('message', message => {
+
+
   // allow members to request role additions/removals for @nmg-race and @100-race on the alttp discord
   if (message.content.startsWith('!addrole')) {
     // parse+validate role name
     var roleName = message.content.match(/\!addrole\s([a-z0-9\-]+)/);
-    if (/nmg\-race|100\-race/.test(roleName[1]))
+    if (/nmg\-race|100\-race|test\-role/.test(roleName[1]))
     {
+      // find the role in the member's guild
       var role = message.guild.roles.find('name', roleName[1]);
+
+      // add the role and DM the user the results
       message.member.addRole(role)
         .then(requestingMember => {
-          message.channel.send("You have successfully been added to the " + roleName[1] + " group!", {reply: requestingMember})
+          requestingMember.createDM()
+            .then(channel => {
+              channel.send("You have successfully been added to the " + roleName[1] + " group!")
+            })
+            .catch(console.log)
         })
         .catch(console.log);
     }
     else
     {
-      message.channel.send("Invalid role name!", {reply: message.member});
+      message.member.createDM()
+        .then(channel => {
+          channel.send(roleName[1] + " is not a valid role name!")
+        })
+        .catch(console.log);
     }
   }
 
+
+  // @todo create these dynamically from a file/DB
   // Definitions / Help / Links
   if (message.content === '!airpumping') {
     message.channel.send("Much like wall pumping, air pumping will reset Link's movement pattern with every \"pump\". The pattern for moving north or west is 2-1-2-1-... and the diagonal movement speed is 1px/frame. So, as an example, going north and pumping west (or east) every other frame would result in a 2North-1Diagonal-2North-1Diagonal-... movement.");
@@ -277,7 +302,7 @@ client.on('message', message => {
   }
 
   if (message.content === '!randodiscord') {
-    message.channel.send("lol");
+    message.channel.send("ALttP Randomizer Discord: https://discord.gg/BEPAD3Q");
   }
 
   if (message.content === '!resources') {
