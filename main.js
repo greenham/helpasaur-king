@@ -7,14 +7,15 @@
 */
 
 // Settings
-var botName = 'ACMLM v2.0',
+var botName = 'ACMLMv2.0',
   alertsChannelName = 'alttp-bot-testing',
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
   srlIrcServer = 'irc.speedrunslive.com',
   srlUsername = 'alttpracewatcher',
-  allowedRolesForRequest = /nmg\-race|100\-race|test\-role/;
+  allowedRolesForRequest = /nmg\-race|100\-race|test\-role/,
+  textCmdCooldown = 60;
 
 // Import modules
 var request = require('request'),
@@ -28,7 +29,8 @@ var tokenFilePath = path.join(__dirname, 'discord_token'),
   textCommandsFilePath = path.join(__dirname, 'text_commands'),
   twitchClientIdPath = path.join(__dirname, 'twitch_client_id'),
   twitchStreamsPath = path.join(__dirname, 'twitch_streams'),
-  livestreamsPath = path.join(__dirname, 'livestreams');
+  livestreamsPath = path.join(__dirname, 'livestreams'),
+  cooldownsPath = path.join(__dirname, 'cooldowns');
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 // Should be placed in discord_token file for security purposes
@@ -183,6 +185,7 @@ client.on('message', message => {
 
 
   // Allow members to request role additions/removals for @nmg-race and @100-race on the alttp discord
+  // @todo implement role removal
   if (message.content.startsWith('!addrole'))
   {
     // parse+validate role name
@@ -225,12 +228,44 @@ client.on('message', message => {
     }
   }
 
-  // Search for text commands in array if message starts with !
+  // Search for matching text command if message starts with !
   if (message.content.startsWith('!'))
   {
     if (textCommands.hasOwnProperty(message.content))
     {
-      message.channel.send(textCommands[message.content]);
+      // Make sure this command isn't on cooldown
+      var onCooldown = false;
+      fs.readFile(cooldownsPath, function(err, data) {
+        // @todo handle error / no data
+
+        var cooldowns = JSON.parse(data);
+        if (cooldowns.hasOwnProperty(message.content))
+        {
+          // Command was recently used, check timestamp to see if it's on cooldown
+          if ((message.createdTimestamp - cooldowns[message.content]) < (textCmdCooldown*1000)) {
+            onCooldown = true;
+          }
+        }
+
+        if (!onCooldown) {
+          message.channel.send(textCommands[message.content]);
+          cooldowns[message.content] = message.createdTimestamp;
+        } else {
+          // DM the user that it's on CD
+          message.member.createDM()
+            .then(channel => {
+              channel.send(message.content + ' is currently on cooldown for another ' + ((textCmdCooldown*1000)- (message.createdTimestamp - cooldowns[message.content]))/1000 + ' seconds!');
+            })
+            .catch(console.log);
+        }
+
+        // write cooldowns back to file
+        fs.writeFile(cooldownsPath, JSON.stringify(cooldowns), function(err) {
+          if (err) {
+            return console.log(err);
+          }
+        });
+      });
     }
   }
 });
