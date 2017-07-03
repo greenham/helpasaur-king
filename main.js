@@ -1,7 +1,6 @@
 /*
   ALttP Discord Bot
     General TODOs
-      - Add basic cooldowns for all commands
       - Move this to a server
       - Add !commands listing -- DM to requesting user
 */
@@ -184,38 +183,56 @@ client.on('ready', () => {
 client.on('message', message => {
 
 
-  // Allow members to request role additions/removals for @nmg-race and @100-race on the alttp discord
+  // Allow members to request role additions/removals for allowed roles
   // @todo implement role removal
-  if (message.content.startsWith('!addrole'))
+  if (message.content.startsWith('!addrole') || message.content.startsWith('!removerole'))
   {
     // parse+validate role name
-    var roleName = message.content.match(/\!addrole\s([a-z0-9\-]+)/);
+    var roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
     if (!roleName)
     {
       message.member.createDM()
         .then(channel => {
-          channel.send("You must include a role name! *e.g. !addrole nmg-race*");
+          channel.send("You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
         })
         .catch(console.log);
-
     }
     else
     {
-      if (allowedRolesForRequest.test(roleName[1]))
+      if (allowedRolesForRequest.test(roleName[2]))
       {
         // find the role in the member's guild
-        var role = message.guild.roles.find('name', roleName[1]);
+        var role = message.guild.roles.find('name', roleName[2]);
 
-        // add the role and DM the user the results
-        message.member.addRole(role)
-          .then(requestingMember => {
-            requestingMember.createDM()
-              .then(channel => {
-                channel.send("You have successfully been added to the " + roleName[1] + " group!")
-              })
-              .catch(console.log)
-          })
-          .catch(console.log);
+        if (!role) {
+          return console.log(roleName[2] + ' does not exist on this server');
+        }
+
+        // add/remove the role and DM the user the results
+        if (roleName[1] === 'add')
+        {
+          message.member.addRole(role)
+            .then(requestingMember => {
+              requestingMember.createDM()
+                .then(channel => {
+                  channel.send("You have successfully been added to the " + roleName[2] + " group!")
+                })
+                .catch(console.log)
+            })
+            .catch(console.log);
+        }
+        else if (roleName[1] === 'remove')
+        {
+          message.member.removeRole(role)
+            .then(requestingMember => {
+              requestingMember.createDM()
+                .then(channel => {
+                  channel.send("You have successfully been removed from the " + roleName[2] + " group!")
+                })
+                .catch(console.log)
+            })
+            .catch(console.log);
+        }
       }
       else
       {
