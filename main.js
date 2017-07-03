@@ -8,7 +8,7 @@
 
 // Settings
 var botName = 'ACMLM v2.0',
-  alertsChannelName = 'alttp-alerts',
+  alertsChannelName = 'alttp-bot-testing',
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
@@ -63,16 +63,16 @@ const client = new Discord.Client();
 client.on('ready', () => {
   console.log(botName + ' Online');
 
-  // Let the world know we're here
+  // Find the channel where we'll be posting alerts
   var alertsChannel = client.channels.find('name', alertsChannelName);
-  alertsChannel.send(botName + ' has connected. :white_check_mark:');
+  //alertsChannel.send(botName + ' has connected. :white_check_mark:');
 
   // Watch for streams going live
   updateStreams();
   setInterval(updateStreams, 60000);
 
   // Watch for SRL races
-  listenForSRLRaces(srlGameName);
+  watchForSRLRaces(srlGameName);
 
   function updateStreams()
   {
@@ -120,22 +120,25 @@ client.on('ready', () => {
 
     // Read the list of currently live streams we've already alerted about
     fs.readFile(livestreamsPath, function(err, data) {
-      var liveStreamIds = data.toString().split(',')
-      var newLiveStreamIds = [];
+      var oldLiveStreams = JSON.parse(data);
+      var newLiveStreams = {};
 
       streams.forEach(function(stream) {
         // Only send an alert message if this stream was not already live
-        // @todo Check for title differences and either send new msg or edit previous?
-        if (liveStreamIds.indexOf(stream._id.toString()) === -1) {
-          alertsChannel.send('**NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+        if (!oldLiveStreams.hasOwnProperty(stream._id)) {
+          alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+        } else {
+          // Stream was already online, check for title change
+          if (oldLiveStreams[stream._id] !== stream.channel.status) {
+            alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+          }
         }
-        newLiveStreamIds.push(stream._id);
+        // @todo eventually just store the whole object so we can output whatever properties we want later
+        newLiveStreams[stream._id] = stream.channel.status;
       });
 
-      liveStreamIds = newLiveStreamIds;
-
       // Store the new list of live streams to a separate file so when the bot restarts it doesn't spam the channel
-      fs.writeFile(livestreamsPath, liveStreamIds.join(), function(err) {
+      fs.writeFile(livestreamsPath, JSON.stringify(newLiveStreams), function(err) {
         if (err) {
           return console.log(err);
         }
@@ -143,8 +146,8 @@ client.on('ready', () => {
     });
   }
 
-  // Connect via IRC to SRL and listen for races
-  function listenForSRLRaces(gameName)
+  // Connect via IRC to SRL and watch for races
+  function watchForSRLRaces(gameName)
   {
     var client = new irc.Client(srlIrcServer, srlUsername, {
       channels: ['#speedrunslive'],
