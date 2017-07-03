@@ -122,7 +122,7 @@ client.on('ready', () => {
 
     // Read the list of currently live streams we've already alerted about
     fs.readFile(livestreamsPath, function(err, data) {
-      // @todo create the livestreams file if it doesn't exist or is empty (populate with empty object)
+      if (err || !data) data = {};
       var oldLiveStreams = JSON.parse(data);
       var newLiveStreams = {};
 
@@ -184,7 +184,6 @@ client.on('message', message => {
 
 
   // Allow members to request role additions/removals for allowed roles
-  // @todo implement role removal
   if (message.content.startsWith('!addrole') || message.content.startsWith('!removerole'))
   {
     // parse+validate role name
@@ -253,7 +252,7 @@ client.on('message', message => {
       // Make sure this command isn't on cooldown
       var onCooldown = false;
       fs.readFile(cooldownsPath, function(err, data) {
-        // @todo handle error / no data
+        if (err || !data) data = {};
 
         var cooldowns = JSON.parse(data);
         if (cooldowns.hasOwnProperty(message.content))
