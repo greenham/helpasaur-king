@@ -10,7 +10,7 @@
 var botName = 'ACMLM v2.0',
   alertsChannelName = 'alttp-bot-testing',
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
-  twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i;
+  twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
   srlIrcServer = 'irc.speedrunslive.com',
   srlUsername = 'alttpracewatcher';
@@ -22,14 +22,12 @@ var request = require('request'),
   path = require('path'),
   Discord = require('discord.js');
 
-// Set up Discord client
-const client = new Discord.Client();
-
 // File paths for config/keys
 var tokenFilePath = path.join(__dirname, 'discord_token'),
   textCommandsFilePath = path.join(__dirname, 'text_commands'),
   twitchClientIdPath = path.join(__dirname, 'twitch_client_id'),
-  twitchStreamsPath = path.join(__dirname, 'twitch_streams');
+  twitchStreamsPath = path.join(__dirname, 'twitch_streams'),
+  livestreamsPath = path.join(__dirname, 'livestreams');
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 // Should be placed in discord_token file for security purposes
@@ -57,6 +55,9 @@ fs.readFile(twitchStreamsPath, function (err, data) {
   twitchChannels = data.toString().split('\r\n');
 });
 
+// Set up Discord client
+const client = new Discord.Client();
+
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
 client.on('ready', () => {
@@ -66,11 +67,11 @@ client.on('ready', () => {
   var alertsChannel = client.channels.find('name', alertsChannelName);
   alertsChannel.send(botName + ' has connected. :white_check_mark:');
 
-  // Update and Output the intial list of live streams, then set a timer to update
-  // @todo pull these in from the file/DB
-  var liveStreamIds = [];
-
+  // Watch for streams going live
+  updateStreams();
   setInterval(updateStreams, 60000);
+
+  // Watch for SRL races
   listenForSRLRaces(srlGameName);
 
   function updateStreams()
@@ -102,7 +103,7 @@ client.on('ready', () => {
           cb(filteredStreams);
         }
       } else {
-        console.log('error:', error); // Print the error if one occurred
+        console.log('Error finding live twitch streams: ', error); // Print the error if one occurred
         console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
         cb(false);
       }
@@ -113,20 +114,33 @@ client.on('ready', () => {
 
   function handleStreamResults(streams)
   {
-    var newLiveStreamIds = [];
-    if (streams !== false)
-    {
-      streams.forEach(function(stream)
-      {
-        if (liveStreamIds.indexOf(stream._id) === -1) {
+    if (streams === false) {
+      return console.log("No livestreams found.");
+    }
+
+    // Read the list of currently live streams we've already alerted about
+    fs.readFile(livestreamsPath, function(err, data) {
+      var liveStreamIds = data.toString().split(',')
+      var newLiveStreamIds = [];
+
+      streams.forEach(function(stream) {
+        // Only send an alert message if this stream was not already live
+        // @todo Check for title differences and either send new msg or edit previous?
+        if (liveStreamIds.indexOf(stream._id.toString()) === -1) {
           alertsChannel.send('**NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
         }
         newLiveStreamIds.push(stream._id);
       });
-      // @todo eventually check for title differences and edit previous message
-    }
-    liveStreamIds = newLiveStreamIds;
-    // @todo store these to a separate file so when the bot restarts it doesn't spam the channel
+
+      liveStreamIds = newLiveStreamIds;
+
+      // Store the new list of live streams to a separate file so when the bot restarts it doesn't spam the channel
+      fs.writeFile(livestreamsPath, liveStreamIds.join(), function(err) {
+        if (err) {
+          return console.log(err);
+        }
+      });
+    });
   }
 
   // Connect via IRC to SRL and listen for races
