@@ -13,7 +13,8 @@ var botName = 'ACMLM v2.0',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
   srlIrcServer = 'irc.speedrunslive.com',
-  srlUsername = 'alttpracewatcher';
+  srlUsername = 'alttpracewatcher',
+  allowedRolesForRequest = /nmg\-race|100\-race|test\-role/;
 
 // Import modules
 var request = require('request'),
@@ -120,6 +121,7 @@ client.on('ready', () => {
 
     // Read the list of currently live streams we've already alerted about
     fs.readFile(livestreamsPath, function(err, data) {
+      // @todo create the livestreams file if it doesn't exist or is empty (populate with empty object)
       var oldLiveStreams = JSON.parse(data);
       var newLiveStreams = {};
 
@@ -196,7 +198,7 @@ client.on('message', message => {
     }
     else
     {
-      if (/nmg\-race|100\-race|test\-role/.test(roleName[1]))
+      if (allowedRolesForRequest.test(roleName[1]))
       {
         // find the role in the member's guild
         var role = message.guild.roles.find('name', roleName[1]);
