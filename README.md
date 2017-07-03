@@ -8,5 +8,5 @@
 
 # Other Commands
 
-```!addrole {name of role}
-!removerole {name of role}```
+`!addrole {name of role}`
+`!removerole {name of role}`
