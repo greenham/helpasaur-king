@@ -2,22 +2,23 @@
   ALttP Discord Bot
     General TODOs
       - Move this to a server
-      - Add !commands listing -- DM to requesting user
 */
 
 // Settings
 var botName = 'ACMLMv2.0',
-  alertsChannelName = 'alttp-alerts',
+  alertsChannelName = 'alttp-bot-testing',
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
   srlIrcServer = 'irc.speedrunslive.com',
   srlUsername = 'alttpracewatcher',
   allowedRolesForRequest = /nmg\-race|100\-race|test\-role/,
-  textCmdCooldown = 60;
+  textCmdCooldown = 60,
+  srcGameSlug = 'alttp';
 
 // Import modules
 var request = require('request'),
+  trequest = require('then-request'),
   irc = require('irc'),
   fs = require('fs'),
   path = require('path'),
@@ -29,7 +30,8 @@ var tokenFilePath = path.join(__dirname, 'discord_token'),
   twitchClientIdPath = path.join(__dirname, 'twitch_client_id'),
   twitchStreamsPath = path.join(__dirname, 'twitch_streams'),
   livestreamsPath = path.join(__dirname, 'livestreams'),
-  cooldownsPath = path.join(__dirname, 'cooldowns');
+  cooldownsPath = path.join(__dirname, 'cooldowns'),
+  srcCategoriesPath = path.join(__dirname, 'src_categories');
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 // Should be placed in discord_token file for security purposes
@@ -52,9 +54,23 @@ fs.readFile(textCommandsFilePath, function (err, data) {
 var twitchClientId = fs.readFileSync(twitchClientIdPath, 'utf-8');
 
 // Read in list of Twitch streams
-var twitchChannels;
-fs.readFile(twitchStreamsPath, function (err, data) {
-  twitchChannels = data.toString().split('\r\n');
+var twitchChannels = fs.readFileSync(twitchStreamsPath, 'utf-8');
+twitchChannels = twitchChannels.toString().split('\r\n');
+
+// Read in current category info on SRC (run src.js to refresh)
+var indexedCategories = {};
+var srcCategories = fs.readFileSync(srcCategoriesPath, 'utf-8');
+srcCategories = srcCategories.toString().split('|||||');
+srcCategories.forEach(function(category, index) {
+  if (category)
+  {
+    category = JSON.parse(category);
+    if (/no/i.test(category.name)) {
+      indexedCategories.nmg = category;
+    } else {
+      indexedCategories.mg = category;
+    }
+  }
 });
 
 // Set up Discord client
@@ -182,7 +198,6 @@ client.on('ready', () => {
 // Create an event listener for messages
 client.on('message', message => {
 
-
   // Allow members to request role additions/removals for allowed roles
   if (message.content.startsWith('!addrole') || message.content.startsWith('!removerole'))
   {
@@ -244,8 +259,57 @@ client.on('message', message => {
     }
   }
 
+  // SRC API Integration (leaderboard lookup)
+  else if (message.content.startsWith('!wr'))
+  {
+    var parsed = message.content.match(/\!wr\s(nmg|mg)\s(.+)/);
+    var mainCat = parsed[1].toLowerCase();
+    var subCatName = parsed[2].toLowerCase();
+
+    // look up ID for this category in local cache
+    var subCategory = indexedCategories[mainCat].subcategories.find(function(subcategory) {
+      return subcategory.name.toLowerCase().startsWith(subCatName);
+    });
+
+    var subCatVarName = 'var-'+subCategory.varId;
+    var query = {
+        top: 1,
+        embed: 'players'
+    };
+    query[subCatVarName] = subCategory.id;
+
+    trequest(
+      'GET',
+      'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + indexedCategories[mainCat].id,
+      {
+        qs: query,
+        headers: {'User-Agent': 'alttp-bot/1.0'}
+      }
+    ).done(function(res) {
+      var data = JSON.parse(res.getBody());
+      if (data && data.data && data.data.runs)
+      {
+        var run = data.data.runs[0].run;
+        var runner = data.data.players.data[0].names.international;
+        var runtime = run.times.primary_t;
+        var response = 'The current world record for *' + indexedCategories[mainCat].name + ' | ' + subCategory.name
+                    + '* is held by **' + runner + '** with a time of ' + runtime.toString().toHHMMSS() + '.'
+                    + ' ' + run.weblink;
+        message.channel.send(response);
+      }
+    });
+  }
+  else if (message.content.startsWith('!rules'))
+  {
+
+  }
+  else if (message.content.startsWith('!time'))
+  {
+
+  }
+
   // Search for matching text command if message starts with !
-  if (message.content.startsWith('!'))
+  else if (message.content.startsWith('!'))
   {
     if (textCommands.hasOwnProperty(message.content))
     {
@@ -288,3 +352,15 @@ client.on('message', message => {
 
 // Log our bot in
 client.login(token);
+
+String.prototype.toHHMMSS = function () {
+  var sec_num = parseInt(this, 10); // don't forget the second param
+  var hours   = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = "0"+hours;}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (seconds < 10) {seconds = "0"+seconds;}
+  return hours+':'+minutes+':'+seconds;
+}
