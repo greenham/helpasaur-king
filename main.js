@@ -263,6 +263,10 @@ client.on('message', message => {
   else if (message.content.startsWith('!wr'))
   {
     var parsed = message.content.match(/\!wr\s(nmg|mg)\s(.+)/);
+    if (!parsed || parsed[1] === undefined || parsed[2] === undefined) {
+      message.channel.send("Not a valid category.");
+      return;
+    }
     var mainCat = parsed[1].toLowerCase();
     var subCatName = parsed[2].toLowerCase();
 
@@ -270,6 +274,11 @@ client.on('message', message => {
     var subCategory = indexedCategories[mainCat].subcategories.find(function(subcategory) {
       return subcategory.name.toLowerCase().startsWith(subCatName);
     });
+
+    if (!subCategory) {
+      message.channel.send("Not valid sub-category name!");
+      return;
+    }
 
     var subCatVarName = 'var-'+subCategory.varId;
     var query = {
