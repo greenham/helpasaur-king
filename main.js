@@ -7,19 +7,21 @@
 // Settings
 var botName = 'ACMLMv2.0',
   alertsChannelName = 'alttp-alerts',
+  alertOnConnect = false,
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
+  twitchUpdateIntervalSeconds = 60,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
   srlIrcServer = 'irc.speedrunslive.com',
   srlUsername = 'alttpracewatcher',
-  allowedRolesForRequest = /nmg\-race|100\-race|test\-role/,
+  allowedRolesForRequest = /nmg\-race|100\-race/,
   textCmdCooldown = 60,
+  srcCmdCooldown = 60,
   srcGameSlug = 'alttp',
   srcUserAgent = 'alttp-bot/1.0';
 
 // Import modules
 var request = require('request'),
-  trequest = require('then-request'),
   irc = require('irc'),
   fs = require('fs'),
   path = require('path'),
@@ -28,11 +30,11 @@ var request = require('request'),
 // File paths for config/keys
 var tokenFilePath = path.join(__dirname, 'discord_token'),
   textCommandsFilePath = path.join(__dirname, 'text_commands'),
-  twitchClientIdPath = path.join(__dirname, 'twitch_client_id'),
-  twitchStreamsPath = path.join(__dirname, 'twitch_streams'),
-  livestreamsPath = path.join(__dirname, 'livestreams'),
-  cooldownsPath = path.join(__dirname, 'cooldowns'),
-  srcCategoriesPath = path.join(__dirname, 'src_categories');
+  twitchClientIdFilePath = path.join(__dirname, 'twitch_client_id'),
+  twitchStreamsFilePath = path.join(__dirname, 'twitch_streams'),
+  livestreamsFilePath = path.join(__dirname, 'livestreams'),
+  cooldownsFilePath = path.join(__dirname, 'cooldowns'),
+  srcCategoriesFilePath = path.join(__dirname, 'src_categories');
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 // Should be placed in discord_token file for security purposes
@@ -52,151 +54,34 @@ fs.readFile(textCommandsFilePath, function (err, data) {
 });
 
 // Read in Twitch client ID for use with API
-var twitchClientId = fs.readFileSync(twitchClientIdPath, 'utf-8');
+var twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8');
 
 // Read in list of Twitch streams
-var twitchChannels = fs.readFileSync(twitchStreamsPath, 'utf-8');
-twitchChannels = twitchChannels.toString().split('\r\n');
+var twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8');
+twitchChannels = twitchChannels.toString().split('\n');
 
 // Read in current category info on SRC (run src.js to refresh)
-var indexedCategories = {};
-var srcCategories = fs.readFileSync(srcCategoriesPath, 'utf-8');
-srcCategories = srcCategories.toString().split('|||||');
-srcCategories.forEach(function(category, index) {
-  if (category)
-  {
-    category = JSON.parse(category);
-    if (/no/i.test(category.name)) {
-      indexedCategories.nmg = category;
-    } else {
-      indexedCategories.mg = category;
-    }
-  }
-});
+var indexedCategories = readSrcCategories(srcCategoriesFilePath);
 
 // Set up Discord client
 const client = new Discord.Client();
+var alertsChannel;
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
 client.on('ready', () => {
   console.log(botName + ' Online');
 
-  // Find the channel where we'll be posting alerts
-  var alertsChannel = client.channels.find('name', alertsChannelName);
-  //alertsChannel.send(botName + ' has connected. :white_check_mark:');
+  // Find the text channel where we'll be posting alerts
+  alertsChannel = client.channels.find('name', alertsChannelName);
+  if (alertOnConnect === true) alertsChannel.send(botName + ' has connected. :white_check_mark:');
 
-  // Watch for streams going live
-  updateStreams();
-  setInterval(updateStreams, 60000);
-
-  // Watch for SRL races
-  watchForSRLRaces(srlGameName);
-
-  function updateStreams()
-  {
-    findLiveStreams(handleStreamResults);
-  }
-
-  // Connect to Twitch to pull a list of currently live streams for ALttP
-  // Attempt to automatically filter out non-speedrun streams
-  function findLiveStreams(cb)
-  {
-    var searchReq = {
-      url: 'https://api.twitch.tv/kraken/streams?limit=100&game='+encodeURIComponent(twitchGameName)+'&channel='+encodeURIComponent(twitchChannels.join()),
-      headers: {
-        'Client-ID': twitchClientId
-      }
-    };
-    var searchHandler = function (error, response, body) {
-      if (!error && response.statusCode == 200)
-      {
-        var info = JSON.parse(body);
-        if (info._total > 0)
-        {
-          //console.log("Found " + info._total + " live streams -- filtering...");
-          var filteredStreams = info.streams.filter(function (item) {
-            return !(twitchStatusFilters.test(item.channel.status));
-          });
-          //console.log("Found " + filteredStreams.length + " live streams after filtering.");
-          cb(filteredStreams);
-        }
-      } else {
-        console.log('Error finding live twitch streams: ', error); // Print the error if one occurred
-        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-        cb(false);
-      }
-    }
-    //console.log("Searching Twitch for live streams of " + twitchGameName);
-    request(searchReq, searchHandler);
-  }
-
-  function handleStreamResults(streams)
-  {
-    if (streams === false) {
-      return console.log("No livestreams found.");
-    }
-
-    // Read the list of currently live streams we've already alerted about
-    fs.readFile(livestreamsPath, function(err, data) {
-      if (err || !data) data = {};
-      var oldLiveStreams = JSON.parse(data);
-      var newLiveStreams = {};
-
-      streams.forEach(function(stream) {
-        // Only send an alert message if this stream was not already live
-        if (!oldLiveStreams.hasOwnProperty(stream._id)) {
-          alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
-        } else {
-          // Stream was already online, check for title change
-          if (oldLiveStreams[stream._id] !== stream.channel.status) {
-            alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
-          }
-        }
-        // @todo eventually just store the whole object so we can output whatever properties we want later
-        newLiveStreams[stream._id] = stream.channel.status;
-      });
-
-      // Store the new list of live streams to a separate file so when the bot restarts it doesn't spam the channel
-      fs.writeFile(livestreamsPath, JSON.stringify(newLiveStreams), function(err) {
-        if (err) {
-          return console.log(err);
-        }
-      });
-    });
-  }
-
-  // Connect via IRC to SRL and watch for races
-  function watchForSRLRaces(gameName)
-  {
-    var client = new irc.Client(srlIrcServer, srlUsername, {
-      channels: ['#speedrunslive'],
-    });
-    client.addListener('message#speedrunslive', function (from, message) {
-      if (from === 'RaceBot')
-      {
-        var raceChannel = message.match(/srl\-([a-z0-9]{5})/),
-          srlUrl;
-        if (raceChannel) {
-          srlUrl = 'http://www.speedrunslive.com/race/?id='+raceChannel[1];
-        }
-        var goal = message.match(/\-\s(.+)\s\|/);
-
-        if (message.startsWith('Race initiated for ' + gameName + '. Join')) {
-          alertsChannel.send('**SRL Race Started** :: *#' + raceChannel[0] + '* :: A race was just started for ' + gameName + '! | ' + srlUrl);
-        } else if (message.startsWith('Goal Set: ' + gameName + ' - ')) {
-          alertsChannel.send('**SRL Race Goal Set** :: *#' + raceChannel[0] + '* ::  __' + goal[1] + '__ | ' + srlUrl);
-        } else if (message.startsWith('Race finished: ' + gameName + ' - ')) {
-          alertsChannel.send('**SRL Race Finished** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
-        } else if (message.startsWith('Rematch initiated: ' + gameName + ' - ')) {
-          alertsChannel.send('**SRL Rematch** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
-        }
-      }
-    });
-  }
+  // Watch allthethings
+  watchForTwitchStreams();
+  watchForSrlRaces();
 });
 
-// Create an event listener for messages
+// Listen for commands (!)
 client.on('message', message => {
 
   // Allow members to request role additions/removals for allowed roles
@@ -260,7 +145,8 @@ client.on('message', message => {
     }
   }
 
-  // SRC API Integration (leaderboard lookup)
+  // Speedrun.com API Integration (leaderboard lookups)
+  // @todo cooldowns
   else if (message.content.startsWith('!wr'))
   {
     if (message.content === '!wr') {
@@ -329,14 +215,47 @@ client.on('message', message => {
   }
   else if (message.content.startsWith('!time'))
   {
+    /*if (message.content === '!time') {
+      return message.member.createDM()
+        .then(channel => {
+          channel.send('Useage: !time {username} {nmg/mg} {subcategory-code}')
+        })
+        .catch(console.log);
+    }
 
+    var commandParts = message.content.split('\s');
+    if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined)
+    {
+      return message.member.createDM()
+        .then(channel => {
+          channel.send('Useage: !time {username} {nmg/mg} {subcategory-code}')
+        })
+        .catch(console.log);
+    }
+
+    // look up info for this sub-category in local cache
+    var category = indexedCategories[commandParts[2]];
+    var subcategory = category.subcategories.find(function(s) {
+      return s.code === commandParts[3];
+    });
+
+    if (!subcategory) {
+      return message.member.createDM()
+        .then(channel => {
+          channel.send("Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes")
+        })
+        .catch(console.log);
+    }*/
+
+    // look up user on SRC, pull in PB's / games
+    //
   }
   else if (message.content.startsWith('!rules'))
   {
 
   }
 
-  // Search for matching text command if message starts with !
+  // Basic text commands
   else if (message.content.startsWith('!'))
   {
     if (textCommands.hasOwnProperty(message.content))
@@ -378,9 +297,10 @@ client.on('message', message => {
   }
 });
 
-// Log our bot in
+// Log the bot in
 client.login(token);
 
+// Converts seconds to human-readable time
 String.prototype.toHHMMSS = function () {
   var sec_num = parseInt(this, 10); // don't forget the second param
   var hours   = Math.floor(sec_num / 3600);
@@ -393,11 +313,129 @@ String.prototype.toHHMMSS = function () {
   return hours+':'+minutes+':'+seconds;
 }
 
-var parseSrcCategory = function(text, callback) {
+function watchForTwitchStreams()
+{
+  findLiveStreams(handleStreamResults);
+  setTimeout(watchForTwitchStreams, twitchUpdateIntervalSeconds*1000);
+}
+
+// Connect to Twitch to pull a list of currently live speedrun streams for ALttP
+function findLiveStreams(callback)
+{
+  var search = {
+    url: 'https://api.twitch.tv/kraken/streams?limit=100&game='+encodeURIComponent(twitchGameName)+'&channel='+encodeURIComponent(twitchChannels.join()),
+    headers: {'Client-ID': twitchClientId}
+  };
+
+  request(search, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var info = JSON.parse(body);
+      if (info._total > 0) {
+        // Attempt to automatically filter out non-speedrun streams by title
+        var filteredStreams = info.streams.filter(function (item) {
+          return !(twitchStatusFilters.test(item.channel.status));
+        });
+        callback(null, filteredStreams);
+      }
+    } else {
+      console.log('Error finding live twitch streams: ', error); // Print the error if one occurred
+      console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+      callback(error);
+    }
+  });
+}
+
+function handleStreamResults(err, streams)
+{
+  if (err || !streams) return;
+
+  // Read the list of currently live streams we've already alerted about
+  fs.readFile(livestreamsFilePath, function(err, data) {
+    if (err || !data) data = {};
+    var oldLiveStreams = JSON.parse(data);
+    var newLiveStreams = {};
+
+    streams.forEach(function(stream) {
+      // Only send an alert message if this stream was not already live
+      if (!oldLiveStreams.hasOwnProperty(stream._id)) {
+        alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+      } else {
+        // Stream was already online, check for title change
+        if (oldLiveStreams[stream._id] !== stream.channel.status) {
+          alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+        }
+      }
+      // @todo eventually just store the whole object so we can check/output whatever properties we want later
+      newLiveStreams[stream._id] = stream.channel.status;
+    });
+
+    // Store the new list of live streams to a separate file so when the bot restarts it doesn't spam the channel
+    fs.writeFile(livestreamsFilePath, JSON.stringify(newLiveStreams), function(err) {
+      if (err) {
+        return console.log(err);
+      }
+    });
+  });
+}
+
+// Connect via IRC to SRL and watch for races
+function watchForSrlRaces()
+{
+  // Connect to SRL IRC server
+  var client = new irc.Client(srlIrcServer, srlUsername, {
+    channels: ['#speedrunslive'],
+  });
+
+  // Listen for messages from RaceBot in the main channel
+  client.addListener('message#speedrunslive', function (from, message) {
+    if (from === 'RaceBot') {
+      var raceChannel = message.match(/srl\-([a-z0-9]{5})/),
+        srlUrl;
+      if (raceChannel) {
+        srlUrl = 'http://www.speedrunslive.com/race/?id='+raceChannel[1];
+      }
+      var goal = message.match(/\-\s(.+)\s\|/);
+
+      if (message.startsWith('Race initiated for ' + srlGameName + '. Join')) {
+        alertsChannel.send('**SRL Race Started** :: *#' + raceChannel[0] + '* :: A race was just started for ' + srlGameName + '! | ' + srlUrl);
+      } else if (message.startsWith('Goal Set: ' + srlGameName + ' - ')) {
+        alertsChannel.send('**SRL Race Goal Set** :: *#' + raceChannel[0] + '* ::  __' + goal[1] + '__ | ' + srlUrl);
+      } else if (message.startsWith('Race finished: ' + srlGameName + ' - ')) {
+        alertsChannel.send('**SRL Race Finished** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
+      } else if (message.startsWith('Rematch initiated: ' + srlGameName + ' - ')) {
+        alertsChannel.send('**SRL Rematch** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
+      }
+    }
+  });
+}
+
+function readSrcCategories(filePath)
+{
+  var categories = {};
+  var srcCategories = fs.readFileSync(filePath, 'utf-8');
+  srcCategories = srcCategories.toString().split('|||||');
+
+  // Re-index subcategories by their main category
+  srcCategories.forEach(function(category, index) {
+    if (category) {
+      category = JSON.parse(category);
+      if (/no/i.test(category.name)) {
+        categories.nmg = category;
+      } else {
+        categories.mg = category;
+      }
+    }
+  });
+
+  return categories;
+}
+
+function parseSrcCategory(text, callback)
+{
   var parsed = text.match(/\s(nmg|mg)\s(.+)/);
   if (!parsed || parsed[1] === undefined || parsed[2] === undefined || !parsed[1] || !parsed[2]) {
     return callback("Not a valid category.");
   }
 
   callback(null, {main: parsed[1].toLowerCase(), sub: parsed[2].toLowerCase()});
-};
+}
