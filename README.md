@@ -11,5 +11,3 @@
 `!addrole {name of role}`
 `!removerole {name of role}`
 `!wr {nmg/mg} {category}`
-`!rules {nmg/mg} {category}`
-`!time {username} {nmg/mg} {category}`

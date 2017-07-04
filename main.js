@@ -6,7 +6,7 @@
 
 // Settings
 var botName = 'ACMLMv2.0',
-  alertsChannelName = 'alttp-bot-testing',
+  alertsChannelName = 'alttp-alerts',
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
