@@ -8,9 +8,9 @@
 
 # Other Commands
 
-`!addrole {name of role}`
-`!removerole {name of role}`
-`!wr {nmg/mg} {category-code}`
+- `!addrole {name of role}`
+- `!removerole {name of role}`
+- `!wr {nmg/mg} {category-code}`
 
 # Category Codes
 

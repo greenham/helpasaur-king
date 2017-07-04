@@ -14,7 +14,8 @@ var botName = 'ACMLMv2.0',
   srlUsername = 'alttpracewatcher',
   allowedRolesForRequest = /nmg\-race|100\-race|test\-role/,
   textCmdCooldown = 60,
-  srcGameSlug = 'alttp';
+  srcGameSlug = 'alttp',
+  srcUserAgent = 'alttp-bot/1.0';
 
 // Import modules
 var request = require('request'),
@@ -262,50 +263,68 @@ client.on('message', message => {
   // SRC API Integration (leaderboard lookup)
   else if (message.content.startsWith('!wr'))
   {
-    var parsed = message.content.match(/\!wr\s(nmg|mg)\s(.+)/);
-    if (!parsed || parsed[1] === undefined || parsed[2] === undefined) {
-      message.channel.send("Not a valid category.");
-      return;
-    }
-    var mainCat = parsed[1].toLowerCase();
-    var subCatCode = parsed[2].toLowerCase();
-
-    // look up info for this sub-category in local cache
-    var subCategory = indexedCategories[mainCat].subcategories.find(function(subcategory) {
-      return subcategory.code === subCatCode;
-    });
-
-    if (!subCategory) {
-      message.channel.send("Not valid sub-category name!");
-      return;
+    if (message.content === '!wr') {
+      return message.member.createDM()
+        .then(channel => {
+          channel.send('Useage: !wr {nmg/mg} {subcategory-code}')
+        })
+        .catch(console.log);
     }
 
-    var subCatVarName = 'var-'+subCategory.varId;
-    var query = {
-        top: 1,
-        embed: 'players'
-    };
-    query[subCatVarName] = subCategory.id;
+    parseSrcCategory(message.content, function(err, res) {
+      if (err) {
+        return message.member.createDM()
+          .then(channel => {
+            channel.send(err)
+          })
+          .catch(console.log);
+      }
 
-    trequest(
-      'GET',
-      'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + indexedCategories[mainCat].id,
-      {
-        qs: query,
-        headers: {'User-Agent': 'alttp-bot/1.0'}
+      // look up info for this sub-category in local cache
+      var category = indexedCategories[res.main];
+      var subcategory = category.subcategories.find(function(s) {
+        return s.code === res.sub;
+      });
+
+      if (!subcategory) {
+        return message.member.createDM()
+          .then(channel => {
+            channel.send("Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes")
+          })
+          .catch(console.log);
       }
-    ).done(function(res) {
-      var data = JSON.parse(res.getBody());
-      if (data && data.data && data.data.runs)
+
+      var wrSearchReq = {
+        url: 'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + category.id + '?top=1&embed=players&var-'+subcategory.varId+'='+subcategory.id,
+        headers: {'User-Agent': srcUserAgent}
+      };
+
+      request(wrSearchReq, function(error, response, body)
       {
-        var run = data.data.runs[0].run;
-        var runner = data.data.players.data[0].names.international;
-        var runtime = run.times.primary_t;
-        var response = 'The current world record for *' + indexedCategories[mainCat].name + ' | ' + subCategory.name
-                    + '* is held by **' + runner + '** with a time of ' + runtime.toString().toHHMMSS() + '.'
-                    + ' ' + run.weblink;
-        message.channel.send(response);
-      }
+        if (!error && response.statusCode == 200)
+        {
+          var data = JSON.parse(body);
+          if (data && data.data && data.data.runs)
+          {
+            var run = data.data.runs[0].run;
+            var runner = data.data.players.data[0].names.international;
+            var runtime = run.times.primary_t;
+            var response = 'The current world record for *' + category.name + ' | ' + subcategory.name
+                        + '* is held by **' + runner + '** with a time of ' + runtime.toString().toHHMMSS() + '.'
+                        + ' ' + run.weblink;
+            message.channel.send(response);
+          }
+          else
+          {
+            console.log('Unexpected response received from SRC: ' + data);
+          }
+        }
+        else
+        {
+          console.log('Error while calling SRC API: ', error); // Print the error if one occurred
+          console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+        }
+      });
     });
   }
   else if (message.content.startsWith('!time'))
@@ -373,3 +392,12 @@ String.prototype.toHHMMSS = function () {
   if (seconds < 10) {seconds = "0"+seconds;}
   return hours+':'+minutes+':'+seconds;
 }
+
+var parseSrcCategory = function(text, callback) {
+  var parsed = text.match(/\s(nmg|mg)\s(.+)/);
+  if (!parsed || parsed[1] === undefined || parsed[2] === undefined || !parsed[1] || !parsed[2]) {
+    return callback("Not a valid category.");
+  }
+
+  callback(null, {main: parsed[1].toLowerCase(), sub: parsed[2].toLowerCase()});
+};
