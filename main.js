@@ -268,11 +268,11 @@ client.on('message', message => {
       return;
     }
     var mainCat = parsed[1].toLowerCase();
-    var subCatName = parsed[2].toLowerCase();
+    var subCatCode = parsed[2].toLowerCase();
 
-    // look up ID for this category in local cache
+    // look up info for this sub-category in local cache
     var subCategory = indexedCategories[mainCat].subcategories.find(function(subcategory) {
-      return subcategory.name.toLowerCase().startsWith(subCatName);
+      return subcategory.code === subCatCode;
     });
 
     if (!subCategory) {
@@ -308,11 +308,11 @@ client.on('message', message => {
       }
     });
   }
-  else if (message.content.startsWith('!rules'))
+  else if (message.content.startsWith('!time'))
   {
 
   }
-  else if (message.content.startsWith('!time'))
+  else if (message.content.startsWith('!rules'))
   {
 
   }

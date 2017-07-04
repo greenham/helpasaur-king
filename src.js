@@ -3,6 +3,18 @@ var request = require('then-request'),
   fs = require('fs'),
   path = require('path');
 
+var categoryNameMap = {
+  "Any%": "any",
+  "100%": "100",
+  "Master Sword": "ms",
+  "Mirror Shield": "mrs",
+  "Any% (No EG/DG/WW)": "anyno",
+  "Reverse Boss Order": "rbo",
+  "Defeat Ganon": "dg",
+  "All Dungeons (No EG)": "ad",
+  "All Dungeons (Swordless)": "swordless"
+};
+
 var srcCategoriesPath = path.join(__dirname, 'src_categories');
 fs.writeFileSync(srcCategoriesPath, '');
 
@@ -47,6 +59,7 @@ var populateSubCategoryInfo = function(category, callback)
             subcategories.push({
               id: subcatId,
               name: subcat.label,
+              code: categoryNameMap[subcat.label],
               varId: item.id
               //rules: subcat.rules
             });

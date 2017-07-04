@@ -10,4 +10,22 @@
 
 `!addrole {name of role}`
 `!removerole {name of role}`
-`!wr {nmg/mg} {category}`
+`!wr {nmg/mg} {category-code}`
+
+# Category Codes
+
+## No Major Glitches (nmg)
+
+- Any% -> any
+- 100% -> 100
+- Master Sword -> ms
+- Mirror Shield -> mrs
+
+## Major Glitches (mg)
+
+- Any% (No EG/DG/WW) -> anyno
+- Reverse Boss Order -> rbo
+- Defeat Ganon -> dg
+- All Dungeons (No EG) -> ad
+- All Dungeons (Swordless) -> swordless
+- Any% -> any
