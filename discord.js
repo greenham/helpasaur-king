@@ -6,11 +6,12 @@
 
 // Settings
 var botName = 'ACMLMv2.0',
-  alertsChannelName = 'alttp-alerts',
+  alertsChannelName = 'alttp-bot-testing',
   alertOnConnect = false,
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
   twitchUpdateIntervalSeconds = 60,
+  twitchOfflineToleranceSeconds = 600,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
   srlIrcServer = 'irc.speedrunslive.com',
   srlUsername = 'alttpracewatcher',
@@ -28,20 +29,20 @@ var request = require('request'),
   Discord = require('discord.js');
 
 // File paths for config/keys
-var tokenFilePath = path.join(__dirname, 'discord_token'),
-  textCommandsFilePath = path.join(__dirname, 'text_commands'),
-  twitchClientIdFilePath = path.join(__dirname, 'twitch_client_id'),
-  twitchStreamsFilePath = path.join(__dirname, 'twitch_streams'),
-  livestreamsFilePath = path.join(__dirname, 'livestreams'),
-  cooldownsFilePath = path.join(__dirname, 'cooldowns'),
-  srcCategoriesFilePath = path.join(__dirname, 'src_categories');
+var tokenFilePath = path.join(__dirname, 'etc', 'discord_token'),
+  textCommandsFilePath = path.join(__dirname, 'etc', 'text_commands'),
+  twitchClientIdFilePath = path.join(__dirname, 'etc', 'twitch_client_id'),
+  twitchStreamsFilePath = path.join(__dirname, 'etc', 'twitch_streams'),
+  livestreamsFilePath = path.join(__dirname, 'etc', 'livestreams'),
+  cooldownsFilePath = path.join(__dirname, 'etc', 'discord_cooldowns'),
+  srcCategoriesFilePath = path.join(__dirname, 'etc', 'src_categories');
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 // Should be placed in discord_token file for security purposes
 // Read token synchronously so we don't try to connect without it
 var token = fs.readFileSync(tokenFilePath, 'utf-8');
 
-// Read in basic text commands / definitions to an array
+// Read in basic text commands / definitions
 var textCommands = {};
 fs.readFile(textCommandsFilePath, function (err, data) {
   if (err) throw err;
@@ -351,23 +352,40 @@ function handleStreamResults(err, streams)
 
   // Read the list of currently live streams we've already alerted about
   fs.readFile(livestreamsFilePath, function(err, data) {
-    if (err || !data) data = {};
+    if (err || !data) data = [];
     var oldLiveStreams = JSON.parse(data);
-    var newLiveStreams = {};
+    var newLiveStreams = [];
 
     streams.forEach(function(stream) {
       // Only send an alert message if this stream was not already live
-      if (!oldLiveStreams.hasOwnProperty(stream._id)) {
+      var currentStream = oldLiveStreams.find(function(s) { return s._id === stream._id});
+      if (currentStream === undefined) {
         alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
       } else {
         // Stream was already online, check for title change
-        if (oldLiveStreams[stream._id] !== stream.channel.status) {
+        if (currentStream.channel.status !== stream.channel.status) {
           alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
         }
       }
-      // @todo eventually just store the whole object so we can check/output whatever properties we want later
-      newLiveStreams[stream._id] = stream.channel.status;
+      newLiveStreams.push(stream);
     });
+
+    // See which streams went offline since last check
+    for (stream in oldLiveStreams) {
+      // This stream is offline if it didn't make it into newLiveStreams
+      var currentStream = newLiveStreams.find(function(s) { return s._id === stream._id});
+      if (currentStream === undefined) {
+        // If this is newly offline, store the time for the event
+        if (stream.offlineAt === undefined) {
+          stream.offlineAt = Date.now();
+        }
+
+        // If the stream has been offline for less than our tolerance, keep it in the list
+        if ((Date.now() - stream.offlineAt) <= (twitchOfflineToleranceSeconds*1000)) {
+          newLiveStreams.push(stream);
+        }
+      }
+    }
 
     // Store the new list of live streams to a separate file so when the bot restarts it doesn't spam the channel
     fs.writeFile(livestreamsFilePath, JSON.stringify(newLiveStreams), function(err) {

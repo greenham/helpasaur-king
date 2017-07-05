@@ -5,13 +5,13 @@ var irc = require('irc'),
 var twitchIrcServer = 'irc.chat.twitch.tv';
 var twitchUsername = 'alttpbot';
 var botName = 'ACMLMv2.0'
-var twitchOauth = fs.readFileSync(path.join(__dirname, 'twitch_oauth'), 'utf-8');
+var twitchOauth = fs.readFileSync(path.join(__dirname, 'etc', 'twitch_oauth'), 'utf-8');
 var textCmdCooldown = 60;
-var cooldownsPath = path.join(__dirname, 'twitch_cooldowns');
+var cooldownsPath = path.join(__dirname, 'etc', 'twitch_cooldowns');
 
 // Read in basic text commands / definitions to an array
 var textCommands = {};
-fs.readFile(path.join(__dirname, 'text_commands'), function (err, data) {
+fs.readFile(path.join(__dirname, 'etc', 'text_commands'), function (err, data) {
   if (err) throw err;
   var commandLines = data.toString().split('\n');
   var commandParts;
