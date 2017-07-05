@@ -6,7 +6,7 @@
 
 // Settings
 var botName = 'ACMLMv2.0',
-  alertsChannelName = 'alttp-bot-testing',
+  alertsChannelName = 'alttp-alerts',
   alertOnConnect = false,
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
@@ -371,21 +371,27 @@ function handleStreamResults(err, streams)
     });
 
     // See which streams went offline since last check
-    for (stream in oldLiveStreams) {
+    oldLiveStreams.forEach(function(stream) {
       // This stream is offline if it didn't make it into newLiveStreams
       var currentStream = newLiveStreams.find(function(s) { return s._id === stream._id});
       if (currentStream === undefined) {
         // If this is newly offline, store the time for the event
         if (stream.offlineAt === undefined) {
           stream.offlineAt = Date.now();
+          console.log(stream.channel.display_name + ' went offline at ' + stream.offlineAt);
         }
 
         // If the stream has been offline for less than our tolerance, keep it in the list
-        if ((Date.now() - stream.offlineAt) <= (twitchOfflineToleranceSeconds*1000)) {
+        var offlineFor = (Date.now() - stream.offlineAt) / 1000;
+        console.log(stream.channel.display_name + ' has been offline for ' + offlineFor + 's');
+        if (offlineFor <= twitchOfflineToleranceSeconds) {
           newLiveStreams.push(stream);
+          console.log('keeping in livestreams');
+        } else {
+          console.log('removing from livestreams');
         }
       }
-    }
+    });
 
     // Store the new list of live streams to a separate file so when the bot restarts it doesn't spam the channel
     fs.writeFile(livestreamsFilePath, JSON.stringify(newLiveStreams), function(err) {
