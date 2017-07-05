@@ -263,7 +263,7 @@ client.on('message', message => {
     {
       // Make sure this command isn't on cooldown
       var onCooldown = false;
-      fs.readFile(cooldownsPath, function(err, data) {
+      fs.readFile(cooldownsFilePath, function(err, data) {
         if (err || !data) data = {};
 
         var cooldowns = JSON.parse(data);
@@ -288,7 +288,7 @@ client.on('message', message => {
         }
 
         // write cooldowns back to file
-        fs.writeFile(cooldownsPath, JSON.stringify(cooldowns), function(err) {
+        fs.writeFile(cooldownsFilePath, JSON.stringify(cooldowns), function(err) {
           if (err) {
             return console.log(err);
           }
