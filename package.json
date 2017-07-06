@@ -6,6 +6,8 @@
   "dependencies": {
     "discord.js": "^11.1.0",
     "irc": "^0.5.2",
+    "md5": "^2.2.1",
+    "memcache": "^0.3.0",
     "node-opus": "^0.2.6",
     "request": "^2.81.0",
     "then-request": "^3.1.0"

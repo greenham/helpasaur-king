@@ -26,7 +26,7 @@ var client = new irc.Client(twitchIrcServer, twitchUsername, {
   password: twitchOauth,
   autoRejoin: true,
   retryCount: 10,
-  channels: ['#greenham83', '#screevo']
+  channels: ['#greenham83', '#screevo', '#timmon_']
 });
 
 client.addListener('error', function(message) {

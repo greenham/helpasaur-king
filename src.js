@@ -6,6 +6,7 @@ var request = require('then-request'),
 var categoryNameMap = {
   "Any%": "any",
   "100%": "100",
+  "Low%": "low",
   "Master Sword": "ms",
   "Mirror Shield": "mrs",
   "Any% (No EG/DG/WW)": "anyno",

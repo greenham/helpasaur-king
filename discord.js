@@ -2,6 +2,8 @@
   ALttP Discord Bot
     General TODOs
       - Move this to a server
+      - Allow users with alttp-bot-editor to add/edit commands
+      - Extract basic functionality to a separate module that both discord/twitch can utilize
 */
 
 // Settings
@@ -26,6 +28,8 @@ var request = require('request'),
   irc = require('irc'),
   fs = require('fs'),
   path = require('path'),
+  memcache = require('memcache'),
+  md5 = require('md5'),
   Discord = require('discord.js');
 
 // File paths for config/keys
@@ -68,19 +72,26 @@ var indexedCategories = readSrcCategories(srcCategoriesFilePath);
 const client = new Discord.Client();
 var alertsChannel;
 
-// The ready event is vital, it means that your bot will only start reacting to information
-// from Discord _after_ ready is emitted
-client.on('ready', () => {
-  console.log(botName + ' Online');
+// Connect to cache
+var cache = new memcache.Client();
+cache.on('connect', () => {
+  // The ready event is vital, it means that your bot will only start reacting to information
+  // from Discord _after_ ready is emitted
+  client.on('ready', () => {
+    console.log(botName + ' Online');
 
-  // Find the text channel where we'll be posting alerts
-  alertsChannel = client.channels.find('name', alertsChannelName);
-  if (alertOnConnect === true) alertsChannel.send(botName + ' has connected. :white_check_mark:');
+    // Find the text channel where we'll be posting alerts
+    alertsChannel = client.channels.find('name', alertsChannelName);
+    if (alertOnConnect === true) alertsChannel.send(botName + ' has connected. :white_check_mark:');
 
-  // Watch allthethings
-  watchForTwitchStreams();
-  watchForSrlRaces();
+    // Watch allthethings
+    watchForTwitchStreams();
+    watchForSrlRaces();
+  });
+}).on('error', function(e) {
+  console.log(e);
 });
+cache.connect();
 
 // Listen for commands (!)
 client.on('message', message => {
@@ -147,9 +158,10 @@ client.on('message', message => {
   }
 
   // Speedrun.com API Integration (leaderboard lookups)
-  // @todo cooldowns
+  // @todo cooldowns & caching
   else if (message.content.startsWith('!wr'))
   {
+    message.content = message.content.toLowerCase();
     if (message.content === '!wr') {
       return message.member.createDM()
         .then(channel => {
@@ -168,6 +180,7 @@ client.on('message', message => {
       }
 
       // look up info for this sub-category in local cache
+      // @todo move to its own function, multiple cases use this
       var category = indexedCategories[res.main];
       var subcategory = category.subcategories.find(function(s) {
         return s.code === res.sub;
@@ -214,22 +227,23 @@ client.on('message', message => {
       });
     });
   }
-  else if (message.content.startsWith('!time'))
+  else if (message.content.startsWith('!pb'))
   {
-    /*if (message.content === '!time') {
+    message.content = message.content.toLowerCase();
+    if (message.content === '!pb') {
       return message.member.createDM()
         .then(channel => {
-          channel.send('Useage: !time {username} {nmg/mg} {subcategory-code}')
+          channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
         })
         .catch(console.log);
     }
 
-    var commandParts = message.content.split('\s');
-    if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined)
+    var commandParts = message.content.split(' ');
+    if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined || (commandParts[2] != 'nmg' && commandParts[2] != 'mg'))
     {
       return message.member.createDM()
         .then(channel => {
-          channel.send('Useage: !time {username} {nmg/mg} {subcategory-code}')
+          channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
         })
         .catch(console.log);
     }
@@ -246,10 +260,52 @@ client.on('message', message => {
           channel.send("Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes")
         })
         .catch(console.log);
-    }*/
+    }
 
-    // look up user on SRC, pull in PB's / games
-    //
+    // look up user on SRC, pull in PB's
+    var userSearchReq = {
+      url: 'http://www.speedrun.com/api/v1/users/'+encodeURIComponent(commandParts[1])+'/personal-bests?embed=players',
+      headers: {'User-Agent': srcUserAgent}
+    };
+
+    // check for cache of this request
+    var cacheKey = md5(JSON.stringify(userSearchReq));
+    cache.get(cacheKey, function(err, res) {
+      if (err) console.log(err);
+      if (!err && res !== null)
+      {
+        // cache hit
+        response = findSrcRun(JSON.parse(res), category, subcategory);
+        if (response) {
+          message.channel.send(response);
+        }
+      }
+      else
+      {
+        request(userSearchReq, function(error, response, body)
+        {
+          if (!error && response.statusCode == 200)
+          {
+            var data = JSON.parse(body);
+
+            // add response to cache
+            cache.set(cacheKey, JSON.stringify(data), function(err, res) {
+              if (err) console.log(err);
+            }, 3600);
+
+            response = findSrcRun(data, category, subcategory);
+            if (response) {
+              message.channel.send(response);
+            }
+          }
+          else
+          {
+            console.log('Error while calling SRC API: ', error); // Print the error if one occurred
+            console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+          }
+        });
+      }
+    });
   }
   else if (message.content.startsWith('!rules'))
   {
@@ -462,4 +518,36 @@ function parseSrcCategory(text, callback)
   }
 
   callback(null, {main: parsed[1].toLowerCase(), sub: parsed[2].toLowerCase()});
+}
+
+function findSrcRun(data, category, subcategory)
+{
+  if (data && data.data)
+  {
+    // find the run matching this search
+    var run = data.data.find(function(r) {
+      return ((r.run.category === category.id) && (r.run.values[subcategory.varId] === subcategory.id));
+    });
+
+    if (run && run.run)
+    {
+      var runner = run.players.data[0].names.international;
+      var runtime = run.run.times.primary_t;
+      var response = 'The current personal best for **' + runner + '** in *' + category.name + ' | ' + subcategory.name
+                  + '* is **' + runtime.toString().toHHMMSS() + '**. Ranking: ' + run.place
+                  + ' | ' + run.run.weblink;
+      return response;
+    }
+    else
+    {
+      // no PB found in this category for this user
+      return 'No personal best found for this user/category!';
+    }
+  }
+  else
+  {
+    console.log('Unexpected response received from SRC: ' + data);
+  }
+
+  return;
 }

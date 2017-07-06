@@ -13,6 +13,7 @@
 - `!addrole {name of role}`
 - `!removerole {name of role}`
 - `!wr {nmg/mg} {category-code}`
+- `!pb {username} {nmg/mg} {category-code}`
 
 # Category Codes
 
@@ -20,6 +21,7 @@
 
 - Any% -> **any**
 - 100% -> **100**
+- Low% -> **low**
 - Master Sword -> **ms**
 - Mirror Shield -> **mrs**
 
