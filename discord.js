@@ -33,13 +33,14 @@ var request = require('request'),
   Discord = require('discord.js');
 
 // File paths for config/keys
-var tokenFilePath = path.join(__dirname, 'etc', 'discord_token'),
-  textCommandsFilePath = path.join(__dirname, 'etc', 'text_commands'),
-  twitchClientIdFilePath = path.join(__dirname, 'etc', 'twitch_client_id'),
-  twitchStreamsFilePath = path.join(__dirname, 'etc', 'twitch_streams'),
-  livestreamsFilePath = path.join(__dirname, 'etc', 'livestreams'),
-  cooldownsFilePath = path.join(__dirname, 'etc', 'discord_cooldowns'),
-  srcCategoriesFilePath = path.join(__dirname, 'etc', 'src_categories');
+var configPath = path.join(__dirname, 'etc');
+var tokenFilePath = path.join(configPath, 'discord_token'),
+  textCommandsFilePath = path.join(configPath, 'text_commands'),
+  twitchClientIdFilePath = path.join(configPath, 'twitch_client_id'),
+  twitchStreamsFilePath = path.join(configPath, 'twitch_streams'),
+  livestreamsFilePath = path.join(configPath, 'livestreams'),
+  cooldownsFilePath = path.join(configPath, 'discord_cooldowns'),
+  srcCategoriesFilePath = path.join(configPath, 'src_categories');
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 // Should be placed in discord_token file for security purposes
@@ -254,21 +255,20 @@ client.on('message', message => {
     // check for cache of this request
     var cacheKey = md5(JSON.stringify(userSearchReq));
     cache.get(cacheKey, function(err, res) {
-      if (err) console.log(err);
-      if (!err && res !== null)
-      {
+      if (err || !res) {
+        console.log(err);
+        return message.channel.send('No user found matching *' + commandParts[1] + '*.');
+      }
+
+      if (!err && res !== null) {
         // cache hit
         response = findSrcRun(JSON.parse(res), category, subcategory);
         if (response) {
           message.channel.send(response);
         }
-      }
-      else
-      {
-        request(userSearchReq, function(error, response, body)
-        {
-          if (!error && response.statusCode == 200)
-          {
+      } else {
+        request(userSearchReq, function(error, response, body) {
+          if (!error && response.statusCode == 200) {
             var data = JSON.parse(body);
 
             // add response to cache
@@ -280,9 +280,7 @@ client.on('message', message => {
             if (response) {
               message.channel.send(response);
             }
-          }
-          else
-          {
+          } else {
             console.log('Error while calling SRC API: ', error); // Print the error if one occurred
             console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
           }
