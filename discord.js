@@ -4,6 +4,7 @@
       - Move this to a server
       - Allow users with alttp-bot-editor to add/edit commands
       - Extract basic functionality to a separate module that both discord/twitch can utilize
+      - Re-add !funfact?
 */
 
 // Settings
@@ -257,7 +258,6 @@ client.on('message', message => {
     cache.get(cacheKey, function(err, res) {
       if (err || !res) {
         console.log(err);
-        return message.channel.send('No user found matching *' + commandParts[1] + '*.');
       }
 
       if (!err && res !== null) {
@@ -283,6 +283,7 @@ client.on('message', message => {
           } else {
             console.log('Error while calling SRC API: ', error); // Print the error if one occurred
             console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+            return message.channel.send('No user found matching *' + commandParts[1] + '*.');
           }
         });
       }
