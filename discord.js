@@ -46,24 +46,15 @@ var tokenFilePath = path.join(__dirname, 'etc', 'discord_token'),
 // Read token synchronously so we don't try to connect without it
 var token = fs.readFileSync(tokenFilePath, 'utf-8');
 
-// Read in basic text commands / definitions
-var textCommands = {};
-fs.readFile(textCommandsFilePath, function (err, data) {
-  if (err) throw err;
-  var commandLines = data.toString().split('\n');
-  var commandParts;
-  commandLines.forEach(function(line) {
-    commandParts = line.split('|');
-    textCommands[commandParts[0]] = commandParts[1];
-  });
-});
-
 // Read in Twitch client ID for use with API
 var twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8');
 
 // Read in list of Twitch streams
 var twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8');
 twitchChannels = twitchChannels.toString().split('\n');
+
+// Read in basic text commands / definitions
+var textCommands = readTextCommands(textCommandsFilePath);
 
 // Read in current category info on SRC (run src.js to refresh)
 var indexedCategories = readSrcCategories(srcCategoriesFilePath);
@@ -101,18 +92,14 @@ client.on('message', message => {
   {
     // parse+validate role name
     var roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
-    if (!roleName)
-    {
+    if (!roleName) {
       message.member.createDM()
         .then(channel => {
           channel.send("You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
         })
         .catch(console.log);
-    }
-    else
-    {
-      if (allowedRolesForRequest.test(roleName[2]))
-      {
+    } else {
+      if (allowedRolesForRequest.test(roleName[2])) {
         // find the role in the member's guild
         var role = message.guild.roles.find('name', roleName[2]);
 
@@ -121,8 +108,7 @@ client.on('message', message => {
         }
 
         // add/remove the role and DM the user the results
-        if (roleName[1] === 'add')
-        {
+        if (roleName[1] === 'add') {
           message.member.addRole(role)
             .then(requestingMember => {
               requestingMember.createDM()
@@ -132,9 +118,7 @@ client.on('message', message => {
                 .catch(console.log)
             })
             .catch(console.log);
-        }
-        else if (roleName[1] === 'remove')
-        {
+        } else if (roleName[1] === 'remove') {
           message.member.removeRole(role)
             .then(requestingMember => {
               requestingMember.createDM()
@@ -145,9 +129,7 @@ client.on('message', message => {
             })
             .catch(console.log);
         }
-      }
-      else
-      {
+      } else {
         message.member.createDM()
           .then(channel => {
             channel.send(roleName[1] + " is not a valid role name!")
@@ -227,6 +209,7 @@ client.on('message', message => {
       });
     });
   }
+  // @todo cooldowns
   else if (message.content.startsWith('!pb'))
   {
     message.content = message.content.toLowerCase();
@@ -434,17 +417,17 @@ function handleStreamResults(err, streams)
         // If this is newly offline, store the time for the event
         if (stream.offlineAt === undefined) {
           stream.offlineAt = Date.now();
-          console.log(stream.channel.display_name + ' went offline at ' + stream.offlineAt);
+          //console.log(stream.channel.display_name + ' went offline at ' + stream.offlineAt);
         }
 
         // If the stream has been offline for less than our tolerance, keep it in the list
         var offlineFor = (Date.now() - stream.offlineAt) / 1000;
-        console.log(stream.channel.display_name + ' has been offline for ' + offlineFor + 's');
+        //console.log(stream.channel.display_name + ' has been offline for ' + offlineFor + 's');
         if (offlineFor <= twitchOfflineToleranceSeconds) {
           newLiveStreams.push(stream);
-          console.log('keeping in livestreams');
+          //console.log('keeping in livestreams');
         } else {
-          console.log('removing from livestreams');
+          //console.log('removing from livestreams');
         }
       }
     });
@@ -487,6 +470,19 @@ function watchForSrlRaces()
       }
     }
   });
+}
+
+function readTextCommands(filePath)
+{
+  var commands = {};
+  var data = fs.readFileSync(filePath, 'utf-8');
+  var commandLines = data.toString().split('\n');
+  var commandParts;
+  commandLines.forEach(function(line) {
+    commandParts = line.split('|');
+    commands[commandParts[0]] = commandParts[1];
+  });
+  return commands;
 }
 
 function readSrcCategories(filePath)
