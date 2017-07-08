@@ -24,7 +24,6 @@ var textCommands = readTextCommands(path.join(__dirname, 'conf', 'text_commands'
 // Connect to cache
 var cache = new memcache.Client();
 cache.on('connect', () => {
-  console.log('connected to cache');
 }).on('error', function(e) {
   console.log(e);
 });
@@ -39,7 +38,7 @@ var client = new irc.Client(twitchIrcServer, twitchUsername, {
 });
 
 client.addListener('error', function(message) {
-  console.log('error: ', message);
+  console.error('error from Twitch IRC Server: ', message);
 });
 
 client.addListener('message', function (from, to, message) {
@@ -103,5 +102,5 @@ function isOnCooldown(command, cooldownTime, callback)
 // Places a command on cooldown for cooldownTime (in seconds)
 function placeOnCooldown(command, cooldownTime)
 {
-  cache.set(md5(command), Date.now(), console.error, cooldownTime);
+  cache.set(md5(command), Date.now(), function(err, res) {}, cooldownTime);
 }
