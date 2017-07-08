@@ -1,10 +1,10 @@
-/*
-  ALttP Discord Bot
-    General TODOs
-      - Move this to a server
-      - Extract basic functionality to a separate module that both discord/twitch can utilize
-      - Allow users with alttp-bot-editor to add/edit commands
-*/
+/**
+ * ALttP Discord Bot
+ *   General TODOs
+ *     - Move this to a server
+ *     - Extract basic functionality to a separate module that both discord/twitch can utilize
+ *     - Allow users with alttp-bot-editor to add/edit commands
+ */
 
 // Settings
 var botName = 'Helpasaur King',
@@ -33,12 +33,13 @@ var request = require('request'),
   Discord = require('discord.js');
 
 // File paths for config/keys
-var configPath = path.join(__dirname, 'etc');
-var tokenFilePath = path.join(configPath, 'discord_token'),
-  twitchClientIdFilePath = path.join(configPath, 'twitch_client_id'),
-  twitchStreamsFilePath = path.join(configPath, 'twitch_streams'),
-  textCommandsFilePath = path.join(configPath, 'text_commands'),
-  srcCategoriesFilePath = path.join(configPath, 'src_categories');
+var etcPath = path.join(__dirname, 'etc');
+var confPath = path.join(__dirname, 'conf');
+var tokenFilePath = path.join(etcPath, 'discord_token'),
+  twitchClientIdFilePath = path.join(etcPath, 'twitch_client_id'),
+  twitchStreamsFilePath = path.join(confPath, 'twitch_streams'),
+  textCommandsFilePath = path.join(confPath, 'text_commands'),
+  srcCategoriesFilePath = path.join(congPath, 'src_categories');
 
 // Discord token for bot - https://discordapp.com/developers/applications/me
 var token = fs.readFileSync(tokenFilePath, 'utf-8');
