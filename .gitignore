@@ -1,4 +1,4 @@
 node_modules
-etc
 logs
-!.gitkeep
+etc/*
+!etc/README
