@@ -18,7 +18,7 @@ var categoryNameMap = {
   "All Dungeons (Swordless)": "swordless"
 };
 
-var srcCategoriesPath = path.join(__dirname, 'etc', 'src_categories');
+var srcCategoriesPath = path.join(__dirname, 'conf', 'src_categories');
 fs.writeFileSync(srcCategoriesPath, '');
 
 var gameAbbr = 'alttp',
