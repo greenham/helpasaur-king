@@ -1,4 +1,4 @@
 node_modules
 logs
 etc/*
-!etc/README
+!etc/README.md
