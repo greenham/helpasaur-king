@@ -2,13 +2,12 @@
   ALttP Discord Bot
     General TODOs
       - Move this to a server
-      - Allow users with alttp-bot-editor to add/edit commands
       - Extract basic functionality to a separate module that both discord/twitch can utilize
-      - Re-add !funfact?
+      - Allow users with alttp-bot-editor to add/edit commands
 */
 
 // Settings
-var botName = 'ACMLMv2.0',
+var botName = 'Helpasaur King',
   alertsChannelName = 'alttp-alerts',
   alertOnConnect = false,
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
@@ -17,7 +16,7 @@ var botName = 'ACMLMv2.0',
   twitchOfflineToleranceSeconds = 600,
   srlGameName = 'The Legend of Zelda: A Link to the Past',
   srlIrcServer = 'irc.speedrunslive.com',
-  srlUsername = 'alttpracewatcher',
+  srlUsername = 'HelpasaurKing',
   allowedRolesForRequest = /nmg\-race|100\-race/,
   textCmdCooldown = 60,
   srcCmdCooldown = 60,
@@ -36,24 +35,19 @@ var request = require('request'),
 // File paths for config/keys
 var configPath = path.join(__dirname, 'etc');
 var tokenFilePath = path.join(configPath, 'discord_token'),
-  textCommandsFilePath = path.join(configPath, 'text_commands'),
   twitchClientIdFilePath = path.join(configPath, 'twitch_client_id'),
   twitchStreamsFilePath = path.join(configPath, 'twitch_streams'),
-  livestreamsFilePath = path.join(configPath, 'livestreams'),
-  cooldownsFilePath = path.join(configPath, 'discord_cooldowns'),
+  textCommandsFilePath = path.join(configPath, 'text_commands'),
   srcCategoriesFilePath = path.join(configPath, 'src_categories');
 
-// The token of your bot - https://discordapp.com/developers/applications/me
-// Should be placed in discord_token file for security purposes
-// Read token synchronously so we don't try to connect without it
+// Discord token for bot - https://discordapp.com/developers/applications/me
 var token = fs.readFileSync(tokenFilePath, 'utf-8');
 
 // Read in Twitch client ID for use with API
 var twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8');
 
 // Read in list of Twitch streams
-var twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8');
-twitchChannels = twitchChannels.toString().split('\n');
+var twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
 
 // Read in basic text commands / definitions
 var textCommands = readTextCommands(textCommandsFilePath);
@@ -81,93 +75,181 @@ cache.on('connect', () => {
     watchForTwitchStreams();
     watchForSrlRaces();
   });
-}).on('error', function(e) {
-  console.log(e);
-});
-cache.connect();
 
-// Listen for commands (!)
-client.on('message', message => {
+  // Listen for commands (!)
+  client.on('message', message => {
 
-  // Allow members to request role additions/removals for allowed roles
-  if (message.content.startsWith('!addrole') || message.content.startsWith('!removerole'))
-  {
-    // parse+validate role name
-    var roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
-    if (!roleName) {
-      message.member.createDM()
-        .then(channel => {
-          channel.send("You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
-        })
-        .catch(console.log);
-    } else {
-      if (allowedRolesForRequest.test(roleName[2])) {
-        // find the role in the member's guild
-        var role = message.guild.roles.find('name', roleName[2]);
-
-        if (!role) {
-          return console.log(roleName[2] + ' does not exist on this server');
-        }
-
-        // add/remove the role and DM the user the results
-        if (roleName[1] === 'add') {
-          message.member.addRole(role)
-            .then(requestingMember => {
-              requestingMember.createDM()
-                .then(channel => {
-                  channel.send("You have successfully been added to the " + roleName[2] + " group!")
-                })
-                .catch(console.log)
-            })
-            .catch(console.log);
-        } else if (roleName[1] === 'remove') {
-          message.member.removeRole(role)
-            .then(requestingMember => {
-              requestingMember.createDM()
-                .then(channel => {
-                  channel.send("You have successfully been removed from the " + roleName[2] + " group!")
-                })
-                .catch(console.log)
-            })
-            .catch(console.log);
-        }
-      } else {
+    // Allow members to request role additions/removals for allowed roles
+    if (message.content.startsWith('!addrole') || message.content.startsWith('!removerole'))
+    {
+      // parse+validate role name
+      var roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
+      if (!roleName) {
         message.member.createDM()
           .then(channel => {
-            channel.send(roleName[1] + " is not a valid role name!")
+            channel.send("You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
+          })
+          .catch(console.log);
+      } else {
+        if (allowedRolesForRequest.test(roleName[2])) {
+          // find the role in the member's guild
+          var role = message.guild.roles.find('name', roleName[2]);
+
+          if (!role) {
+            return console.log(roleName[2] + ' does not exist on this server');
+          }
+
+          // add/remove the role and DM the user the results
+          if (roleName[1] === 'add') {
+            message.member.addRole(role)
+              .then(requestingMember => {
+                requestingMember.createDM()
+                  .then(channel => {
+                    channel.send("You have successfully been added to the " + roleName[2] + " group!")
+                  })
+                  .catch(console.log)
+              })
+              .catch(console.log);
+          } else if (roleName[1] === 'remove') {
+            message.member.removeRole(role)
+              .then(requestingMember => {
+                requestingMember.createDM()
+                  .then(channel => {
+                    channel.send("You have successfully been removed from the " + roleName[2] + " group!")
+                  })
+                  .catch(console.log)
+              })
+              .catch(console.log);
+          }
+        } else {
+          message.member.createDM()
+            .then(channel => {
+              channel.send(roleName[1] + " is not a valid role name!")
+            })
+            .catch(console.log);
+        }
+      }
+    }
+    ///////////////////////////////////////////////////////////////////////////
+
+    // Speedrun.com API Integration (leaderboard lookups)
+    else if (message.content.startsWith('!wr'))
+    {
+      message.content = message.content.toLowerCase();
+      if (message.content === '!wr') {
+        return message.member.createDM()
+          .then(channel => {
+            channel.send('Useage: !wr {nmg/mg} {subcategory-code}')
           })
           .catch(console.log);
       }
-    }
-  }
 
-  // Speedrun.com API Integration (leaderboard lookups)
-  // @todo cooldowns & caching
-  else if (message.content.startsWith('!wr'))
-  {
-    message.content = message.content.toLowerCase();
-    if (message.content === '!wr') {
-      return message.member.createDM()
-        .then(channel => {
-          channel.send('Useage: !wr {nmg/mg} {subcategory-code}')
-        })
-        .catch(console.log);
-    }
+      parseSrcCategory(message.content, function(err, res) {
+        if (err) {
+          return message.member.createDM()
+            .then(channel => {
+              channel.send(err)
+            })
+            .catch(console.log);
+        }
 
-    parseSrcCategory(message.content, function(err, res) {
-      if (err) {
+        // look up info for this sub-category in local cache
+        // @todo move to its own function, multiple cases use this
+        var category = indexedCategories[res.main];
+        var subcategory = category.subcategories.find(function(s) {
+          return s.code === res.sub;
+        });
+
+        if (!subcategory) {
+          return message.member.createDM()
+            .then(channel => {
+              channel.send("Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes")
+            })
+            .catch(console.log);
+        }
+
+        // Make sure this command isn't on cooldown
+        isOnCooldown(message.content, srcCmdCooldown, function(onCooldown) {
+          if (onCooldown === false) {
+            var wrSearchReq = {
+              url: 'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + category.id + '?top=1&embed=players&var-'+subcategory.varId+'='+subcategory.id,
+              headers: {'User-Agent': srcUserAgent}
+            };
+
+            // check for cache of this request
+            var wrCacheKey = md5(JSON.stringify(wrSearchReq));
+            cache.get(wrCacheKey, function(err, res) {
+              if (err || !res) {
+                console.log(err);
+              }
+
+              if (!err && res !== null) {
+                // cache hit
+                message.channel.send(res);
+              } else {
+                request(wrSearchReq, function(error, response, body) {
+                  if (!error && response.statusCode == 200) {
+                    var data = JSON.parse(body);
+                    if (data && data.data && data.data.runs) {
+                      var run = data.data.runs[0].run;
+                      var runner = data.data.players.data[0].names.international;
+                      var runtime = run.times.primary_t;
+                      var wrResponse = 'The current world record for *' + category.name + ' | ' + subcategory.name
+                                  + '* is held by **' + runner + '** with a time of ' + runtime.toString().toHHMMSS() + '.'
+                                  + ' ' + run.weblink;
+
+                      message.channel.send(wrResponse)
+                        .then(sentMessage => placeOnCooldown(message.content, srcCmdCooldown))
+                        .catch(console.error);
+
+                      // cache the response
+                      cache.set(wrCacheKey, wrResponse, console.error, 3600);
+                    } else {
+                      console.log('Unexpected response received from SRC: ' + data);
+                    }
+                  } else {
+                    console.log('Error while calling SRC API: ', error); // Print the error if one occurred
+                    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+                  }
+                });
+              }
+            });
+          } else {
+            // DM the user that it's on CD
+            return message.member.createDM()
+              .then(channel => {
+                channel.send('"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
+              })
+              .catch(console.log);
+          }
+        });
+      });
+    }
+    else if (message.content.startsWith('!pb'))
+    {
+      message.content = message.content.toLowerCase();
+      if (message.content === '!pb') {
         return message.member.createDM()
           .then(channel => {
-            channel.send(err)
+            channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
+          })
+          .catch(console.log);
+      }
+
+      var commandParts = message.content.split(' ');
+      if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined || (commandParts[2] != 'nmg' && commandParts[2] != 'mg'))
+      {
+        return message.member.createDM()
+          .then(channel => {
+            channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
           })
           .catch(console.log);
       }
 
       // look up info for this sub-category in local cache
-      // @todo move to its own function, multiple cases use this
-      var category = indexedCategories[res.main];
+      var category = indexedCategories[commandParts[2]];
       var subcategory = category.subcategories.find(function(s) {
-        return s.code === res.sub;
+        return s.code === commandParts[3];
       });
 
       if (!subcategory) {
@@ -178,166 +260,100 @@ client.on('message', message => {
           .catch(console.log);
       }
 
-      var wrSearchReq = {
-        url: 'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + category.id + '?top=1&embed=players&var-'+subcategory.varId+'='+subcategory.id,
-        headers: {'User-Agent': srcUserAgent}
-      };
-
-      request(wrSearchReq, function(error, response, body)
-      {
-        if (!error && response.statusCode == 200)
-        {
-          var data = JSON.parse(body);
-          if (data && data.data && data.data.runs)
-          {
-            var run = data.data.runs[0].run;
-            var runner = data.data.players.data[0].names.international;
-            var runtime = run.times.primary_t;
-            var response = 'The current world record for *' + category.name + ' | ' + subcategory.name
-                        + '* is held by **' + runner + '** with a time of ' + runtime.toString().toHHMMSS() + '.'
-                        + ' ' + run.weblink;
-            message.channel.send(response);
-          }
-          else
-          {
-            console.log('Unexpected response received from SRC: ' + data);
-          }
-        }
-        else
-        {
-          console.log('Error while calling SRC API: ', error); // Print the error if one occurred
-          console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-        }
-      });
-    });
-  }
-  // @todo cooldowns
-  else if (message.content.startsWith('!pb'))
-  {
-    message.content = message.content.toLowerCase();
-    if (message.content === '!pb') {
-      return message.member.createDM()
-        .then(channel => {
-          channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
-        })
-        .catch(console.log);
-    }
-
-    var commandParts = message.content.split(' ');
-    if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined || (commandParts[2] != 'nmg' && commandParts[2] != 'mg'))
-    {
-      return message.member.createDM()
-        .then(channel => {
-          channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
-        })
-        .catch(console.log);
-    }
-
-    // look up info for this sub-category in local cache
-    var category = indexedCategories[commandParts[2]];
-    var subcategory = category.subcategories.find(function(s) {
-      return s.code === commandParts[3];
-    });
-
-    if (!subcategory) {
-      return message.member.createDM()
-        .then(channel => {
-          channel.send("Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes")
-        })
-        .catch(console.log);
-    }
-
-    // look up user on SRC, pull in PB's
-    var userSearchReq = {
-      url: 'http://www.speedrun.com/api/v1/users/'+encodeURIComponent(commandParts[1])+'/personal-bests?embed=players',
-      headers: {'User-Agent': srcUserAgent}
-    };
-
-    // check for cache of this request
-    var cacheKey = md5(JSON.stringify(userSearchReq));
-    cache.get(cacheKey, function(err, res) {
-      if (err || !res) {
-        console.log(err);
-      }
-
-      if (!err && res !== null) {
-        // cache hit
-        response = findSrcRun(JSON.parse(res), category, subcategory);
-        if (response) {
-          message.channel.send(response);
-        }
-      } else {
-        request(userSearchReq, function(error, response, body) {
-          if (!error && response.statusCode == 200) {
-            var data = JSON.parse(body);
-
-            // add response to cache
-            cache.set(cacheKey, JSON.stringify(data), function(err, res) {
-              if (err) console.log(err);
-            }, 3600);
-
-            response = findSrcRun(data, category, subcategory);
-            if (response) {
-              message.channel.send(response);
-            }
-          } else {
-            console.log('Error while calling SRC API: ', error); // Print the error if one occurred
-            console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-            return message.channel.send('No user found matching *' + commandParts[1] + '*.');
-          }
-        });
-      }
-    });
-  }
-  else if (message.content.startsWith('!rules'))
-  {
-
-  }
-
-  // Basic text commands
-  else if (message.content.startsWith('!'))
-  {
-    if (textCommands.hasOwnProperty(message.content))
-    {
       // Make sure this command isn't on cooldown
-      var onCooldown = false;
-      fs.readFile(cooldownsFilePath, function(err, data) {
-        if (err || !data) data = {};
+      isOnCooldown(message.content, srcCmdCooldown, function(onCooldown) {
+        if (onCooldown === false) {
+          // look up user on SRC, pull in PB's
+          var userSearchReq = {
+            url: 'http://www.speedrun.com/api/v1/users/'+encodeURIComponent(commandParts[1])+'/personal-bests?embed=players',
+            headers: {'User-Agent': srcUserAgent}
+          };
 
-        var cooldowns = JSON.parse(data);
-        if (cooldowns.hasOwnProperty(message.content))
-        {
-          // Command was recently used, check timestamp to see if it's on cooldown
-          if ((message.createdTimestamp - cooldowns[message.content]) < (textCmdCooldown*1000)) {
-            onCooldown = true;
-          }
-        }
+          // check for cache of this request
+          var cacheKey = md5(JSON.stringify(userSearchReq));
+          cache.get(cacheKey, function(err, res) {
+            if (err || !res) {
+              console.log(err);
+            }
 
-        if (!onCooldown) {
-          message.channel.send(textCommands[message.content]);
-          cooldowns[message.content] = message.createdTimestamp;
+            if (!err && res !== null) {
+              // cache hit
+              response = findSrcRun(JSON.parse(res), category, subcategory);
+              if (response) {
+                message.channel.send(response);
+              }
+            } else {
+              request(userSearchReq, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                  var data = JSON.parse(body);
+
+                  // add response to cache
+                  cache.set(cacheKey, JSON.stringify(data), function(err, res) {
+                    if (err) console.log(err);
+                  }, 3600);
+
+                  response = findSrcRun(data, category, subcategory);
+                  if (response) {
+                    message.channel.send(response);
+                  }
+                } else {
+                  console.log('Error while calling SRC API: ', error); // Print the error if one occurred
+                  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+                  return message.channel.send('No user found matching *' + commandParts[1] + '*.');
+                }
+              });
+            }
+
+            placeOnCooldown(message.content, srcCmdCooldown);
+          });
         } else {
           // DM the user that it's on CD
-          message.member.createDM()
+          return message.member.createDM()
             .then(channel => {
-              channel.send(message.content + ' is currently on cooldown for another ' + ((textCmdCooldown*1000)- (message.createdTimestamp - cooldowns[message.content]))/1000 + ' seconds!');
+              channel.send('"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
             })
             .catch(console.log);
         }
-
-        // write cooldowns back to file
-        fs.writeFile(cooldownsFilePath, JSON.stringify(cooldowns), function(err) {
-          if (err) {
-            return console.log(err);
-          }
-        });
       });
     }
-  }
-});
+    // @todo implement this
+    else if (message.content.startsWith('!rules'))
+    {
 
-// Log the bot in
-client.login(token);
+    }
+    ///////////////////////////////////////////////////////////////////////////
+
+    // Basic text commands
+    else if (message.content.startsWith('!'))
+    {
+      if (textCommands.hasOwnProperty(message.content))
+      {
+        // Make sure this command isn't on cooldown
+        isOnCooldown(message.content, textCmdCooldown, function(onCooldown) {
+          if (onCooldown === false) {
+            message.channel.send(textCommands[message.content])
+              .then(sentMessage => placeOnCooldown(message.content, textCmdCooldown))
+              .catch(console.error);
+          } else {
+            // DM the user that it's on CD
+            message.member.createDM()
+              .then(channel => {
+                channel.send('"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
+              })
+              .catch(console.log);
+          }
+        });
+      }
+    }
+    ///////////////////////////////////////////////////////////////////////////
+  });
+
+  // Log the bot in
+  client.login(token);
+}).on('error', function(e) {
+  console.log(e);
+});
+cache.connect();
 
 // Converts seconds to human-readable time
 String.prototype.toHHMMSS = function () {
@@ -352,13 +368,14 @@ String.prototype.toHHMMSS = function () {
   return hours+':'+minutes+':'+seconds;
 }
 
+// Starts watching for streams, updates every twitchUpdateIntervalSeconds
 function watchForTwitchStreams()
 {
   findLiveStreams(handleStreamResults);
   setTimeout(watchForTwitchStreams, twitchUpdateIntervalSeconds*1000);
 }
 
-// Connect to Twitch to pull a list of currently live speedrun streams for ALttP
+// Connect to Twitch to pull a list of currently live speedrun streams for configured game/channels
 function findLiveStreams(callback)
 {
   var search = {
@@ -388,54 +405,27 @@ function handleStreamResults(err, streams)
 {
   if (err || !streams) return;
 
-  // Read the list of currently live streams we've already alerted about
-  fs.readFile(livestreamsFilePath, function(err, data) {
-    if (err || !data) data = [];
-    var oldLiveStreams = JSON.parse(data);
-    var newLiveStreams = [];
-
-    streams.forEach(function(stream) {
-      // Only send an alert message if this stream was not already live
-      var currentStream = oldLiveStreams.find(function(s) { return s._id === stream._id});
-      if (currentStream === undefined) {
-        alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
-      } else {
-        // Stream was already online, check for title change
+  streams.forEach(function(stream) {
+    // Only send an alert message if this stream was not already live
+    var cacheKey = 'livestream-' + stream.channel.name;
+    cache.get(cacheKey, function(err, currentStream) {
+      if (err) {
+        console.log(err);
+      } else if (currentStream) {
+        // cache hit, stream was already online, check for title change
+        currentStream = JSON.parse(currentStream);
         if (currentStream.channel.status !== stream.channel.status) {
           alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
         }
+      } else {
+        // stream is newly live
+        alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
       }
-      newLiveStreams.push(stream);
-    });
 
-    // See which streams went offline since last check
-    oldLiveStreams.forEach(function(stream) {
-      // This stream is offline if it didn't make it into newLiveStreams
-      var currentStream = newLiveStreams.find(function(s) { return s._id === stream._id});
-      if (currentStream === undefined) {
-        // If this is newly offline, store the time for the event
-        if (stream.offlineAt === undefined) {
-          stream.offlineAt = Date.now();
-          //console.log(stream.channel.display_name + ' went offline at ' + stream.offlineAt);
-        }
-
-        // If the stream has been offline for less than our tolerance, keep it in the list
-        var offlineFor = (Date.now() - stream.offlineAt) / 1000;
-        //console.log(stream.channel.display_name + ' has been offline for ' + offlineFor + 's');
-        if (offlineFor <= twitchOfflineToleranceSeconds) {
-          newLiveStreams.push(stream);
-          //console.log('keeping in livestreams');
-        } else {
-          //console.log('removing from livestreams');
-        }
-      }
-    });
-
-    // Store the new list of live streams to a separate file so when the bot restarts it doesn't spam the channel
-    fs.writeFile(livestreamsFilePath, JSON.stringify(newLiveStreams), function(err) {
-      if (err) {
-        return console.log(err);
-      }
+      // add back to cache, update timeout
+      cache.set(cacheKey, JSON.stringify(stream), function(err, res) {
+        if (err) console.log(err);
+      }, twitchOfflineToleranceSeconds);
     });
   });
 }
@@ -471,6 +461,7 @@ function watchForSrlRaces()
   });
 }
 
+// Read/parse text commands from the "database"
 function readTextCommands(filePath)
 {
   var commands = {};
@@ -484,6 +475,7 @@ function readTextCommands(filePath)
   return commands;
 }
 
+// Read/parse SRC category information
 function readSrcCategories(filePath)
 {
   var categories = {};
@@ -505,6 +497,7 @@ function readSrcCategories(filePath)
   return categories;
 }
 
+// Extract main/sub category codes from a command
 function parseSrcCategory(text, callback)
 {
   var parsed = text.match(/\s(nmg|mg)\s(.+)/);
@@ -515,34 +508,59 @@ function parseSrcCategory(text, callback)
   callback(null, {main: parsed[1].toLowerCase(), sub: parsed[2].toLowerCase()});
 }
 
+// Given a category/subcategory, find the run in the response from SRC
+// and format a response
 function findSrcRun(data, category, subcategory)
 {
-  if (data && data.data)
-  {
+  if (data && data.data) {
     // find the run matching this search
     var run = data.data.find(function(r) {
       return ((r.run.category === category.id) && (r.run.values[subcategory.varId] === subcategory.id));
     });
 
-    if (run && run.run)
-    {
+    if (run && run.run) {
       var runner = run.players.data[0].names.international;
       var runtime = run.run.times.primary_t;
       var response = 'The current personal best for **' + runner + '** in *' + category.name + ' | ' + subcategory.name
                   + '* is **' + runtime.toString().toHHMMSS() + '**. Ranking: ' + run.place
                   + ' | ' + run.run.weblink;
       return response;
-    }
-    else
-    {
+    } else {
       // no PB found in this category for this user
       return 'No personal best found for this user/category!';
     }
-  }
-  else
-  {
+  } else {
     console.log('Unexpected response received from SRC: ' + data);
   }
 
   return;
+}
+
+// Given a cooldownTime in seconds and a command, returns false if the command is not on cooldown
+// returns the time in seconds until the command will be ready again otherwise
+function isOnCooldown(command, cooldownTime, callback)
+{
+  var now = Date.now();
+  var onCooldown = false;
+
+  cache.get(md5(command), function(err, timeUsed) {
+    if (err) console.log(err);
+
+    if (!err && timeUsed !== null) {
+      // Command was recently used, check timestamp to see if it's on cooldown
+      if ((now - timeUsed) <= (cooldownTime*1000)) {
+        // Calculate how much longer it's on cooldown
+        onCooldown = ((cooldownTime*1000) - (now - timeUsed))/1000;
+      }
+    }
+
+    if (callback !== undefined) callback(onCooldown);
+    return onCooldown;
+  });
+}
+
+// Places a command on cooldown for cooldownTime (in seconds)
+function placeOnCooldown(command, cooldownTime)
+{
+  cache.set(md5(command), Date.now(), console.error, cooldownTime);
 }

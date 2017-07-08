@@ -1,3 +1,5 @@
+// @todo write to cache instead of file
+
 // Import modules
 var request = require('then-request'),
   fs = require('fs'),
