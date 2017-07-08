@@ -39,7 +39,7 @@ var tokenFilePath = path.join(etcPath, 'discord_token'),
   twitchClientIdFilePath = path.join(etcPath, 'twitch_client_id'),
   twitchStreamsFilePath = path.join(confPath, 'twitch_streams'),
   textCommandsFilePath = path.join(confPath, 'text_commands'),
-  srcCategoriesFilePath = path.join(congPath, 'src_categories');
+  srcCategoriesFilePath = path.join(confPath, 'src_categories');
 
 // Discord token for bot - https://discordapp.com/developers/applications/me
 var token = fs.readFileSync(tokenFilePath, 'utf-8');
@@ -93,6 +93,9 @@ cache.on('connect', () => {
           .catch(console.log);
       } else {
         if (allowedRolesForRequest.test(roleName[2])) {
+          // make sure this message is in a guild channel they're a member of
+          if (!message.guild) return;
+
           // find the role in the member's guild
           var role = message.guild.roles.find('name', roleName[2]);
 
@@ -408,7 +411,7 @@ function handleStreamResults(err, streams)
 
   streams.forEach(function(stream) {
     // Only send an alert message if this stream was not already live
-    var cacheKey = 'livestream-' + stream.channel.name;
+    var cacheKey = md5('livestream-' + stream.channel.name);
     cache.get(cacheKey, function(err, currentStream) {
       if (err) {
         console.log(err);
@@ -424,9 +427,7 @@ function handleStreamResults(err, streams)
       }
 
       // add back to cache, update timeout
-      cache.set(cacheKey, JSON.stringify(stream), function(err, res) {
-        if (err) console.log(err);
-      }, twitchOfflineToleranceSeconds);
+      cache.set(cacheKey, JSON.stringify(stream), console.error, twitchOfflineToleranceSeconds);
     });
   });
 }
