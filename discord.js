@@ -207,7 +207,7 @@ cache.on('connect', () => {
                         .catch(console.error);
 
                       // cache the response
-                      cache.set(wrCacheKey, wrResponse, console.error, 3600);
+                      cache.set(wrCacheKey, wrResponse, handleCacheSet, 3600);
                     } else {
                       console.log('Unexpected response received from SRC: ' + data);
                     }
@@ -292,9 +292,7 @@ cache.on('connect', () => {
                   var data = JSON.parse(body);
 
                   // add response to cache
-                  cache.set(cacheKey, JSON.stringify(data), function(err, res) {
-                    if (err) console.log(err);
-                  }, 3600);
+                  cache.set(cacheKey, JSON.stringify(data), handleCacheSet, 3600);
 
                   response = findSrcRun(data, category, subcategory);
                   if (response) {
@@ -427,7 +425,7 @@ function handleStreamResults(err, streams)
       }
 
       // add back to cache, update timeout
-      cache.set(cacheKey, JSON.stringify(stream), console.error, twitchOfflineToleranceSeconds);
+      cache.set(cacheKey, JSON.stringify(stream), handleCacheSet, twitchOfflineToleranceSeconds);
     });
   });
 }
@@ -564,5 +562,7 @@ function isOnCooldown(command, cooldownTime, callback)
 // Places a command on cooldown for cooldownTime (in seconds)
 function placeOnCooldown(command, cooldownTime)
 {
-  cache.set(md5(command), Date.now(), console.error, cooldownTime);
+  cache.set(md5(command), Date.now(), handleCacheSet, cooldownTime);
 }
+
+function handleCacheSet(error, result) {}
