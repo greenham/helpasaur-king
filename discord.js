@@ -435,7 +435,7 @@ function watchForSrlRaces()
 {
   // Connect to SRL IRC server
   var client = new irc.Client(srlIrcServer, srlUsername, {
-    channels: ['#speedrunslive'],
+    channels: ['#speedrunslive']
   });
 
   // Listen for messages from RaceBot in the main channel
@@ -464,6 +464,9 @@ function watchForSrlRaces()
     console.error('error from SRL IRC Server: ', message);
   });
 }
+
+// catch Promise errors
+process.on('unhandledRejection', console.error);
 
 // Read/parse text commands from the "database"
 function readTextCommands(filePath)
