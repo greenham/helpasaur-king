@@ -73,7 +73,7 @@ cache.on('connect', () => {
 
     // Watch allthethings
     watchForTwitchStreams();
-    watchForSrlRaces();
+    //watchForSrlRaces();
   });
 
   // Listen for commands (!)

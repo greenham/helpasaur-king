@@ -35,6 +35,7 @@ function watchForSrlRaces()
     password: srlPassword,
     autoRejoin: true,
     retryCount: 10,
+    debug: true,
     channels: ['#speedrunslive']
   });
 
