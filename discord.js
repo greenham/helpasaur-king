@@ -459,6 +459,10 @@ function watchForSrlRaces()
       }
     }
   });
+
+  client.addListener('error', function(message) {
+    console.error('error from SRL IRC Server: ', message);
+  });
 }
 
 // Read/parse text commands from the "database"
