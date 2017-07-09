@@ -42,10 +42,10 @@ var tokenFilePath = path.join(etcPath, 'discord_token'),
   srcCategoriesFilePath = path.join(confPath, 'src_categories');
 
 // Discord token for bot - https://discordapp.com/developers/applications/me
-var token = fs.readFileSync(tokenFilePath, 'utf-8');
+var token = fs.readFileSync(tokenFilePath, 'utf-8').toString().trim().replace(/\n/, '');
 
 // Read in Twitch client ID for use with API
-var twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8');
+var twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8').toString().trim().replace(/\n/, '');
 
 // Read in list of Twitch streams
 var twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
