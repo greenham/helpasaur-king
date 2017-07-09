@@ -1,7 +1,6 @@
 /**
  * ALttP Discord Bot
  *   General TODOs
- *     - Move this to a server
  *     - Extract basic functionality to a separate module that both discord/twitch can utilize
  *     - Allow users with alttp-bot-editor to add/edit commands
  */
