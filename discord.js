@@ -7,7 +7,7 @@
 
 // Settings
 var botName = 'Helpasaur King',
-  alertsChannelName = 'alttp-bot-testing',
+  alertsChannelName = 'alttp-alerts',
   alertOnConnect = false,
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
