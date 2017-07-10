@@ -17,8 +17,8 @@ var botName = 'Helpasaur King',
   srlIrcServer = 'irc.speedrunslive.com',
   srlUsername = 'HelpasaurKing',
   allowedRolesForRequest = /nmg\-race|100\-race/,
-  textCmdCooldown = 60,
-  srcCmdCooldown = 60,
+  textCmdCooldown = 10,
+  srcCmdCooldown = 10,
   srcGameSlug = 'alttp',
   srcUserAgent = 'alttp-bot/1.0';
 
@@ -330,18 +330,25 @@ cache.on('connect', () => {
       if (textCommands.hasOwnProperty(message.content))
       {
         // Make sure this command isn't on cooldown
-        isOnCooldown(message.content, textCmdCooldown, function(onCooldown) {
+        var cooldownKey = message.content + message.channel.id;
+        isOnCooldown(cooldownKey, textCmdCooldown, function(onCooldown) {
           if (onCooldown === false) {
             message.channel.send(textCommands[message.content])
-              .then(sentMessage => placeOnCooldown(message.content, textCmdCooldown))
+              .then(sentMessage => placeOnCooldown(cooldownKey, textCmdCooldown))
               .catch(console.error);
           } else {
             // DM the user that it's on CD
-            message.member.createDM()
-              .then(channel => {
-                channel.send('"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
-              })
-              .catch(console.log);
+            // check that this isn't already a DM
+            var cooldownMessage = '"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!';
+            if (message.type === 'dm') {
+              message.channel.send(cooldownMessage);
+            } else {
+              message.member.createDM()
+                .then(channel => {
+                  channel.send(cooldownMessage);
+                })
+                .catch(console.log);
+            }
           }
         });
       }
