@@ -2,7 +2,7 @@
  * ALttP Discord Bot
  *   General TODOs
  *     - Extract basic functionality to a separate module that both discord/twitch can utilize
- *     - Allow users with alttp-bot-editor to add/edit commands
+ *     - Allow users with alttp-bot-editor role to add/edit commands
  */
 
 // Settings
