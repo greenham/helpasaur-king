@@ -3,6 +3,8 @@
  *   General TODOs
  *     - Extract basic functionality to a separate module that both discord/twitch can utilize
  *     - Allow users with alttp-bot-editor role to add/edit commands
+ *     - Create per-environment settings file
+ *     - Watch conf files for changes and auto-update
  */
 
 // Settings
