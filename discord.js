@@ -7,7 +7,7 @@
 
 // Settings
 var botName = 'Helpasaur King',
-  alertsChannelName = 'alttp-alerts',
+  alertsChannelName = 'alttp-bot-testing',
   alertOnConnect = false,
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
   twitchStatusFilters = /rando|lttpr|z3r|casual|2v2/i,
@@ -85,11 +85,7 @@ cache.on('connect', () => {
       // parse+validate role name
       var roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
       if (!roleName) {
-        message.member.createDM()
-          .then(channel => {
-            channel.send("You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
-          })
-          .catch(console.log);
+        dmUser(message, "You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
       } else {
         if (allowedRolesForRequest.test(roleName[2])) {
           // make sure this message is in a guild channel they're a member of
@@ -125,11 +121,7 @@ cache.on('connect', () => {
               .catch(console.log);
           }
         } else {
-          message.member.createDM()
-            .then(channel => {
-              channel.send(roleName[1] + " is not a valid role name!")
-            })
-            .catch(console.log);
+          dmUser(message, roleName[1] + " is not a valid role name!");
         }
       }
     }
@@ -140,20 +132,12 @@ cache.on('connect', () => {
     {
       message.content = message.content.toLowerCase();
       if (message.content === '!wr') {
-        return message.member.createDM()
-          .then(channel => {
-            channel.send('Useage: !wr {nmg/mg} {subcategory-code}')
-          })
-          .catch(console.log);
+        return dmUser(message, 'Useage: !wr {nmg/mg} {subcategory-code}');
       }
 
       parseSrcCategory(message.content, function(err, res) {
         if (err) {
-          return message.member.createDM()
-            .then(channel => {
-              channel.send(err)
-            })
-            .catch(console.log);
+          return dmUser(message, err);
         }
 
         // look up info for this sub-category in local cache
@@ -164,15 +148,12 @@ cache.on('connect', () => {
         });
 
         if (!subcategory) {
-          return message.member.createDM()
-            .then(channel => {
-              channel.send("Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes")
-            })
-            .catch(console.log);
+          return dmUser(message, "Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes");
         }
 
-        // Make sure this command isn't on cooldown
-        isOnCooldown(message.content, srcCmdCooldown, function(onCooldown) {
+        // Make sure this command isn't on cooldown in this channel
+        var cooldownKey = message.content + message.channel.id;
+        isOnCooldown(cooldownKey, srcCmdCooldown, function(onCooldown) {
           if (onCooldown === false) {
             var wrSearchReq = {
               url: 'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + category.id + '?top=1&embed=players&var-'+subcategory.varId+'='+subcategory.id,
@@ -202,7 +183,7 @@ cache.on('connect', () => {
                                   + ' ' + run.weblink;
 
                       message.channel.send(wrResponse)
-                        .then(sentMessage => placeOnCooldown(message.content, srcCmdCooldown))
+                        .then(sentMessage => placeOnCooldown(cooldownKey, srcCmdCooldown))
                         .catch(console.error);
 
                       // cache the response
@@ -219,11 +200,7 @@ cache.on('connect', () => {
             });
           } else {
             // DM the user that it's on CD
-            return message.member.createDM()
-              .then(channel => {
-                channel.send('"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
-              })
-              .catch(console.log);
+            return dmUser(message, '"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
           }
         });
       });
@@ -232,21 +209,12 @@ cache.on('connect', () => {
     {
       message.content = message.content.toLowerCase();
       if (message.content === '!pb') {
-        return message.member.createDM()
-          .then(channel => {
-            channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
-          })
-          .catch(console.log);
+        return dmUser(message, 'Useage: !pb {username} {nmg/mg} {subcategory-code}');
       }
 
       var commandParts = message.content.split(' ');
-      if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined || (commandParts[2] != 'nmg' && commandParts[2] != 'mg'))
-      {
-        return message.member.createDM()
-          .then(channel => {
-            channel.send('Useage: !pb {username} {nmg/mg} {subcategory-code}')
-          })
-          .catch(console.log);
+      if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined || (commandParts[2] != 'nmg' && commandParts[2] != 'mg')) {
+        return dmUser(message, 'Useage: !pb {username} {nmg/mg} {subcategory-code}');
       }
 
       // look up info for this sub-category in local cache
@@ -256,15 +224,12 @@ cache.on('connect', () => {
       });
 
       if (!subcategory) {
-        return message.member.createDM()
-          .then(channel => {
-            channel.send("Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes")
-          })
-          .catch(console.log);
+        dmUser(message, 'Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes');
       }
 
       // Make sure this command isn't on cooldown
-      isOnCooldown(message.content, srcCmdCooldown, function(onCooldown) {
+      var cooldownKey = message.content + message.channel.id;
+      isOnCooldown(cooldownKey, srcCmdCooldown, function(onCooldown) {
         if (onCooldown === false) {
           // look up user on SRC, pull in PB's
           var userSearchReq = {
@@ -305,15 +270,11 @@ cache.on('connect', () => {
               });
             }
 
-            placeOnCooldown(message.content, srcCmdCooldown);
+            placeOnCooldown(cooldownKey, srcCmdCooldown);
           });
         } else {
           // DM the user that it's on CD
-          return message.member.createDM()
-            .then(channel => {
-              channel.send('"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
-            })
-            .catch(console.log);
+          return dmUser(message, '"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!');
         }
       });
     }
@@ -340,15 +301,7 @@ cache.on('connect', () => {
             // DM the user that it's on CD
             // check that this isn't already a DM
             var cooldownMessage = '"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!';
-            if (message.channel.type === 'dm') {
-              message.channel.send(cooldownMessage);
-            } else {
-              message.member.createDM()
-                .then(channel => {
-                  channel.send(cooldownMessage);
-                })
-                .catch(console.log);
-            }
+            dmUser(message, cooldownMessage);
           }
         });
       }
@@ -576,6 +529,20 @@ function isOnCooldown(command, cooldownTime, callback)
 function placeOnCooldown(command, cooldownTime)
 {
   cache.set(md5(command), Date.now(), handleCacheSet, cooldownTime);
+}
+
+function dmUser(originalMessage, newMessage)
+{
+  // check that this isn't already a DM before sending
+  if (originalMessage.channel.type === 'dm') {
+    originalMessage.channel.send(newMessage);
+  } else {
+    originalMessage.member.createDM()
+      .then(channel => {
+        channel.send(newMessage);
+      })
+      .catch(console.log);
+  }
 }
 
 function handleCacheSet(error, result) {}
