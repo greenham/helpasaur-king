@@ -340,7 +340,7 @@ cache.on('connect', () => {
             // DM the user that it's on CD
             // check that this isn't already a DM
             var cooldownMessage = '"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!';
-            if (message.type === 'dm') {
+            if (message.channel.type === 'dm') {
               message.channel.send(cooldownMessage);
             } else {
               message.member.createDM()
