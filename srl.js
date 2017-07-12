@@ -33,16 +33,42 @@ function watchForSrlRaces()
   // Connect to SRL IRC server
   var client = new irc.Client(srlIrcServer, srlUsername, {
     password: srlPassword,
-    autoRejoin: true,
-    retryCount: 10,
+    autoRejoin: false,
+    retryCount: 0,
+    retryDelay: 10000,
+    floodProtection: true,
+    floodProtectionDelay: 1000,
     debug: true,
+    showErrors: true,
     channels: ['#speedrunslive']
   });
+  // Defaults:
+  /*userName: 'nodebot',
+    realName: 'nodeJS IRC client',
+    port: 6667,
+    localAddress: null,
+    debug: false,
+    showErrors: false,
+    autoRejoin: false,
+    autoConnect: true,
+    channels: [],
+    secure: false,
+    selfSigned: false,
+    certExpired: false,
+    floodProtection: false,
+    floodProtectionDelay: 1000,
+    sasl: false,
+    retryCount: 0,
+    retryDelay: 2000,
+    stripColors: false,
+    channelPrefixes: "&#",
+    messageSplit: 512,
+    encoding: ''*/
 
   // Listen for messages from RaceBot in the main channel
   client.addListener('message#speedrunslive', function (from, message) {
     console.log(from + ': ' + message);
-    if (from === 'RaceBot') {
+    /*if (from === 'RaceBot') {
       var raceChannel = message.match(/srl\-([a-z0-9]{5})/),
         srlUrl;
       if (raceChannel) {
@@ -50,7 +76,7 @@ function watchForSrlRaces()
       }
       var goal = message.match(/\-\s(.+)\s\|/);
 
-      /*if (message.startsWith('Race initiated for ' + srlGameName + '. Join')) {
+      if (message.startsWith('Race initiated for ' + srlGameName + '. Join')) {
         alertsChannel.send('**SRL Race Started** :: *#' + raceChannel[0] + '* :: A race was just started for ' + srlGameName + '! | ' + srlUrl);
       } else if (message.startsWith('Goal Set: ' + srlGameName + ' - ')) {
         alertsChannel.send('**SRL Race Goal Set** :: *#' + raceChannel[0] + '* ::  __' + goal[1] + '__ | ' + srlUrl);
@@ -58,8 +84,8 @@ function watchForSrlRaces()
         alertsChannel.send('**SRL Race Finished** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
       } else if (message.startsWith('Rematch initiated: ' + srlGameName + ' - ')) {
         alertsChannel.send('**SRL Rematch** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
-      }*/
-    }
+      }
+    }*/
   });
 
   client.addListener('error', function(message) {
