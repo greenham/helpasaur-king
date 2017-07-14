@@ -8,7 +8,7 @@
  */
 
 // Settings
-var botName = 'Helpasaur King',
+const botName = 'Helpasaur King',
   alertsChannelName = 'alttp-alerts',
   alertOnConnect = false,
   twitchGameName = 'The Legend of Zelda: A Link to the Past',
@@ -25,7 +25,7 @@ var botName = 'Helpasaur King',
   srcUserAgent = 'alttp-bot/1.0';
 
 // Import modules
-var request = require('request'),
+const request = require('request'),
   irc = require('irc'),
   fs = require('fs'),
   path = require('path'),
@@ -34,35 +34,47 @@ var request = require('request'),
   Discord = require('discord.js');
 
 // File paths for config/keys
-var etcPath = path.join(__dirname, 'etc');
-var confPath = path.join(__dirname, 'conf');
-var tokenFilePath = path.join(etcPath, 'discord_token'),
+let etcPath = path.join(__dirname, 'etc');
+let confPath = path.join(__dirname, 'conf');
+let tokenFilePath = path.join(etcPath, 'discord_token'),
   twitchClientIdFilePath = path.join(etcPath, 'twitch_client_id'),
   twitchStreamsFilePath = path.join(confPath, 'twitch_streams'),
   textCommandsFilePath = path.join(confPath, 'text_commands'),
   srcCategoriesFilePath = path.join(confPath, 'src_categories');
 
 // Discord token for bot - https://discordapp.com/developers/applications/me
-var token = fs.readFileSync(tokenFilePath, 'utf-8').toString().trim().replace(/\n/, '');
+let token = fs.readFileSync(tokenFilePath, 'utf-8').toString().trim().replace(/\n/, '');
 
 // Read in Twitch client ID for use with API
-var twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8').toString().trim().replace(/\n/, '');
+let twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8').toString().trim().replace(/\n/, '');
 
 // Read in list of Twitch streams
-var twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
+let twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
+// Watch file for changes
+fs.watchFile(twitchStreamsFilePath, (curr, prev) => {
+  if (curr.mtime !== prev.mtime) {
+    twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
+  }
+});
 
 // Read in basic text commands / definitions
-var textCommands = readTextCommands(textCommandsFilePath);
+let textCommands = readTextCommands(textCommandsFilePath);
+// Watch file for changes
+fs.watchFile(textCommandsFilePath, (curr, prev) => {
+  if (curr.mtime !== prev.mtime) {
+    textCommands = readTextCommands(textCommandsFilePath);
+  }
+});
 
 // Read in current category info on SRC (run src.js to refresh)
-var indexedCategories = readSrcCategories(srcCategoriesFilePath);
+let indexedCategories = readSrcCategories(srcCategoriesFilePath);
 
 // Set up Discord client
 const client = new Discord.Client();
-var alertsChannel;
+let alertsChannel;
 
 // Connect to cache
-var cache = new memcache.Client();
+let cache = new memcache.Client();
 cache.on('connect', () => {
   // The ready event is vital, it means that your bot will only start reacting to information
   // from Discord _after_ ready is emitted
@@ -85,7 +97,7 @@ cache.on('connect', () => {
     if (message.content.startsWith('!addrole') || message.content.startsWith('!removerole'))
     {
       // parse+validate role name
-      var roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
+      let roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
       if (!roleName) {
         dmUser(message, "You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
       } else {
@@ -94,7 +106,7 @@ cache.on('connect', () => {
           if (!message.guild) return;
 
           // find the role in the member's guild
-          var role = message.guild.roles.find('name', roleName[2]);
+          let role = message.guild.roles.find('name', roleName[2]);
 
           if (!role) {
             return console.log(roleName[2] + ' does not exist on this server');
@@ -144,8 +156,8 @@ cache.on('connect', () => {
 
         // look up info for this sub-category in local cache
         // @todo move to its own function, multiple cases use this
-        var category = indexedCategories[res.main];
-        var subcategory = category.subcategories.find(function(s) {
+        let category = indexedCategories[res.main];
+        let subcategory = category.subcategories.find(function(s) {
           return s.code === res.sub;
         });
 
@@ -154,16 +166,16 @@ cache.on('connect', () => {
         }
 
         // Make sure this command isn't on cooldown in this channel
-        var cooldownKey = message.content + message.channel.id;
+        let cooldownKey = message.content + message.channel.id;
         isOnCooldown(cooldownKey, srcCmdCooldown, function(onCooldown) {
           if (onCooldown === false) {
-            var wrSearchReq = {
+            let wrSearchReq = {
               url: 'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + category.id + '?top=1&embed=players&var-'+subcategory.varId+'='+subcategory.id,
               headers: {'User-Agent': srcUserAgent}
             };
 
             // check for cache of this request
-            var wrCacheKey = md5(JSON.stringify(wrSearchReq));
+            let wrCacheKey = md5(JSON.stringify(wrSearchReq));
             cache.get(wrCacheKey, function(err, res) {
               if (err || !res) {
                 console.log(err);
@@ -175,12 +187,12 @@ cache.on('connect', () => {
               } else {
                 request(wrSearchReq, function(error, response, body) {
                   if (!error && response.statusCode == 200) {
-                    var data = JSON.parse(body);
+                    let data = JSON.parse(body);
                     if (data && data.data && data.data.runs) {
-                      var run = data.data.runs[0].run;
-                      var runner = data.data.players.data[0].names.international;
-                      var runtime = run.times.primary_t;
-                      var wrResponse = 'The current world record for *' + category.name + ' | ' + subcategory.name
+                      let run = data.data.runs[0].run;
+                      let runner = data.data.players.data[0].names.international;
+                      let runtime = run.times.primary_t;
+                      let wrResponse = 'The current world record for *' + category.name + ' | ' + subcategory.name
                                   + '* is held by **' + runner + '** with a time of ' + runtime.toString().toHHMMSS() + '.'
                                   + ' ' + run.weblink;
 
@@ -214,14 +226,14 @@ cache.on('connect', () => {
         return dmUser(message, 'Useage: !pb {username} {nmg/mg} {subcategory-code}');
       }
 
-      var commandParts = message.content.split(' ');
+      let commandParts = message.content.split(' ');
       if (!commandParts || commandParts[1] === undefined || commandParts[2] === undefined || commandParts[3] === undefined || (commandParts[2] != 'nmg' && commandParts[2] != 'mg')) {
         return dmUser(message, 'Useage: !pb {username} {nmg/mg} {subcategory-code}');
       }
 
       // look up info for this sub-category in local cache
-      var category = indexedCategories[commandParts[2]];
-      var subcategory = category.subcategories.find(function(s) {
+      let category = indexedCategories[commandParts[2]];
+      let subcategory = category.subcategories.find(function(s) {
         return s.code === commandParts[3];
       });
 
@@ -230,17 +242,17 @@ cache.on('connect', () => {
       }
 
       // Make sure this command isn't on cooldown
-      var cooldownKey = message.content + message.channel.id;
+      let cooldownKey = message.content + message.channel.id;
       isOnCooldown(cooldownKey, srcCmdCooldown, function(onCooldown) {
         if (onCooldown === false) {
           // look up user on SRC, pull in PB's
-          var userSearchReq = {
+          let userSearchReq = {
             url: 'http://www.speedrun.com/api/v1/users/'+encodeURIComponent(commandParts[1])+'/personal-bests?embed=players',
             headers: {'User-Agent': srcUserAgent}
           };
 
           // check for cache of this request
-          var cacheKey = md5(JSON.stringify(userSearchReq));
+          let cacheKey = md5(JSON.stringify(userSearchReq));
           cache.get(cacheKey, function(err, res) {
             if (err || !res) {
               console.log(err);
@@ -255,7 +267,7 @@ cache.on('connect', () => {
             } else {
               request(userSearchReq, function(error, response, body) {
                 if (!error && response.statusCode == 200) {
-                  var data = JSON.parse(body);
+                  let data = JSON.parse(body);
 
                   // add response to cache
                   cache.set(cacheKey, JSON.stringify(data), handleCacheSet, 3600);
@@ -293,7 +305,7 @@ cache.on('connect', () => {
       if (textCommands.hasOwnProperty(message.content))
       {
         // Make sure this command isn't on cooldown
-        var cooldownKey = message.content + message.channel.id;
+        let cooldownKey = message.content + message.channel.id;
         isOnCooldown(cooldownKey, textCmdCooldown, function(onCooldown) {
           if (onCooldown === false) {
             message.channel.send(textCommands[message.content])
@@ -302,7 +314,7 @@ cache.on('connect', () => {
           } else {
             // DM the user that it's on CD
             // check that this isn't already a DM
-            var cooldownMessage = '"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!';
+            let cooldownMessage = '"'+message.content + '" is currently on cooldown for another ' + onCooldown + ' seconds!';
             dmUser(message, cooldownMessage);
           }
         });
@@ -320,10 +332,10 @@ cache.connect();
 
 // Converts seconds to human-readable time
 String.prototype.toHHMMSS = function () {
-  var sec_num = parseInt(this, 10); // don't forget the second param
-  var hours   = Math.floor(sec_num / 3600);
-  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+  let sec_num = parseInt(this, 10); // don't forget the second param
+  let hours   = Math.floor(sec_num / 3600);
+  let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  let seconds = sec_num - (hours * 3600) - (minutes * 60);
 
   if (hours   < 10) {hours   = "0"+hours;}
   if (minutes < 10) {minutes = "0"+minutes;}
@@ -341,17 +353,17 @@ function watchForTwitchStreams()
 // Connect to Twitch to pull a list of currently live speedrun streams for configured game/channels
 function findLiveStreams(callback)
 {
-  var search = {
+  let search = {
     url: 'https://api.twitch.tv/kraken/streams?limit=100&game='+encodeURIComponent(twitchGameName)+'&channel='+encodeURIComponent(twitchChannels.join()),
     headers: {'Client-ID': twitchClientId}
   };
 
   request(search, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      var info = JSON.parse(body);
+      let info = JSON.parse(body);
       if (info._total > 0) {
         // Attempt to automatically filter out non-speedrun streams by title
-        var filteredStreams = info.streams.filter(function (item) {
+        let filteredStreams = info.streams.filter(function (item) {
           return !(twitchStatusFilters.test(item.channel.status));
         });
         callback(null, filteredStreams);
@@ -370,7 +382,7 @@ function handleStreamResults(err, streams)
 
   streams.forEach(function(stream) {
     // Only send an alert message if this stream was not already live
-    var cacheKey = md5('livestream-' + stream.channel.name);
+    let cacheKey = md5('livestream-' + stream.channel.name);
     cache.get(cacheKey, function(err, currentStream) {
       if (err) {
         console.log(err);
@@ -395,19 +407,19 @@ function handleStreamResults(err, streams)
 function watchForSrlRaces()
 {
   // Connect to SRL IRC server
-  var client = new irc.Client(srlIrcServer, srlUsername, {
+  let client = new irc.Client(srlIrcServer, srlUsername, {
     channels: ['#speedrunslive']
   });
 
   // Listen for messages from RaceBot in the main channel
   client.addListener('message#speedrunslive', function (from, message) {
     if (from === 'RaceBot') {
-      var raceChannel = message.match(/srl\-([a-z0-9]{5})/),
+      let raceChannel = message.match(/srl\-([a-z0-9]{5})/),
         srlUrl;
       if (raceChannel) {
         srlUrl = 'http://www.speedrunslive.com/race/?id='+raceChannel[1];
       }
-      var goal = message.match(/\-\s(.+)\s\|/);
+      let goal = message.match(/\-\s(.+)\s\|/);
 
       if (message.startsWith('Race initiated for ' + srlGameName + '. Join')) {
         alertsChannel.send('**SRL Race Started** :: *#' + raceChannel[0] + '* :: A race was just started for ' + srlGameName + '! | ' + srlUrl);
@@ -432,10 +444,10 @@ process.on('unhandledRejection', console.error);
 // Read/parse text commands from the "database"
 function readTextCommands(filePath)
 {
-  var commands = {};
-  var data = fs.readFileSync(filePath, 'utf-8');
-  var commandLines = data.toString().split('\n');
-  var commandParts;
+  let commands = {};
+  let data = fs.readFileSync(filePath, 'utf-8');
+  let commandLines = data.toString().split('\n');
+  let commandParts;
   commandLines.forEach(function(line) {
     commandParts = line.split('|');
     commands[commandParts[0]] = commandParts[1];
@@ -446,8 +458,8 @@ function readTextCommands(filePath)
 // Read/parse SRC category information
 function readSrcCategories(filePath)
 {
-  var categories = {};
-  var srcCategories = fs.readFileSync(filePath, 'utf-8');
+  let categories = {};
+  let srcCategories = fs.readFileSync(filePath, 'utf-8');
   srcCategories = srcCategories.toString().split('|||||');
 
   // Re-index subcategories by their main category
@@ -468,7 +480,7 @@ function readSrcCategories(filePath)
 // Extract main/sub category codes from a command
 function parseSrcCategory(text, callback)
 {
-  var parsed = text.match(/\s(nmg|mg)\s(.+)/);
+  let parsed = text.match(/\s(nmg|mg)\s(.+)/);
   if (!parsed || parsed[1] === undefined || parsed[2] === undefined || !parsed[1] || !parsed[2]) {
     return callback("Not a valid category.");
   }
@@ -482,14 +494,14 @@ function findSrcRun(data, category, subcategory)
 {
   if (data && data.data) {
     // find the run matching this search
-    var run = data.data.find(function(r) {
+    let run = data.data.find(function(r) {
       return ((r.run.category === category.id) && (r.run.values[subcategory.varId] === subcategory.id));
     });
 
     if (run && run.run) {
-      var runner = run.players.data[0].names.international;
-      var runtime = run.run.times.primary_t;
-      var response = 'The current personal best for **' + runner + '** in *' + category.name + ' | ' + subcategory.name
+      let runner = run.players.data[0].names.international;
+      let runtime = run.run.times.primary_t;
+      let response = 'The current personal best for **' + runner + '** in *' + category.name + ' | ' + subcategory.name
                   + '* is **' + runtime.toString().toHHMMSS() + '**. Ranking: ' + run.place
                   + ' | ' + run.run.weblink;
       return response;
@@ -508,8 +520,8 @@ function findSrcRun(data, category, subcategory)
 // returns the time in seconds until the command will be ready again otherwise
 function isOnCooldown(command, cooldownTime, callback)
 {
-  var now = Date.now();
-  var onCooldown = false;
+  let now = Date.now();
+  let onCooldown = false;
 
   cache.get(md5(command), function(err, timeUsed) {
     if (err) console.log(err);

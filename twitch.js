@@ -3,26 +3,49 @@
  */
 
 // Settings
-var twitchIrcServer = 'irc.chat.twitch.tv',
+const twitchIrcServer = 'irc.chat.twitch.tv',
   twitchUsername = 'alttpbot',
   textCmdCooldown = 60;
 
 // Import modules
-var irc = require('irc'),
+const irc = require('irc'),
   memcache = require('memcache'),
   md5 = require('md5'),
   fs = require('fs'),
   path = require('path');
 
+// Config file paths
+const twitchOauthFilePath = path.join(__dirname, 'etc', 'twitch_oauth'),
+  textCommandsFilePath = path.join(__dirname, 'conf', 'text_commands'),
+  joinChannelsFilePath = path.join(__dirname, 'conf', 'twitch_bot_channels');
+
 // Read in config items
-var twitchOauth = fs.readFileSync(path.join(__dirname, 'etc', 'twitch_oauth'), 'utf-8'),
-  twitchChannels = fs.readFileSync(path.join(__dirname, 'conf', 'twitch_bot_channels'), 'utf-8').toString().split('\n');
+const twitchOauth = fs.readFileSync(twitchOauthFilePath, 'utf-8');
+
+let twitchChannels = fs.readFileSync(joinChannelsFilePath, 'utf-8').toString().split('\n');
+// Watch file for changes
+fs.watchFile(joinChannelsFilePath, (curr, prev) => {
+  if (curr.mtime !== prev.mtime) {
+    // @todo figure out how to handle this scenario
+    // option 1: compare old/new list and manually join/part those channels
+    // let newTwitchChannels = fs.readFileSync(joinChannelsFilePath, 'utf-8').toString().split('\n');
+    // option 2: disconnect, kill the process, and let forever reboot it
+    client.disconnect(() => process.exit());
+    // option 3: extract connection/listeners to function and call
+  }
+});
 
 // Read in basic text commands / definitions
-var textCommands = readTextCommands(path.join(__dirname, 'conf', 'text_commands'));
+let textCommands = readTextCommands(textCommandsFilePath);
+// Watch file for changes
+fs.watchFile(textCommandsFilePath, (curr, prev) => {
+  if (curr.mtime !== prev.mtime) {
+    textCommands = readTextCommands(textCommandsFilePath);
+  }
+});
 
 // Connect to cache
-var cache = new memcache.Client();
+let cache = new memcache.Client();
 cache.on('connect', () => {
 }).on('error', function(e) {
   console.log(e);
@@ -30,7 +53,7 @@ cache.on('connect', () => {
 cache.connect();
 
 // Connect to Twitch IRC server
-var client = new irc.Client(twitchIrcServer, twitchUsername, {
+let client = new irc.Client(twitchIrcServer, twitchUsername, {
   password: twitchOauth,
   autoRejoin: true,
   retryCount: 10,
