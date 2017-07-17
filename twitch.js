@@ -2,11 +2,6 @@
  * ALttP Twitch Bot
  */
 
-// Settings
-const twitchIrcServer = 'irc.chat.twitch.tv',
-  twitchUsername = 'alttpbot',
-  textCmdCooldown = 60;
-
 // Import modules
 const irc = require('irc'),
   memcache = require('memcache'),
@@ -14,16 +9,15 @@ const irc = require('irc'),
   fs = require('fs'),
   path = require('path');
 
+// Read in bot configuration
+let config = require('./config.json');
+
 // Config file paths
-const twitchOauthFilePath = path.join(__dirname, 'etc', 'twitch_oauth'),
-  textCommandsFilePath = path.join(__dirname, 'conf', 'text_commands'),
+const textCommandsFilePath = path.join(__dirname, 'conf', 'text_commands'),
   joinChannelsFilePath = path.join(__dirname, 'conf', 'twitch_bot_channels');
 
-// Read in config items
-const twitchOauth = fs.readFileSync(twitchOauthFilePath, 'utf-8');
-
+// Read in twitch channel list and watch for changes
 let twitchChannels = fs.readFileSync(joinChannelsFilePath, 'utf-8').toString().split('\n');
-// Watch file for changes
 fs.watchFile(joinChannelsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
     // @todo figure out how to handle this scenario
@@ -35,9 +29,8 @@ fs.watchFile(joinChannelsFilePath, (curr, prev) => {
   }
 });
 
-// Read in basic text commands / definitions
+// Read in basic text commands / definitions and watch for changes
 let textCommands = readTextCommands(textCommandsFilePath);
-// Watch file for changes
 fs.watchFile(textCommandsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
     textCommands = readTextCommands(textCommandsFilePath);
@@ -48,13 +41,13 @@ fs.watchFile(textCommandsFilePath, (curr, prev) => {
 let cache = new memcache.Client();
 cache.on('connect', () => {
 }).on('error', function(e) {
-  console.log(e);
+  console.error(e);
 });
 cache.connect();
 
 // Connect to Twitch IRC server
-let client = new irc.Client(twitchIrcServer, twitchUsername, {
-  password: twitchOauth,
+let client = new irc.Client(config.twitch.ircServer, config.twitch.username, {
+  password: config.twitch.oauth,
   autoRejoin: true,
   retryCount: 10,
   channels: twitchChannels
@@ -71,11 +64,11 @@ client.addListener('message', function (from, to, message) {
       console.log(to + ': ' + message);
 
       // Make sure this command isn't on cooldown
-      var cooldownIndex = to+message;
-      isOnCooldown(cooldownIndex, textCmdCooldown, function(onCooldown) {
+      let cooldownIndex = to+message;
+      isOnCooldown(cooldownIndex, config.twitch.textCmdCooldown, function(onCooldown) {
         if (onCooldown === false) {
           client.say(to, textCommands[message]);
-          placeOnCooldown(cooldownIndex, textCmdCooldown);
+          placeOnCooldown(cooldownIndex, config.twitch.textCmdCooldown);
         } else {
           // command is on cooldown in this channel
           client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');

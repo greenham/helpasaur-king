@@ -3,26 +3,7 @@
  *   General TODOs
  *     - Extract basic functionality to a separate module that both discord/twitch can utilize
  *     - Allow users with alttp-bot-editor role to add/edit commands
- *     - Create per-environment settings file
- *     - Watch conf files for changes and auto-update
  */
-
-// Settings
-const botName = 'Helpasaur King',
-  alertsChannelName = 'alttp-alerts',
-  alertOnConnect = false,
-  twitchGameName = 'The Legend of Zelda: A Link to the Past',
-  twitchStatusFilters = /rando|lttpr|z3r|casual|2v2|enemizer/i,
-  twitchUpdateIntervalSeconds = 60,
-  twitchOfflineToleranceSeconds = 600,
-  srlGameName = 'The Legend of Zelda: A Link to the Past',
-  srlIrcServer = 'irc.speedrunslive.com',
-  srlUsername = 'HelpasaurKing',
-  allowedRolesForRequest = /nmg\-race|100\-race/,
-  textCmdCooldown = 10,
-  srcCmdCooldown = 10,
-  srcGameSlug = 'alttp',
-  srcUserAgent = 'alttp-bot/1.0';
 
 // Import modules
 const request = require('request'),
@@ -33,33 +14,25 @@ const request = require('request'),
   md5 = require('md5'),
   Discord = require('discord.js');
 
-// File paths for config/keys
-let etcPath = path.join(__dirname, 'etc');
+// Read in bot configuration
+let config = require('./config.json');
+
+// File paths for extra configs
 let confPath = path.join(__dirname, 'conf');
-let tokenFilePath = path.join(etcPath, 'discord_token'),
-  twitchClientIdFilePath = path.join(etcPath, 'twitch_client_id'),
-  twitchStreamsFilePath = path.join(confPath, 'twitch_streams'),
+let twitchStreamsFilePath = path.join(confPath, 'twitch_streams'),
   textCommandsFilePath = path.join(confPath, 'text_commands'),
   srcCategoriesFilePath = path.join(confPath, 'src_categories');
 
-// Discord token for bot - https://discordapp.com/developers/applications/me
-let token = fs.readFileSync(tokenFilePath, 'utf-8').toString().trim().replace(/\n/, '');
-
-// Read in Twitch client ID for use with API
-let twitchClientId = fs.readFileSync(twitchClientIdFilePath, 'utf-8').toString().trim().replace(/\n/, '');
-
-// Read in list of Twitch streams
+// Read in list of Twitch streams and watch for changes
 let twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
-// Watch file for changes
 fs.watchFile(twitchStreamsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
     twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
   }
 });
 
-// Read in basic text commands / definitions
+// Read in basic text commands / definitions and watch for changes
 let textCommands = readTextCommands(textCommandsFilePath);
-// Watch file for changes
 fs.watchFile(textCommandsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
     textCommands = readTextCommands(textCommandsFilePath);
@@ -79,11 +52,11 @@ cache.on('connect', () => {
   // The ready event is vital, it means that your bot will only start reacting to information
   // from Discord _after_ ready is emitted
   client.on('ready', () => {
-    console.log(botName + ' Online');
+    console.log(config.botName + ' Online');
 
     // Find the text channel where we'll be posting alerts
-    alertsChannel = client.channels.find('name', alertsChannelName);
-    if (alertOnConnect === true) alertsChannel.send(botName + ' has connected. :white_check_mark:');
+    alertsChannel = client.channels.find('name', config.discord.alertsChannelName);
+    if (config.discord.alertOnConnect === true) alertsChannel.send(config.botName + ' has connected. :white_check_mark:');
 
     // Watch allthethings
     watchForTwitchStreams();
@@ -101,7 +74,8 @@ cache.on('connect', () => {
       if (!roleName) {
         dmUser(message, "You must include a role name! *e.g. !"+roleName[1]+"role nmg-race*");
       } else {
-        if (allowedRolesForRequest.test(roleName[2])) {
+        let tester = new RegExp(config.discord.allowedRolesForRequest, 'i');
+        if (tester.test(roleName[2])) {
           // make sure this message is in a guild channel they're a member of
           if (!message.guild) return;
 
@@ -167,11 +141,11 @@ cache.on('connect', () => {
 
         // Make sure this command isn't on cooldown in this channel
         let cooldownKey = message.content + message.channel.id;
-        isOnCooldown(cooldownKey, srcCmdCooldown, function(onCooldown) {
+        isOnCooldown(cooldownKey, config.discord.srcCmdCooldown, function(onCooldown) {
           if (onCooldown === false) {
             let wrSearchReq = {
-              url: 'http://www.speedrun.com/api/v1/leaderboards/alttp/category/' + category.id + '?top=1&embed=players&var-'+subcategory.varId+'='+subcategory.id,
-              headers: {'User-Agent': srcUserAgent}
+              url: 'http://www.speedrun.com/api/v1/leaderboards/'+config.src.gameSlug+'/category/' + category.id + '?top=1&embed=players&var-'+subcategory.varId+'='+subcategory.id,
+              headers: {'User-Agent': config.src.userAgent}
             };
 
             // check for cache of this request
@@ -197,7 +171,7 @@ cache.on('connect', () => {
                                   + ' ' + run.weblink;
 
                       message.channel.send(wrResponse)
-                        .then(sentMessage => placeOnCooldown(cooldownKey, srcCmdCooldown))
+                        .then(sentMessage => placeOnCooldown(cooldownKey, config.discord.srcCmdCooldown))
                         .catch(console.error);
 
                       // cache the response
@@ -243,12 +217,12 @@ cache.on('connect', () => {
 
       // Make sure this command isn't on cooldown
       let cooldownKey = message.content + message.channel.id;
-      isOnCooldown(cooldownKey, srcCmdCooldown, function(onCooldown) {
+      isOnCooldown(cooldownKey, config.discord.srcCmdCooldown, function(onCooldown) {
         if (onCooldown === false) {
           // look up user on SRC, pull in PB's
           let userSearchReq = {
             url: 'http://www.speedrun.com/api/v1/users/'+encodeURIComponent(commandParts[1])+'/personal-bests?embed=players',
-            headers: {'User-Agent': srcUserAgent}
+            headers: {'User-Agent': config.src.userAgent}
           };
 
           // check for cache of this request
@@ -284,7 +258,7 @@ cache.on('connect', () => {
               });
             }
 
-            placeOnCooldown(cooldownKey, srcCmdCooldown);
+            placeOnCooldown(cooldownKey, config.discord.srcCmdCooldown);
           });
         } else {
           // DM the user that it's on CD
@@ -306,10 +280,10 @@ cache.on('connect', () => {
       {
         // Make sure this command isn't on cooldown
         let cooldownKey = message.content + message.channel.id;
-        isOnCooldown(cooldownKey, textCmdCooldown, function(onCooldown) {
+        isOnCooldown(cooldownKey, config.discord.textCmdCooldown, function(onCooldown) {
           if (onCooldown === false) {
             message.channel.send(textCommands[message.content])
-              .then(sentMessage => placeOnCooldown(cooldownKey, textCmdCooldown))
+              .then(sentMessage => placeOnCooldown(cooldownKey, config.discord.textCmdCooldown))
               .catch(console.error);
           } else {
             // DM the user that it's on CD
@@ -324,7 +298,7 @@ cache.on('connect', () => {
   });
 
   // Log the bot in
-  client.login(token);
+  client.login(config.discord.token);
 }).on('error', function(e) {
   console.log(e);
 });
@@ -343,20 +317,22 @@ String.prototype.toHHMMSS = function () {
   return hours+':'+minutes+':'+seconds;
 }
 
-// Starts watching for streams, updates every twitchUpdateIntervalSeconds
+// Starts watching for streams, updates every config.twitch.updateIntervalSeconds
 function watchForTwitchStreams()
 {
   findLiveStreams(handleStreamResults);
-  setTimeout(watchForTwitchStreams, twitchUpdateIntervalSeconds*1000);
+  setTimeout(watchForTwitchStreams, config.twitch.updateIntervalSeconds*1000);
 }
 
 // Connect to Twitch to pull a list of currently live speedrun streams for configured game/channels
 function findLiveStreams(callback)
 {
   let search = {
-    url: 'https://api.twitch.tv/kraken/streams?limit=100&game='+encodeURIComponent(twitchGameName)+'&channel='+encodeURIComponent(twitchChannels.join()),
-    headers: {'Client-ID': twitchClientId}
+    url: 'https://api.twitch.tv/kraken/streams?limit=100&game='+encodeURIComponent(config.twitch.gameName)+'&channel='+encodeURIComponent(twitchChannels.join()),
+    headers: {'Client-ID': config.twitch.clientId}
   };
+
+  let tester = new RegExp(config.twitch.statusFilters, 'i');
 
   request(search, function (error, response, body) {
     if (!error && response.statusCode == 200) {
@@ -364,7 +340,7 @@ function findLiveStreams(callback)
       if (info._total > 0) {
         // Attempt to automatically filter out non-speedrun streams by title
         let filteredStreams = info.streams.filter(function (item) {
-          return !(twitchStatusFilters.test(item.channel.status));
+          return !(tester.test(item.channel.status));
         });
         callback(null, filteredStreams);
       }
@@ -398,7 +374,7 @@ function handleStreamResults(err, streams)
       }
 
       // add back to cache, update timeout
-      cache.set(cacheKey, JSON.stringify(stream), handleCacheSet, twitchOfflineToleranceSeconds);
+      cache.set(cacheKey, JSON.stringify(stream), handleCacheSet, config.twitch.offlineToleranceSeconds);
     });
   });
 }
@@ -407,9 +383,23 @@ function handleStreamResults(err, streams)
 function watchForSrlRaces()
 {
   // Connect to SRL IRC server
-  let client = new irc.Client(srlIrcServer, srlUsername, {
+  let client = new irc.Client(config.srl.ircServer, config.srl.username, {
+    password: config.srl.password,
     channels: ['#speedrunslive']
   });
+
+  // Connect to SRL IRC server
+  /*var client = new irc.Client(srlIrcServer, srlUsername, {
+    password: srlPassword,
+    autoRejoin: false,
+    retryCount: 0,
+    retryDelay: 10000,
+    floodProtection: true,
+    floodProtectionDelay: 1000,
+    debug: true,
+    showErrors: true,
+    channels: ['#speedrunslive']
+  });*/
 
   // Listen for messages from RaceBot in the main channel
   client.addListener('message#speedrunslive', function (from, message) {
@@ -421,13 +411,13 @@ function watchForSrlRaces()
       }
       let goal = message.match(/\-\s(.+)\s\|/);
 
-      if (message.startsWith('Race initiated for ' + srlGameName + '. Join')) {
-        alertsChannel.send('**SRL Race Started** :: *#' + raceChannel[0] + '* :: A race was just started for ' + srlGameName + '! | ' + srlUrl);
-      } else if (message.startsWith('Goal Set: ' + srlGameName + ' - ')) {
+      if (message.startsWith('Race initiated for ' + config.srl.gameName + '. Join')) {
+        alertsChannel.send('**SRL Race Started** :: *#' + raceChannel[0] + '* :: A race was just started for ' + config.srl.gameName + '! | ' + srlUrl);
+      } else if (message.startsWith('Goal Set: ' + config.srl.gameName + ' - ')) {
         alertsChannel.send('**SRL Race Goal Set** :: *#' + raceChannel[0] + '* ::  __' + goal[1] + '__ | ' + srlUrl);
-      } else if (message.startsWith('Race finished: ' + srlGameName + ' - ')) {
+      } else if (message.startsWith('Race finished: ' + config.srl.gameName + ' - ')) {
         alertsChannel.send('**SRL Race Finished** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
-      } else if (message.startsWith('Rematch initiated: ' + srlGameName + ' - ')) {
+      } else if (message.startsWith('Rematch initiated: ' + config.srl.gameName + ' - ')) {
         alertsChannel.send('**SRL Rematch** :: *#' + raceChannel[0] + '* :: __' + goal[1] + '__ | ' + srlUrl);
       }
     }
