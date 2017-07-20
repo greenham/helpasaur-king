@@ -1,0 +1,34 @@
+{
+  "botName": "ALttP Bot",
+  "discord": {
+    "token": "APP_BOT_USER_TOKEN", // https://discordapp.com/developers/applications/me
+    "alertsChannelName": "alttp-alerts", // text channel where stream+race alerts will be posted
+    "alertOnConnect": false, // whether or not to send a greeting to the alerts channel upon starting
+    "allowedRolesForRequest": "nmg-race|100-race", // roles that can be automatically added/removed by any user
+    "textCmdCooldown": 10, // how long in seconds before an individual text command can be used again
+    "srcCmdCooldown": 10, // how long in seconds before an individual SRC command can be used again
+    "cmdPrefix": "!" // the character(s) that all commands should start with
+  },
+  "twitch": {
+    "clientId": "APP_CLIENT_ID", // https://www.twitch.tv/settings/connections
+    "gameName": "The Legend of Zelda: A Link to the Past", // the game to search for live stream alerts
+    "statusFilters": "rando|lttpr|z3r|casual|2v2|enemizer", // keywords to filter out for live stream alerts
+    "updateIntervalSeconds": 60, // how often in seconds to check for new live streams
+    "offlineToleranceSeconds": 600, // how long in seconds a stream must be offline before another live alert will be sent
+    "username": "USERNAME", // username for chat bot
+    "oauth": "OAUTH_PASSWORD", // http://twitchapps.com/tmi/
+    "ircServer": "irc.chat.twitch.tv", // chat server
+    "textCmdCooldown": 60, // how long in seconds before an individual text commands can be used again (per-channel)
+    "cmdPrefix": "!" // the character(s) that all commands should start with
+  },
+  "srl": {
+    "username": "USERNAME",
+    "password": "PASSWORD",
+    "gameName": "The Legend of Zelda: A Link to the Past",
+    "ircServer": "irc.speedrunslive.com"
+  },
+  "src": {
+    "gameSlug": "alttp",
+    "userAgent": "alttp-bot/1.0"
+  }
+}

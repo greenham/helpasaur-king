@@ -3,8 +3,12 @@
  *   General TODOs
  *     - Extract basic functionality to a separate module that both discord/twitch can utilize
  *     - Allow users with alttp-bot-editor role to add/edit commands
+<<<<<<< Updated upstream
  *     - Create per-environment settings file
  *     - Watch conf files for changes and auto-update
+=======
+ *     - Make the prefix (!) configurable
+>>>>>>> Stashed changes
  */
 
 // Settings
@@ -82,7 +86,7 @@ cache.on('connect', () => {
   client.on('message', message => {
 
     // Allow members to request role additions/removals for allowed roles
-    if (message.content.startsWith('!addrole') || message.content.startsWith('!removerole'))
+    if (message.content.startsWith(`{config.prefix}addrole`) || message.content.startsWith(`{config.prefix}removerole`))
     {
       // parse+validate role name
       var roleName = message.content.match(/\!(add|remove)role\s([a-z0-9\-]+)/);
@@ -130,7 +134,7 @@ cache.on('connect', () => {
     ///////////////////////////////////////////////////////////////////////////
 
     // Speedrun.com API Integration (leaderboard lookups)
-    else if (message.content.startsWith('!wr'))
+    else if (message.content.startsWith(`{config.prefix}wr`))
     {
       message.content = message.content.toLowerCase();
       if (message.content === '!wr') {
@@ -207,7 +211,7 @@ cache.on('connect', () => {
         });
       });
     }
-    else if (message.content.startsWith('!pb'))
+    else if (message.content.startsWith(`{config.prefix}pb`))
     {
       message.content = message.content.toLowerCase();
       if (message.content === '!pb') {
@@ -281,14 +285,14 @@ cache.on('connect', () => {
       });
     }
     // @todo implement this
-    else if (message.content.startsWith('!rules'))
+    else if (message.content.startsWith(`{config.prefix}rules`))
     {
 
     }
     ///////////////////////////////////////////////////////////////////////////
 
-    // Basic text commands
-    else if (message.content.startsWith('!'))
+    // Static text commands
+    else if (message.content.startsWith(config.prefix))
     {
       if (textCommands.hasOwnProperty(message.content))
       {
