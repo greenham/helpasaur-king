@@ -1,0 +1,34 @@
+{
+  "botName": "Helpasaur King",
+  "discord": {
+    "token": "MzMzODAyNDY0MTI4MDA4MTkz.DER9XQ.E6iu44iKWKOl8ZFntX5iUL3UAwE",
+    "alertsChannelName": "alttp-alerts",
+    "alertOnConnect": false,
+    "allowedRolesForRequest": "nmg-race|100-race",
+    "textCmdCooldown": 10,
+    "srcCmdCooldown": 10,
+    "cmdPrefix": "!"
+  },
+  "twitch": {
+    "clientId": "p000sp5q14fg2web0dx71p9fbmx5m9",
+    "gameName": "The Legend of Zelda: A Link to the Past",
+    "statusFilters": "rando|lttpr|z3r|casual|2v2|enemizer",
+    "updateIntervalSeconds": 60,
+    "offlineToleranceSeconds": 600,
+    "username": "alttpbot",
+    "oauth": "oauth:uoye2000t9g34rd4jq5rg3zhiyk851",
+    "ircServer": "irc.chat.twitch.tv",
+    "textCmdCooldown": 60,
+    "cmdPrefix": "!"
+  },
+  "srl": {
+    "username": "HelpasaurKing",
+    "password": "v!028UH04Tmt",
+    "gameName": "The Legend of Zelda: A Link to the Past",
+    "ircServer": "irc.speedrunslive.com"
+  },
+  "src": {
+    "gameSlug": "alttp",
+    "userAgent": "alttp-bot/1.0"
+  }
+}
