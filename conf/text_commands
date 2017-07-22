@@ -1,3 +1,5 @@
+!relay|The ALttP Community is currently planning a relay race for October 21st. If you're interested in joining, please fill out this form: https://docs.google.com/forms/d/1SB_NKDhytAVdOHHGE9pBgXba3L-OBBu8enKANSVJd-o and join the discord here: https://discord.gg/ajgFSV
+!low%race|Community Race of Low% on July 30th: https://pastebin.com/niS5aBk5
 !airpumping|Much like wall pumping, air pumping will reset Link's movement pattern with every pump. The pattern for moving north or west is 2-1-2-1-... and the diagonal movement speed is 1px/frame. So, as an example, going north and pumping west (or east) every other frame would result in a 2North-1Diagonal-2North-1Diagonal-... movement.
 !antipumping|Exactly the same as Wall Pumping or Air Pumping, but this happened when you accidentally do an air/wall pump while Link is facing East or South. Instead of changing 2-1-2-1 to 2-2-2-2, it changes your walk pattern from 1-2-1-2 to 1-1-1-1.
 !bb|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defated after being hit by 6 yellow balls.
@@ -20,7 +22,6 @@
 !lanmo|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv
 !lb|http://www.speedrun.com/alttp
 !low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. That means, yes, if you grab the Magic Mushroom, you have to reset (or get rid of it at the Witch's Hut). It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon).
-!low%race|Community Race of Low% on July 30th: https://pastebin.com/niS5aBk5
 !mothtut|tiny moth dik: https://www.youtube.com/watch?v=qmR3zO2VQCE
 !nmg|NMG is short for No Major Glitches and means that glitches that skip a large chunk of the game, such as EG and OOB, are not allowed. More information on glitch classifications can be found here: http://pastebin.com/bb0vHjcm
 !oob|Out of Bounds (abbreviated OoB) means leaving the intended confinements of the playing field. The most powerful/broken Out of Bounds state is EG (Exploration Glitch).
@@ -30,7 +31,8 @@
 !randodiscord|ALttP Randomizer Discord: https://discord.gg/BEPAD3Q
 !resources|https://alttp-wiki.net/index.php/Tutorials_and_other_external_resources
 !tuts|https://alttp-wiki.net/index.php/Tutorials_and_other_external_resources
-!roomsheet|BluntBunny room sheet: http://bombch.us/CByk
+!bbrooms|BluntBunny room sheet: http://bombch.us/CByk
+!roomsheet|ALttP Community Room Sheet: https://docs.google.com/spreadsheets/d/1dV2ozAGgDdFZAne8rwG3h0KyOPgIN72pWeRsS1hR2QU/edit?usp=sharing
 !rbo|Reverse Boss Order is a category in which you defeat all bosses in the reverse order, all the way from Ganon to Armos Knight. The run ends, as usual, when collecting the Triforce. The category requires frequent use of larger glitches such as EG and YBA.
 !s+q|S+Q means Save and Quit and can be used to minimize overworld travel. With so many other categories that allow heavy sequence breaking, the community at large has decided to not allow S+Q in an NMG speedrun simply to include more content of the game that most other categories skip.
 !spindash|By releasing a sword spin and pressing the A-button the first frame after release, Link will be put into a glitched state and cannot use his sword. If you touch manual stairs and exit cardinally, Link will move at dashing speed with the ability to change directions. Just as with hookdash, pressing A, taking damage, changing screen, or jumping off a ledge will end the glitched state. JP v1.0 only.
@@ -75,8 +77,7 @@
 !zeldagamer|https://www.youtube.com/watch?v=48eMTIYpKeo
 !commands|https://github.com/greenham/alttp-bot/blob/master/README.md
 !help|https://github.com/greenham/alttp-bot/blob/master/README.md
-!relay|The ALttP Community is currently planning a relay race for sometime in September or October. If you're interested in joining, please fill out this form: https://docs.google.com/forms/d/1SB_NKDhytAVdOHHGE9pBgXba3L-OBBu8enKANSVJd-o
-!weekly|There is a weekly Any% NMG No S+Q race every Sunday at 3:00 PM Eastern Time held on SpeedRunsLive. Everyone is welcome to join! :LinkFace:
+!weekly|There is a weekly Any% NMG No S+Q race every Sunday at 3:00 PM Eastern Time held on SpeedRunsLive. Everyone is welcome to join!
 !bsnes+|http://helge.monsternett.no/bsnes-plus.zip
 !rom|3322effc
 !goldsheet|https://docs.google.com/spreadsheets/d/1ludCDzwLxWp-0XR2Ea14T3zoLz0L0UyY1etcvrLqwHo/edit?usp=sharing

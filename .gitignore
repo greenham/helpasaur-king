@@ -1,4 +1,3 @@
 node_modules
-logs
-etc/*
-!etc/README.md
+logs/*
+config.json

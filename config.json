@@ -1,10 +1,10 @@
 {
-  "botName": "Helpasaur King",
+  "botName": "deebsenhamenbot",
   "discord": {
     "token": "MzMzODAyNDY0MTI4MDA4MTkz.DER9XQ.E6iu44iKWKOl8ZFntX5iUL3UAwE",
     "alertsChannelName": "alttp-alerts",
     "alertOnConnect": false,
-    "allowedRolesForRequest": "nmg-race|100-race",
+    "allowedRolesForRequest": "NERDS",
     "textCmdCooldown": 10,
     "srcCmdCooldown": 10,
     "cmdPrefix": "!"

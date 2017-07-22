@@ -2,16 +2,16 @@
 
 ## Definitions/Links
 
-```!airpumping, !antipumping, !arcvar, !bb, !bb%, !blockerase, !bsnes+, !catchtimes, !discord, !eg, !ff, !ganontut, !glitchtuts, !goldsheet, !prachack, !hammeryump, !hover, !hovertut, !ipbj, !itemdash, !jamtut, !jp, !keydash, !lanmo, !lb, !low%, !low%race, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !prizepacks, !quickwarp, !randodiscord, !relay, !resources, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !superspeed, !swordbuffer, !swordclimb, !trident, !tuts, !wallpumping, !weekly, !wiki, !wqvitty, !yba```
+```!airpumping, !antipumping, !arcvar, !bb, !bb%, !bbrooms, !blockerase, !bsnes+, !catchtimes, !discord, !eg, !ff, !ganontut, !glitchtuts, !goldsheet, !prachack, !hammeryump, !hover, !hovertut, !ipbj, !itemdash, !jamtut, !jp, !keydash, !lanmo, !lb, !low%, !low%race, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !prizepacks, !quickwarp, !randodiscord, !relay, !resources, !rom, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !superspeed, !swordbuffer, !swordclimb, !trident, !tuts, !wallpumping, !weekly, !wiki, !wqvitty, !yba```
 
 ## Memes/Highlights
 
-```!69blazeit, !armface, !birdtoss, !clap, !clipclap, !clipirl, !dildo, !doubleteam, !firstdigflute, !ganondik, !gonnabeme, !illbefine, !kholdstare, !middlehole, !mothhole, !mothtut2, !pissonface, !playmario, !psa, !rapbattle, !sobesmooth, !thebee, !thewobble, !thirtyseven, !trolldorm, !uhoh, !wafflehouse, !whatagod, !zeldagamer```
+```!69blazeit, !armface, !birdtoss, !clap, !clipclap, !clipirl, !dildo, !doubleteam, !firstdigflute, !foosdabridge, !ganondik, !gonnabeme, !illbefine, !kholdstare, !middlehole, !mothhole, !mothtut2, !pissonface, !playmario, !psa, !rapbattle, !sobesmooth, !thebee, !thewobble, !thirtyseven, !trolldorm, !uhoh, !wafflehouse, !whatagod, !zeldagamer```
 
 ## Discord-Only Commands
 
-- `!addrole {name-of-role}`
-- `!removerole {name-of-role}`
+- `!role add {name-of-role}`
+- `!role remove {name-of-role}`
 - `!wr {nmg/mg} {category-code}`
 - `!pb {speedrun.com-username} {nmg/mg} {category-code}`
 
