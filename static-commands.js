@@ -1,26 +1,20 @@
 module.exports = {};
 
 const fs = require('fs'),
-  path = require('path'),
-  cooldowns = require('./cooldowns.js');
+  path = require('path');
 
-const textCommandsFilePath = path.join(__dirname, 'conf', 'text_commands');
+const commandsFilePath = path.join(__dirname, 'conf', 'text_commands');
 
 // Read in basic text commands / definitions and watch for changes
-let textCommands = readTextCommands(textCommandsFilePath);
-fs.watchFile(textCommandsFilePath, (curr, prev) => {
+let commands = parseCommands(commandsFilePath);
+fs.watchFile(commandsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
-    textCommands = readTextCommands(textCommandsFilePath);
+    commands = parseCommands(commandsFilePath);
   }
 });
 
-function commandExists(command)
-{
-  return textCommands.hasOwnProperty(command):
-}
-
 // Read/parse text commands from the "database"
-function readTextCommands(filePath)
+function parseCommands(filePath)
 {
   let commands = {};
   let data = fs.readFileSync(filePath, 'utf-8');
@@ -31,4 +25,16 @@ function readTextCommands(filePath)
     commands[commandParts[0]] = commandParts[1];
   });
   return commands;
+}
+
+function exists(command)
+{
+  return commands.hasOwnProperty(command);
+}
+
+function get(command)
+{
+  if (exists(commmand)) {
+    return commands[command];
+  }
 }
