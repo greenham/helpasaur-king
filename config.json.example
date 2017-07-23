@@ -7,7 +7,9 @@
     "allowedRolesForRequest": "nmg-race|100-race", // roles that can be automatically added/removed by any user
     "textCmdCooldown": 10, // how long in seconds before an individual text command can be used again
     "srcCmdCooldown": 10, // how long in seconds before an individual SRC command can be used again
-    "cmdPrefix": "!" // the character(s) that all commands should start with
+    "cmdPrefix": "!", // the character(s) that all commands should start with
+    "enableLivestreamAlerts": true,
+    "enableRaceAlerts": true
   },
   "twitch": {
     "clientId": "APP_CLIENT_ID", // https://www.twitch.tv/settings/connections

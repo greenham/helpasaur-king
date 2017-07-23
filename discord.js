@@ -13,7 +13,8 @@ const request = require('request'),
   path = require('path'),
   memcache = require('memcache'),
   md5 = require('md5'),
-  Discord = require('discord.js');
+  Discord = require('discord.js')
+  staticCommands = require('./static-commands.js');
 
 // Read in bot configuration
 let config = require('./config.json');
@@ -33,12 +34,12 @@ fs.watchFile(twitchStreamsFilePath, (curr, prev) => {
 });
 
 // Read in basic text commands / definitions and watch for changes
-let textCommands = readTextCommands(textCommandsFilePath);
+/*let textCommands = readTextCommands(textCommandsFilePath);
 fs.watchFile(textCommandsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
     textCommands = readTextCommands(textCommandsFilePath);
   }
-});
+});*/
 
 // Read in current category info on SRC (run src.js to refresh)
 let indexedCategories = readSrcCategories(srcCategoriesFilePath);
@@ -275,8 +276,8 @@ function init()
     if (config.discord.alertOnConnect === true) alertsChannel.send(config.botName + ' has connected. :white_check_mark:');
 
     // Watch allthethings
-    watchForTwitchStreams();
-    watchForSrlRaces();
+    if (config.discord.enableLivestreamAlerts) watchForTwitchStreams();
+    if (config.discord.enableRaceAlerts) watchForSrlRaces();
   }).on('message', msg => {
     // Listen for commands for the bot to respond to
     msg.originalContent = msg.content;
@@ -288,8 +289,8 @@ function init()
     // Check for native or static command
     if (commands.hasOwnProperty(msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0])) {
       commands[msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0]](msg);
-    } else if (textCommands.hasOwnProperty(msg.content)) {
-      // Make sure this command isn't on cooldown
+    } else if (staticCommands.exists(msg.content)) {
+      // Make sure this command isn't on cooldown in this particular channel
       let cooldownKey = msg.content + msg.channel.id;
       isOnCooldown(cooldownKey, config.discord.textCmdCooldown, function(onCooldown) {
         if (onCooldown === false) {

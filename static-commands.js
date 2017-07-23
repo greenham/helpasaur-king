@@ -1,4 +1,7 @@
-module.exports = {};
+module.exports = {
+  exists: exists,
+  get: get
+};
 
 const fs = require('fs'),
   path = require('path');
