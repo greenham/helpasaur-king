@@ -15,7 +15,7 @@ const request = require('request'),
   memcache = require('memcache'),
   md5 = require('md5'),
   Discord = require('discord.js');
-  //staticCommands = require('./static-commands.js');
+  staticCommands = require('./static-commands.js');
 
 // Read in bot configuration
 let config = require('./config.json');
@@ -23,7 +23,6 @@ let config = require('./config.json');
 // File paths for extra configs
 let confPath = path.join(__dirname, 'conf');
 let twitchStreamsFilePath = path.join(confPath, 'twitch_streams'),
-  textCommandsFilePath = path.join(confPath, 'text_commands'),
   srcCategoriesFilePath = path.join(confPath, 'src_categories');
 
 // Read in list of Twitch streams and watch for changes
@@ -31,14 +30,6 @@ let twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().
 fs.watchFile(twitchStreamsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
     twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
-  }
-});
-
-// Read in basic text commands / definitions and watch for changes
-let textCommands = readTextCommands(textCommandsFilePath);
-fs.watchFile(textCommandsFilePath, (curr, prev) => {
-  if (curr.mtime !== prev.mtime) {
-    textCommands = readTextCommands(textCommandsFilePath);
   }
 });
 
@@ -290,12 +281,12 @@ function init()
     // Check for native or static command
     if (commands.hasOwnProperty(msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0])) {
       commands[msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0]](msg);
-    } else if (textCommands.hasOwnProperty(msg.content)) {
+    } else if (staticCommands.exists(msg.content)) {
       // Make sure this command isn't on cooldown in this particular channel
       let cooldownKey = msg.content + msg.channel.id;
       isOnCooldown(cooldownKey, config.discord.textCmdCooldown, function(onCooldown) {
         if (onCooldown === false) {
-          msg.channel.send(textCommands[msg.content])
+          msg.channel.send(staticCommands.get(msg.content))
             .then(sentMessage => placeOnCooldown(cooldownKey, config.discord.textCmdCooldown))
             .catch(console.error);
         } else {
@@ -422,20 +413,6 @@ function watchForSrlRaces()
   client.addListener('error', function(message) {
     console.error('error from SRL IRC Server: ', message);
   });
-}
-
-// Read/parse text commands from the "database"
-function readTextCommands(filePath)
-{
-  let commands = {};
-  let data = fs.readFileSync(filePath, 'utf-8');
-  let commandLines = data.toString().split('\n');
-  let commandParts;
-  commandLines.forEach(function(line) {
-    commandParts = line.split('|');
-    commands[commandParts[0]] = commandParts[1];
-  });
-  return commands;
 }
 
 // Read/parse SRC category information

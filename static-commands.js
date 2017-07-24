@@ -37,7 +37,9 @@ function exists(command)
 
 function get(command)
 {
-  if (exists(commmand)) {
+  if (exists(command)) {
     return commands[command];
+  } else {
+    return undefined;
   }
 }

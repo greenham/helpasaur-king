@@ -7,14 +7,14 @@ const irc = require('irc'),
   memcache = require('memcache'),
   md5 = require('md5'),
   fs = require('fs'),
-  path = require('path');
+  path = require('path'),
+  staticCommands = require('./static-commands.js');
 
 // Read in bot configuration
 let config = require('./config.json');
 
 // Config file paths
-const textCommandsFilePath = path.join(__dirname, 'conf', 'text_commands'),
-  joinChannelsFilePath = path.join(__dirname, 'conf', 'twitch_bot_channels');
+const joinChannelsFilePath = path.join(__dirname, 'conf', 'twitch_bot_channels');
 
 // Read in twitch channel list and watch for changes
 let twitchChannels = fs.readFileSync(joinChannelsFilePath, 'utf-8').toString().split('\n');
@@ -29,67 +29,49 @@ fs.watchFile(joinChannelsFilePath, (curr, prev) => {
   }
 });
 
-// Read in basic text commands / definitions and watch for changes
-let textCommands = readTextCommands(textCommandsFilePath);
-fs.watchFile(textCommandsFilePath, (curr, prev) => {
-  if (curr.mtime !== prev.mtime) {
-    textCommands = readTextCommands(textCommandsFilePath);
-  }
-});
-
 // Connect to cache
 let cache = new memcache.Client();
 cache.on('connect', () => {
+  init();
 }).on('error', function(e) {
   console.error(e);
 });
 cache.connect();
 
-// Connect to Twitch IRC server
-let client = new irc.Client(config.twitch.ircServer, config.twitch.username, {
-  password: config.twitch.oauth,
-  autoRejoin: true,
-  retryCount: 10,
-  channels: twitchChannels
-});
-
-client.addListener('error', function(message) {
-  console.error('error from Twitch IRC Server: ', message);
-});
-
-client.addListener('message', function (from, to, message) {
-  // Basic text commands
-  if (message.startsWith('!')) {
-    if (textCommands.hasOwnProperty(message)) {
-      console.log(to + ': ' + message);
-
-      // Make sure this command isn't on cooldown
-      let cooldownIndex = to+message;
-      isOnCooldown(cooldownIndex, config.twitch.textCmdCooldown, function(onCooldown) {
-        if (onCooldown === false) {
-          client.say(to, textCommands[message]);
-          placeOnCooldown(cooldownIndex, config.twitch.textCmdCooldown);
-        } else {
-          // command is on cooldown in this channel
-          client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');
-        }
-      });
-    }
-  }
-});
-
-// Read/parse text commands from the "database"
-function readTextCommands(filePath)
+function init()
 {
-  var commands = {};
-  var data = fs.readFileSync(filePath, 'utf-8');
-  var commandLines = data.toString().split('\n');
-  var commandParts;
-  commandLines.forEach(function(line) {
-    commandParts = line.split('|');
-    commands[commandParts[0]] = commandParts[1];
+  // Connect to Twitch IRC server
+  let client = new irc.Client(config.twitch.ircServer, config.twitch.username, {
+    password: config.twitch.oauth,
+    autoRejoin: true,
+    retryCount: 10,
+    channels: twitchChannels
   });
-  return commands;
+
+  client.addListener('error', function(message) {
+    console.error('error from Twitch IRC Server: ', message);
+  });
+
+  client.addListener('message', function (from, to, message) {
+    // Basic text commands
+    if (message.startsWith(config.twitch.cmdPrefix)) {
+      if (staticCommands.exists(message)) {
+        console.log(`received command in ${to} from ${from}: ${message}`);
+
+        // Make sure this command isn't on cooldown
+        let cooldownIndex = to+message;
+        isOnCooldown(cooldownIndex, config.twitch.textCmdCooldown, function(onCooldown) {
+          if (onCooldown === false) {
+            client.say(to, staticCommands.get(message));
+            placeOnCooldown(cooldownIndex, config.twitch.textCmdCooldown);
+          } else {
+            // command is on cooldown in this channel
+            client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');
+          }
+        });
+      }
+    }
+  });
 }
 
 // Given a cooldownTime in seconds and a command, returns false if the command is not on cooldown
