@@ -11,12 +11,14 @@
     "enableLivestreamAlerts": true,
     "enableRaceAlerts": true
   },
-  "twitch": {
+  "streamAlerts": {
     "clientId": "APP_CLIENT_ID", // https://www.twitch.tv/settings/connections
     "gameName": "The Legend of Zelda: A Link to the Past", // the game to search for live stream alerts
     "statusFilters": "rando|lttpr|z3r|casual|2v2|enemizer", // keywords to filter out for live stream alerts
     "updateIntervalSeconds": 60, // how often in seconds to check for new live streams
-    "offlineToleranceSeconds": 600, // how long in seconds a stream must be offline before another live alert will be sent
+    "offlineToleranceSeconds": 600 // how long in seconds a stream must be offline before another live alert will be sent
+  },
+  "twitch": {
     "username": "USERNAME", // username for chat bot
     "oauth": "OAUTH_PASSWORD", // http://twitchapps.com/tmi/
     "ircServer": "irc.chat.twitch.tv", // chat server
@@ -30,7 +32,6 @@
     "ircServer": "irc.speedrunslive.com"
   },
   "src": {
-    "gameSlug": "alttp",
-    "userAgent": "alttp-bot/1.0"
+    "gameSlug": "alttp"
   }
 }
