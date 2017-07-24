@@ -14,8 +14,10 @@ const request = require('request'),
   path = require('path'),
   memcache = require('memcache'),
   md5 = require('md5'),
-  Discord = require('discord.js');
-  staticCommands = require('./static-commands.js');
+  Discord = require('discord.js'),
+  staticCommands = require('./lib/static-commands.js'),
+  cooldowns = require('./lib/cooldowns.js'),
+  StreamAlerts = require('./lib/stream-alerts.js');
 
 // Read in bot configuration
 let config = require('./config.json');
@@ -25,15 +27,16 @@ let confPath = path.join(__dirname, 'conf');
 let twitchStreamsFilePath = path.join(confPath, 'twitch_streams'),
   srcCategoriesFilePath = path.join(confPath, 'src_categories');
 
-// Read in list of Twitch streams and watch for changes
+// Set up Twitch stream watcher
 let twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
+let streamWatcher = new StreamAlerts(twitchChannels, config.streamAlerts);
 fs.watchFile(twitchStreamsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
-    twitchChannels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
+    streamWatcher.channels = fs.readFileSync(twitchStreamsFilePath, 'utf-8').toString().split('\n');
   }
 });
 
-// Read in current category info on SRC (run src.js to refresh)
+// Read in current category info on SRC (run lib/src.js to refresh)
 let indexedCategories = readSrcCategories(srcCategoriesFilePath);
 
 // Set up Discord client
@@ -134,54 +137,51 @@ function init()
           return dmUser(msg, 'Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes');
         }
 
-        // Make sure this command isn't on cooldown in this channel
-        let cooldownKey = msg.content + msg.channel.id;
-        isOnCooldown(cooldownKey, config.discord.srcCmdCooldown, function(onCooldown) {
-          if (onCooldown === false) {
-            let wrSearchReq = {
-              url: `http://www.speedrun.com/api/v1/leaderboards/${config.src.gameSlug}/category/${category.id}?top=1&embed=players&var-${subcategory.varId}=${subcategory.id}`,
-              headers: {'User-Agent': config.src.userAgent}
-            };
+        let wrSearchReq = {
+          url: `http://www.speedrun.com/api/v1/leaderboards/${config.src.gameSlug}/category/${category.id}?top=1&embed=players&var-${subcategory.varId}=${subcategory.id}`,
+          headers: {'User-Agent': config.src.userAgent}
+        };
 
-            // check for cache of this request
-            let wrCacheKey = md5(JSON.stringify(wrSearchReq));
-            cache.get(wrCacheKey, function(err, res) {
-              if (!err && res !== null) {
-                // cache hit
-                msg.channel.send(res);
+        // Check for cache of this request
+        let wrCacheKey = md5(JSON.stringify(wrSearchReq));
+        cache.get(wrCacheKey, function(err, res) {
+          if (!err && res !== null) {
+            // cache hit
+            msg.channel.send(res)
+              .then(sentmsg => {})
+              .catch(console.error);
+          } else {
+            request(wrSearchReq, function(error, response, body) {
+              if (!error && response.statusCode == 200) {
+                let data = JSON.parse(body);
+                if (data && data.data && data.data.runs) {
+                  let run = data.data.runs[0].run;
+                  let runner = data.data.players.data[0].names.international;
+                  let runtime = run.times.primary_t;
+                  let wrResponse = `The current world record for *${category.name} | ${subcategory.name}`
+                              + `* is held by **${runner}** with a time of ${runtime.toString().toHHMMSS()}.`
+                              + ` ${run.weblink}`;
+
+                  msg.channel.send(wrResponse)
+                    .then(sentmsg => cooldowns.set(cooldownKey, config.discord.srcCmdCooldown))
+                    .catch(console.error);
+
+                  // cache the response
+                  cache.set(wrCacheKey, wrResponse, handleCacheSet, 3600);
+                } else {
+                  console.error('Unexpected response/format from SRC: ', data);
+                }
+              } else if (response && response.statusCode == 404) {
+                  return msg.channel.send(`No record found for *${category.name} | ${subcategory.name}*`);
               } else {
-                request(wrSearchReq, function(error, response, body) {
-                  if (!error && response.statusCode == 200) {
-                    let data = JSON.parse(body);
-                    if (data && data.data && data.data.runs) {
-                      let run = data.data.runs[0].run;
-                      let runner = data.data.players.data[0].names.international;
-                      let runtime = run.times.primary_t;
-                      let wrResponse = `The current world record for *${category.name} | ${subcategory.name}`
-                                  + `* is held by **${runner}** with a time of ${runtime.toString().toHHMMSS()}.`
-                                  + ` ${run.weblink}`;
-
-                      msg.channel.send(wrResponse)
-                        .then(sentmsg => placeOnCooldown(cooldownKey, config.discord.srcCmdCooldown))
-                        .catch(console.error);
-
-                      // cache the response
-                      cache.set(wrCacheKey, wrResponse, handleCacheSet, 3600);
-                    } else {
-                      console.error('Unexpected response/format from SRC: ', data);
-                    }
-                  } else if (response && response.statusCode == 404) {
-                      return msg.channel.send(`No record found for *${category.name} | ${subcategory.name}*`);
-                  } else {
-                    console.log('Error while calling SRC API: ', error);
-                  }
-                });
+                console.log('Error while calling SRC API: ', error);
               }
             });
-          } else {
-            // DM the user that it's on CD
-            return dmUser(msg, `"${msg.content}" is currently on cooldown for another ${onCooldown} seconds!`);
           }
+
+          // Place on cooldown
+          let cooldownKey = msg.content + msg.channel.id;
+          cooldowns.set(cooldownKey, config.discord.srcCmdCooldown)
         });
       });
     },
@@ -190,10 +190,8 @@ function init()
         return dmUser(msg, `Useage: ${config.discord.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
       }
 
-      //let command, username, majorCat, minorCat;
       let [command, username, majorCat, minorCat] = msg.content.split(' ');
-      //let commandParts = msg.content.split(' ');
-      if (!command || username === undefined || majorCat === undefined || minorCat === undefined || (majorCat != 'nmg' && majorCat != 'mg')) {
+      if (!command || !username || !majorCat || !minorCat || (majorCat !== 'nmg' && majorCat !== 'mg')) {
         return dmUser(msg, `Useage: ${config.discord.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
       }
 
@@ -207,51 +205,48 @@ function init()
         return dmUser(msg, 'Not a valid sub-category name! Codes are listed here: https://github.com/greenham/alttp-bot/blob/master/README.md#category-codes');
       }
 
-      // Make sure this command isn't on cooldown
-      let cooldownKey = msg.content + msg.channel.id;
-      isOnCooldown(cooldownKey, config.discord.srcCmdCooldown, function(onCooldown) {
-        if (onCooldown === false) {
-          // look up user on SRC, pull in PB's
-          let userSearchReq = {
-            url: `http://www.speedrun.com/api/v1/users/${encodeURIComponent(username)}/personal-bests?embed=players`,
-            headers: {'User-Agent': config.src.userAgent}
-          };
+      // look up user on SRC, pull in PB's
+      let userSearchReq = {
+        url: `http://www.speedrun.com/api/v1/users/${encodeURIComponent(username)}/personal-bests?embed=players`,
+        headers: {'User-Agent': config.src.userAgent}
+      };
 
-          // check for cache of this request
-          let cacheKey = md5(JSON.stringify(userSearchReq));
-          cache.get(cacheKey, function(err, res) {
-            if (!err && res !== null) {
-              // cache hit
-              response = findSrcRun(JSON.parse(res), category, subcategory);
-              if (response) {
-                msg.channel.send(response);
-              }
-            } else {
-              request(userSearchReq, function(error, response, body) {
-                if (!error && response.statusCode == 200) {
-                  let data = JSON.parse(body);
-
-                  // add response to cache
-                  cache.set(cacheKey, JSON.stringify(data), handleCacheSet, 3600);
-
-                  response = findSrcRun(data, category, subcategory);
-                  if (response) {
-                    msg.channel.send(response);
-                  }
-                } else if (response && response.statusCode == 404) {
-                  return msg.channel.send(`No user found matching *${username}*.`);
-                } else {
-                  console.error('Error while calling SRC API: ', error); // Print the error if one occurred
-                }
-              });
-            }
-
-            placeOnCooldown(cooldownKey, config.discord.srcCmdCooldown);
-          });
+      // check for cache of this request
+      let cacheKey = md5(JSON.stringify(userSearchReq));
+      cache.get(cacheKey, function(err, res) {
+        if (!err && res !== null) {
+          // cache hit
+          response = findSrcRun(JSON.parse(res), category, subcategory);
+          if (response) {
+            msg.channel.send(response)
+              .then(sentmsg => {})
+              .catch(console.error);
+          }
         } else {
-          // DM the user that it's on CD
-          return dmUser(msg, `"${msg.content}" is currently on cooldown for another ${onCooldown} seconds!`);
+          request(userSearchReq, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+              let data = JSON.parse(body);
+
+              // add response to cache
+              cache.set(cacheKey, JSON.stringify(data), handleCacheSet, 3600);
+
+              response = findSrcRun(data, category, subcategory);
+              if (response) {
+                msg.channel.send(response)
+                  .then(sentmsg => {})
+                  .catch(console.error);
+              }
+            } else if (response && response.statusCode == 404) {
+              return msg.channel.send(`No user found matching *${username}*.`);
+            } else {
+              console.error('Error while calling SRC API: ', error); // Print the error if one occurred
+            }
+          });
         }
+
+        // Place on cooldown
+        let cooldownKey = msg.content + msg.channel.id;
+        cooldowns.set(cooldownKey, config.discord.srcCmdCooldown);
       });
     },
     // @todo implement pulling in category rules from SRC
@@ -268,7 +263,14 @@ function init()
     if (config.discord.alertOnConnect === true) alertsChannel.send(config.botName + ' has connected. :white_check_mark:');
 
     // Watch allthethings
-    if (config.discord.enableLivestreamAlerts) watchForTwitchStreams();
+    if (config.discord.enableLivestreamAlerts) {
+      streamWatcher.on('live', stream => {
+        alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+      }).on('title', stream => {
+        alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+      }).watch();
+    }
+
     if (config.discord.enableRaceAlerts) watchForSrlRaces();
   }).on('message', msg => {
     // Listen for commands for the bot to respond to
@@ -278,92 +280,31 @@ function init()
     // Make sure it starts with the configured prefix
     if (!msg.content.startsWith(config.discord.cmdPrefix)) return;
 
-    // Check for native or static command
-    if (commands.hasOwnProperty(msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0])) {
-      commands[msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0]](msg);
-    } else if (staticCommands.exists(msg.content)) {
-      // Make sure this command isn't on cooldown in this particular channel
-      let cooldownKey = msg.content + msg.channel.id;
-      isOnCooldown(cooldownKey, config.discord.textCmdCooldown, function(onCooldown) {
+    // And that it's not on cooldown
+    let cooldownKey = msg.content + msg.channel.id;
+    cooldowns.get(cooldownKey, config.discord.textCmdCooldown)
+      .then(onCooldown => {
         if (onCooldown === false) {
-          msg.channel.send(staticCommands.get(msg.content))
-            .then(sentMessage => placeOnCooldown(cooldownKey, config.discord.textCmdCooldown))
-            .catch(console.error);
+          // Not on CD, check for native or static command
+          if (commands.hasOwnProperty(msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0])) {
+            commands[msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0]](msg);
+          } else if (staticCommands.exists(msg.content)) {
+            msg.channel.send(staticCommands.get(msg.content))
+              .then(sentMessage => cooldowns.set(cooldownKey, config.discord.textCmdCooldown))
+              .catch(console.error);
+          } else {
+            // Not a command we recognize, ignore
+          }
         } else {
           // DM the user that it's on CD
-          dmUser(msg, `"{msg.content}" is currently on cooldown for another {onCooldown} seconds!`);
+          dmUser(msg, `**${msg.content}** is currently on cooldown for another *${onCooldown} seconds!*`);
         }
-      });
-    } else {
-      // ignore
-    }
+      })
+      .catch(console.error);
   });
 
   // Log the bot in
   client.login(config.discord.token);
-}
-
-// Starts watching for streams, updates every config.twitch.updateIntervalSeconds
-function watchForTwitchStreams()
-{
-  findLiveStreams(handleStreamResults);
-  setTimeout(watchForTwitchStreams, config.twitch.updateIntervalSeconds*1000);
-}
-
-// Connect to Twitch to pull a list of currently live speedrun streams for configured game/channels
-function findLiveStreams(callback)
-{
-  let search = {
-    url: 'https://api.twitch.tv/kraken/streams?limit=100&game='+encodeURIComponent(config.twitch.gameName)+'&channel='+encodeURIComponent(twitchChannels.join()),
-    headers: {'Client-ID': config.twitch.clientId}
-  };
-
-  let tester = new RegExp(config.twitch.statusFilters, 'i');
-
-  request(search, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      let info = JSON.parse(body);
-      if (info._total > 0) {
-        // Attempt to automatically filter out non-speedrun streams by title
-        let filteredStreams = info.streams.filter(function (item) {
-          return !(tester.test(item.channel.status));
-        });
-        callback(null, filteredStreams);
-      }
-    } else {
-      console.log('Error finding live twitch streams: ', error); // Print the error if one occurred
-      console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-      callback(error);
-    }
-  });
-}
-
-// Handles sending of live / title change alerts
-function handleStreamResults(err, streams)
-{
-  if (err || !streams) return;
-
-  streams.forEach(function(stream) {
-    // Only send an alert message if this stream was not already live
-    let cacheKey = md5('livestream-' + stream.channel.name);
-    cache.get(cacheKey, function(err, currentStream) {
-      if (err) {
-        console.error(err);
-      } else if (currentStream !== null) {
-        // cache hit, stream was already online, check for title change
-        currentStream = JSON.parse(currentStream);
-        if (currentStream.channel.status !== stream.channel.status) {
-          alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
-        }
-      } else {
-        // stream is newly live
-        alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
-      }
-
-      // add back to cache, update timeout
-      cache.set(cacheKey, JSON.stringify(stream), handleCacheSet, config.twitch.offlineToleranceSeconds);
-    });
-  });
 }
 
 // Connect via IRC to SRL and watch for races
@@ -474,35 +415,6 @@ function findSrcRun(data, category, subcategory)
   }
 
   return;
-}
-
-// Given a cooldownTime in seconds and a command, returns false if the command is not on cooldown
-// returns the time in seconds until the command will be ready again otherwise
-function isOnCooldown(command, cooldownTime, callback)
-{
-  let now = Date.now();
-  let onCooldown = false;
-
-  cache.get(md5(command), function(err, timeUsed) {
-    if (err) console.log(err);
-
-    if (!err && timeUsed !== null) {
-      // Command was recently used, check timestamp to see if it's on cooldown
-      if ((now - timeUsed) <= (cooldownTime*1000)) {
-        // Calculate how much longer it's on cooldown
-        onCooldown = ((cooldownTime*1000) - (now - timeUsed))/1000;
-      }
-    }
-
-    if (callback !== undefined) callback(onCooldown);
-    return onCooldown;
-  });
-}
-
-// Places a command on cooldown for cooldownTime (in seconds)
-function placeOnCooldown(command, cooldownTime)
-{
-  cache.set(md5(command), Date.now(), handleCacheSet, cooldownTime);
 }
 
 function dmUser(originalMessage, newMessage)

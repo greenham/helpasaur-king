@@ -8,7 +8,8 @@ const irc = require('irc'),
   md5 = require('md5'),
   fs = require('fs'),
   path = require('path'),
-  staticCommands = require('./static-commands.js');
+  staticCommands = require('./lib/static-commands.js'),
+  cooldowns = require('./lib/cooldowns.js');
 
 // Read in bot configuration
 let config = require('./config.json');
@@ -102,3 +103,5 @@ function placeOnCooldown(command, cooldownTime)
 {
   cache.set(md5(command), Date.now(), function(err, res) {}, cooldownTime);
 }
+
+process.on('exit', (code) => {cache.close()});
