@@ -4,8 +4,6 @@
 
 // Import modules
 const irc = require('irc'),
-  memcache = require('memcache'),
-  md5 = require('md5'),
   fs = require('fs'),
   path = require('path'),
   staticCommands = require('./lib/static-commands.js'),
@@ -30,78 +28,40 @@ fs.watchFile(joinChannelsFilePath, (curr, prev) => {
   }
 });
 
-// Connect to cache
-let cache = new memcache.Client();
-cache.on('connect', () => {
-  init();
-}).on('error', function(e) {
-  console.error(e);
+// Connect to Twitch IRC server
+let client = new irc.Client(config.twitch.ircServer, config.twitch.username, {
+  password: config.twitch.oauth,
+  autoRejoin: true,
+  retryCount: 10,
+  channels: twitchChannels
 });
-cache.connect();
 
-function init()
-{
-  // Connect to Twitch IRC server
-  let client = new irc.Client(config.twitch.ircServer, config.twitch.username, {
-    password: config.twitch.oauth,
-    autoRejoin: true,
-    retryCount: 10,
-    channels: twitchChannels
-  });
+client.addListener('error', function(message) {
+  console.error('error from Twitch IRC Server: ', message);
+});
 
-  client.addListener('error', function(message) {
-    console.error('error from Twitch IRC Server: ', message);
-  });
+client.addListener('message', function (from, to, message) {
+  // Basic text commands
+  if (message.startsWith(config.twitch.cmdPrefix)) {
+    if (staticCommands.exists(message)) {
+      console.log(`received command in ${to} from ${from}: ${message}`);
 
-  client.addListener('message', function (from, to, message) {
-    // Basic text commands
-    if (message.startsWith(config.twitch.cmdPrefix)) {
-      if (staticCommands.exists(message)) {
-        console.log(`received command in ${to} from ${from}: ${message}`);
-
-        // Make sure this command isn't on cooldown
-        let cooldownIndex = to+message;
-        isOnCooldown(cooldownIndex, config.twitch.textCmdCooldown, function(onCooldown) {
+      // Make sure this command isn't on cooldown
+      let cooldownIndex = to+message;
+      cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
+        .then(onCooldown => {
           if (onCooldown === false) {
             client.say(to, staticCommands.get(message));
-            placeOnCooldown(cooldownIndex, config.twitch.textCmdCooldown);
+            cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
           } else {
             // command is on cooldown in this channel
             client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');
           }
-        });
-      }
+        })
+        .catch(console.error);
     }
-  });
-}
+  }
+});
 
-// Given a cooldownTime in seconds and a command, returns false if the command is not on cooldown
-// returns the time in seconds until the command will be ready again otherwise
-function isOnCooldown(command, cooldownTime, callback)
-{
-  var now = Date.now();
-  var onCooldown = false;
-
-  cache.get(md5(command), function(err, timeUsed) {
-    if (err) console.log(err);
-
-    if (!err && timeUsed !== null) {
-      // Command was recently used, check timestamp to see if it's on cooldown
-      if ((now - timeUsed) <= (cooldownTime*1000)) {
-        // Calculate how much longer it's on cooldown
-        onCooldown = ((cooldownTime*1000) - (now - timeUsed))/1000;
-      }
-    }
-
-    if (callback !== undefined) callback(onCooldown);
-    return onCooldown;
-  });
-}
-
-// Places a command on cooldown for cooldownTime (in seconds)
-function placeOnCooldown(command, cooldownTime)
-{
-  cache.set(md5(command), Date.now(), function(err, res) {}, cooldownTime);
-}
-
-process.on('exit', (code) => {cache.close()});
+// catch Promise errors
+process.on('unhandledRejection', console.error);
