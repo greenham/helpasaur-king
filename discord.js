@@ -2,6 +2,7 @@
  * ALttP Discord Bot
  *   General TODOs
  *     - Extract basic functionality to separate modules that both discord/twitch can utilize
+ *     - Auto-notify nmg-race for weekly
  *     - Create per-guild configurations
  *       (so each can have their own prefix, cooldowns, allowed roles, etc. without the need for separate bot accounts)
  */
@@ -13,8 +14,8 @@ const request = require('request'),
   path = require('path'),
   memcache = require('memcache'),
   md5 = require('md5'),
-  Discord = require('discord.js')
-  staticCommands = require('./static-commands.js');
+  Discord = require('discord.js');
+  //staticCommands = require('./static-commands.js');
 
 // Read in bot configuration
 let config = require('./config.json');
@@ -34,12 +35,12 @@ fs.watchFile(twitchStreamsFilePath, (curr, prev) => {
 });
 
 // Read in basic text commands / definitions and watch for changes
-/*let textCommands = readTextCommands(textCommandsFilePath);
+let textCommands = readTextCommands(textCommandsFilePath);
 fs.watchFile(textCommandsFilePath, (curr, prev) => {
   if (curr.mtime !== prev.mtime) {
     textCommands = readTextCommands(textCommandsFilePath);
   }
-});*/
+});
 
 // Read in current category info on SRC (run src.js to refresh)
 let indexedCategories = readSrcCategories(srcCategoriesFilePath);
@@ -289,7 +290,7 @@ function init()
     // Check for native or static command
     if (commands.hasOwnProperty(msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0])) {
       commands[msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0]](msg);
-    } else if (staticCommands.exists(msg.content)) {
+    } else if (textCommands.hasOwnProperty(msg.content)) {
       // Make sure this command isn't on cooldown in this particular channel
       let cooldownKey = msg.content + msg.channel.id;
       isOnCooldown(cooldownKey, config.discord.textCmdCooldown, function(onCooldown) {
