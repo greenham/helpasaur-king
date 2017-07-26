@@ -8,8 +8,10 @@
     "textCmdCooldown": 10, // how long in seconds before an individual text command can be used again
     "srcCmdCooldown": 10, // how long in seconds before an individual SRC command can be used again
     "cmdPrefix": "!", // the character(s) that all commands should start with
-    "enableLivestreamAlerts": true,
-    "enableRaceAlerts": true
+    "enableLivestreamAlerts": true, // whether or not to watch for Twitch streams going live and alert
+    "enableRaceAlerts": true, // whether or not to watch for SRL races and alert
+    "enableWeeklyRaceAlert": true, // whether or not to send an alert for the weekly race
+    "weeklyRaceAlertRole": "nmg-race" // the role to mention for the weekly alert
   },
   "streamAlerts": {
     "clientId": "APP_CLIENT_ID", // https://www.twitch.tv/settings/connections

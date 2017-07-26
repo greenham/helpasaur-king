@@ -11,12 +11,14 @@ const request = require('request'),
   irc = require('irc'),
   fs = require('fs'),
   path = require('path'),
+  moment = require('moment'),
   Discord = require('discord.js'),
   staticCommands = require('./lib/static-commands.js'),
   cooldowns = require('./lib/cooldowns.js'),
   StreamAlerts = require('./lib/stream-alerts.js'),
   RaceAlerts = require('./lib/race-alerts.js'),
-  src = require('./lib/src.js');
+  src = require('./lib/src.js'),
+  timers = require('./lib/timers.js');
 
 // Read in bot configuration
 let config = require('./config.json');
@@ -26,9 +28,6 @@ const streamWatcher = new StreamAlerts(config.streamAlerts);
 
 // Set up SRL Race watcher
 const raceWatcher = new RaceAlerts(config.srl);
-
-// Set up Discord client
-const client = new Discord.Client();
 
 // Set up the commands the bot will natively handle
 const commands = {
@@ -131,6 +130,8 @@ const commands = {
   }
 };
 
+// Set up Discord client
+const client = new Discord.Client();
 // Wait for bot to be ready before watching streams/races
 client.on('ready', () => {
   console.log(config.botName + ' Online');
@@ -152,18 +153,30 @@ client.on('ready', () => {
   if (config.discord.enableRaceAlerts) {
     raceWatcher.on('init', (raceChannel, srlUrl) => {
       alertsChannel.send('**SRL Race Started** :: *#' + raceChannel + '* :: A race was just started for ' + config.srl.gameName + '! | ' + srlUrl);
-    })
-    .on('goal', (raceChannel, goal, srlUrl) => {
+    }).on('goal', (raceChannel, goal, srlUrl) => {
       alertsChannel.send('**SRL Race Goal Set** :: *#' + raceChannel + '* ::  __' + goal + '__ | ' + srlUrl);
-    })
-    .on('done', (raceChannel, goal, srlUrl) => {
+    }).on('done', (raceChannel, goal, srlUrl) => {
       alertsChannel.send('**SRL Race Finished** :: *#' + raceChannel + '* :: __' + goal + '__ | ' + srlUrl);
-    })
-    .on('rematch', (raceChannel, goal, srlUrl) => {
+    }).on('rematch', (raceChannel, goal, srlUrl) => {
       alertsChannel.send('**SRL Rematch** :: *#' + raceChannel + '* :: __' + goal + '__ | ' + srlUrl);
-    })
-    .on('error', console.error)
+    }).on('error', console.error)
     .watch();
+  }
+
+  // Schedule timers for some special messages / commands
+  //
+  // Weekly NMG Race Alert: Every Sunday at 11 PM PST
+  if (config.discord.enableWeeklyRaceAlert) {
+    let weeklyAlertTimestamp = moment().day(7).hour(11).minute(0).second(0).valueOf();
+    let weeklyRaceAlertRole = client.guilds.first().roles.find('name', config.discord.weeklyRaceAlertRole);
+    let randomEmoji = client.guilds.first().emojis.random();
+    timers.onceAndRepeat(weeklyAlertTimestamp, 604800, 'weekly-alert')
+      .on('weekly-alert', () => {
+        alertsChannel.send([
+          weeklyRaceAlertRole,
+          `The weekly Any% NMG Race is starting in 1 Hour! ${randomEmoji} Information on joining SRL can be found here: http://www.speedrunslive.com/faq/#join`
+        ]);
+      });
   }
 // Listen for commands for the bot to respond to
 }).on('message', msg => {
