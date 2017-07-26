@@ -1,10 +1,6 @@
 /**
  * ALttP Discord Bot
- *   General TODOs
- *     - Auto-notify nmg-race for weekly
- *     - Create per-guild configurations
- *       (so each can have their own prefix, cooldowns, allowed roles, etc. without the need for separate bot accounts)
- */
+  */
 
 // Import modules
 const request = require('request'),

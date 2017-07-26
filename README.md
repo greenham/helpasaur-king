@@ -33,3 +33,12 @@
 - All Dungeons (No EG) -> **ad**
 - All Dungeons (Swordless) -> **swordless**
 - Any% -> **any**
+
+# Planned Features
+
+- Integration with ALttP Wiki search
+- Support for pulling category rules from SRC
+
+# Ideas
+
+- Automatically DM new guild members with a welcome message, links to resources, and answers to common questions
