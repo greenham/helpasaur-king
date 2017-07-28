@@ -1,10 +1,6 @@
 /**
  * ALttP Discord Bot
- *   General TODOs
- *     - Auto-notify nmg-race for weekly
- *     - Create per-guild configurations
- *       (so each can have their own prefix, cooldowns, allowed roles, etc. without the need for separate bot accounts)
- */
+  */
 
 // Import modules
 const request = require('request'),
@@ -192,10 +188,12 @@ client.on('ready', () => {
     .then(onCooldown => {
       if (onCooldown === false) {
         // Not on CD, check for native or static command
-        if (commands.hasOwnProperty(msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0])) {
-          commands[msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0]](msg);
-        } else if (staticCommands.exists(msg.content)) {
-          msg.channel.send(staticCommands.get(msg.content))
+        let commandNoPrefix = msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0];
+        console.log(`'${commandNoPrefix}' received in #${msg.channel.name} from @${msg.author.username}`);
+        if (commands.hasOwnProperty(commandNoPrefix)) {
+          commands[commandNoPrefix](msg);
+        } else if (staticCommands.exists(commandNoPrefix)) {
+          msg.channel.send(staticCommands.get(commandNoPrefix))
             .then(sentMessage => cooldowns.set(cooldownKey, config.discord.textCmdCooldown))
             .catch(console.error);
         } else {
