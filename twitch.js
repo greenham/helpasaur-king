@@ -42,22 +42,25 @@ client.addListener('error', function(message) {
 
 client.addListener('message', function (from, to, message) {
   // Listen for commands that start with the designated prefix
-  if (message.startsWith(config.twitch.cmdPrefix) && staticCommands.exists(message)) {
-    console.log(`received command in ${to} from ${from}: ${message}`);
+  if (message.startsWith(config.twitch.cmdPrefix)) {
+    let commandNoPrefix = message.slice(config.twitch.cmdPrefix.length).split(' ')[0];
+    if (staticCommands.exists(commandNoPrefix)) {
+      console.log(`received command in ${to} from ${from}: ${message}`);
 
-    // Make sure this command isn't on cooldown
-    let cooldownIndex = to+message;
-    cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
-      .then(onCooldown => {
-        if (onCooldown === false) {
-          client.say(to, staticCommands.get(message));
-          cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
-        } else {
-          // command is on cooldown in this channel
-          client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');
-        }
-      })
-      .catch(console.error);
+      // Make sure this command isn't on cooldown
+      let cooldownIndex = to+message;
+      cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
+        .then(onCooldown => {
+          if (onCooldown === false) {
+            client.say(to, staticCommands.get(commandNoPrefix));
+            cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
+          } else {
+            // command is on cooldown in this channel
+            client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');
+          }
+        })
+        .catch(console.error);
+    }
   }
 });
 
