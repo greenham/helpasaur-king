@@ -138,36 +138,50 @@ client.on('ready', () => {
 
   // Watch + alert for Twitch streams
   if (config.discord.enableLivestreamAlerts) {
+    let embed = new Discord.RichEmbed();
     streamWatcher.on('live', stream => {
-      alertsChannel.send(':arrow_forward: **NOW LIVE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+      embed.setStreamAlertDefaults(stream)
+        .setTitle(`Now live at ${stream.channel.url}!`)
+        .setColor('#339e31')
+        .setImage(stream.preview.medium)
+      alertsChannel.send({embed});
     }).on('title', stream => {
-      alertsChannel.send(':arrows_counterclockwise: **NEW TITLE** :: ' + stream.channel.url + ' :: *' + stream.channel.status + '*');
+      embed.setStreamAlertDefaults(stream)
+        .setTitle(`Changed title:`)
+        .setColor('#dedede')
+        .setImage(null)
+      alertsChannel.send({embed});
     }).watch();
   }
 
   // Watch + alert for SRL races
   if (config.discord.enableRaceAlerts) {
+    let embed = new Discord.RichEmbed();
     raceWatcher.on('init', (raceChannel, srlUrl) => {
-      alertsChannel.send('**SRL Race Started** :: *#' + raceChannel + '* :: A race was just started for ' + config.srl.gameName + '! | ' + srlUrl);
+      embed.setRaceAlertDefaults(raceChannel, srlUrl).setDescription(`A race was just started for *${config.srl.gameName}*!`);
+      alertsChannel.send({embed});
     }).on('goal', (raceChannel, goal, srlUrl) => {
-      alertsChannel.send('**SRL Race Goal Set** :: *#' + raceChannel + '* ::  __' + goal + '__ | ' + srlUrl);
+      embed.setRaceAlertDefaults(raceChannel, srlUrl).setDescription(`Goal was set to: **${goal}**`);
+      alertsChannel.send({embed});
     }).on('done', (raceChannel, goal, srlUrl) => {
-      alertsChannel.send('**SRL Race Finished** :: *#' + raceChannel + '* :: __' + goal + '__ | ' + srlUrl);
+      embed.setRaceAlertDefaults(raceChannel, srlUrl).setDescription('Race finished!');
+      alertsChannel.send({embed});
     }).on('rematch', (raceChannel, goal, srlUrl) => {
-      alertsChannel.send('**SRL Rematch** :: *#' + raceChannel + '* :: __' + goal + '__ | ' + srlUrl);
+      embed.setRaceAlertDefaults(raceChannel, srlUrl).setDescription('Rematch initiated!');
+      alertsChannel.send({embed});
     }).on('error', console.error)
     .watch();
   }
 
   // Schedule timers for some special messages / commands
   //
-  // Weekly NMG Race Alert: Every Sunday at 11 PM PST
+  // Weekly NMG Race Alert: Every Sunday at 11 PM Pacific /
   if (config.discord.enableWeeklyRaceAlert) {
     let weeklyAlertTimestamp = moment().day(7).hour(11).minute(0).second(0).valueOf();
     let weeklyRaceAlertRole = client.guilds.first().roles.find('name', config.discord.weeklyRaceAlertRole);
-    let randomEmoji = client.guilds.first().emojis.random();
     timers.onceAndRepeat(weeklyAlertTimestamp, 604800, 'weekly-alert')
       .on('weekly-alert', () => {
+        let randomEmoji = client.guilds.first().emojis.random();
         alertsChannel.send([
           weeklyRaceAlertRole,
           `The weekly Any% NMG Race is starting in 1 Hour! ${randomEmoji} Information on joining SRL can be found here: http://www.speedrunslive.com/faq/#join`
@@ -193,9 +207,13 @@ client.on('ready', () => {
         if (commands.hasOwnProperty(commandNoPrefix)) {
           commands[commandNoPrefix](msg);
         } else if (staticCommands.exists(commandNoPrefix)) {
-          msg.channel.send(staticCommands.get(commandNoPrefix))
-            .then(sentMessage => cooldowns.set(cooldownKey, config.discord.textCmdCooldown))
-            .catch(console.error);
+          let result = staticCommands.get(commandNoPrefix);
+          msg.channel.send({embed: {
+            "title": commandNoPrefix,
+            "color": 0xff9f25,
+            "description": result
+          }}).then(sentMessage => cooldowns.set(cooldownKey, config.discord.textCmdCooldown))
+          .catch(console.error);
         } else {
           // Not a command we recognize, ignore
         }
@@ -222,6 +240,22 @@ function dmUser(originalMessage, newMessage)
   }
 }
 
+Discord.RichEmbed.prototype.setStreamAlertDefaults = function (stream) {
+  return this.setAuthor(stream.channel.display_name, stream.channel.logo)
+    .setURL(stream.channel.url)
+    .setDescription(stream.channel.status)
+    .setTimestamp();
+};
+
+Discord.RichEmbed.prototype.setRaceAlertDefaults = function (raceChannel, srlUrl) {
+  return this.setTitle(`SRL Race #${raceChannel}`)
+    .setURL(srlUrl)
+    .setThumbnail('http://i.imgur.com/8nqgDcI.png')
+    .setColor('#f8e47f')
+    .setFooter(`#${raceChannel}`)
+    .setTimestamp();
+};
+
 // Converts seconds to human-readable time
 String.prototype.toHHMMSS = function () {
   let sec_num = parseInt(this, 10); // don't forget the second param
@@ -233,7 +267,7 @@ String.prototype.toHHMMSS = function () {
   if (minutes < 10) {minutes = "0"+minutes;}
   if (seconds < 10) {seconds = "0"+seconds;}
   return hours+':'+minutes+':'+seconds;
-}
+};
 
 // catch Promise errors
 process.on('unhandledRejection', console.error);
