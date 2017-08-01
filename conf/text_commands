@@ -1,11 +1,10 @@
 relay|The ALttP Community is currently planning a relay race for October 21st. If you're interested in joining, please fill out this form: https://docs.google.com/forms/d/1SB_NKDhytAVdOHHGE9pBgXba3L-OBBu8enKANSVJd-o and join the discord here: https://discord.gg/ajgFSV
-low%race|Community Race of Low% on July 30th: https://pastebin.com/niS5aBk5
-airpumping|Much like wall pumping, air pumping will reset Link's movement pattern with every pump. The pattern for moving north or west is 2-1-2-1-... and the diagonal movement speed is 1px/frame. So, as an example, going north and pumping west (or east) every other frame would result in a 2North-1Diagonal-2North-1Diagonal-... movement.
+airpumping|Much like wall pumping, air pumping will reset Link's movement pattern with every pump. The pattern for moving north or west is 2-1-2-1 and the diagonal movement speed is 1px/frame. e.g. going north and pumping west (or east) every other frame would result in a 2North-1Diagonal-2North-1Diagonal-... movement.
 antipumping|Exactly the same as Wall Pumping or Air Pumping, but this happened when you accidentally do an air/wall pump while Link is facing East or South. Instead of changing 2-1-2-1 to 2-2-2-2, it changes your walk pattern from 1-2-1-2 to 1-1-1-1.
 bb|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defated after being hit by 6 yellow balls.
 bb%|Blue Ball probabilities: [2cyc=34.375% - 0bb: 6.25% - 1bb: 12.5% - 2bb: 15.625%] [3cyc=56.640625% - 3bb: 31.25% - 4bb: 11.71875% - 5bb: 8.203125% - 6bb: 5.46875%] [4cyc=8.666992% - 7bb: 7.03125% - 8bb: 0.878906% - 9bb: 0.488281% - 10bb: 0.268555%] [5cyc=0.314331% - 11bb: 0.292969% - 12bb: 0.012207% - 13bb: 0.006103% - 14bb: 0.003052%] [6cyc=0.003052% - 15bb: 0.003052%]
 blockerase|Using the mirror while pushing a block will make it disappear. You need to be indoors but NOT in a dungeon for it to work. This minor glitch is most commonly used in the swamp dam in light world. JP v1.0 only.
-discord|If you're interested in speedrunning ALttP or discussing it with us, feel free to join the community discord: https://discordapp.com/invite/3Bsfnwk
+discord|If you're interested in speedrunning ALttP or discussing it with us, feel free to join the community discord: https://discord.gg/SSufwfA
 eg|EG means Exploration Glitch. The glitch allows you to walk on the incorrect layer and thereby pass through anything. With EG, the game can be completed within 2 minutes.
 ff|Fake flippers, a glitch which allows you to swim without having the flippers. It is performed by jumping into water and changing screen just as you hit the water. Leaving the water will end the glitch, and taking damage whilst swimming can result in the infinite scroll glitch. JP v1.0 only.
 ganontut|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered and gold sword strats by timmon_: https://www.dropbox.com/s/yyzml0hs75hgoor/hybrid-ganon-tut-pinkus-timmon.mp4?dl=0
@@ -87,3 +86,4 @@ somaria|https://www.youtube.com/watch?v=KfP3jF4sdIY
 owglitches|https://www.youtube.com/watch?v=mf5mvuJaQaY
 arcvar|https://www.youtube.com/watch?v=u4TQh15hbzo
 foosdabridge|https://www.twitch.tv/videos/71995149
+coinsnake|https://clips.twitch.tv/AmericanCourageousHedgehogAMPTropPunch
