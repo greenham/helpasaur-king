@@ -90,7 +90,7 @@ srcguides|http://www.speedrun.com/alttp/guides
 
 stairlag|When exiting a staircase, Link will walk in place for a short period of time unless you hold LEFT or RIGHT during the first frame or 2 (depending on directions) after the stairwell animation.
 
-stairpumping|While walking on a staircase or ladder in which you still retain control of Link's movement, you can pump diagonals when walking north on them. The normal animation for climbing stairs/ladders contains a lot of 0 pixel per frame movement, so pumping these ladders to avoid such frames is very important. Even if you do no other pumping, you should incorporate stairpumping into your movement, since it saves more than just a handful of frames in the areas it's used in.
+stairpumping|While walking on a staircase or ladder in which you still retain control of Link's movement, you can pump diagonals when walking north on them. The normal animation for climbing stairs/ladders contains a lot of 0 pixel per frame movement, so pumping these ladders to avoid such frames is very important. Even if you do no other pumping, you should incorporate stairpumping into your movement, since it saves more than just a handful of frames.
 
 superspeed|By having a medallion or hookshot equipped and hitting the Y-button and the A-button at the same frame (or using a spindash), you activate a glitched walking state. By climbing stairs that you can manually move up and down and exiting them cardinally, you will gain dash speed while walking. This activated state is called superspeed. The effect is active until canceled by pressing the A-button, taking damage, changing screen, or jumping off a ledge. JP v1.0 only.
 
