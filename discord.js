@@ -143,7 +143,7 @@ client.on('ready', () => {
       embed.setStreamAlertDefaults(stream)
         .setTitle(`Now live at ${stream.channel.url}!`)
         .setColor('#339e31')
-        .setImage(stream.preview.medium)
+        .setImage(`${stream.preview.medium}?r=${moment().valueOf()}`);
       alertsChannel.send({embed});
     }).on('title', stream => {
       embed.setStreamAlertDefaults(stream)
