@@ -1,60 +1,128 @@
 relay|The ALttP Community is currently planning a relay race for October 21st. If you're interested in joining, please fill out this form: https://docs.google.com/forms/d/1SB_NKDhytAVdOHHGE9pBgXba3L-OBBu8enKANSVJd-o and join the discord here: https://discord.gg/ajgFSV
-airpumping|Much like wall pumping, air pumping will reset Link's movement pattern with every pump. The pattern for moving north or west is 2-1-2-1 and the diagonal movement speed is 1px/frame. e.g. going north and pumping west (or east) every other frame would result in a 2North-1Diagonal-2North-1Diagonal-... movement.
-antipumping|Exactly the same as Wall Pumping or Air Pumping, but this happened when you accidentally do an air/wall pump while Link is facing East or South. Instead of changing 2-1-2-1 to 2-2-2-2, it changes your walk pattern from 1-2-1-2 to 1-1-1-1.
+
+airpumping|Another technique to optimize Link's walking patterns. When walking diagonally to the north or west and at an angle of less than 45 degrees, you can mash diagonals into the air to boost pixels. Like wallpumping, this is a frame-saving technique in most instances, due to human limitations on mashing.
+
+antipumping|When walking east or south, Link's movement begins on the 1 pixel per frame speed of his animation. This means you do not want to reset his walking speed by wallpumping, airpumping, or stairpumping. But this even has more implications than that: you always want to avoid altering your input while moving south or east, as any alteration can slow Link down by resetting the movement sequence. Generally speaking, if you're moving south or east, you want to minimize the number of inputs you use to do so.
+
+arcvar|https://www.youtube.com/watch?v=u4TQh15hbzo
+
 bb|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defated after being hit by 6 yellow balls.
+
 bb%|Blue Ball probabilities: [2cyc=34.375% - 0bb: 6.25% - 1bb: 12.5% - 2bb: 15.625%] [3cyc=56.640625% - 3bb: 31.25% - 4bb: 11.71875% - 5bb: 8.203125% - 6bb: 5.46875%] [4cyc=8.666992% - 7bb: 7.03125% - 8bb: 0.878906% - 9bb: 0.488281% - 10bb: 0.268555%] [5cyc=0.314331% - 11bb: 0.292969% - 12bb: 0.012207% - 13bb: 0.006103% - 14bb: 0.003052%] [6cyc=0.003052% - 15bb: 0.003052%]
+
+bbrooms|BluntBunny room sheet (notes + times for every room in any% nmg): https://goo.gl/AGMyAa
+
 blockerase|Using the mirror while pushing a block will make it disappear. You need to be indoors but NOT in a dungeon for it to work. This minor glitch is most commonly used in the swamp dam in light world. JP v1.0 only.
+
+bsnes+|http://helge.monsternett.no/bsnes-plus.zip
+
+catchtimes|https://pastebin.com/eKjVx96V
+
 discord|If you're interested in speedrunning ALttP or discussing it with us, feel free to join the community discord: https://discord.gg/SSufwfA
+
 eg|EG means Exploration Glitch. The glitch allows you to walk on the incorrect layer and thereby pass through anything. With EG, the game can be completed within 2 minutes.
+
 ff|Fake flippers, a glitch which allows you to swim without having the flippers. It is performed by jumping into water and changing screen just as you hit the water. Leaving the water will end the glitch, and taking damage whilst swimming can result in the infinite scroll glitch. JP v1.0 only.
+
 ganontut|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered and gold sword strats by timmon_: https://www.dropbox.com/s/yyzml0hs75hgoor/hybrid-ganon-tut-pinkus-timmon.mp4?dl=0
+
 glitchtuts|A comprehensive set of tutorial videos made by superSKUJ covering a variety of glitches in ALttP including basic wall clipping, DMA, DMD, Cane of Somaria glitches and more: https://www.youtube.com/playlist?list=PLPsUbwi58oG_hjrgq1wpYmM3JMEn9b8R8
-prachack|Practice hack for ALttP by pinkus: http://milde.no/lttp/
+
+goldsheet|https://docs.google.com/spreadsheets/d/1ludCDzwLxWp-0XR2Ea14T3zoLz0L0UyY1etcvrLqwHo/edit?usp=sharing
+
 hammeryump|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by bluntbunny here: https://www.youtube.com/watch?v=IMqqGzU_eo0
+
 hover|Hovering over gaps is performed by holding the A button (for up to 31 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall!
+
 hovertut|Hover tutorial by malibukenn: https://www.youtube.com/watch?v=XraSVjZYXR0
+
 ipbj|The bomb jump performed in Ice Palace which skips a large portion of the dungeon. Guide by wqqqqwrt: https://www.youtube.com/watch?v=N6mD9YM8m7Q
+
 itemdash|By hitting both the Y-button and the A-button on the same frame, one can perform a dash where the currently equipped item is activated throughout the dash. The most commonly used itemdash is the hammerdash. JP v1.0 only.
+
 jamtut|GTower Skip Tutorial / Mirror on Conveyor + Somaria: https://www.twitch.tv/videos/117750046
+
 jp|Japanese 1.0 is the version of ALttP most commonly used for speedrunning since the Japanese version contains less text (saves ~1 minute), and a few minor glitches like fake flippers, item dash, and superspeed only exist in version 1.0 (saves ~30-40s).
+
 kevtut|https://drive.google.com/drive/folders/0BzJTdbx9GMY7NkJZdEhFd2tibTg#list
+
 keydash|A keydash can be performed by initiating a dash a multiple of 4 pixels away from a locked door. Positioning yourself against an opposing wall before starting the dash, or nudging an object whilst dashing, will both automatically align you properly.
+
 lanmo|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv
+
 lb|http://www.speedrun.com/alttp
-low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. That means, yes, if you grab the Magic Mushroom, you have to reset (or get rid of it at the Witch's Hut). It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon).
+
+low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon).
+
 mothtut|tiny moth dik: https://www.youtube.com/watch?v=qmR3zO2VQCE
+
 nmg|NMG is short for No Major Glitches and means that glitches that skip a large chunk of the game, such as EG and OOB, are not allowed. More information on glitch classifications can be found here: http://pastebin.com/bb0vHjcm
+
 oob|Out of Bounds (abbreviated OoB) means leaving the intended confinements of the playing field. The most powerful/broken Out of Bounds state is EG (Exploration Glitch).
+
+owglitches|https://www.youtube.com/watch?v=mf5mvuJaQaY
+
 pinkustips|Some excellent tips from pinkus that most tutorials don't cover: https://gist.github.com/helgefmi/2c2652effb31e0ee0a4e0c48440fd4ee
+
+prachack|Practice hack for ALttP by pinkus: http://milde.no/lttp/
+
 prizepacks|The order of items in which certain groups of enemies will drop, supposing the enemy decides to drop something upon dead. Killing an enemy with a dash does not advanced the prizepack. For more info, see: http://imgur.com/a/FOO65
-quickwarp|Quickwarps: With the camera aligned to the correct horizontal pixel when initiating a mirror warp or entering a warp tile, the warp animation can be shortened by 34 frames. More info here: https://alttp-wiki.net/index.php/Quick_Warps
+
+quickwarp|With the camera aligned to the correct horizontal pixel when initiating a mirror warp or entering a warp tile, the warp animation can be shortened by 34 frames. More info here: https://alttp-wiki.net/index.php/Quick_Warps
+
 randodiscord|ALttP Randomizer Discord: https://discord.gg/BEPAD3Q
+
 resources|https://alttp-wiki.net/index.php/Tutorials_and_other_external_resources
-tuts|https://alttp-wiki.net/index.php/Tutorials_and_other_external_resources
-bbrooms|BluntBunny room sheet: http://bombch.us/CByk
+
+rom|3322effc
+
 roomsheet|ALttP Community Room Sheet: https://docs.google.com/spreadsheets/d/1dV2ozAGgDdFZAne8rwG3h0KyOPgIN72pWeRsS1hR2QU/edit?usp=sharing
+
 rbo|Reverse Boss Order is a category in which you defeat all bosses in the reverse order, all the way from Ganon to Armos Knight. The run ends, as usual, when collecting the Triforce. The category requires frequent use of larger glitches such as EG and YBA.
+
 s+q|S+Q means Save and Quit and can be used to minimize overworld travel. With so many other categories that allow heavy sequence breaking, the community at large has decided to not allow S+Q in an NMG speedrun simply to include more content of the game that most other categories skip.
+
+somaria|https://www.youtube.com/watch?v=KfP3jF4sdIY
+
 spindash|By releasing a sword spin and pressing the A-button the first frame after release, Link will be put into a glitched state and cannot use his sword. If you touch manual stairs and exit cardinally, Link will move at dashing speed with the ability to change directions. Just as with hookdash, pressing A, taking damage, changing screen, or jumping off a ledge will end the glitched state. JP v1.0 only.
+
 srcguides|http://www.speedrun.com/alttp/guides
+
 stairlag|When exiting a staircase, Link will walk in place for a short period of time unless you hold LEFT or RIGHT during the first frame or 2 (depending on directions) after the stairwell animation.
+
+stairpumping|While walking on a staircase or ladder in which you still retain control of Link's movement, you can pump diagonals when walking north on them. The normal animation for climbing stairs/ladders contains a lot of 0 pixel per frame movement, so pumping these ladders to avoid such frames is very important. Even if you do no other pumping, you should incorporate stairpumping into your movement, since it saves more than just a handful of frames in the areas it's used in.
+
 superspeed|By having a medallion or hookshot equipped and hitting the Y-button and the A-button at the same frame (or using a spindash), you activate a glitched walking state. By climbing stairs that you can manually move up and down and exiting them cardinally, you will gain dash speed while walking. This activated state is called superspeed. The effect is active until canceled by pressing the A-button, taking damage, changing screen, or jumping off a ledge. JP v1.0 only.
+
 swordbuffer|Sword Buffering is performed by pressing a direction and pressing B the next frame. Since using your sword will interrupt all D-Pad inputs it allows you to hold the dpad for longer than 1 frame but you move for only 1 frame if executed properly.
+
 swordclimb|By holding out the sword first then performing a hookdash (itemdash with hookshot) on stairs you will be able to climb the stairs with the same speed as walking whilst holding out the sword on flat ground. If the sword spin is released before exiting the stairs, you will also have superspeed afterwards. JP v1.0 only.
+
 trident|Avoiding the trident in Ganon Phase 1 by poor_little_pinkus: https://www.youtube.com/watch?v=pmlsW1M6leo
-wallpumping|When walking in a straight line, Link's movement speed is alternated between 1px and 2px per frame. Furthermore, when walking north or west and up against a wall, continuously hitting a directional button towards the wall can increase the movement speed. The movement pattern for north or west is 2-1-2-1-.. and will be reset with every pump. Thereby, successfully pumping every frame will completely replace 1px movements with 2px movements (ie: 2-2-2 instead of 2-1-2-1)
+
+tuts|https://alttp-wiki.net/index.php/Tutorials_and_other_external_resources
+
+wallpumping|A technique that optimizes Link's walking pattern. When walking cardinally to the west or north, Link's movement begins on the 2 pixel speed, and changes to the directional input will reset his movement speed back to the beginning of the sequence. Therefore, if walking north or west along a wall, you can mash diagonals into the wall to repeatedly reset Link's movement to the 2 pixel speed and avoid the slower 1 pixel speed in the sequence.
+
+weekly|There is a weekly Any% NMG No S+Q race every Sunday at 3:00 PM Eastern Time held on SpeedRunsLive. Everyone is welcome to join!
+
 wiki|http://www.alttp-wiki.net/index.php/Main_Page
+
 wqvitty|Tutorial by JoeDamillio covering the WQ Vitty Strat: https://youtu.be/dJUnf4D0_zQ?t=249
+
 yba|Yuzuhara's Bottle Adventure (YBA) is a glitch that involves using a potion the same frame as you initiate a screen transition to manipulate the memory. Different locations and potions can have different effects such as screen warps or accessing the flute menu without actually having the flute (even in the dark world).
+
 69blazeit|https://www.twitch.tv/greenham83/v/83767030
 armface|https://www.twitch.tv/videos/48994119
 birdtoss|https://www.twitch.tv/videos/57872039
 clap|https://clips.twitch.tv/HumbleBumblingPlumageDancingBanana
 clipclap|https://clips.twitch.tv/BashfulMistyVelociraptorBrainSlug
 clipirl|How to Clip IRL by Muttski: https://www.youtube.com/watch?v=GmbQZ6u32_0
+coinsnake|https://clips.twitch.tv/AmericanCourageousHedgehogAMPTropPunch
 dildo|https://clips.twitch.tv/greenham83/HealthyYakTheRinger
 doubleteam|https://www.youtube.com/watch?v=A4Sjhj_Tshc
 firstdigflute|https://www.youtube.com/watch?v=uHjEP_77PK0
+foosdabridge|https://www.twitch.tv/videos/71995149
 ganondik|https://clips.twitch.tv/christosowen/WrongHerringSuperVinlin
 gonnabeme|https://clips.twitch.tv/CogentSquareHornetBabyRage
 illbefine|https://www.youtube.com/watch?v=nzgAln6nXOw
@@ -75,15 +143,6 @@ uhoh|UH OH!!: https://www.youtube.com/watch?v=Nllqiar7cSk
 wafflehouse|https://www.twitch.tv/videos/45723591
 whatagod|https://www.twitch.tv/videos/76518228
 zeldagamer|https://www.youtube.com/watch?v=48eMTIYpKeo
+
 commands|https://github.com/greenham/alttp-bot/blob/master/README.md
 help|https://github.com/greenham/alttp-bot/blob/master/README.md
-weekly|There is a weekly Any% NMG No S+Q race every Sunday at 3:00 PM Eastern Time held on SpeedRunsLive. Everyone is welcome to join!
-bsnes+|http://helge.monsternett.no/bsnes-plus.zip
-rom|3322effc
-goldsheet|https://docs.google.com/spreadsheets/d/1ludCDzwLxWp-0XR2Ea14T3zoLz0L0UyY1etcvrLqwHo/edit?usp=sharing
-catchtimes|https://pastebin.com/eKjVx96V
-somaria|https://www.youtube.com/watch?v=KfP3jF4sdIY
-owglitches|https://www.youtube.com/watch?v=mf5mvuJaQaY
-arcvar|https://www.youtube.com/watch?v=u4TQh15hbzo
-foosdabridge|https://www.twitch.tv/videos/71995149
-coinsnake|https://clips.twitch.tv/AmericanCourageousHedgehogAMPTropPunch
