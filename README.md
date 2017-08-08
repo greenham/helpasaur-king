@@ -6,7 +6,7 @@
 
 ## Memes/Highlights
 
-```!69blazeit, !armface, !birdtoss, !clap, !clipclap, !clipirl, !coinsnake, !dildo, !doubleteam, !firstdigflute, !foosdabridge, !ganondik, !gonnabeme, !illbefine, !kholdstare, !middlehole, !mothhole, !mothtut2, !pissonface, !playmario, !psa, !rapbattle, !sobesmooth, !thebee, !thewobble, !thirtyseven, !trolldorm, !uhoh, !wafflehouse, !whatagod, !zeldagamer```
+```!69blazeit, !armface, !birdtoss, !clap, !clipclap, !clipirl, !coinsnake, !dildo, !doubleteam, !firstdigflute, !foosdabridge, !ganondik, !gonnabeme, !illbefine, !kholdstare, !middlehole, !mothhole, !mothtut2, !pissonface, !playmario, !psa, !rapbattle, !sobesmooth, !squirrelfest, !thebee, !thewobble, !thirtyseven, !trolldorm, !uhoh, !wafflehouse, !whatagod, !zeldagamer```
 
 ## Temporary / Event-Related Commands
 ```!relay```
@@ -30,14 +30,19 @@
 - Low% -> **low**
 - Master Sword -> **ms**
 - Mirror Shield -> **mrs**
+- Cane of Byrna -> **cob**
+- Any% (S+Q) -> **anysq**
+- Any% 2x Speed -> **2x**
 
 ## Major Glitches (mg)
 
 - Any% (No EG/DG/WW) -> **anyno**
 - Reverse Boss Order -> **rbo**
 - Defeat Ganon -> **dg**
-- All Dungeons (No EG) -> **ad**
+- All Dungeons (No EG/DG/WW) -> **ad**
+- All Bosses (No EG) -> **ab**
 - All Dungeons (Swordless) -> **swordless**
+- Any% (No OOB) -> **noob**
 - Any% -> **any**
 
 # Planned Features
