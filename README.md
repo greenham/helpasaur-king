@@ -2,7 +2,7 @@
 
 ## Definitions/Links
 
-```!airpumping, !antipumping, !arcvar, !bb, !bb%, !bbrooms, !blockerase, !bsnes+, !catchtimes, !discord, !eg, !ff, !ganontut, !glitchtuts, !goldsheet, !hammeryump, !hover, !hovertut, !ipbj, !itemdash, !jamtut, !jp, !kevtut, !keydash, !lanmo, !lb, !low%, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !prachack, !prizepacks, !quickwarp, !randodiscord, !relay, !resources, !rom, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !stairpumping, !superspeed, !swordbuffer, !swordclimb, !trident, !tuts, !wallpumping, !weekly, !wiki, !wqvitty, !yba```
+```!agah2, !airpumping, !antipumping, !arcvar, !ashbackup, !bb, !bb%, !bbrooms, !blockerase, !bsnes+, !catchtimes, !discord, !eg, !ff, !ganontut, !glitchtuts, !goldsheet, !gt5, !hammeryump, !hover, !hovertut, !ipbj, !itemdash, !jamtut, !jp, !kevtut, !keydash, !lanmo, !lb, !low%, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !prachack, !prizepacks, !quickwarp, !randodiscord, !relay, !resources, !rom, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !stairpumping, !superspeed, !swordbuffer, !swordclimb, !trident, !tuts, !wallpumping, !weekly, !whitecircle, !wiki, !wqvitty, !yba```
 
 ## Memes/Highlights
 

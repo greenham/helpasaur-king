@@ -1,8 +1,12 @@
 relay|The ALttP Community is currently planning a relay race for October 21st. If you're interested in joining, please fill out this form: https://docs.google.com/forms/d/1SB_NKDhytAVdOHHGE9pBgXba3L-OBBu8enKANSVJd-o and join the discord here: https://discord.gg/ajgFSV
 
+agah2|Tutorial by BluntBunny: https://www.twitch.tv/videos/167608707
+
 airpumping|Another technique to optimize Link's walking patterns. When walking diagonally to the north or west and at an angle of less than 45 degrees, you can mash diagonals into the air to boost pixels. Like wallpumping, this is a frame-saving technique in most instances, due to human limitations on mashing.
 
 antipumping|When walking east or south, Link's movement begins on the 1 pixel per frame speed of his animation. This means you do not want to reset his walking speed by wallpumping, airpumping, or stairpumping. But this even has more implications than that: you always want to avoid altering your input while moving south or east, as any alteration can slow Link down by resetting the movement sequence. Generally speaking, if you're moving south or east, you want to minimize the number of inputs you use to do so.
+
+ashbackup|https://www.twitch.tv/videos/120626409
 
 arcvar|https://www.youtube.com/watch?v=u4TQh15hbzo
 
@@ -28,7 +32,11 @@ ganontut|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered
 
 glitchtuts|A comprehensive set of tutorial videos made by superSKUJ covering a variety of glitches in ALttP including basic wall clipping, DMA, DMD, Cane of Somaria glitches and more: https://www.youtube.com/playlist?list=PLPsUbwi58oG_hjrgq1wpYmM3JMEn9b8R8
 
+godtas5|Godtas5 - Jadin's most recent Theory TAS - https://www.twitch.tv/videos/44070881
+
 goldsheet|https://docs.google.com/spreadsheets/d/1ludCDzwLxWp-0XR2Ea14T3zoLz0L0UyY1etcvrLqwHo/edit?usp=sharing
+
+gt5|Godtas5 - Jadin's most recent Theory TAS - https://www.twitch.tv/videos/44070881
 
 hammeryump|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by bluntbunny here: https://www.youtube.com/watch?v=IMqqGzU_eo0
 
@@ -105,6 +113,8 @@ tuts|https://alttp-wiki.net/index.php/Tutorials_and_other_external_resources
 wallpumping|A technique that optimizes Link's walking pattern. When walking cardinally to the west or north, Link's movement begins on the 2 pixel speed, and changes to the directional input will reset his movement speed back to the beginning of the sequence. Therefore, if walking north or west along a wall, you can mash diagonals into the wall to repeatedly reset Link's movement to the 2 pixel speed and avoid the slower 1 pixel speed in the sequence.
 
 weekly|There is a weekly Any% NMG No S+Q race every Sunday at 3:00 PM Eastern Time held on SpeedRunsLive. Everyone is welcome to join!
+
+whitecircle|http://www.screevo.com/dump/alttp/bombjump.png
 
 wiki|http://www.alttp-wiki.net/index.php/Main_Page
 

@@ -175,7 +175,7 @@ client.on('ready', () => {
 
   // Schedule timers for some special messages / commands
   //
-  // Weekly NMG Race Alert: Every Sunday at 11 PM Pacific /
+  // Weekly NMG Race Alert: Every Sunday at 11 AM Pacific /
   if (config.discord.enableWeeklyRaceAlert) {
     let weeklyAlertTimestamp = moment().day(7).hour(11).minute(0).second(0).valueOf();
     let weeklyRaceAlertRole = client.guilds.first().roles.find('name', config.discord.weeklyRaceAlertRole);
