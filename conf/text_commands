@@ -6,9 +6,9 @@ airpumping|Another technique to optimize Link's walking patterns. When walking d
 
 antipumping|When walking east or south, Link's movement begins on the 1 pixel per frame speed of his animation. This means you do not want to reset his walking speed by wallpumping, airpumping, or stairpumping. But this even has more implications than that: you always want to avoid altering your input while moving south or east, as any alteration can slow Link down by resetting the movement sequence. Generally speaking, if you're moving south or east, you want to minimize the number of inputs you use to do so.
 
-ashbackup|https://www.twitch.tv/videos/170635873?t=22m06s
+arcvar|Arc Variable Lesson by Professor SuperSKUJ: https://www.youtube.com/watch?v=u4TQh15hbzo
 
-arcvar|https://www.youtube.com/watch?v=u4TQh15hbzo
+ashbackup|A backup for when you don't have swordbeams for the prize pack manipulation strat in the 3rd room of Agah Tower: https://www.twitch.tv/videos/170635873?t=22m06s
 
 bb|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defated after being hit by 6 yellow balls.
 
@@ -20,9 +20,13 @@ bbrooms|BluntBunny room sheet (notes + times for every room in any% nmg): https:
 
 blockerase|Using the mirror while pushing a block will make it disappear. You need to be indoors but NOT in a dungeon for it to work. This minor glitch is most commonly used in the swamp dam in light world. JP v1.0 only.
 
+bombdupe|Big Bomb Dupe Setup for 100% or GS/SA by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h41m37s
+
 bsnes+|http://helge.monsternett.no/bsnes-plus.zip
 
 catchtimes|https://pastebin.com/eKjVx96V
+
+chomps|Some strats for handling various chomps RNGs by BluntBunny: https://www.twitch.tv/videos/170635873?t=02h25m21s
 
 discord|If you're interested in speedrunning ALttP or discussing it with us, feel free to join the community discord: https://discord.gg/SSufwfA
 
@@ -32,27 +36,28 @@ ff|Fake flippers, a glitch which allows you to swim without having the flippers.
 
 ganontut|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered and gold sword strats by timmon_: https://www.dropbox.com/s/yyzml0hs75hgoor/hybrid-ganon-tut-pinkus-timmon.mp4?dl=0
 
-glitchtuts|A comprehensive set of tutorial videos made by superSKUJ covering a variety of glitches in ALttP including basic wall clipping, DMA, DMD, Cane of Somaria glitches and more: https://www.youtube.com/playlist?list=PLPsUbwi58oG_hjrgq1wpYmM3JMEn9b8R8
+glitchtuts|A comprehensive set of tutorial videos made by SuperSKUJ covering a variety of glitches in ALttP including basic wall clipping, DMA, DMD, Cane of Somaria glitches and more: https://www.youtube.com/playlist?list=PLPsUbwi58oG_hjrgq1wpYmM3JMEn9b8R8
 
 godtas5|Godtas5 - Jadin's most recent Theory TAS - https://www.twitch.tv/videos/44070881
 
-goldsheet|https://docs.google.com/spreadsheets/d/1ludCDzwLxWp-0XR2Ea14T3zoLz0L0UyY1etcvrLqwHo/edit?usp=sharing
+goldsheet|Community Gold Segment Sheet: https://docs.google.com/spreadsheets/d/1ludCDzwLxWp-0XR2Ea14T3zoLz0L0UyY1etcvrLqwHo/edit?usp=sharing
 
 gt5|Godtas5 - Jadin's most recent Theory TAS - https://www.twitch.tv/videos/44070881
 
-hammeryump|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https:/
-/www.youtube.com/watch?v=IMqqGzU_eo0)
 hammerjump|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https:/
+/www.youtube.com/watch?v=IMqqGzU_eo0)
+hammeryump|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https:/
 /www.youtube.com/watch?v=IMqqGzU_eo0)
 
 hover|Hovering over gaps is performed by holding the A button (for up to 31 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall!
 
 hovertut|Hover tutorial by malibukenn: https://www.youtube.com/watch?v=XraSVjZYXR0
 
-ipbj|The bomb jump performed in Ice Palace which skips a large portion of the dungeon. Guide by wqqqqwrt: https://www.youtube.com/watch?v=N6mD9YM8m7Q
+ipbj|The bomb jump performed in Ice Palace which skips a large portion of the dungeon. Guide by wqqqqwrt: https://www.youtube.com/watch?v=N6mD9YM8m7Q ~ Guide by BluntBunny: https://www.twitch.tv/videos/170635873?t=13m38s
 
 itemdash|By hitting both the Y-button and the A-button on the same frame, one can perform a dash where the currently equipped item is activated throughout the dash. The most commonly used itemdash is the hammerdash. JP v1.0 only.
 
+gtowerskip|GTower Skip Tutorial / Mirror on Conveyor + Somaria: https://www.twitch.tv/videos/117750046
 jamtut|GTower Skip Tutorial / Mirror on Conveyor + Somaria: https://www.twitch.tv/videos/117750046
 
 jp|Japanese 1.0 is the version of ALttP most commonly used for speedrunning since the Japanese version contains less text (saves ~1 minute), and a few minor glitches like fake flippers, item dash, and superspeed only exist in version 1.0 (saves ~30-40s).
@@ -61,9 +66,9 @@ kevtut|https://drive.google.com/drive/folders/0BzJTdbx9GMY7NkJZdEhFd2tibTg#list
 
 keydash|A keydash can be performed by initiating a dash a multiple of 4 pixels away from a locked door. Positioning yourself against an opposing wall before starting the dash, or nudging an object whilst dashing, will both automatically align you properly.
 
-lanmo|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv
+lanmo|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv ~ Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h04m27s
 
-lb|http://www.speedrun.com/alttp
+lb|Speedrun.com Leaderboard for ALttP: http://www.speedrun.com/alttp
 
 low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon).
 
@@ -73,7 +78,7 @@ nmg|NMG is short for No Major Glitches and means that glitches that skip a large
 
 oob|Out of Bounds (abbreviated OoB) means leaving the intended confinements of the playing field. The most powerful/broken Out of Bounds state is EG (Exploration Glitch).
 
-owglitches|https://www.youtube.com/watch?v=mf5mvuJaQaY
+owglitches|Overworld Out Of Bounds Glitches Tutorial by SuperSKUJ: https://www.youtube.com/watch?v=mf5mvuJaQaY
 
 pinkustips|Some excellent tips from pinkus that most tutorials don't cover: https://gist.github.com/helgefmi/2c2652effb31e0ee0a4e0c48440fd4ee
 
@@ -87,6 +92,7 @@ prizepacks|The order of items in which certain groups of enemies will drop, supp
 
 quickwarp|With the camera aligned to the correct horizontal pixel when initiating a mirror warp or entering a warp tile, the warp animation can be shortened by 34 frames. More info here: https://alttp-wiki.net/index.php/Quick_Warps
 
+rando|ALttP Randomizer Discord: https://discord.gg/BEPAD3Q
 randodiscord|ALttP Randomizer Discord: https://discord.gg/BEPAD3Q
 
 resources|https://alttp-wiki.net/index.php/Tutorials_and_other_external_resources
@@ -99,7 +105,7 @@ rbo|Reverse Boss Order is a category in which you defeat all bosses in the rever
 
 s+q|S+Q means Save and Quit and can be used to minimize overworld travel. With so many other categories that allow heavy sequence breaking, the community at large has decided to not allow S+Q in an NMG speedrun simply to include more content of the game that most other categories skip.
 
-somaria|https://www.youtube.com/watch?v=KfP3jF4sdIY
+somaria|Somaria Glitches Tutorial by SuperSKUJ: https://www.youtube.com/watch?v=KfP3jF4sdIY
 
 spindash|By releasing a sword spin and pressing the A-button the first frame after release, Link will be put into a glitched state and cannot use his sword. If you touch manual stairs and exit cardinally, Link will move at dashing speed with the ability to change directions. Just as with hookdash, pressing A, taking damage, changing screen, or jumping off a ledge will end the glitched state. JP v1.0 only.
 
@@ -110,6 +116,8 @@ stairlag|When exiting a staircase, Link will walk in place for a short period of
 stairpumping|While walking on a staircase or ladder in which you still retain control of Link's movement, you can pump diagonals when walking north on them. The normal animation for climbing stairs/ladders contains a lot of 0 pixel per frame movement, so pumping these ladders to avoid such frames is very important. Even if you do no other pumping, you should incorporate stairpumping into your movement, since it saves more than just a handful of frames.
 
 superspeed|By having a medallion or hookshot equipped and hitting the Y-button and the A-button at the same frame (or using a spindash), you activate a glitched walking state. By climbing stairs that you can manually move up and down and exiting them cardinally, you will gain dash speed while walking. This activated state is called superspeed. The effect is active until canceled by pressing the A-button, taking damage, changing screen, or jumping off a ledge. JP v1.0 only.
+
+swamp|Room-by-room Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=01h18m48s
 
 swordbuffer|Sword Buffering is performed by pressing a direction and pressing B the next frame. Since using your sword will interrupt all D-Pad inputs it allows you to hold the dpad for longer than 1 frame but you move for only 1 frame if executed properly.
 
@@ -123,7 +131,7 @@ wallpumping|A technique that optimizes Link's walking pattern. When walking card
 
 weekly|There is a weekly Any% NMG No S+Q race every Sunday at 3:00 PM Eastern Time held on SpeedRunsLive. Everyone is welcome to join!
 
-whitecircle|http://www.screevo.com/dump/alttp/bombjump.png
+whitecircle|A Visual Cue for Hammerjump: http://www.screevo.com/dump/alttp/bombjump.png
 
 wiki|http://www.alttp-wiki.net/index.php/Main_Page
 
