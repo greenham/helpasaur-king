@@ -6,7 +6,7 @@ airpumping|Another technique to optimize Link's walking patterns. When walking d
 
 antipumping|When walking east or south, Link's movement begins on the 1 pixel per frame speed of his animation. This means you do not want to reset his walking speed by wallpumping, airpumping, or stairpumping. But this even has more implications than that: you always want to avoid altering your input while moving south or east, as any alteration can slow Link down by resetting the movement sequence. Generally speaking, if you're moving south or east, you want to minimize the number of inputs you use to do so.
 
-ashbackup|https://www.twitch.tv/videos/120626409
+ashbackup|https://www.twitch.tv/videos/170635873?t=22m06s
 
 arcvar|https://www.youtube.com/watch?v=u4TQh15hbzo
 
