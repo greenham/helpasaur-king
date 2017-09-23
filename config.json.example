@@ -16,7 +16,7 @@
   "streamAlerts": {
     "clientId": "APP_CLIENT_ID", // https://www.twitch.tv/settings/connections
     "gameName": "The Legend of Zelda: A Link to the Past", // the game to search for live stream alerts
-    "statusFilters": "rando|lttpr|z3r|casual|2v2|enemizer", // keywords to filter out for live stream alerts
+    "statusFilters": "rando|lttpr|z3r|casual|2v2|enemizer|starhunt|v26|open|shuffle|entrance|seed|izer|qualif|tourney|tournament", // keywords to filter out for live stream alerts
     "updateIntervalSeconds": 60, // how often in seconds to check for new live streams
     "offlineToleranceSeconds": 600 // how long in seconds a stream must be offline before another live alert will be sent
   },
