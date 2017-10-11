@@ -186,6 +186,7 @@ client.on('ready', () => {
           weeklyRaceAlertRole,
           `The weekly Any% NMG Race is starting in 1 Hour! ${randomEmoji} Information on joining SRL can be found here: http://www.speedrunslive.com/faq/#join`
         ]);
+        //console.log('received weekly alert event at' + moment().format('MMMM Do YYYY, h:mm:ss a'));
       });
   }
 // Listen for commands for the bot to respond to
