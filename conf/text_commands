@@ -40,6 +40,10 @@ discord|If you're interested in speedrunning ALttP or discussing it with us, fee
 
 eg|EG means Exploration Glitch. The glitch allows you to walk on the incorrect layer and thereby pass through anything. With EG, the game can be completed within 2 minutes.
 
+egmap|https://alttp-wiki.net/index.php/File:Eg-map.png
+
+egstrength|https://alttp-wiki.net/index.php/File:EG_Strength_Map.jpg
+
 ff|Fake flippers, a glitch which allows you to swim without having the flippers. It is performed by jumping into water and changing screen just as you hit the water. Leaving the water will end the glitch, and taking damage whilst swimming can result in the infinite scroll glitch. JP v1.0 only.
 
 ganontut|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered and gold sword strats by timmon_: https://www.dropbox.com/s/yyzml0hs75hgoor/hybrid-ganon-tut-pinkus-timmon.mp4?dl=0
@@ -54,6 +58,8 @@ gt5|Godtas5 - Jadin's most recent Theory TAS - https://www.twitch.tv/videos/4407
 
 hammerjump|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https://www.youtube.com/watch?v=IMqqGzU_eo0)
 hammeryump|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https://www.youtube.com/watch?v=IMqqGzU_eo0)
+podbj|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https://www.youtube.com/watch?v=IMqqGzU_eo0)
+hj|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https://www.youtube.com/watch?v=IMqqGzU_eo0)
 
 hover|Hovering over gaps is performed by holding the A button (for up to 31 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall!
 
@@ -125,9 +131,9 @@ stairlag|When exiting a staircase, Link will walk in place for a short period of
 
 stairpumping|While walking on a staircase or ladder in which you still retain control of Link's movement, you can pump diagonals when walking north on them. The normal animation for climbing stairs/ladders contains a lot of 0 pixel per frame movement, so pumping these ladders to avoid such frames is very important. Even if you do no other pumping, you should incorporate stairpumping into your movement, since it saves more than just a handful of frames.
 
-superspeed|By having a medallion or hookshot equipped and hitting the Y-button and the A-button at the same frame (or using a spindash), you activate a glitched walking state. By climbing stairs that you can manually move up and down and exiting them cardinally, you will gain dash speed while walking. This activated state is called superspeed. The effect is active until canceled by pressing the A-button, taking damage, changing screen, or jumping off a ledge. JP v1.0 only.
+superspeed|By having a medallion or hookshot equipped and hitting the Y-button and the A-button at the same frame (or using a spindash), you activate a glitched walking state. By climbing stairs that you can manually move up and down and exiting them cardinally, you will gain dash speed while walking. This activated state is called superspeed. The effect is active until canceled by pressing the A-button, taking damage, changing screen, or jumping off a ledge. JP v1.0 only. Tutorial by SuperSKUJ: https://youtu.be/Pvmi5DuR9rA
 
-swamp|Room-by-room Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=01h18m48s
+swamp|Room-by-room Swamp Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=01h18m48s
 
 swordbuffer|Sword Buffering is performed by pressing a direction and pressing B the next frame. Since using your sword will interrupt all D-Pad inputs it allows you to hold the dpad for longer than 1 frame but you move for only 1 frame if executed properly.
 
