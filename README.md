@@ -2,7 +2,10 @@
 
 ## Definitions/Links
 
-```!1.0, !agah2, !airpumping, !antipumping, !arcvar, !ashbackup, !bb, !bb%, !bbfaq, !bbrooms, !blockerase, !bombdupe, !bsnes+, !catchtimes, !chomps, !discord, !doublepokeys, !eg, !ff, !ganontut, !glitchtuts, !godtas5, !goldsheet, !gt5, !hammerjump, !hammeryump, !hover, !hovertut, !ipbj, !itemdash, !gtowerskip, !jamtut, !jp, !kevtut, !keydash, !lanmo, !lb, !low%, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !pokey2, !pokeys2, !prachack, !prizepacks, !quickwarp, !rando, !randodiscord, !resources, !rom, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !stairpumping, !superspeed, !swamp, !swordbuffer, !swordclimb, !trident, !tuts, !version, !wallpumping, !weekly, !whitecircle, !wiki, !wqvitty, !yba```
+```!1.0, !adtas, !adtut, !agah2, !airpumping, !antipumping, !arcvar, !ashbackup, !bb, !bb%, !bbfaq, !bbrooms, !blockerase, !bombdupe, !bsnes+, !catchtimes, !chomps, !discord, !doublepokeys, !eg, !egmap, !egstrength, !ff, !ganontut, !glitchtuts, !godtas5, !goldsheet, !gt5, !hammeryump, !hover, !hovertut, !ipbj, !itemdash, !gtowerskip, !jamtut, !jp, !kevtut, !keydash, !lanmo, !lb, !low%, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !pokeys2, !prachack, !prizepacks, !pumping, !quickwarp, !randodiscord, !resources, !rom, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !stairpumping, !superspeed, !swamp, !swordbuffer, !swordclimb, !trident, !tuts, !version, !wallpumping, !weekly, !whitecircle, !wiki, !wqvitty, !yba```
+
+Some of the above commands have synonyms:
+```
 
 ## Memes/Highlights
 
