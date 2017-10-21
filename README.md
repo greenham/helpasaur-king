@@ -11,8 +11,6 @@ Some of the above commands have synonyms:
 
 ```!69blazeit, !armface, !birdtoss, !clap, !clipclap, !clipirl, !coinsnake, !dildo, !doubleteam, !firstdigflute, !foosdabridge, !ganondik, !gonnabeme, !illbefine, !kholdstare, !middlehole, !mothhole, !mothtut2, !pissonface, !playmario, !psa, !rapbattle, !sobesmooth, !squirrelfest, !thebee, !thewobble, !thirtyseven, !trolldorm, !uhoh, !wafflehouse, !whatagod, !zeldagamer```
 
-## Temporary / Event-Related Commands
-```!relay```
 
 ## Discord-Only Commands
 
