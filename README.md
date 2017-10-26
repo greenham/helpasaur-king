@@ -45,6 +45,7 @@
 - All Bosses (No EG) -> **ab**
 - All Dungeons (Swordless) -> **swordless**
 - Any% (No OOB) -> **noob**
+- 100% All Heart Pieces -> **100hp**
 - Any% -> **any**
 
 # Planned Features
