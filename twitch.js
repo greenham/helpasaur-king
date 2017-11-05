@@ -44,6 +44,7 @@ client.addListener('message', function (from, to, message) {
   // Listen for commands that start with the designated prefix
   if (message.startsWith(config.twitch.cmdPrefix)) {
     let commandNoPrefix = message.slice(config.twitch.cmdPrefix.length).split(' ')[0];
+    // Check for basic static command first
     if (staticCommands.exists(commandNoPrefix)) {
       console.log(`received command in ${to} from ${from}: ${message}`);
 
@@ -56,13 +57,49 @@ client.addListener('message', function (from, to, message) {
             cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
           } else {
             // command is on cooldown in this channel
-            client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');
+            //client.say(to, '@' + from + ' => That command is on cooldown for another ' + onCooldown + ' seconds!');
           }
         })
         .catch(console.error);
+    // Listen for specific commands in helpasaur's channel
+    } else if (to === '#helpasaurking') {
+      if (commandNoPrefix === 'join') {
+        // join the requesting user's channel
+        const userChannel = '#' + from;
+        console.log(`Received request to join ${userChannel}`);
+        // if they are not already in the list, add to file
+        if (twitchChannels.indexOf(userChannel) === -1) {
+          //client.join(userChannel);
+          client.say(to, `@${from} >> Joining your channel... please mod ${config.twitch.username} to avoid accidental timeouts or bans!`);
+          twitchChannels.push(userChannel);
+          updateChannelList(joinChannelsFilePath, twitchChannels);
+        } else {
+          client.say(to, '@' + from + ' >> I am already in your channel!');
+        }
+      } else if (commandNoPrefix === 'leave') {
+        // leave the requesting user's channel
+        const userChannel = '#' + from;
+        console.log(`Received request to leave ${userChannel}`);
+        // if they are already in the list, remove from file
+        if (twitchChannels.indexOf(userChannel) !== -1) {
+          //client.part(userChannel, 'Okay, bye! Have a beautiful time!');
+          client.say(to, `@${from} >> Leaving your channel... use ${config.twitch.cmdPrefix}join in this channel to re-join at any time!`);
+          twitchChannels.splice(twitchChannels.indexOf(userChannel), 1);
+          updateChannelList(joinChannelsFilePath, twitchChannels);
+        } else {
+          client.say(to, '@' + from + ' >> I am not in your channel!');
+        }
+      }
     }
   }
 });
+
+function updateChannelList(filePath, channels)
+{
+  fs.writeFile(filePath, channels.join('\n'), (err) => {
+    console.error(err);
+  });
+}
 
 // catch Promise errors
 process.on('unhandledRejection', console.error);
