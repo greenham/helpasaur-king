@@ -10,7 +10,7 @@
 
 ## Memes/Highlights
 
-```!69blazeit, !armface, !birdtoss, !clap, !clipclap, !clipirl, !coinsnake, !dildo, !doubleteam, !firstdigflute, !foosdabridge, !ganondik, !gonnabeme, !illbefine, !kholdstare, !middlehole, !mothhole, !mothtut2, !pissonface, !playmario, !psa, !rapbattle, !sobesmooth, !squirrelfest, !thebee, !thewobble, !thirtyseven, !trolldorm, !uhoh, !wafflehouse, !whatagod, !zeldagamer```
+```!69blazeit, !archery, !armface, !birdtoss, !clap, !clipclap, !clipirl, !coinsnake, !dildo, !doubleteam, !firstdigflute, !foosdabridge, !ganondik, !gloveless, !gonnabeme, !illbefine, !kholdstare, !middlehole, !mothhole, !mothtut2, !pissonface, !playmario, !psa, !rapbattle, !sobesmooth, !squirrelfest, !thebee, !thewobble, !thirtyseven, !trolldorm, !uhoh, !wafflehouse, !whatagod, !zeldagamer```
 
 
 ## Discord-Only Commands
