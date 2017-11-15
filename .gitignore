@@ -2,3 +2,4 @@ node_modules
 logs/*
 config.json
 config.production.json
+conf/twitch_bot_channels
