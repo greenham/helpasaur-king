@@ -134,7 +134,9 @@ client.on('ready', () => {
 
   // Set up alerts for each guild we're a member of
   client.guilds.forEach((guild) => {
-    initGuild(guild, config);
+    if (guild.id !== "default") {
+      initGuild(guild, config);
+    }
   });
 
 // Listen for commands for the bot to respond to across all channels
@@ -142,8 +144,8 @@ client.on('ready', () => {
   msg.originalContent = msg.content;
   msg.content = msg.content.toLowerCase();
 
-  // Find the guild config for this msg
-  let guildConfig = config.discord.guilds[msg.guild.id];
+  // Find the guild config for this msg, use default if no guild (DM)
+  let guildConfig = (msg.guild) ? config.discord.guilds[msg.guild.id] : config.discord.guilds.default;
 
   // Make sure it starts with the configured prefix
   if (!msg.content.startsWith(guildConfig.cmdPrefix)) return;
@@ -180,10 +182,10 @@ client.on('ready', () => {
 
 function initGuild(guild, config)
 {
-  let guildConfig = config.discord.guilds[guild.id];
   // @TODO add some validation to guild config
   // - require alerts channel if any alerts are enabled
   // - require weekly race role if weekly race alert is enabled
+  let guildConfig = config.discord.guilds[guild.id];
 
   // Find the text channel(s) where we'll be posting alerts
   let alertsChannel = guild.channels.find('name', guildConfig.alertsChannelName);
