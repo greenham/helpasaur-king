@@ -28,24 +28,24 @@ const raceWatcher = new RaceAlerts(config.srl);
 // Set up the commands the bot will natively handle
 const commands = {
   // Allow members to request role additions/removals for allowed roles
-  'role': msg => {
+  'role': (msg, guildConfig) => {
     // make sure there are allowed roles defined
-    if (typeof config.discord.allowedRolesForRequest === undefined || config.discord.allowedRolesForRequest.length === 0) {
+    if (typeof guildConfig.allowedRolesForRequest === undefined || guildConfig.allowedRolesForRequest.length === 0) {
       return msg.reply('No roles are currently allowed to be added/removed by members.');
     }
 
-    let validRoles = config.discord.allowedRolesForRequest.split('|');
+    let validRoles = guildConfig.allowedRolesForRequest.split('|');
 
-    if (msg.content === config.discord.cmdPrefix+'role') {
-      return dmUser(msg, `Useage: ${config.discord.cmdPrefix}role {add|remove} {${config.discord.allowedRolesForRequest}}`);
+    if (msg.content === guildConfig.cmdPrefix+'role') {
+      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}role {add|remove} {${guildConfig.allowedRolesForRequest}}`);
     }
 
     // parse+validate action+role (use original case from message because roles are case-sensitive)
     let roleName = msg.originalContent.match(/role\s(add|remove)\s([a-z0-9\-]+)/i);
     if (!roleName) {
-      return dmUser(msg, `You must include a role name! *e.g. ${config.discord.cmdPrefix}role ${roleName[1]} ${validRoles[0]}*`);
+      return dmUser(msg, `You must include a role name! *e.g. ${guildConfig.cmdPrefix}role ${roleName[1]} ${validRoles[0]}*`);
     } else {
-      let tester = new RegExp(config.discord.allowedRolesForRequest, 'i');
+      let tester = new RegExp(guildConfig.allowedRolesForRequest, 'i');
       if (tester.test(roleName[2])) {
         // make sure this message is in a guild channel they're a member of
         if (!msg.guild) return;
@@ -79,7 +79,7 @@ const commands = {
             })
             .catch(console.error);
         } else {
-          return dmUser(msg, `You must use add/remove after the role command! *e.g. ${config.discord.cmdPrefix}role add ${validRoles[0]}*`);
+          return dmUser(msg, `You must use add/remove after the role command! *e.g. ${guildConfig.cmdPrefix}role add ${validRoles[0]}*`);
         }
       } else {
         dmUser(msg, `${roleName[1]} is not a valid role name! The roles allowed for request are: ${validRoles.join(',')}`);
@@ -87,37 +87,37 @@ const commands = {
     }
   },
   // Speedrun.com API Integration (leaderboard lookups)
-  'wr': msg => {
-    if (msg.content === config.discord.cmdPrefix+'wr') {
-      return dmUser(msg, `Useage: ${config.discord.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
+  'wr': (msg, guildConfig) => {
+    if (msg.content === guildConfig.cmdPrefix+'wr') {
+      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
     }
 
     let [command, majorCat, minorCat] = msg.content.split(' ');
     if (!command || !majorCat || !minorCat || (majorCat !== 'nmg' && majorCat !== 'mg')) {
-      return dmUser(msg, `Useage: ${config.discord.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
+      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
     }
 
     let cooldownKey = msg.content + msg.channel.id;
     src.findWR(config.src.gameSlug, majorCat, minorCat)
       .then(result => {
-        msg.reply(result).then(sentMsg => cooldowns.set(cooldownKey, config.discord.srcCmdCooldown));
+        msg.reply(result).then(sentMsg => cooldowns.set(cooldownKey, guildConfig.srcCmdCooldown));
       })
       .catch(console.error);
   },
-  'pb': msg => {
-    if (msg.content === config.discord.cmdPrefix+'pb') {
-      return dmUser(msg, `Useage: ${config.discord.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
+  'pb': (msg, guildConfig) => {
+    if (msg.content === guildConfig.cmdPrefix+'pb') {
+      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
     }
 
     let [command, username, majorCat, minorCat] = msg.content.split(' ');
     if (!command || !username || !majorCat || !minorCat || (majorCat !== 'nmg' && majorCat !== 'mg')) {
-      return dmUser(msg, `Useage: ${config.discord.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
+      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
     }
 
     let cooldownKey = msg.content + msg.channel.id;
     src.findPB(username, majorCat, minorCat)
       .then(result => {
-        msg.reply(result).then(sentMsg => cooldowns.set(cooldownKey, config.discord.srcCmdCooldown));
+        msg.reply(result).then(sentMsg => cooldowns.set(cooldownKey, guildConfig.srcCmdCooldown));
       })
       .catch(console.error);
   },
@@ -132,9 +132,9 @@ const client = new Discord.Client();
 client.on('ready', () => {
   console.log(config.botName + ' Online');
 
-  // @TODO Set up alerts for each guild we're a member of
+  // Set up alerts for each guild we're a member of
   client.guilds.forEach((guild) => {
-    initGuild(guild, config, client);
+    initGuild(guild, config);
   });
 
 // Listen for commands for the bot to respond to across all channels
@@ -142,26 +142,29 @@ client.on('ready', () => {
   msg.originalContent = msg.content;
   msg.content = msg.content.toLowerCase();
 
+  // Find the guild config for this msg
+  let guildConfig = config.discord.guilds[msg.guild.id];
+
   // Make sure it starts with the configured prefix
-  if (!msg.content.startsWith(config.discord.cmdPrefix)) return;
+  if (!msg.content.startsWith(guildConfig.cmdPrefix)) return;
 
   // And that it's not on cooldown
   let cooldownKey = msg.content + msg.channel.id;
-  cooldowns.get(cooldownKey, config.discord.textCmdCooldown)
+  cooldowns.get(cooldownKey, guildConfig.textCmdCooldown)
     .then(onCooldown => {
       if (onCooldown === false) {
         // Not on CD, check for native or static command
-        let commandNoPrefix = msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0];
-        console.log(`'${commandNoPrefix}' received in #${msg.channel.name} from @${msg.author.username}`);
+        let commandNoPrefix = msg.content.slice(guildConfig.cmdPrefix.length).split(' ')[0];
+        console.log(`'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`);
         if (commands.hasOwnProperty(commandNoPrefix)) {
-          commands[commandNoPrefix](msg);
+          commands[commandNoPrefix](msg, guildConfig);
         } else if (staticCommands.exists(commandNoPrefix)) {
           let result = staticCommands.get(commandNoPrefix);
           msg.channel.send({embed: {
             "title": commandNoPrefix,
             "color": 0xff9f25,
             "description": result
-          }}).then(sentMessage => cooldowns.set(cooldownKey, config.discord.textCmdCooldown))
+          }}).then(sentMessage => cooldowns.set(cooldownKey, guildConfig.textCmdCooldown))
           .catch(console.error);
         } else {
           // Not a command we recognize, ignore
@@ -175,14 +178,19 @@ client.on('ready', () => {
 // Log the bot in
 }).login(config.discord.token);
 
-function initGuild(guild, config, client)
+function initGuild(guild, config)
 {
+  let guildConfig = config.discord.guilds[guild.id];
+  // @TODO add some validation to guild config
+  // - require alerts channel if any alerts are enabled
+  // - require weekly race role if weekly race alert is enabled
+
   // Find the text channel(s) where we'll be posting alerts
-  let alertsChannel = guild.channels.find('name', config.discord.guilds[guild.id].alertsChannelName);
-  if (config.discord.alertOnConnect === true) alertsChannel.send(config.botName + ' has connected. :white_check_mark:');
+  let alertsChannel = guild.channels.find('name', guildConfig.alertsChannelName);
+  if (guildConfig.alertOnConnect === true) alertsChannel.send(config.botName + ' has connected. :white_check_mark:');
 
   // Watch + alert for Twitch streams
-  if (config.discord.enableLivestreamAlerts) {
+  if (guildConfig.enableLivestreamAlerts) {
     let embed = new Discord.RichEmbed();
     streamWatcher.on('live', stream => {
       embed.setStreamAlertDefaults(stream)
@@ -200,7 +208,7 @@ function initGuild(guild, config, client)
   }
 
   // Watch + alert for SRL races
-  if (config.discord.enableRaceAlerts) {
+  if (guildConfig.enableRaceAlerts) {
     let embed = new Discord.RichEmbed();
     raceWatcher.on('init', (raceChannel, srlUrl) => {
       embed.setRaceAlertDefaults(raceChannel, srlUrl).setDescription(`A race was just started for *${config.srl.gameName}*!`);
@@ -221,12 +229,12 @@ function initGuild(guild, config, client)
   // Schedule timers for some special messages / commands
   //
   // Weekly NMG Race Alert: Every Sunday at 11 AM Pacific /
-  if (config.discord.enableWeeklyRaceAlert) {
+  if (guildConfig.enableWeeklyRaceAlert) {
     let weeklyAlertTimestamp = moment().day(7).hour(11).minute(0).second(0).valueOf();
-    let weeklyRaceAlertRole = client.guilds.first().roles.find('name', config.discord.weeklyRaceAlertRole);
+    let weeklyRaceAlertRole = guild.roles.find('name', guildConfig.weeklyRaceAlertRole);
     timers.onceAndRepeat(weeklyAlertTimestamp, 604800, 'weekly-alert')
       .on('weekly-alert', () => {
-        let randomEmoji = client.guilds.first().emojis.random();
+        let randomEmoji = guild.emojis.random();
         alertsChannel.send([
           weeklyRaceAlertRole,
           `The weekly Any% NMG Race is starting in 1 Hour! ${randomEmoji} Information on joining SRL can be found here: http://www.speedrunslive.com/faq/#join`
