@@ -132,8 +132,53 @@ const client = new Discord.Client();
 client.on('ready', () => {
   console.log(config.botName + ' Online');
 
-  // Find the text channel where we'll be posting alerts
-  let alertsChannel = client.channels.find('name', config.discord.alertsChannelName);
+  // @TODO Set up alerts for each guild we're a member of
+  client.guilds.forEach((guild) => {
+    initGuild(guild, config, client);
+  });
+
+// Listen for commands for the bot to respond to across all channels
+}).on('message', msg => {
+  msg.originalContent = msg.content;
+  msg.content = msg.content.toLowerCase();
+
+  // Make sure it starts with the configured prefix
+  if (!msg.content.startsWith(config.discord.cmdPrefix)) return;
+
+  // And that it's not on cooldown
+  let cooldownKey = msg.content + msg.channel.id;
+  cooldowns.get(cooldownKey, config.discord.textCmdCooldown)
+    .then(onCooldown => {
+      if (onCooldown === false) {
+        // Not on CD, check for native or static command
+        let commandNoPrefix = msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0];
+        console.log(`'${commandNoPrefix}' received in #${msg.channel.name} from @${msg.author.username}`);
+        if (commands.hasOwnProperty(commandNoPrefix)) {
+          commands[commandNoPrefix](msg);
+        } else if (staticCommands.exists(commandNoPrefix)) {
+          let result = staticCommands.get(commandNoPrefix);
+          msg.channel.send({embed: {
+            "title": commandNoPrefix,
+            "color": 0xff9f25,
+            "description": result
+          }}).then(sentMessage => cooldowns.set(cooldownKey, config.discord.textCmdCooldown))
+          .catch(console.error);
+        } else {
+          // Not a command we recognize, ignore
+        }
+      } else {
+        // DM the user that it's on CD
+        dmUser(msg, `**${msg.content}** is currently on cooldown for another *${onCooldown} seconds!*`);
+      }
+    })
+    .catch(console.error);
+// Log the bot in
+}).login(config.discord.token);
+
+function initGuild(guild, config, client)
+{
+  // Find the text channel(s) where we'll be posting alerts
+  let alertsChannel = guild.channels.find('name', config.discord.guilds[guild.id].alertsChannelName);
   if (config.discord.alertOnConnect === true) alertsChannel.send(config.botName + ' has connected. :white_check_mark:');
 
   // Watch + alert for Twitch streams
@@ -189,43 +234,7 @@ client.on('ready', () => {
         //console.log('received weekly alert event at' + moment().format('MMMM Do YYYY, h:mm:ss a'));
       });
   }
-// Listen for commands for the bot to respond to
-}).on('message', msg => {
-  msg.originalContent = msg.content;
-  msg.content = msg.content.toLowerCase();
-
-  // Make sure it starts with the configured prefix
-  if (!msg.content.startsWith(config.discord.cmdPrefix)) return;
-
-  // And that it's not on cooldown
-  let cooldownKey = msg.content + msg.channel.id;
-  cooldowns.get(cooldownKey, config.discord.textCmdCooldown)
-    .then(onCooldown => {
-      if (onCooldown === false) {
-        // Not on CD, check for native or static command
-        let commandNoPrefix = msg.content.slice(config.discord.cmdPrefix.length).split(' ')[0];
-        console.log(`'${commandNoPrefix}' received in #${msg.channel.name} from @${msg.author.username}`);
-        if (commands.hasOwnProperty(commandNoPrefix)) {
-          commands[commandNoPrefix](msg);
-        } else if (staticCommands.exists(commandNoPrefix)) {
-          let result = staticCommands.get(commandNoPrefix);
-          msg.channel.send({embed: {
-            "title": commandNoPrefix,
-            "color": 0xff9f25,
-            "description": result
-          }}).then(sentMessage => cooldowns.set(cooldownKey, config.discord.textCmdCooldown))
-          .catch(console.error);
-        } else {
-          // Not a command we recognize, ignore
-        }
-      } else {
-        // DM the user that it's on CD
-        dmUser(msg, `**${msg.content}** is currently on cooldown for another *${onCooldown} seconds!*`);
-      }
-    })
-    .catch(console.error);
-// Log the bot in
-}).login(config.discord.token);
+}
 
 function dmUser(originalMessage, newMessage)
 {
