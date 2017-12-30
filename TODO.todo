@@ -9,9 +9,3 @@ Feature Requests:
  ☐ Support for pulling category rules from SRC
  ✔ Add !chomps: https://www.twitch.tv/videos/170635873?t=02h25m21s + link to image @done (17-12-27 10:53)
  ✔ Support multiple guilds @done (17-12-28 09:14)
-   - add guild-specific items to config.json
-     - roles that can be added/removed
-     - enable/disable stream alerts
-     - enable/disable race alerts
-     - enable/disable weekly alerts
-   - make cooldowns guild-specific
