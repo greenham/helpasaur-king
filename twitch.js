@@ -67,7 +67,7 @@ client.addListener('message', function (from, to, message) {
         // join the requesting user's channel
         const userChannel = '#' + from;
         console.log(`Received request to join ${userChannel}`);
-        // if they are not already in the list, add to file
+        // if they are not already in the list, add to temporary file and manually join
         if (twitchChannels.indexOf(userChannel) === -1) {
           //client.join(userChannel);
           client.say(to, `@${from} >> Joining your channel... please mod ${config.twitch.username} to avoid accidental timeouts or bans!`);

@@ -1,10 +1,10 @@
-tourney,tournament|The 2018 ALttP Tournament will be an Any% No Major Glitches tournament. Signups are open now: http://challonge.com/ALTTP2018/ Group stage matches will begin the last week of March. Groups will be seeded by your SR.com (or ZSR) PB as of March 18 at Midnight! Matches will be broadcast on Speedgaming!
+tourney,tournament|The 2018 ALttP Tournament will be an Any% No Major Glitches tournament. Signups are open now: http://challonge.com/ALTTP2018/ ~ Discord: https://discord.gg/QuWmfb5 ~ Group stage matches will begin the last week of March. Groups will be seeded by runner's SR.com PB as of March 18 at Midnight. Matches will be broadcast on SpeedGaming!
 
 adrace|https://pastebin.com/jNPJ9kSR ~ There will be an All Dungeons community race held on Saturday Jan 27th, 4PM EST streamed on SpeedGaming. Sign up here to participate: https://goo.gl/forms/fMj3qsRJrFE5Mdfo1 ~ !adtut and !bombclips for more info
 
-1.0,jp|Japanese 1.0 is the version of ALttP most commonly used for speedrunning since the Japanese version contains less text (saves ~1 minute in NMG), and a few minor glitches like fake flippers, item dash, superspeed, and mirror-delete only exist in version 1.0 (saves ~30-40s in NMG).
+1.0,jp,jp1.0|Japanese 1.0 is the version of ALttP most commonly used for speedrunning since the Japanese version contains less text (saves ~1 minute in NMG), and a few minor glitches like fake flippers, item dash, superspeed, and block-erase only exist in version 1.0 (saves ~30-40s in NMG).
 
-about|I am a discord/twitch bot for ALttP speedrunners. If you would like HelpasaurKing in your twitch channel, you can go directly to https://www.twitch.tv/helpasaurking and use !join in the chat.
+ad|AD is a common abbreviation for the All Dungeons category, which allows some major glitches like Out of Bounds, but bans Exploration Glitch, Door Glitches, and Wrong Warps. See: adtas, adtut, and bombclips for more info.
 
 adtas|All Dungeons Theory TAS by JoshRTA: https://www.twitch.tv/videos/175287796
 
@@ -14,7 +14,7 @@ agah2|Agah 2 Tutorial by BluntBunny: https://www.twitch.tv/videos/167608707
 
 airpumping,airpump|A technique to optimize Link's walking patterns. When walking diagonally to the north or west and at an angle of less than 45 degrees, you can mash diagonals into the air to boost pixels. Like wallpumping, this is merely a frame-saving technique in most instances, due to human limitations on mashing.
 
-antipumping,antipump|When walking east or south, Link's movement begins on the 1 pixel per frame speed of his animation. This means you do not want to reset his walking speed by wallpumping, airpumping, or stairpumping. But this even has more implications than that: you always want to avoid altering your input while moving south or east, as any alteration can slow Link down by resetting the movement sequence. Generally speaking, if you're moving south or east, you want to minimize the number of inputs you use to do so.
+antipumping,antipump|When walking east or south, Link's movement begins on the 1 pixel per frame speed of his animation. This means you do not want to reset his walking speed by wallpumping, airpumping, or stairpumping. You always want to avoid altering your input while moving south or east, as any change can slow Link down by resetting the movement sequence. Generally speaking, if you're moving south or east, you want to minimize the number of inputs you use to do so.
 
 arcvar|Arc Variable Lesson by Professor SuperSKUJ: https://www.youtube.com/watch?v=u4TQh15hbzo
 
@@ -28,9 +28,9 @@ bbfaq|BluntBunny Knowledge Dump #1: https://www.twitch.tv/videos/170635873
 
 bbrooms|BluntBunny room sheet (notes + times for every room in any% nmg): https://goo.gl/AGMyAa
 
-blockerase|Using the mirror while pushing a block will make it disappear. You need to be indoors but NOT in a dungeon for it to work. This minor glitch is most commonly used in the swamp dam in light world. JP v1.0 only.
+blockerase,mirrordelete|Using the mirror while pushing a block will make it disappear. You need to be indoors but NOT in a dungeon for it to work. This minor glitch is most commonly used in the swamp dam in light world. JP v1.0 only.
 
-bombclips|How to do Kiki Skip and Ice Clip with Bombs+Boots: https://www.twitch.tv/videos/184736680 ~ Hera->Swamp: https://puu.sh/y3xBu/33f34fb7f5.mp4
+bombclips|How to do Kiki Skip and Ice Clip with Bombs+Boots: https://www.twitch.tv/videos/184736680 ~ Hera->Swamp: https://youtu.be/M5dGYwB4K54
 
 bombdupe|Big Bomb Dupe Setup for 100% or GS/SA by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h41m37s
 
@@ -66,6 +66,8 @@ gtowerskip,jamtut|GTower Skip Tutorial / Mirror on Conveyor + Somaria: https://w
 
 hammerjump,hammeryump,podbj|A bomb jump trick in Palace of Darkness that skips a large portion of the dungeon. Tutorial by BluntBunny here: https://www.twitch.tv/videos/170642679 (old version: https://www.youtube.com/watch?v=IMqqGzU_eo0)
 
+helpa|I am a discord/twitch bot for ALttP speedrunners. If you would like HelpasaurKing in your twitch channel, you can go directly to https://www.twitch.tv/helpasaurking and use !join in the chat.
+
 hover|Hovering over gaps is performed by holding the A button (for up to 29 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall!
 
 hovertut|Hover tutorial by malibukenn: https://www.youtube.com/watch?v=XraSVjZYXR0
@@ -76,13 +78,13 @@ ipbj|The bomb jump performed in Ice Palace which skips a large portion of the du
 
 itemdash|By hitting both the Y-button and the A-button on the same frame, one can perform a dash where the currently equipped item is activated throughout the dash. The most commonly used itemdash is the hammerdash. JP v1.0 only.
 
-kevtut|https://drive.google.com/drive/folders/0BzJTdbx9GMY7NkJZdEhFd2tibTg#list
+kevtut,dtdtut|Advanced Any% NMG Tutorial by downtimedeath: https://drive.google.com/drive/folders/0BzJTdbx9GMY7NkJZdEhFd2tibTg#list
 
 keydash|A keydash can be performed by initiating a dash a multiple of 4 pixels away from a locked door. Positioning yourself against an opposing wall before starting the dash, or nudging an object whilst dashing, will both automatically align you properly.
 
 lanmo,lanmos,lanmolas|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv ~ Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h04m27s
 
-lb|Speedrun.com Leaderboard for ALttP: http://www.speedrun.com/alttp
+lb,src,leaderboard,leaderboards|Speedrun.com Leaderboard for ALttP: http://www.speedrun.com/alttp
 
 low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon).
 
@@ -118,9 +120,9 @@ rom|google this: 3322effc
 
 roomsheet|ALttP Community Room Sheet: https://docs.google.com/spreadsheets/d/1dV2ozAGgDdFZAne8rwG3h0KyOPgIN72pWeRsS1hR2QU/edit?usp=sharing
 
-rbo|Reverse Boss Order is a category in which you defeat all bosses in the reverse order, all the way from Ganon to Armos Knights. The run ends, as usual, when collecting the Triforce. The category requires frequent use of larger glitches such as EG and YBA.
+rbo|Reverse Boss Order is a category in which you defeat all bosses in the reverse order, all the way from Ganon to Armos Knights. The run ends, as usual, when collecting the Triforce. The category requires frequent use of major glitches such as EG and YBA.
 
-s+q|S+Q means Save and Quit and can be used to minimize overworld travel. With so many other categories that allow heavy sequence breaking, the community at large has decided to not allow S+Q in an NMG speedrun simply to include more content of the game that most other categories skip.
+s+q,sq,snq,s&q|S+Q means Save and Quit and can be used to minimize overworld travel. With so many other categories that allow heavy sequence breaking, the community at large has decided to not allow S+Q in an NMG speedrun simply to include more content of the game that most other categories skip.
 
 somaria|Somaria Glitches Tutorial by SuperSKUJ: https://www.youtube.com/watch?v=KfP3jF4sdIY
 
@@ -191,5 +193,4 @@ wafflehouse|https://www.twitch.tv/videos/45723591
 whatagod|https://www.twitch.tv/videos/76518228
 zeldagamer|https://www.youtube.com/watch?v=48eMTIYpKeo
 
-commands|https://github.com/greenham/alttp-bot/blob/master/README.md
-help|https://github.com/greenham/alttp-bot/blob/master/README.md
+commands,help|https://github.com/greenham/alttp-bot/blob/master/README.md
