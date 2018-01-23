@@ -1,5 +1,5 @@
 Bugs Fixes:
- ☐ When updating twitch streams, write new results to temporary file, manually join/part channels, copy temp file to main file when script ends
+ ✔ When updating twitch streams, write new results to temporary file, manually join/part channels, copy temp file to main file when script ends @done (18-01-23 11:34)
 
 Feature Requests:
  ☐ Automatically DM new guild members with a welcome message, links to resources, and answers to common questions
