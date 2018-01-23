@@ -11,6 +11,7 @@ const irc = require('irc'),
 
 // Read in bot configuration
 let config = require('./config.json');
+let botChannel = '#' + config.twitch.username.toLowerCase();
 
 // Config file paths
 const joinChannelsFilePath = path.join(__dirname, 'conf', 'twitch_bot_channels');
@@ -61,18 +62,22 @@ client.addListener('message', function (from, to, message) {
           }
         })
         .catch(console.error);
-    // Listen for specific commands in helpasaur's channel
-    } else if (to === '#helpasaurking') {
+    // Listen for specific commands in the bot's channel
+    } else if (to === botChannel) {
       if (commandNoPrefix === 'join') {
         // join the requesting user's channel
         const userChannel = '#' + from;
         console.log(`Received request to join ${userChannel}`);
-        // if they are not already in the list, add to temporary file and manually join
-        if (twitchChannels.indexOf(userChannel) === -1) {
-          //client.join(userChannel);
+        let channelIndex = twitchChannels.indexOf(userChannel);
+        if (channelIndex === -1) {
           client.say(to, `@${from} >> Joining your channel... please mod ${config.twitch.username} to avoid accidental timeouts or bans!`);
-          twitchChannels.push(userChannel);
-          updateChannelList(joinChannelsFilePath, twitchChannels);
+          console.log('before join', twitchChannels);
+          client.join(userChannel, () => {
+            // somehow the line below is happening without the line below being called
+            //twitchChannels.push(userChannel);
+            console.log('after join', twitchChannels);
+            updateChannelList(joinChannelsFilePath, twitchChannels);
+          });
         } else {
           client.say(to, '@' + from + ' >> I am already in your channel!');
         }
@@ -80,12 +85,16 @@ client.addListener('message', function (from, to, message) {
         // leave the requesting user's channel
         const userChannel = '#' + from;
         console.log(`Received request to leave ${userChannel}`);
-        // if they are already in the list, remove from file
-        if (twitchChannels.indexOf(userChannel) !== -1) {
-          //client.part(userChannel, 'Okay, bye! Have a beautiful time!');
+        let channelIndex = twitchChannels.indexOf(userChannel);
+        if (channelIndex !== -1) {
           client.say(to, `@${from} >> Leaving your channel... use ${config.twitch.cmdPrefix}join in this channel to re-join at any time!`);
-          twitchChannels.splice(twitchChannels.indexOf(userChannel), 1);
-          updateChannelList(joinChannelsFilePath, twitchChannels);
+          console.log('before part', twitchChannels);
+          client.part(userChannel, 'Okay, bye! Have a beautiful time!', () => {
+            console.log('removing 1 element at position', channelIndex);
+            twitchChannels.splice(channelIndex, 1);
+            console.log('after part', twitchChannels);
+            updateChannelList(joinChannelsFilePath, twitchChannels);
+          });
         } else {
           client.say(to, '@' + from + ' >> I am not in your channel!');
         }
@@ -96,10 +105,45 @@ client.addListener('message', function (from, to, message) {
 
 function updateChannelList(filePath, channels)
 {
-  fs.writeFile(filePath, channels.join('\n'), (err) => {
-    console.error(err);
+  console.log('updating channel list...', channels);
+  fs.writeFile(filePath+'.new', channels.join('\n'), (err) => {
+    if (err) console.error(err);
   });
 }
 
-// catch Promise errors
+process.stdin.resume(); // so the program will not close instantly
+
+function exitHandler(options, err) {
+  if (options.cleanup) {
+    console.log('script is exiting... starting cleanup...');
+    // if we created a .new file for the channel list, copy that to the live file and delete the .new file
+    let newFilePath = joinChannelsFilePath+'.new';
+    if (fs.existsSync(newFilePath)) {
+      console.log(`copying ${newFilePath} to ${joinChannelsFilePath}...`);
+      fs.copyFileSync(newFilePath, joinChannelsFilePath);
+      console.log(`removing ${newFilePath}...`);
+      fs.unlinkSync(newFilePath);
+    }
+    console.log('cleanup finished');
+  }
+
+  // log any errors and exit
+  if (err) console.log(err.stack);
+  if (options.exit) process.exit();
+}
+
+// do some cleanup when this process stops
+process.on('exit', exitHandler.bind(null, {cleanup:true}));
+
+// catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+
+// catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+
+// catches Promise errors
 process.on('unhandledRejection', console.error);

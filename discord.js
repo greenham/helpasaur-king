@@ -122,7 +122,7 @@ const commands = {
       .catch(console.error);
   },
   // @todo implement pulling in category rules from SRC
-  'rules': msg => {
+  'rules': (msg, guildConfig) => {
   }
 };
 
