@@ -5,7 +5,7 @@
 ```!1.0, !ad, !adtas, !adtut, !agah2, !airpumping, !antipumping, !arcvar, !ashbackup, !bb, !bb%, !bbfaq, !bbrooms, !blockerase, !bombclips, !bombdupe, !bsnes+, !catchtimes, !chomps, !clips, !discord, !eg, !egmap, !egstrength, !ff, !ganontut, !glitches, !glitchtuts, !godtas5, !gt5, !goldsheet, !gtowerskip, !jamtut, !hammerjump, !hammeryump, !podbj, !hover, !hovertut, !ipbj, !itemdash, !kevtut, !keydash, !lanmo, !lb, !low%, !maps, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !doublepokeys, !pokey2, !pokeys2, !prac, !practice, !practicehack, !practicerom, !prachack, !prizepacks, !pumping, !quickwarp, !qw, !rando, !randodiscord, !resources, !tuts, !tutorials, !rom, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !stairpumping, !superspeed, !swamp, !swordbuffer, !swordclimb, !trident, !version, !wallpumping, !weekly, !whitecircle, !wiki, !wqvitty, !yba```
 
 ## Temporary/Event Commands
-```!adrace, !tourney```
+```!tourney```
 
 
 ## Memes/Highlights
