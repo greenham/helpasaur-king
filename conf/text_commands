@@ -92,7 +92,9 @@ lb,src,leaderboard,leaderboards|Speedrun.com Leaderboard for ALttP: http://www.s
 
 low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon).
 
-maps|Some misc maps and images showing room layouts, sprite placements, contents of chests/pots, and NPC/boss rewards: http://ian-albert.com/games/legend_of_zelda_a_link_to_the_past_maps/
+maps,map|Some misc maps and images showing room layouts, sprite placements, contents of chests/pots, and NPC/boss rewards: http://ian-albert.com/games/legend_of_zelda_a_link_to_the_past_maps/
+
+mirrorjump,mirrorjumps|A Mirror Jump involves hopping a ledge and using the Magic Mirror at the same time. The usual intended effect (on the overworld) is to shift Link's position by 1px where it would not otherwise be possible. This is most commonly applied in the Any% No EG category to rescue the frog/dwarf without the Titan's Mitts. More info here: https://alttp-wiki.net/index.php/Mirror_Jumps
 
 mothtut|tiny moth dik: https://www.youtube.com/watch?v=qmR3zO2VQCE
 
