@@ -2,10 +2,12 @@
 
 ## Definitions/Links
 
-```!1.0, !ad, !adtas, !adtut, !agah2, !airpumping, !antipumping, !arcvar, !ashbackup, !bb, !bb%, !bbfaq, !bbrooms, !blockerase, !bombclips, !bombdupe, !bsnes+, !catchtimes, !chomps, !clips, !discord, !dma, !dmd, !eg, !egmap, !egstrength, !ff, !ganontut, !glitches, !glitchtuts, !godtas5, !gt5, !goldsheet, !gtowerskip, !jamtut, !hammerjump, !hammeryump, !podbj, !hover, !hovertut, !ipbj, !itemdash, !kevtut, !keydash, !lanmo, !lb, !low%, !maps, !mirrorjump, !mothtut, !nmg, !oob, !owglitches, !pinkustips, !doublepokeys, !pokey2, !pokeys2, !prac, !practice, !practicehack, !practicerom, !prachack, !prizepacks, !pumping, !quickwarp, !qw, !rando, !randodiscord, !resources, !tuts, !tutorials, !rom, !roomsheet, !rbo, !s+q, !somaria, !spindash, !srcguides, !stairlag, !stairpumping, !superspeed, !swamp, !swordbuffer, !swordclimb, !trident, !version, !wallpumping, !weekly, !whitecircle, !wiki, !wqvitty, !yba```
+Some of these commands are simply convenient aliases and are listed here for completeness.
+
+```!1.0, !1.0cart, !ad, !adtas, !adtut, !agah2, !airpump, !airpumping, !antipump, !antipumping, !arcvar, !ashbackup, !bb, !bb%, !bbfaq, !bbrooms, !blockerase, !bombclip, !bombclips, !bombdupe, !bsnes+, !catchtimes, !chomps, !clips, !discord, !dma, !dmd, !doordiag, !doublepokeys, !drops, !dtdtut, !eg, !egmap, !egstrength, !fakeflippers, !ff, !ganontut, !glitches, !glitchtuts, !godtas5, !goldsheet, !gt5, !gtowerskip, !hammerjump, !hammeryump, !helpa, !hover, !hovertut, !icons, !ipbj, !itemdash, !jamtut, !jp, !jp1.0, !kevtut, !keydash, !lanmo, !lanmolas, !lanmos, !lb, !leaderboard, !leaderboards, !low%, !map, !maps, !mirrordelete, !mirrorjump, !mirrorjumps, !mothtut, !movement, !nmg, !oob, !owglitches, !pinkustips, !podbj, !pokey2, !pokeys2, !prac, !prachack, !practice, !practicehack, !practicerom, !prizepack, !prizepacks, !pump, !pumping, !puzzles, !quickwarp, !quickwarps, !qw, !rando, !randodiscord, !random, !randomizer, !rbo, !resources, !rom, !roomsheet, !s&q, !s+q, !snq, !somaria, !spindash, !spinspeed, !sq, !src, !srcguides, !stairlag, !stairpump, !stairpumping, !superspeed, !swamp, !swordbuffer, !swordclimb, !trident, !tutorial, !tutorials, !tuts, !version, !wallpump, !wallpumping, !weekly, !whitecircle, !wiki, !wqvitty, !yba```
 
 ## Temporary/Event Commands
-```!tourney```
+```!tourney, !tournament```
 
 
 ## Memes/Highlights

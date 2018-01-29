@@ -1,12 +1,14 @@
-Bugs Fixes:
- ✔ When updating twitch streams, write new results to temporary file, manually join/part channels, copy temp file to main file when script ends @done (18-01-23 11:34)
-
-Feature Requests:
+Planned Features:
  ☐ Automatically DM new guild members with a welcome message, links to resources, and answers to common questions
  ☐ Integrate with speedrun.tv once API is available/documented
  ☐ Create a web interface for editing commands / settings
  ☐ Integration with ALttP Wiki search
  ☐ Support for pulling category rules from SRC
- ☐ Add a script to auto-generate the README command list
- ✔ Add !chomps: https://www.twitch.tv/videos/170635873?t=02h25m21s + link to image @done (17-12-27 10:53)
- ✔ Support multiple guilds @done (17-12-28 09:14)
+ 
+Bugs Fixes:
+
+ Done:
+   ✔ When updating twitch streams, write new results to temporary file, manually join/part channels, copy temp file to main file when script ends @done (18-01-23 11:34)
+   ✔ Add !chomps: https://www.twitch.tv/videos/170635873?t=02h25m21s + link to image @done (17-12-27 10:53)
+   ✔ Support multiple guilds @done (17-12-28 09:14)
+   ✔ Add a script to auto-generate the README command list @done (18-01-29 13:08)
