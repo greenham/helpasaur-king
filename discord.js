@@ -196,9 +196,6 @@ client.on('ready', () => {
 
 function initGuild(guild, config)
 {
-  // @TODO add some validation to guild config
-  // - require alerts channel if any alerts are enabled
-  // - require weekly race role if weekly race alert is enabled
   let guildConfig = config.discord.guilds[guild.id];
 
   // Find the text channel(s) where we'll be posting alerts
@@ -206,7 +203,7 @@ function initGuild(guild, config)
   if (guildConfig.alertOnConnect === true) alertsChannel.send(config.botName + ' has connected. :white_check_mark:');
 
   // Watch + alert for Twitch streams
-  if (guildConfig.enableLivestreamAlerts) {
+  if (alertsChannel && guildConfig.enableLivestreamAlerts) {
     let embed = new Discord.RichEmbed();
     streamWatcher.on('live', stream => {
       embed.setStreamAlertDefaults(stream)
@@ -224,7 +221,7 @@ function initGuild(guild, config)
   }
 
   // Watch + alert for SRL races
-  if (guildConfig.enableRaceAlerts) {
+  if (alertsChannel && guildConfig.enableRaceAlerts) {
     let embed = new Discord.RichEmbed();
     raceWatcher.on('init', (raceChannel, srlUrl) => {
       embed.setRaceAlertDefaults(raceChannel, srlUrl).setDescription(`A race was just started for *${config.srl.gameName}*!`);
@@ -245,7 +242,7 @@ function initGuild(guild, config)
   // Schedule timers for some special messages / commands
   //
   // Weekly NMG Race Alert: Every Sunday at 11 AM Pacific /
-  if (guildConfig.enableWeeklyRaceAlert) {
+  if (alertsChannel && guildConfig.enableWeeklyRaceAlert) {
     let weeklyAlertTimestamp = moment().day(7).hour(11).minute(0).second(0).valueOf();
     let weeklyRaceAlertRole = guild.roles.find('name', guildConfig.weeklyRaceAlertRole);
     timers.onceAndRepeat(weeklyAlertTimestamp, 604800, 'weekly-alert')
