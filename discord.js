@@ -37,13 +37,13 @@ const commands = {
     let validRoles = guildConfig.allowedRolesForRequest.split('|');
 
     if (msg.content === guildConfig.cmdPrefix+'role') {
-      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}role {add|remove} {${guildConfig.allowedRolesForRequest}}`);
+      return dmUserFromMsg(msg, `Useage: ${guildConfig.cmdPrefix}role {add|remove} {${guildConfig.allowedRolesForRequest}}`);
     }
 
     // parse+validate action+role (use original case from message because roles are case-sensitive)
     let roleName = msg.originalContent.match(/role\s(add|remove)\s([a-z0-9\-]+)/i);
     if (!roleName) {
-      return dmUser(msg, `You must include a role name! *e.g. ${guildConfig.cmdPrefix}role ${roleName[1]} ${validRoles[0]}*`);
+      return dmUserFromMsg(msg, `You must include a role name! *e.g. ${guildConfig.cmdPrefix}role ${roleName[1]} ${validRoles[0]}*`);
     } else {
       let tester = new RegExp(guildConfig.allowedRolesForRequest, 'i');
       if (tester.test(roleName[2])) {
@@ -54,7 +54,7 @@ const commands = {
         let role = msg.guild.roles.find('name', roleName[2]);
 
         if (!role) {
-          return dmUser(msg, `${roleName[2]} is not a role on this server!`);
+          return dmUserFromMsg(msg, `${roleName[2]} is not a role on this server!`);
         }
 
         // add/remove the role and DM the user the results
@@ -79,22 +79,22 @@ const commands = {
             })
             .catch(console.error);
         } else {
-          return dmUser(msg, `You must use add/remove after the role command! *e.g. ${guildConfig.cmdPrefix}role add ${validRoles[0]}*`);
+          return dmUserFromMsg(msg, `You must use add/remove after the role command! *e.g. ${guildConfig.cmdPrefix}role add ${validRoles[0]}*`);
         }
       } else {
-        dmUser(msg, `${roleName[1]} is not a valid role name! The roles allowed for request are: ${validRoles.join(',')}`);
+        dmUserFromMsg(msg, `${roleName[1]} is not a valid role name! The roles allowed for request are: ${validRoles.join(',')}`);
       }
     }
   },
   // Speedrun.com API Integration (leaderboard lookups)
   'wr': (msg, guildConfig) => {
     if (msg.content === guildConfig.cmdPrefix+'wr') {
-      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
+      return dmUserFromMsg(msg, `Useage: ${guildConfig.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
     }
 
     let [command, majorCat, minorCat] = msg.content.split(' ');
     if (!command || !majorCat || !minorCat || (majorCat !== 'nmg' && majorCat !== 'mg')) {
-      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
+      return dmUserFromMsg(msg, `Useage: ${guildConfig.cmdPrefix}wr {nmg/mg} {subcategory-code}`);
     }
 
     let cooldownKey = msg.content + msg.channel.id;
@@ -106,12 +106,12 @@ const commands = {
   },
   'pb': (msg, guildConfig) => {
     if (msg.content === guildConfig.cmdPrefix+'pb') {
-      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
+      return dmUserFromMsg(msg, `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
     }
 
     let [command, username, majorCat, minorCat] = msg.content.split(' ');
     if (!command || !username || !majorCat || !minorCat || (majorCat !== 'nmg' && majorCat !== 'mg')) {
-      return dmUser(msg, `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
+      return dmUserFromMsg(msg, `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`);
     }
 
     let cooldownKey = msg.content + msg.channel.id;
@@ -138,7 +138,6 @@ client.on('ready', () => {
       initGuild(guild, config);
     }
   });
-
 // Listen for commands for the bot to respond to across all channels
 }).on('message', msg => {
   msg.originalContent = msg.content;
@@ -173,10 +172,25 @@ client.on('ready', () => {
         }
       } else {
         // DM the user that it's on CD
-        dmUser(msg, `**${msg.content}** is currently on cooldown for another *${onCooldown} seconds!*`);
+        dmUserFromMsg(msg, `**${msg.content}** is currently on cooldown for another *${onCooldown} seconds!*`);
       }
     })
     .catch(console.error);
+// Create an event listener for new guild members
+}).on('guildMemberAdd', member => {
+  console.log(`A new member has joined '${member.guild.name}': ${member.displayName}`);
+  // Check to see if this guild has welcome DM's enabled
+  let guildConfig = (member.guild) ? config.discord.guilds[member.guild.id] : config.discord.guilds.default;
+  if (guildConfig.enableWelcomeDM === true && guildConfig.welcomeDMFile) {
+    console.log('Guild has welcome DMs enabled, fetching message...');
+    // Send the member a DM using the configured message for the guild
+    let filePath = path.join(__dirname, 'conf', guildConfig.welcomeDMFile);
+    let welcomeMessage = fs.readFileSync(filePath, 'utf-8').toString();
+    if (welcomeMessage) {
+      console.log('Sending welcome DM to user...');
+      dmUser(member, welcomeMessage);
+    }
+  }
 // Log the bot in
 }).login(config.discord.token);
 
@@ -246,7 +260,7 @@ function initGuild(guild, config)
   }
 }
 
-function dmUser(originalMessage, newMessage)
+function dmUserFromMsg(originalMessage, newMessage)
 {
   // check that this isn't already a DM before sending
   if (originalMessage.channel.type === 'dm') {
@@ -258,6 +272,15 @@ function dmUser(originalMessage, newMessage)
       })
       .catch(console.log);
   }
+}
+
+function dmUser(user, message)
+{
+  user.createDM()
+    .then(channel => {
+      channel.send(message);
+    })
+    .catch(console.log);
 }
 
 Discord.RichEmbed.prototype.setStreamAlertDefaults = function (stream) {
