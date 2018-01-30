@@ -1,10 +1,9 @@
 {
   "botName": "ALttP Bot",
   "discord": {
-    "token": "MzMwNzgwOTYyODMxMjA0MzU0.DEPp1w.I011n4AAMhzJYa428ccGsy7S-jE",
+    "token": "APP_BOT_USER_TOKEN", // https://discordapp.com/developers/applications/me
     "guilds": {
       "default": {
-        "token": "APP_BOT_USER_TOKEN", // https://discordapp.com/developers/applications/me
         "alertsChannelName": "alttp-alerts", // text channel where stream+race alerts will be posted
         "alertOnConnect": false, // whether or not to send a greeting to the alerts channel upon starting
         "allowedRolesForRequest": "nmg-race|100-race", // roles that can be automatically added/removed by any user
