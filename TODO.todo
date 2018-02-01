@@ -1,12 +1,15 @@
+Bugs:
+ ☐ Inconsistent weekly alerts -- look into alternatives for scheduled, repeated events
+ ☐ Double stream alerts -- maybe the event listener is being attached twice somehow during a restart?
+ 
 Planned Features:
+ ☐ Update SR.C functionality to reflect new Extensions board
  ☐ Integrate with speedrun.tv once API is available/documented
  ☐ Create a web interface for editing commands / settings
  ☐ Integration with ALttP Wiki search
  ☐ Support for pulling category rules from SRC
  ☐ Add a !treerupees command
  
-Bugs:
- ☐ Inconsistent weekly alerts -- look into alternatives for scheduled, repeated events
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
  ✔ Automatically DM new guild members with a welcome message, links to resources, and answers to common questions @done (18-01-29 16:23) @project(Planned Features)
