@@ -14,7 +14,8 @@ const request = require('request'),
   StreamAlerts = require('./lib/stream-alerts.js'),
   RaceAlerts = require('./lib/race-alerts.js'),
   src = require('./lib/src.js'),
-  timers = require('./lib/timers.js');
+  timers = require('./lib/timers.js'),
+  schedule = require('node-schedule');
 
 // Read in bot configuration
 let config = require('./config.json');
@@ -243,17 +244,16 @@ function initGuild(guild, config)
   //
   // Weekly NMG Race Alert: Every Sunday at 11 AM Pacific /
   if (alertsChannel && guildConfig.enableWeeklyRaceAlert) {
-    let weeklyAlertTimestamp = moment().day(7).hour(11).minute(0).second(0).valueOf();
+    let timeToSchedule = {dayOfWeek: 0, hour: 11, minute: 0};
     let weeklyRaceAlertRole = guild.roles.find('name', guildConfig.weeklyRaceAlertRole);
-    timers.onceAndRepeat(weeklyAlertTimestamp, 604800, 'weekly-alert')
-      .on('weekly-alert', () => {
-        let randomEmoji = guild.emojis.random();
-        alertsChannel.send([
-          weeklyRaceAlertRole,
-          `The weekly Any% NMG Race is starting in 1 Hour! ${randomEmoji} Information on joining SRL can be found here: http://www.speedrunslive.com/faq/#join`
-        ]);
-        console.log('received weekly alert event at' + moment().format('MMMM Do YYYY, h:mm:ss a'));
-      });
+    let j = schedule.scheduleJob(timeToSchedule, () => {
+      console.log(`Sending weekly alert event at ${moment().format('MMMM Do YYYY, h:mm:ss a')} to ${guild.name}`);
+      let randomEmoji = guild.emojis.random();
+      alertsChannel.send([
+        weeklyRaceAlertRole,
+        `The weekly Any% NMG Race is starting in 1 Hour! ${randomEmoji} Information on joining SRL can be found here: http://www.speedrunslive.com/faq/#join`
+      ]);
+    });
   }
 }
 
