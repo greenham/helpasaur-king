@@ -1,5 +1,4 @@
 Bugs:
- ☐ Double stream alerts -- maybe the event listener is being attached twice somehow during a restart?
  
 Planned Features:
  ☐ Update SR.C functionality to reflect new Extensions board
@@ -13,6 +12,7 @@ Ideas:
  
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Double stream alerts -- maybe the event listener is being attached twice somehow during a restart? @done (18-02-01 14:19) @project(Bugs)
  ✔ Inconsistent weekly alerts -- look into alternatives for scheduled, repeated events @done (18-02-01 11:56) @project(Bugs)
  ✔ Automatically DM new guild members with a welcome message, links to resources, and answers to common questions @done (18-01-29 16:23) @project(Planned Features)
  ✔ Add a script to auto-generate the README command list @done (18-01-29 13:08) @project(Bugs Fixes / Done)

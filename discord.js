@@ -131,10 +131,11 @@ const client = new Discord.Client();
 // Wait for bot to be ready before watching streams/races
 client.on('ready', () => {
   console.log(config.botName + ' Online');
+  client.setRandomActivity();
 
   // Set up alerts for each guild we're a member of
   client.guilds.forEach((guild, index) => {
-    // Make sure it's not the dummy default guild
+    // Make sure it's not the dummy default guild and not already initialized
     if (guild.id !== "default" && !guild.initialized) {
       initGuild(guild, config, (err, res) => {
         if (err) console.error(err);
@@ -143,6 +144,11 @@ client.on('ready', () => {
         client.guilds[index] = guild;
       });
     }
+  });
+
+  // Update our activity to something random every hour
+  schedule.scheduleJob({minute: 0}, () => {
+    client.setRandomActivity();
   });
 })
 // Listen for commands for the bot to respond to across all channels
@@ -200,18 +206,21 @@ client.on('ready', () => {
     }
   }
 })
-// Handle guild becoming unavailable (usually due to server outage)
+// Log guild becoming unavailable (usually due to server outage)
 .on('guildUnavailable', guild => {
   console.log(`Guild '${guild.name}' is no longer available! Most likely due to server outage.`);
 })
+// Log debug messages if enabled
 .on('debug', info => {
   if (config.debug === true) {
     console.log(`[${new Date()}] DEBUG: ${info}`);
   }
 })
+// Log disconnect event
 .on('disconnect', event => {
   console.log(`Web Socket disconnected with code ${event.code} and reason '${event.reason}'`);
 })
+// Log errors
 .on('error', console.error)
 // Log the bot in
 .login(config.discord.token);
@@ -280,7 +289,7 @@ function initGuild(guild, config, cb)
   if (alertsChannel && guildConfig.enableWeeklyRaceAlert) {
     let timeToSchedule = {dayOfWeek: 0, hour: 11, minute: 0};
     let weeklyRaceAlertRole = guild.roles.find('name', guildConfig.weeklyRaceAlertRole);
-    let j = schedule.scheduleJob(timeToSchedule, () => {
+    schedule.scheduleJob(timeToSchedule, () => {
       console.log(`Sending weekly alert at ${moment().format('MMMM Do YYYY, h:mm:ss a')} to ${guild.name}`);
       let randomEmoji = guild.emojis.random();
       alertsChannel.send([
@@ -347,6 +356,11 @@ Discord.RichEmbed.prototype.setRaceAlertDefaults = function (raceChannel, srlUrl
     .setColor('#f8e47f')
     .setFooter(`#${raceChannel}`)
     .setTimestamp();
+};
+
+Discord.Client.prototype.setRandomActivity = function() {
+  let activity = config.discord.activities[Math.floor(Math.random() * config.discord.activities.length)];
+  this.user.setActivity(activity, {url: `https://www.twitch.tv/${config.twitch.username}`, type: "STREAMING"});
 };
 
 // Converts seconds to human-readable time

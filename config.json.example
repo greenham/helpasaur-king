@@ -18,7 +18,10 @@
         "enableWelcomeDM": true, // whether or not to send a welcome message to new members when they join the server
         "welcomeDMFile": "welcome_text" // filepath (relative to conf) to welcome message to use for the DM
       }
-    }
+    },
+    "activities": [
+      "DESTROY ALL HUMANS", "Servin' Up Din-Din", "Bomb Clipping"
+    ]
   },
   "streamAlerts": {
     "clientId": "APP_CLIENT_ID", // https://www.twitch.tv/settings/connections
