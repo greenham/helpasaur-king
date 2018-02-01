@@ -14,7 +14,6 @@ const request = require('request'),
   StreamAlerts = require('./lib/stream-alerts.js'),
   RaceAlerts = require('./lib/race-alerts.js'),
   src = require('./lib/src.js'),
-  timers = require('./lib/timers.js'),
   schedule = require('node-schedule');
 
 // Read in bot configuration
@@ -127,6 +126,7 @@ const commands = {
   }
 };
 
+
 // Set up Discord client
 const client = new Discord.Client();
 // Wait for bot to be ready before watching streams/races
@@ -135,8 +135,12 @@ client.on('ready', () => {
 
   // Set up alerts for each guild we're a member of
   client.guilds.forEach((guild) => {
+    // Make sure it's not the dummy default guild
     if (guild.id !== "default") {
-      initGuild(guild, config);
+      initGuild(guild, config, (err, res) => {
+        if (err) console.error(err);
+        if (res) console.log(`Successfully initialized guild: ${guild.name}`);
+      });
     }
   });
 // Listen for commands for the bot to respond to across all channels
@@ -195,9 +199,22 @@ client.on('ready', () => {
 // Log the bot in
 }).login(config.discord.token);
 
-function initGuild(guild, config)
+
+/**
+ * Sets up watches/alerts for each guild.
+ * 
+ * @param  {Object} guild
+ * @param  {Object} config
+ * @param  {Function} callback (err, res)
+ * @return {null}
+ */
+function initGuild(guild, config, cb)
 {
   let guildConfig = config.discord.guilds[guild.id];
+
+  if (!guildConfig) {
+    cb(new Error(`No guild config found for guild ID ${guild.id} (${guild.name})!`), false);
+  }
 
   // Find the text channel(s) where we'll be posting alerts
   let alertsChannel = guild.channels.find('name', guildConfig.alertsChannelName);
@@ -247,7 +264,7 @@ function initGuild(guild, config)
     let timeToSchedule = {dayOfWeek: 0, hour: 11, minute: 0};
     let weeklyRaceAlertRole = guild.roles.find('name', guildConfig.weeklyRaceAlertRole);
     let j = schedule.scheduleJob(timeToSchedule, () => {
-      console.log(`Sending weekly alert event at ${moment().format('MMMM Do YYYY, h:mm:ss a')} to ${guild.name}`);
+      console.log(`Sending weekly alert at ${moment().format('MMMM Do YYYY, h:mm:ss a')} to ${guild.name}`);
       let randomEmoji = guild.emojis.random();
       alertsChannel.send([
         weeklyRaceAlertRole,
@@ -255,8 +272,15 @@ function initGuild(guild, config)
       ]);
     });
   }
+
+  cb(null, true);
 }
 
+/**
+ * @param  {Object}
+ * @param  {Object}
+ * @return {null}
+ */
 function dmUserFromMsg(originalMessage, newMessage)
 {
   // check that this isn't already a DM before sending
@@ -271,6 +295,11 @@ function dmUserFromMsg(originalMessage, newMessage)
   }
 }
 
+/**
+ * @param  {Object}
+ * @param  {Object}
+ * @return {null}
+ */
 function dmUser(user, message)
 {
   user.createDM()
@@ -280,6 +309,9 @@ function dmUser(user, message)
     .catch(console.log);
 }
 
+/**
+ * @param {Object}
+ */
 Discord.RichEmbed.prototype.setStreamAlertDefaults = function (stream) {
   return this.setAuthor(stream.channel.display_name, stream.channel.logo)
     .setURL(stream.channel.url)
@@ -287,6 +319,10 @@ Discord.RichEmbed.prototype.setStreamAlertDefaults = function (stream) {
     .setTimestamp();
 };
 
+/**
+ * @param {string}
+ * @param {string}
+ */
 Discord.RichEmbed.prototype.setRaceAlertDefaults = function (raceChannel, srlUrl) {
   return this.setTitle(`SRL Race #${raceChannel}`)
     .setURL(srlUrl)

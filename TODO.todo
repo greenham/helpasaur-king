@@ -1,5 +1,4 @@
 Bugs:
- ☐ Inconsistent weekly alerts -- look into alternatives for scheduled, repeated events
  ☐ Double stream alerts -- maybe the event listener is being attached twice somehow during a restart?
  
 Planned Features:
@@ -9,9 +8,12 @@ Planned Features:
  ☐ Integration with ALttP Wiki search
  ☐ Support for pulling category rules from SRC
  ☐ Add a !treerupees command
+
+Ideas:
  
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Inconsistent weekly alerts -- look into alternatives for scheduled, repeated events @done (18-02-01 11:56) @project(Bugs)
  ✔ Automatically DM new guild members with a welcome message, links to resources, and answers to common questions @done (18-01-29 16:23) @project(Planned Features)
  ✔ Add a script to auto-generate the README command list @done (18-01-29 13:08) @project(Bugs Fixes / Done)
  ✔ When updating twitch streams, write new results to temporary file, manually join/part channels, copy temp file to main file when script ends @done (18-01-23 11:34) @project(Bugs Fixes / Done)
