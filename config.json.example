@@ -1,5 +1,6 @@
 {
   "botName": "ALttP Bot",
+  "debug": false, // enables/disabled debug logging from discord.js client
   "discord": {
     "token": "APP_BOT_USER_TOKEN", // https://discordapp.com/developers/applications/me
     "guilds": {

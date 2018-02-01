@@ -126,7 +126,6 @@ const commands = {
   }
 };
 
-
 // Set up Discord client
 const client = new Discord.Client();
 // Wait for bot to be ready before watching streams/races
@@ -134,17 +133,20 @@ client.on('ready', () => {
   console.log(config.botName + ' Online');
 
   // Set up alerts for each guild we're a member of
-  client.guilds.forEach((guild) => {
+  client.guilds.forEach((guild, index) => {
     // Make sure it's not the dummy default guild
-    if (guild.id !== "default") {
+    if (guild.id !== "default" && !guild.initialized) {
       initGuild(guild, config, (err, res) => {
         if (err) console.error(err);
         if (res) console.log(`Successfully initialized guild: ${guild.name}`);
+        guild.initialized = res;
+        client.guilds[index] = guild;
       });
     }
   });
+})
 // Listen for commands for the bot to respond to across all channels
-}).on('message', msg => {
+.on('message', msg => {
   msg.originalContent = msg.content;
   msg.content = msg.content.toLowerCase();
 
@@ -181,8 +183,9 @@ client.on('ready', () => {
       }
     })
     .catch(console.error);
+})
 // Create an event listener for new guild members
-}).on('guildMemberAdd', member => {
+.on('guildMemberAdd', member => {
   console.log(`A new member has joined '${member.guild.name}': ${member.displayName}`);
   // Check to see if this guild has welcome DM's enabled
   let guildConfig = (member.guild) ? config.discord.guilds[member.guild.id] : config.discord.guilds.default;
@@ -196,8 +199,22 @@ client.on('ready', () => {
       dmUser(member, welcomeMessage);
     }
   }
+})
+// Handle guild becoming unavailable (usually due to server outage)
+.on('guildUnavailable', guild => {
+  console.log(`Guild '${guild.name}' is no longer available! Most likely due to server outage.`);
+})
+.on('debug', info => {
+  if (config.debug === true) {
+    console.log(`[${new Date()}] DEBUG: ${info}`);
+  }
+})
+.on('disconnect', event => {
+  console.log(`Web Socket disconnected with code ${event.code} and reason '${event.reason}'`);
+})
+.on('error', console.error)
 // Log the bot in
-}).login(config.discord.token);
+.login(config.discord.token);
 
 
 /**
