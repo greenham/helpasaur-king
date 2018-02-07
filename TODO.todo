@@ -11,10 +11,10 @@ Planned Features:
 Ideas:
 
 DevOps:
-  ☐ On next release, push config.production.json and run npm update (new discord.js version)
  
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ On next release, push config.production.json and run npm update (new discord.js version) @done (18-02-03 07:43) @project(DevOps)
  ✔ Set a random activity every hour in discord @done (18-02-01 14:22) @project(Planned Features)
  ✔ Double stream alerts -- maybe the event listener is being attached twice somehow during a restart? @done (18-02-01 14:19) @project(Bugs)
  ✔ Inconsistent weekly alerts -- look into alternatives for scheduled, repeated events @done (18-02-01 11:56) @project(Bugs)
