@@ -88,11 +88,11 @@ client.addListener('message', function (from, to, message) {
         let channelIndex = twitchChannels.indexOf(userChannel);
         if (channelIndex !== -1) {
           client.say(to, `@${from} >> Leaving your channel... use ${config.twitch.cmdPrefix}join in this channel to re-join at any time!`);
-          console.log('before part', twitchChannels);
+          //console.log('before part', twitchChannels);
           client.part(userChannel, 'Okay, bye! Have a beautiful time!', () => {
-            console.log('removing 1 element at position', channelIndex);
+            //console.log('removing 1 element at position', channelIndex);
             twitchChannels.splice(channelIndex, 1);
-            console.log('after part', twitchChannels);
+            //console.log('after part', twitchChannels);
             updateChannelList(joinChannelsFilePath, twitchChannels);
           });
         } else {
