@@ -16,6 +16,8 @@ antipumping,antipump|When walking east or south, Link's movement begins on the 1
 
 arcvar|Arc Variable Lesson by Professor SuperSKUJ: https://www.youtube.com/watch?v=u4TQh15hbzo
 
+arrghus|https://alttp-wiki.net/index.php/Arrghus
+
 ashbackup|A backup for when you don't have swordbeams for the prize pack manipulation strat in the 3rd room of Agah Tower: https://www.twitch.tv/videos/170635873?t=22m06s
 
 bb|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defated after being hit by 6 yellow balls.
@@ -26,6 +28,8 @@ bbfaq|BluntBunny Knowledge Dump #1: https://www.twitch.tv/videos/170635873
 
 bbrooms|BluntBunny room sheet (notes + times for every room in any% nmg): https://goo.gl/AGMyAa
 
+blind|https://alttp-wiki.net/index.php/Blind
+
 blockerase,mirrordelete|Using the mirror while pushing a block will make it disappear. You need to be indoors but NOT in a dungeon for it to work. This minor glitch is most commonly used in the swamp dam in light world. JP v1.0 only.
 
 bnc,b&c,ballnchain,ballnchains,ballandchains,blackknight,maceguard|https://alttp-wiki.net/index.php/Hyrule_Castle#Ball_.27n_Chains_.2F_Black_Knight
@@ -35,6 +39,10 @@ bombclips,bombclip|How to do Kiki Skip and Ice Clip with Bombs+Boots: https://ww
 bombdupe|Big Bomb Dupe Setup for 100% or GS/SA by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h41m37s
 
 bsnes+|http://helge.monsternett.no/bsnes-plus.zip
+
+bunnyglitches|https://alttp-wiki.net/index.php/Bunny_Glitches
+
+catch|How to save time when catching pendants and crystals: https://alttp-wiki.net/index.php/Pendant/crystal_catching
 
 catchtimes|https://pastebin.com/eKjVx96V
 
@@ -56,15 +64,17 @@ egmap|https://alttp-wiki.net/index.php/File:Eg-map.png ~ Interactive EG Map: htt
 
 egstrength|https://alttp-wiki.net/index.php/File:EG_Strength_Map.jpg
 
-ff,fakeflippers|Fake flippers, a glitch which allows you to swim without having the flippers. It is performed by jumping into water and changing screen just as you hit the water. Leaving the water will end the glitch, and taking damage whilst swimming can result in the infinite scroll glitch. JP v1.0 only.
+ff,fakeflippers|Fake flippers, a glitch which allows you to swim without having the flippers. It is performed by jumping into water and changing screen just as you hit the water. Leaving the water will end the glitch, and taking damage whilst swimming can result in the infinite scroll glitch. JP v1.0 only. More info: https://alttp-wiki.net/index.php/Fake_Flippers
 
-ganontut|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered and gold sword strats by timmon_: https://www.dropbox.com/s/yyzml0hs75hgoor/hybrid-ganon-tut-pinkus-timmon.mp4?dl=0
+ganontut,ganon|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered and gold sword strats by timmon_: https://www.dropbox.com/s/yyzml0hs75hgoor/hybrid-ganon-tut-pinkus-timmon.mp4?dl=0 ~ More info: https://alttp-wiki.net/index.php/Ganon
 
 glitches|Major Glitches - Definitions and Categorizations: https://alttp-wiki.net/index.php/Major_glitches
 
 glitchtuts|A comprehensive set of tutorial videos made by SuperSKUJ covering a variety of glitches in ALttP including basic wall clipping, DMA, DMD, Cane of Somaria glitches and more: https://www.youtube.com/playlist?list=PLPsUbwi58oG_hjrgq1wpYmM3JMEn9b8R8
 
 godtas5,gt5|Godtas5 - Jadin's most recent Theory TAS - https://www.twitch.tv/videos/44070881
+
+goldknights,puiknights|https://alttp-wiki.net/index.php/Agahnim%27s_Tower#Gold_Knights
 
 goldsheet|Community Gold Segment Sheet: https://docs.google.com/spreadsheets/d/1ludCDzwLxWp-0XR2Ea14T3zoLz0L0UyY1etcvrLqwHo/edit?usp=sharing
 
@@ -74,7 +84,9 @@ hammerjump,hammeryump,podbj|A bomb jump trick in Palace of Darkness that skips a
 
 helpa|I am a discord/twitch bot for ALttP speedrunners. If you would like HelpasaurKing in your twitch channel, you can go directly to https://www.twitch.tv/helpasaurking and use !join in the chat.
 
-hover|Hovering over gaps is performed by holding the A button (for up to 29 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall!
+helma,helmasaur|https://alttp-wiki.net/index.php/Helmasaur
+
+hover|Hovering over gaps is performed by holding the A button (for up to 29 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall! More info: https://alttp-wiki.net/index.php/Hovering
 
 hovertut|Hover tutorial by malibukenn: https://www.youtube.com/watch?v=XraSVjZYXR0
 
@@ -82,17 +94,21 @@ icons|https://cdn.discordapp.com/attachments/138378732376162304/3525159514150010
 
 ipbj|The bomb jump performed in Ice Palace which skips a large portion of the dungeon. Guide by wqqqqwrt: https://www.youtube.com/watch?v=N6mD9YM8m7Q ~ Guide by BluntBunny: https://www.twitch.tv/videos/170635873?t=13m38s
 
-itemdash|By hitting both the Y-button and the A-button on the same frame, one can perform a dash where the currently equipped item is activated throughout the dash. The most commonly used itemdash is the hammerdash. JP v1.0 only.
+itemdash|By hitting both the Y-button and the A-button on the same frame, one can perform a dash where the currently equipped item is activated throughout the dash. The most commonly used itemdash is the hammerdash. JP v1.0 only. More info: https://alttp-wiki.net/index.php/Itemdash
+
+joestrats|Mummy Hellway: https://clips.twitch.tv/BovineBadSquidOSsloth ~ Mimics 1: https://clips.twitch.tv/AttractiveAwkwardBeaverLitty
 
 kevtut,dtdtut|Advanced Any% NMG Tutorial by downtimedeath: https://drive.google.com/open?id=1pSzEsa91w_Fkv7cEmmteCIlaMEUQRFkk
 
-keydash|A keydash can be performed by initiating a dash a multiple of 4 pixels away from a locked door. Positioning yourself against an opposing wall before starting the dash, or nudging an object whilst dashing, will both automatically align you properly.
+keydash|A keydash can be performed by initiating a dash a multiple of 4 pixels away from a locked door. Positioning yourself against an opposing wall before starting the dash, or nudging an object whilst dashing, will both automatically align you properly. More info: https://alttp-wiki.net/index.php/Keydash
 
-lanmo,lanmos,lanmolas|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv ~ Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h04m27s
+khold,kholdstare|https://alttp-wiki.net/index.php/Kholdstare
+
+lanmo,lanmos,lanmolas|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv ~ Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h04m27s ~ Wiki page: https://alttp-wiki.net/index.php/Lanmolas
 
 lb,src,leaderboard,leaderboards|Speedrun.com Leaderboard for ALttP: http://www.speedrun.com/alttp
 
-low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon).
+low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon). More info: https://alttp-wiki.net/index.php/Low%25_(NMG,_No_S%2BQ)
 
 maps,map|Some misc maps and images showing room layouts, sprite placements, contents of chests/pots, and NPC/boss rewards: http://ian-albert.com/games/legend_of_zelda_a_link_to_the_past_maps/
 
@@ -100,7 +116,9 @@ mashing|MASHING THE BUTTONS IS CALLED PUMPING
 
 mirrorjump,mirrorjumps|A Mirror Jump involves hopping a ledge and using the Magic Mirror at the same time. The usual intended effect (on the overworld) is to shift Link's position by 1px where it would not otherwise be possible. This is most commonly applied in the Any% No EG category to rescue the frog/dwarf without the Titan's Mitts. More info here: https://alttp-wiki.net/index.php/Mirror_Jumps
 
-mothtut|tiny moth dik: https://www.youtube.com/watch?v=qmR3zO2VQCE
+moldorm|https://alttp-wiki.net/index.php/Moldorm
+
+mothtut,mothula,moth|Mothula tutorial by JoshRTA: https://www.youtube.com/watch?v=qmR3zO2VQCE ~ More info: https://alttp-wiki.net/index.php/Mothula
 
 movement|https://alttp-wiki.net/index.php/Movement
 
@@ -146,6 +164,8 @@ stairlag|When exiting a staircase, Link will walk in place for a short period of
 
 stairpumping,stairpump|While walking on a staircase or ladder in which you still retain control of Link's movement, you can pump diagonals when walking north on them. The normal animation for climbing stairs/ladders contains a lot of 0 pixel per frame movement, so pumping these ladders to avoid such frames is very important. Even if you do no other pumping, you should incorporate stairpumping into your movement, since it saves more than just a handful of frames.
 
+subpixel,subpixels|This game uses subpixels for its movement. This is how Link gets the movement speed of 2-1-2-1 on normal ground etc. More info: https://alttp-wiki.net/index.php/Subpixels
+
 superspeed|By having a medallion or hookshot equipped and hitting the Y-button and the A-button at the same frame (or using a spindash), you activate a glitched walking state. By climbing stairs that you can manually move up and down and exiting them cardinally, you will gain dash speed while walking. This activated state is called superspeed. The effect is active until canceled by pressing the A-button, taking damage, changing screen, or jumping off a ledge. JP v1.0 only. Tutorial by SuperSKUJ: https://youtu.be/Pvmi5DuR9rA
 
 swamp|Room-by-room Swamp Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=01h18m48s
@@ -154,7 +174,11 @@ swordbuffer|Sword Buffering is performed by pressing a direction and pressing B 
 
 swordclimb|By holding out the sword first then performing a hookdash (itemdash with hookshot) on stairs you will be able to climb the stairs with the same speed as walking whilst holding out the sword on flat ground. If the sword spin is released before exiting the stairs, you will also have superspeed afterwards. JP v1.0 only.
 
+treerupees|An alternate rupee route for Any% NMG which skips the chests behind Saha in favor of pulling 2 trees. Done well, this route only saves ~5-6 seconds over Saha rupees. More info: https://alttp-wiki.net/index.php/Agahnim%27s_Tower#Rupee_tree
+
 trident|Avoiding the trident in Ganon Phase 1 by poor_little_pinkus: https://www.youtube.com/watch?v=pmlsW1M6leo
+
+trinexx|https://alttp-wiki.net/index.php/Trinexx
 
 version,1.0cart|The best way to verify a 1.0 cart is to try one of the 1.0-specific glitches such as item-dashing or fake flippers. Genuine 1.0 carts will have a 2-digit number on the back. Letters indicate patched versions (A=1.1, B=1.2).
 

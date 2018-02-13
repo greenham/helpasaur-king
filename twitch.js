@@ -71,11 +71,11 @@ client.addListener('message', function (from, to, message) {
         let channelIndex = twitchChannels.indexOf(userChannel);
         if (channelIndex === -1) {
           client.say(to, `@${from} >> Joining your channel... please mod ${config.twitch.username} to avoid accidental timeouts or bans!`);
-          console.log('before join', twitchChannels);
+          //console.log('before join', twitchChannels);
           client.join(userChannel, () => {
             // somehow the line below is happening without the line below being called
             //twitchChannels.push(userChannel);
-            console.log('after join', twitchChannels);
+            //console.log('after join', twitchChannels);
             updateChannelList(joinChannelsFilePath, twitchChannels);
           });
         } else {
@@ -105,7 +105,7 @@ client.addListener('message', function (from, to, message) {
 
 function updateChannelList(filePath, channels)
 {
-  console.log('updating channel list...', channels);
+  //console.log('updating channel list...', channels);
   fs.writeFile(filePath+'.new', channels.join('\n'), (err) => {
     if (err) console.error(err);
   });
