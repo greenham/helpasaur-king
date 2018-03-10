@@ -72,6 +72,8 @@ ff,fakeflippers|Fake flippers, a glitch which allows you to swim without having 
 
 ganontut,ganon|Comprehensive Ganon tutorial with Trident spin tut by pinkus + tempered and gold sword strats by timmon_: https://www.dropbox.com/s/yyzml0hs75hgoor/hybrid-ganon-tut-pinkus-timmon.mp4?dl=0 ~ More info: https://alttp-wiki.net/index.php/Ganon
 
+ghqna|Any% NMG Q+A Sessions with Timestamps ~ 1: https://www.twitch.tv/videos/231524875 ~ 2: https://www.twitch.tv/videos/233153042 ~ 3: https://www.twitch.tv/videos/234240605
+
 glitches|Major Glitches - Definitions and Categorizations: https://alttp-wiki.net/index.php/Major_glitches
 
 glitchtuts|A comprehensive set of tutorial videos made by SuperSKUJ covering a variety of glitches in ALttP including basic wall clipping, DMA, DMD, Cane of Somaria glitches and more: https://www.youtube.com/playlist?list=PLPsUbwi58oG_hjrgq1wpYmM3JMEn9b8R8
@@ -89,6 +91,8 @@ hammerjump,hammeryump,podbj|A bomb jump trick in Palace of Darkness that skips a
 helpa|I am a discord/twitch bot for ALttP speedrunners. If you would like HelpasaurKing in your twitch channel, you can go directly to https://www.twitch.tv/helpasaurking and use !join in the chat.
 
 helma,helmasaur|https://alttp-wiki.net/index.php/Helmasaur
+
+helmahellway,helmway,helmahallway|Just Hold Left: https://imgur.com/a/PZKPG ~ Dom Strat: https://drive.google.com/open?id=1RiejcfuuO3OUPaVzgAz00-MFwjNiF59d ~ Protip: use ether in emergency situations as mini-helmas can potentially drop a heart/fairy.
 
 hover|Hovering over gaps is performed by holding the A button (for up to 29 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall! More info: https://alttp-wiki.net/index.php/Hovering
 
@@ -126,6 +130,10 @@ mothtut,mothula,moth|Mothula tutorial by JoshRTA: https://www.youtube.com/watch?
 
 movement|https://alttp-wiki.net/index.php/Movement
 
+mummystatue|Blunt's tips: https://www.twitch.tv/videos/170635873?t=44m20s
+
+mummyhellway,mummway|Joestrat: https://clips.twitch.tv/BovineBadSquidOSsloth ~ Blunt's tips on the optimal strat: https://www.twitch.tv/videos/170635873?t=03h45m29s
+
 nmg|NMG is short for No Major Glitches and means that glitches that skip a large chunk of the game, such as EG and OOB, are not allowed. More information on glitch classifications can be found here: https://alttp-wiki.net/index.php/Major_glitches
 
 oob|Out of Bounds (abbreviated OoB) means leaving the intended confinements of the playing field. The most powerful/broken Out of Bounds state is EG (Exploration Glitch).
@@ -134,7 +142,13 @@ owglitches|Overworld Out Of Bounds Glitches Tutorial by SuperSKUJ: https://www.y
 
 pinkustips|Some excellent tips from pinkus that most tutorials don't cover: https://gist.github.com/helgefmi/2c2652effb31e0ee0a4e0c48440fd4ee
 
-doublepokeys,pokey2,pokeys2|Tutorial by BluntBunny covering all 16 RNGs: https://www.youtube.com/watch?v=KlggYWKLCQY
+plaidworld,plaid|Plaid World is what we call the place we get to after doing an underworld fake flute. This can be done by using blue/green YBA from inside a dungeon, house or a cave (collectivly known as "underworld"). More info: https://gist.github.com/helgefmi/6cca5f2a52de663d41b7332b116b0edc
+
+pokey0|https://alttp-wiki.net/index.php/Turtle_Rock#Key_Pokey_1
+
+pokey1|https://alttp-wiki.net/index.php/Turtle_Rock#Key_Pokey_2 ~ EZ setup for bottom-left: https://www.twitch.tv/videos/151356110?t=13s
+
+pokey2,pokeys2,doublepokeys|Tutorial by BluntBunny covering all 16 RNGs: https://www.youtube.com/watch?v=KlggYWKLCQY
 
 prac,practice,practicehack,practicerom,prachack|Practice hack for ALttP by pinkus: https://milde.no/lttp/
 
@@ -191,6 +205,8 @@ wallpumping,wallpump|A technique that optimizes Link's walking pattern. When wal
 weekly|There is a weekly Any% NMG No S+Q race every Sunday at 3:00 PM Eastern Time held on SpeedRunsLive. Everyone is welcome to join!
 
 welcome,new|Welcome new ALttP speedrunner(s)! Check out this thread full of useful info: https://www.speedrun.com/alttp/thread/1s03m
+
+westsidebreeze,wsb|A lag reduction strat for the screen west of Hyrule Castle: https://www.youtube.com/watch?v=VmDf8hodQNk
 
 whitecircle|A Visual Cue for Hammerjump: http://www.screevo.com/dump/alttp/bombjump.png
 
