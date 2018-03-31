@@ -20,7 +20,7 @@ arrghus|https://alttp-wiki.net/index.php/Arrghus
 
 ashbackup|A backup for when you don't have swordbeams for the prize pack manipulation strat in the 3rd room of Agah Tower: https://www.twitch.tv/videos/170635873?t=22m06s
 
-bb|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defated after being hit by 6 yellow balls.
+bb,blueball,blueballs|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defeated after being hit by 6 yellow balls.
 
 bb%|Blue Ball probabilities: [2cyc=34.375% - 0bb: 6.25% - 1bb: 12.5% - 2bb: 15.625%] [3cyc=56.640625% - 3bb: 31.25% - 4bb: 11.71875% - 5bb: 8.203125% - 6bb: 5.46875%] [4cyc=8.666992% - 7bb: 7.03125% - 8bb: 0.878906% - 9bb: 0.488281% - 10bb: 0.268555%] [5cyc=0.314331% - 11bb: 0.292969% - 12bb: 0.012207% - 13bb: 0.006103% - 14bb: 0.003052%] [6cyc=0.003052% - 15bb: 0.003052%]
 
@@ -118,7 +118,7 @@ khold,kholdstare|https://alttp-wiki.net/index.php/Kholdstare
 
 lanmo,lanmos,lanmolas|Lanmo Tips 'n' Tricks: https://pastebin.com/Y45gaDqv ~ Tutorial by BluntBunny: https://www.twitch.tv/videos/170635873?t=03h04m27s ~ Wiki page: https://alttp-wiki.net/index.php/Lanmolas
 
-lb,src,leaderboard,leaderboards,wr|Speedrun.com Leaderboard for ALttP: http://www.speedrun.com/alttp
+lb,src,leaderboard,leaderboards,wr|Speedrun.com Leaderboard for ALttP: http://www.speedrun.com/alttp ~ Extensions: https://www.speedrun.com/alttpce
 
 low%|Low%: Beat the game using the minimal items required to finish the game. This means no extra items or hearts that the game already does not force you to obtain. It is possible to defeat Ganon with only the Master Sword but requires a beefy 52 spins (Master Sword slashes do not damage Ganon). More info: https://alttp-wiki.net/index.php/Low%25_(NMG,_No_S%2BQ)
 
@@ -220,6 +220,7 @@ wqvitty|Tutorial by JoeDamillio covering the WQ Vitty Strat: https://youtu.be/dJ
 
 yba|Yuzuhara's Bottle Adventure (YBA) is a glitch that involves using a potion the same frame as you initiate a screen transition to manipulate the memory. Different locations and potions can have different effects such as screen warps or accessing the flute menu without actually having the flute (even in the dark world).
 
+15bb,screevo|https://www.twitch.tv/videos/244469622
 5dig|https://www.youtube.com/watch?v=Ah_h3Uq6s5o&feature=youtu.be&t=41m11s
 69blazeit|https://www.twitch.tv/greenham/v/83767030
 archery|https://clips.twitch.tv/SaltyPowerfulGnatKappaPride
