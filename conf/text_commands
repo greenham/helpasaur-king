@@ -108,9 +108,13 @@ helma,helmasaur|https://alttp-wiki.net/index.php/Helmasaur
 
 helmahellway,helmway,helmahallway|Just Hold Left: https://imgur.com/a/PZKPG ~ Dom Strat: https://drive.google.com/open?id=1RiejcfuuO3OUPaVzgAz00-MFwjNiF59d ~ Protip: use ether in emergency situations as mini-helmas can potentially drop a heart/fairy.
 
+hookdash|An itemdash using the hookshot. When performed properly, on the JPv1.0 version, Link will be put into the same glitched state as a spindash and can achieve superspeed.
+
 hover|Hovering over gaps is performed by holding the A button (for up to 29 frames), releasing it for one frame, and repressing it the next frame. ie: (Release A)(Move for one frame)(Press A)[repeat]. If the A button is held or released for too long you will fall! More info: https://alttp-wiki.net/index.php/Hovering
 
 hovertut|Hover tutorial by malibukenn: https://www.youtube.com/watch?v=XraSVjZYXR0
+
+howtocatch|https://alttp-wiki.net/index.php/Pendant/crystal_catching
 
 icons|https://cdn.discordapp.com/attachments/138378732376162304/352515951415001088/alttp.zip ~ https://zelda.gamepedia.com/Category:A_Link_to_the_Past_Sprites
 
@@ -188,13 +192,15 @@ s+q,sq,snq,s&q|S+Q means Save and Quit and can be used to minimize overworld tra
 
 somaria|Somaria Glitches Tutorial by SuperSKUJ: https://www.youtube.com/watch?v=KfP3jF4sdIY
 
-spindash,spinspeed|By releasing a sword spin and pressing the A-button the first frame after release, Link will be put into a glitched state and cannot use his sword. If you touch manual stairs and exit cardinally, Link will move at dashing speed with the ability to change directions. Just as with hookdash, pressing A, taking damage, changing screen, or jumping off a ledge will end the glitched state. JP v1.0 only.
+spindash,spinspeed|By releasing a sword spin and pressing the A-button the first frame after release, Link will be put into a glitched state and cannot use his sword. If you touch manual stairs and exit cardinally, Link will move at dashing speed with the ability to change directions. Just as with hookdash, pressing A, changing screens, or jumping off a ledge will end the glitched state. JP v1.0 only.
 
 srcguides|http://www.speedrun.com/alttp/guides
 
 stairlag|When exiting a staircase, Link will walk in place for a short period of time unless you hold LEFT or RIGHT during the first frame or 2 (depending on directions) after the stairwell animation.
 
 stairpumping,stairpump|While walking on a staircase or ladder in which you still retain control of Link's movement, you can pump diagonals when walking north on them. The normal animation for climbing stairs/ladders contains a lot of 0 pixel per frame movement, so pumping these ladders to avoid such frames is very important. Even if you do no other pumping, you should incorporate stairpumping into your movement, since it saves more than just a handful of frames.
+
+sub6,escape|sub 8 gtower > sub 6 escape
 
 subpixel,subpixels|This game uses subpixels for its movement. This is how Link gets the movement speed of 2-1-2-1 on normal ground etc. More info: https://alttp-wiki.net/index.php/Subpixels
 
@@ -231,7 +237,7 @@ wqvitty|Tutorial by JoeDamillio covering the WQ Vitty Strat: https://youtu.be/dJ
 yba|Yuzuhara's Bottle Adventure (YBA) is a glitch that involves using a potion the same frame as you initiate a screen transition to manipulate the memory. Different locations and potions can have different effects such as screen warps or accessing the flute menu without actually having the flute (even in the dark world).
 
 15bb,screevo|F I F T E E N: https://youtu.be/pEA3MQR6Bn8 ~ F I F T E E N A G A I N: https://youtu.be/UuwOInOvlXs
-5dig|https://www.youtube.com/watch?v=Ah_h3Uq6s5o&feature=youtu.be&t=41m11s
+5dig|https://youtu.be/Ah_h3Uq6s5o?t=41m11s
 69blazeit|https://www.twitch.tv/greenham/v/83767030
 archery|https://clips.twitch.tv/SaltyPowerfulGnatKappaPride
 armface|https://www.twitch.tv/videos/48994119
