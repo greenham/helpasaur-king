@@ -26,7 +26,9 @@ ashbackup|A backup for when you don't have swordbeams for the prize pack manipul
 
 bb,blueball,blueballs|Blue balls (bb) refers to an attack Agahnim makes. This attack is undesired since it can't be repelled back at him, unlike the yellow ball (yb) attack. The first Agahnim fight consists of repeating cycles of the following five attacks: 1.[yb] 2.[yb or bb] 3.[yb or bb] 4.[yb or bb] 5.[lightning]. Agahnim is defeated after being hit by 6 yellow balls.
 
-bb%|Blue Ball probabilities: [2cyc=34.375% - 0bb: 6.25% - 1bb: 12.5% - 2bb: 15.625%] [3cyc=56.640625% - 3bb: 31.25% - 4bb: 11.71875% - 5bb: 8.203125% - 6bb: 5.46875%] [4cyc=8.666992% - 7bb: 7.03125% - 8bb: 0.878906% - 9bb: 0.488281% - 10bb: 0.268555%] [5cyc=0.314331% - 11bb: 0.292969% - 12bb: 0.012207% - 13bb: 0.006103% - 14bb: 0.003052%] [6cyc=0.003052% - 15bb: 0.003052%]
+agahcyc|Agahnim 1 Cycle Probabilities: 2cyc=34.38% ~ 3cyc=56.64% ~ 4cyc=8.67% ~ 5cyc=0.31% ~ 6cyc=0.003%
+
+bb%|Blue Ball Probabilities: [0bb=6.25% ~ 1bb=12.50% ~ 2bb=15.625%] -- [3bb=31.25% ~ 4bb=11.718% ~ 5bb=8.203% ~ 6bb=5.468%] -- [7bb=7.03% ~ 8bb=0.88% ~ 9bb=0.49% ~ 10bb=0.27%] -- [11bb=0.29% ~ 12bb=0.01% ~ 13bb=0.006% ~ 14bb=0.003%] -- [15bb=0.003%]
 
 bbfaq|BluntBunny Knowledge Dump #1: https://www.twitch.tv/videos/170635873
 
@@ -75,6 +77,8 @@ egmap|https://alttp-wiki.net/index.php/File:Eg-map.png ~ Interactive EG Map: htt
 egstrength|https://alttp-wiki.net/index.php/File:EG_Strength_Map.jpg
 
 fakepowder|Fake Powder is a minor glitch that allows you to use the Cane of Somaria with no magic to trick the game into allowing you to powder with the mushroom, without having to exchange it at the Witch's Hut. Example: https://clips.twitch.tv/PrettyPreciousAntelopeKeepo
+
+fencedash|<+A
 
 ff,fakeflippers|Fake flippers, a glitch which allows you to swim without having the flippers. It is performed by jumping into water and changing screen just as you hit the water. Leaving the water will end the glitch, and taking damage whilst swimming can result in the infinite scroll glitch. JP v1.0 only. More info: https://alttp-wiki.net/index.php/Fake_Flippers
 
