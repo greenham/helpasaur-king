@@ -1,35 +1,33 @@
 const schedule = require('node-schedule'),
 	SG = require('./lib/speedgaming.js'),
 	moment = require('moment-timezone'),
-	MongoClient = require('mongodb').MongoClient,	
-  mongoServer = "mongodb://127.0.0.1:27017/",
-  mongoDBName = "alttpbot";
+	db = require('./db');
 
-
-const updateEventScheduleJob = schedule.scheduleJob('*/15 * * * *', () => {
-	console.log(`[${moment().format()}] Fetching upcoming events for alttp from SpeedGaming...`);
-
-	try {
-		MongoClient.connect(mongoServer, (err, db) => {
-			if (err) throw err;
-			dbo = db.db(mongoDBName);
-
-			SG.upcoming('alttp', {days: 2})
-				.then(events => {
-					console.log(`Found ${events.length} scheduled within the next 2 days... updating local cache`);
-					events.forEach((event, index) => {
-						event.lastUpdated = moment().format();
-						dbo.collection("tourney-events").update({"id": event.id}, event, {upsert: true}, (err, res) => {
-							if (err) throw err;
-							console.log(`Updated event ${event.id}`);
-							db.close();
-						});
-					});
-				})
-				.catch(console.error);
-		});
-	} catch (e) {
-		console.error(e);
+db.connect('mongodb://127.0.0.1:27017/alttpbot', (err) => {
+	if (err) {
+		console.error('Unable to connect to Mongo.');
+		process.exit(1);
+	} else {
+		scheduleJobs();
 	}
 });
-console.log(`Scheduled updateEventSchedule for: ${updateEventScheduleJob.nextInvocation()}`);
+
+let scheduleJobs = () => {
+	const updateEventScheduleJob = schedule.scheduleJob('*/15 * * * *', () => {
+		console.log(`[${moment().format()}] Fetching upcoming events for alttp from SpeedGaming...`);
+
+		SG.upcoming('alttp', {days: 2})
+			.then(events => {
+				console.log(`Found ${events.length} scheduled within the next 2 days... updating local cache`);
+				events.forEach((event, index) => {
+					event.lastUpdated = moment().format();
+					db.get().collection("tourney-events").update({"id": event.id}, event, {upsert: true}, (err, res) => {
+						if (err) throw err;
+						console.log(`Updated event ${event.id}`);
+					});
+				});
+			})
+			.catch(console.error);
+	});
+	console.log(`Scheduled updateEventSchedule for: ${updateEventScheduleJob.nextInvocation()}`);
+}

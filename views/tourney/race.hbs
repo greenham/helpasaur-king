@@ -1,0 +1,39 @@
+<div class="container" data-race-id="{{race._id}}" id="raceContainer">
+	<h1>Tourney Race Management</h1>
+	{{#with race}}
+		<div class="container" id="raceHeader">
+			<h2>{{{parseRacers match1.players}}} {{{parseRacers match2.players}}}</h2>
+			<h3>Race Starts: {{localize when}}</h3>
+			<h4>Restream: {{#if channel}}<strong>{{channel.name}}</strong>{{else}}<em>Undecided</em>{{/if}}</h4>
+			<h4>Commentary: {{{parseCommentary commentators}}}</h4>
+		</div>
+
+		<div class="btn-group" role="group" aria-label="Race Actions">
+			<button class="btn btn-secondary" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">Create Race Channel</button>
+			<button class="btn btn-secondary" id="btnPingParticipants" disabled>Ping Participants</button>
+			<button class="btn btn-secondary" id="btnSendRaceAnnouncements" disabled>Send Race Announcements</button>
+			<button class="btn btn-secondary" id="btnGenerateFilenames" disabled>Generate Filenames</button>
+			<button class="btn btn-secondary" disabled>Report Results</button>
+		</div>
+
+	{{/with}}
+</div>
+
+{{> modal id="createRaceChannelConfirmation" title="Confirmation" body="Test" affirmativeText="Create Race Channel"}}
+
+<script>
+	$(document).ready(() => {
+		var raceId = $('#raceContainer').data('race-id');
+
+		$('#btncreateRaceChannelConfirmationAffirmative').on('click', () => {
+			// make call to server to create the race
+			$.ajax({
+				type: "POST",
+				url: "/tourney/races",
+				data: {id: raceId},
+				success: data => {console.log(data)},
+				dataType: "json"
+			});
+		});
+	});
+</script>

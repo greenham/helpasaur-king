@@ -4,15 +4,16 @@
 	<table class="table">
 		<thead>
 			<tr>
+				<th></th>
 				<th>Scheduled For</th>
 				<th>Racers</th>
 				<th>Commentary</th>
 				<th>Restream</th>
-				<th></th>
 			</tr>
 		</thead>
 		{{#each events}}
 			<tr>
+				<td><a class="btn btn-info" href="/tourney/races/{{_id}}"><i class="fas fa-clipboard-list"></i></a></td>
 				<td>{{localize when}}</td>
 				<td>
 					{{{parseRacers match1.players}}}
@@ -27,20 +28,6 @@
 					{{else}}
 						<em>Undecided</em>
 					{{/if}}
-				</td>
-				<td>
-					<div class="dropdown">
-					  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					    Actions
-					  </button>
-					  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					    <a class="dropdown-item" href="#">Create Race Channel</a>
-					    <a class="dropdown-item" href="#">Ping Racers + Comm</a>
-					    <a class="dropdown-item" href="#">Send Announcements</a>
-					    <a class="dropdown-item" href="#">Generate Filenames</a>
-					    <a class="dropdown-item" href="#">Record Results</a>
-					  </div>
-					</div>
 				</td>
 			</tr>
 		{{/each}}
