@@ -12,6 +12,16 @@ const raceAnnouncements = [
 	"Please choose a single character for your opponent to use for their filename ASAP."
 ];
 
+let raceDefaults = {
+	"category": "253d897e-3fc2-4cb1-945c-a24e6c423663",	// ALttP Any% NMG No S+Q
+	"startupMode": "READY_UP",
+	"ranked": false,
+	"unlisted": true,
+	"streamed": false
+};
+
+let raceNamePrefix = "NMG Tourney";
+
 router.get('/', (req, res) => {
 	res.render('tourney/index');
 });
@@ -20,7 +30,7 @@ router.get('/schedule', (req, res) => {
 	// Get the current time in UTC
   let now = moment().tz("UTC");
   let start = now.format();
-  let end = now.add({days: 2}).format();
+  let end = now.add({days: 3}).format();
 
 	db.get().collection("tourney-events")
 		.find({when: {$gte: start, $lte: end}})
@@ -33,7 +43,7 @@ router.get('/schedule', (req, res) => {
 				res.render('tourney/schedule', {
 					events: events,
 					helpers: {
-						parseRacers: parseRacers,
+						decorateRacers: decorateRacers,
 						parseCommentary: parseCommentary
 					}
 				});
@@ -41,6 +51,7 @@ router.get('/schedule', (req, res) => {
 		});
 });
 
+// Manage Race
 router.get('/races/:id', (req, res) => {
 	db.get().collection("tourney-events")
 		.findOne({"_id": db.oid(req.params.id)}, (err, result) => {
@@ -51,25 +62,56 @@ router.get('/races/:id', (req, res) => {
 				res.render('tourney/race', {
 					race: result,
 					helpers: {
-						parseRacers: parseRacers,
-						parseCommentary: parseCommentary
+						decorateRacers: decorateRacers,
+						parseCommentary: parseCommentary,
+						restreamStatus: (channel) => {
+							if (channel) {
+					    	if (channel.slug.match(/^speedgaming/)) {
+					    		return `On <a href="https://twitch.tv/${channel.slug}" class="card-link" target="_blank">${channel.name}</a>`;
+					    	} else {
+				    			return channel.name;
+				    		}
+				    	} else {
+				    		return "<em>Restream Undecided</em>";
+				    	}
+						}
 					}
 				})
 			}
 		});
 });
 
+// Create Race
 router.post('/races', (req, res) => {
 	var raceId = req.body.id;
 	db.get().collection("tourney-events")
-		.findOne({"_id": db.oid(raceId)}, (err, result) => {
+		.findOne({"_id": db.oid(raceId)}, (err, race) => {
 			if (err) {
 				res.send('Error!');
 				console.error(err);
 			} else {
-				// @TODO: create race via SRTV
-				// @TODO: store guid of race in DB
-				// @TODO: return json
+				// create race via SRTV
+				let racers = getRacersPlain(race);
+				let raceName = `${raceNamePrefix} | ${racers}`;
+				let newRace = Object.assign(raceDefaults, {"name": raceName});
+
+				console.log("Starting race creation...");
+
+				SRTV.createRace(newRace)
+					.then(raceGuid => {
+						console.log(`Race '${newRace.name}' created successfully: ${raceGuid}`);
+
+						// store guid of race in DB
+						db.get().collection("tourney-events")
+							.update({"_id": db.oid(raceId)}, {$set: {"srtvRace": {"guid": raceGuid}}}, (err, result) => {
+								if (err) {
+									res.status(500).send({"error": err});
+								} else {
+									res.send({"raceLink": SRTV.raceUrl(raceGuid)})
+								}
+							});
+					})
+					.catch(console.error);
 			}
 		});
 });
@@ -94,35 +136,54 @@ router.get('/races/:guid/announce', (req, res) => {
 		})
 });
 
+// @TODO: Find a better spot/method for doing this
 let parseRacers = (players) => {
-	if (!players) { return ''; }
+	if (!players) { return null; }
 	let player1 = (typeof players[0] !== 'undefined') ? players[0] : null;
 	let player2 = (typeof players[1] !== 'undefined') ? players[1] : null;
 
 	if (player1 === null && player2 === null) {
+		return null;
+	}
+
+	return {
+		player1: player1,
+		player2: player2
+	};
+};
+
+let decorateRacers = (players) => {
+
+	let parsed = parseRacers(players);
+	if (!parsed) {
 		return '';
 	}
 
-	let ret = '<p>';
 
-	if (player1 !== null) {
-		ret += `<span class="racer">${player1.displayName}</span> v `;
+	let ret = '<span class="racers">';
+
+	if (parsed.player1 !== null) {
+		ret += `<span class="racer">${parsed.player1.displayName}</span> v `;
 	}
 
-	if (player2 !== null) {
-		ret += `<span class="racer">${player2.displayName}</span>`;
+	if (parsed.player2 !== null) {
+		ret += `<span class="racer">${parsed.player2.displayName}</span>`;
 	}
 
-	ret += '</p>';
+	ret += '</span>';
 
 	return ret;
 };
 
+let getRacersPlain = (race) => {
+	return decorateRacers(race.match1.players).replace(/<(?:.|\n)*?>/gm, '') + ((race.match2) ? `. ${decorateRacers(race.match2.players).replace(/<(?:.|\n)*?>/gm, '')}` : '')
+};
+
 let parseCommentary = (commentators) => {
-	if (commentators === null || commentators.length === 0) { return '<p class="text-danger"><em>None</em></p>'; }
-	let ret = '<p>';
+	if (commentators === null || commentators.length === 0) { return '<span class="text-danger"><em>None</em></span>'; }
+	let ret = '<span>';
 	ret += commentators.map(e => e.displayName).join(', ');
-	ret += '</p>';
+	ret += '</span>';
 	return ret;
 };
 

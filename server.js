@@ -1,7 +1,8 @@
 const express = require('express'),
   Handlebars = require('express-handlebars'),
   moment = require('moment-timezone'),
-  db = require('./db');
+  db = require('./db'),
+  SRTV = require('./lib/srtv.js');
 
 let config = require('./config.json');
 
@@ -18,6 +19,9 @@ const hbs = Handlebars.create({
 		localize: (time) => {
 			// @TODO: determine the user's timezone? might not be possible until after the req object is available
 			return moment(time).tz("America/Los_Angeles").calendar();
+		},
+		srtvUrl: (guid) => {
+			return SRTV.raceUrl(guid);
 		}
 	}
 });
