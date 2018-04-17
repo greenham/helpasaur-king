@@ -22,6 +22,9 @@ let raceDefaults = {
 
 let raceNamePrefix = "NMG Tourney";
 
+let guildId = "395628442017857536";
+let guildPingChannel = "bot-testing";
+
 router.get('/', (req, res) => {
 	res.render('tourney/index');
 });
@@ -139,36 +142,57 @@ router.post('/races/discordPing', (req, res) => {
 
 	// Set up Discord client
 	const client = new DISCORD.Client();
-	// Wait for bot to be ready before watching streams/races
 	client.on('ready', () => {
 		console.log('Connected to discord');
-		/*db.get().collection("tourney-events")
+		db.get().collection("tourney-events")
 			.findOne({"_id": db.oid(raceId)}, (err, race) => {
 				if (!err) {
 					if (race) {
 						let pingUsers = [];
 						if (race.match1 && race.match1.players) {
-							let match1Racers = parseRacers(race.match1.players);
-							if (match1Racers.player1 !== null && match1Racers.player1.discordTag) {
-
-							}
+							pingUsers = pingUsers.concat(extractDiscordTags(race.match1.players));
 						}
 						if (race.match2 && race.match2.players) {
-							let match2Racers = parseRacers(race.match2.players);
+							pingUsers = pingUsers.concat(extractDiscordTags(race.match2.players));
 						}
+						if (race.commentators.length > 0) {
+							pingUsers = pingUsers.concat(extractDiscordTags(race.commentators));
+						}
+
+						pingUsers.map(e => {
+							// if it's an ID, return
+							if (e.match(/^\d+$/)) {
+								return e;
+							}
+
+							// lookup ID from tag otherwise
+							return client.users.find('tag', e).id;
+						});
+
+						// find the correct text channel in the correct guild to send the message
+						let guild = client.guilds.find('id', guildId);
+						let notificationChannel = guild.channels.find('name', guildPingChannel);
+
+						// construct and send the message
+						let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
+							+ ` ${SRTV.raceUrl(race.srtvRace.guid)}`;
+
+						notificationChannel.send(message).then(() => {
+							res.send({sent: message});
+							client.destroy();
+						});
 					}
 				} else {
 					res.status(500).send({"error": err});
 					console.error(err);
 				}
-			});*/
-		res.send({result: true});
+			});
 	})
 	.on('error', err => {
 		res.status(500).send(err);
 		console.error(err);
 	})
-	.login(req.app.locals.discord.token);
+	.login(req.app.locals.discord.prodToken);
 });
 
 // @TODO: Find a better spot/method for doing this
@@ -196,7 +220,7 @@ let decorateRacers = (players) => {
 	let ret = '<span class="racers">';
 
 	if (parsed.player1 !== null) {
-		ret += `<span class="racer">${parsed.player1.displayName}</span> v `;
+		ret += `<span class="racer">${parsed.player1.displayName}</span> <small>v</small> `;
 	}
 
 	if (parsed.player2 !== null) {
@@ -266,6 +290,20 @@ let sendRaceAnnouncements = (race, res) => {
 			res.status(500).send({"error": err});
 			console.error(err);
 		});
+}
+
+let extractDiscordTags = (players) => {
+	let res = [];
+	let racers = parseRacers(players);
+	if (racers.player1 !== null && (racers.player1.discordTag || racers.player1.discordId)) {
+		let target = racers.player1.discordId || racers.player1.discordTag;
+		res.push(target);
+	}
+	if (racers.player2 !== null && (racers.player2.discordTag || racers.player2.discordId)) {
+		let target = racers.player2.discordId || racers.player2.discordTag;
+		res.push(target);
+	}
+	return res;
 }
 
 module.exports = router;

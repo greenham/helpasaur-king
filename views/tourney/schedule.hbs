@@ -13,7 +13,12 @@
 		</thead>
 		{{#each events}}
 			<tr>
-				<td><a class="btn btn-info" href="/tourney/races/{{_id}}"><i class="fas fa-clipboard-list"></i></a></td>
+				<td>
+					<a class="btn btn-info btn-sm" href="/tourney/races/{{_id}}" title="Manage Race"><i class="fas fa-clipboard-list"></i></a>
+					{{#if srtvRace}}
+						<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary btn-sm"><img src="/img/srtv-logo-16x16.png" /></a>
+					{{/if}}
+				</td>
 				<td>{{localize when}}</td>
 				<td>
 					{{{decorateRacers match1.players}}}

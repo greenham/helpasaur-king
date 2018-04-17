@@ -5,35 +5,34 @@
 		  <div class="card-body">
 		    <h5 class="card-title">{{{decorateRacers match1.players}}}{{#if match2}}<br>{{{decorateRacers match2.players}}}{{/if}}</h5>
 		    <h6 class="card-subtitle mb-2 text-muted">{{localize when}}</h6>
-		    <ul class="list-group list-group-flush">
-			    <li class="list-group-item"><i class="fas fa-microphone"></i>&nbsp;{{{parseCommentary commentators}}}</li>
-			    <li class="list-group-item"><i class="fas fa-tv"></i>&nbsp;{{{restreamStatus channel}}}</li>
-			  </ul>
 		  </div>
-		</div>
-
-		<div id="raceActions" style="margin-top: 10px">
-			{{#if srtvRace}}
-				<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary">
-					<i class="fas fa-external-link-alt"></i>&nbsp;Go To Race Channel
-				</a>
-				<button class="btn btn-primary" id="btnDiscordPing" data-toggle="modal" data-target="#discordPingConfirmation"{{#unless srtvRace}} disabled{{/unless}}>
-					<i class="fas fa-bell"></i>&nbsp;Discord Ping
-				</button>
-				<button class="btn btn-primary" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation"{{#unless srtvRace}} disabled{{/unless}}>
-					<i class="fas fa-bullhorn"></i>&nbsp;Race Announcements
-				</button>
-				<button class="btn btn-primary" id="btnGenerateFilenames"{{#unless srtvRace}} disabled{{/unless}}>
-					<i class="fas fa-file"></i>&nbsp;Generate Filenames
-				</button>
-				<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary">
-					<i class="fas fa-clipboard-check"></i>&nbsp;Report Results
-				</a>
-			{{else}}
-				<button class="btn btn-primary" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
-					<i class="fas fa-plus"></i>&nbsp;Create Race Channel
-				</button>
-			{{/if}}
+	    <ul class="list-group list-group-flush">
+		    <li class="list-group-item"><i class="fas fa-microphone"></i>&nbsp;{{{parseCommentary commentators}}}</li>
+		    <li class="list-group-item"><i class="fas fa-tv"></i>&nbsp;{{{restreamStatus channel}}}</li>
+		  </ul>
+		  <div class="card-body" id="raceAction">
+				{{#if srtvRace}}
+					<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary" title="Go to Race Channel">
+						<i class="fas fa-external-link-alt"></i><!-- &nbsp;Go To Race Channel -->
+					</a>
+					<button class="btn btn-primary" id="btnDiscordPing" data-toggle="modal" data-target="#discordPingConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Discord Ping">
+						<i class="fas fa-bell"></i><!-- &nbsp;Discord Ping -->
+					</button>
+					<button class="btn btn-primary" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Race Announcements">
+						<i class="fas fa-bullhorn"></i><!-- &nbsp;Race Announcements -->
+					</button>
+					<button class="btn btn-primary" id="btnGenerateFilenames"{{#unless srtvRace}} disabled{{/unless}} title="Generate Filenames">
+						<i class="fas fa-file"></i><!-- &nbsp;Generate Filenames -->
+					</button>
+					<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary" title="Report Scores">
+						<i class="fas fa-clipboard-check"></i><!-- &nbsp;Report Results -->
+					</a>
+				{{else}}
+					<button class="btn btn-primary" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
+						<i class="fas fa-plus"></i>&nbsp;Create Race Channel
+					</button>
+				{{/if}}
+		  </div>
 		</div>
 	{{/with}}
 </div>
@@ -48,7 +47,8 @@
 
 		$('#btncreateRaceChannelConfirmationAffirmative').on('click', (e) => {
 			let btn = $(e.target);
-			btn.attr('disabled', 'disabled');
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Creating...');
 
 			// make call to server to create the race
 			$.ajax({
@@ -66,13 +66,14 @@
 				location.reload();
 			})
 			.always(() => {
-				btn.removeAttr('disabled');
+				btn.removeAttr('disabled').html(originalBtnText);
 			});
 		});
 
 		$('#btnsendRaceAnnouncementsConfirmationAffirmative').on('click', (e) => {
 			let btn = $(e.target);
-			btn.attr('disabled', 'disabled');
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Sending...');
 
 			// make call to server to send the announcements for this race
 			$.ajax({
@@ -88,14 +89,15 @@
 				alert('Request failed: ' + textStatus);
 			})
 			.always(() => {
-				btn.removeAttr('disabled');
+				btn.removeAttr('disabled').html(originalBtnText);
 				$('#sendRaceAnnouncementsConfirmation').modal('hide');
 			});
 		});
 
 		$('#btndiscordPingConfirmationAffirmative').on('click', (e) => {
 			let btn = $(e.target);
-			btn.attr('disabled', 'disabled');
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Pinging...');
 
 			// make call to server to send the announcements for this race
 			$.ajax({
@@ -111,7 +113,7 @@
 				alert('Request failed: ' + textStatus);
 			})
 			.always(() => {
-				btn.removeAttr('disabled');
+				btn.removeAttr('disabled').html(originalBtnText);
 				$('#discordPingConfirmation').modal('hide');
 			});
 		});
