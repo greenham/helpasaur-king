@@ -16,7 +16,7 @@ let raceDefaults = {
 	"category": "253d897e-3fc2-4cb1-945c-a24e6c423663",	// ALttP Any% NMG No S+Q
 	"startupMode": "READY_UP",
 	"ranked": false,
-	"unlisted": true,
+	"unlisted": false,
 	"streamed": false
 };
 
@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
 router.get('/schedule', (req, res) => {
 	// Get the current time in UTC
   let now = moment().tz("UTC");
-  let start = now.format();
+  let start = now.subtract({hours: 2}).format();
   let end = now.add({days: 3}).format();
 
 	db.get().collection("tourney-events")
@@ -136,27 +136,39 @@ router.post('/races/announce', (req, res) => {
 
 router.post('/races/discordPing', (req, res) => {
 	var raceId = req.body.id;
-	res.send({raceId: raceId});
-	/*db.get().collection("tourney-events")
-		.findOne({"_id": db.oid(raceId)}, (err, race) => {
-			if (!err) {
-				if (race && race.srtvRace && race.srtvRace.guid) {
-					// check if race info was already fetched
-					if (race.srtvRace.announcements) {
-						sendRaceAnnouncements(race.srtvRace, res);
-					} else {
-						updateSRTVRace(raceId, race.srtvRace.guid)
-							.then(updatedRace => {
-								sendRaceAnnouncements(updatedRace, res);
-							})
-							.catch(console.error);	
+
+	// Set up Discord client
+	const client = new DISCORD.Client();
+	// Wait for bot to be ready before watching streams/races
+	client.on('ready', () => {
+		console.log('Connected to discord');
+		/*db.get().collection("tourney-events")
+			.findOne({"_id": db.oid(raceId)}, (err, race) => {
+				if (!err) {
+					if (race) {
+						let pingUsers = [];
+						if (race.match1 && race.match1.players) {
+							let match1Racers = parseRacers(race.match1.players);
+							if (match1Racers.player1 !== null && match1Racers.player1.discordTag) {
+
+							}
+						}
+						if (race.match2 && race.match2.players) {
+							let match2Racers = parseRacers(race.match2.players);
+						}
 					}
+				} else {
+					res.status(500).send({"error": err});
+					console.error(err);
 				}
-			} else {
-				res.status(500).send({"error": err});
-				console.error(err);
-			}
-		});*/
+			});*/
+		res.send({result: true});
+	})
+	.on('error', err => {
+		res.status(500).send(err);
+		console.error(err);
+	})
+	.login(req.app.locals.discord.token);
 });
 
 // @TODO: Find a better spot/method for doing this
@@ -211,7 +223,7 @@ let parseCommentary = (commentators) => {
 let restreamStatus = (channel) => {
 	if (channel) {
   	if (channel.slug.match(/^speedgaming/)) {
-  		return `<a href="https://twitch.tv/${channel.slug}" class="card-link" target="_blank">${channel.name}</a>`;
+  		return `<a href="https://twitch.tv/${channel.slug}" target="_blank">${channel.name}</a>`;
   	} else {
 			return channel.name;
 		}

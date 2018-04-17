@@ -13,7 +13,7 @@ db.connect('mongodb://127.0.0.1:27017/alttpbot', (err) => {
 });
 
 let scheduleJobs = () => {
-	const updateEventScheduleJob = schedule.scheduleJob('*/5 * * * *', () => {
+	const updateEventScheduleJob = schedule.scheduleJob('*/15 * * * *', () => {
 		console.log(`[${moment().format()}] Fetching upcoming events for alttp from SpeedGaming...`);
 
 		SG.upcoming('alttp', {days: 3})

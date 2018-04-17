@@ -10,6 +10,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.locals.botName = config.botName;
+app.locals.discord = config.discord;
 
 // Set up the template engine (Handlebars)
 const hbs = Handlebars.create({
@@ -31,7 +32,7 @@ app.set('view engine', '.hbs');
 // Routing for static files
 app.use(express.static('public'));
 
-
+// Easy form request parsing
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
