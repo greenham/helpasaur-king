@@ -1,5 +1,6 @@
 const express = require('express'),
-  Handlebars = require('express-handlebars');
+  Handlebars = require('express-handlebars'),
+  moment = require('moment-timezone');
 
 let config = require('./config.json');
 
@@ -12,7 +13,12 @@ app.locals.botName = config.botName;
 const hbs = Handlebars.create({
 	defaultLayout: 'main',
 	extname: '.hbs',
-	helpers: {}
+	helpers: {
+		localize: (time) => {
+			// @TODO: determine the user's timezone? might not be possible until after the req object is available
+			return moment(time).tz("America/Los_Angeles").calendar();
+		}
+	}
 });
 app.engine('.hbs', hbs.engine);
 app.set('view engine', '.hbs');
