@@ -17,18 +17,14 @@
 				<td>{{localize when}}</td>
 				<td>
 					{{{decorateRacers match1.players}}}
-					{{{decorateRacers match2.players}}}
+					{{#if match2}}
+						<br>{{{decorateRacers match2.players}}}
+					{{/if}}
 				</td>
 				<td>
 					{{{parseCommentary commentators}}}
 				</td>
-				<td>
-					{{#if channel}}
-						<strong>{{channel.name}}</strong>
-					{{else}}
-						<em>Undecided</em>
-					{{/if}}
-				</td>
+				<td>{{{restreamStatus channel}}}</td>
 			</tr>
 		{{/each}}
 	</table>

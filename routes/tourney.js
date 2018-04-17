@@ -44,7 +44,8 @@ router.get('/schedule', (req, res) => {
 					events: events,
 					helpers: {
 						decorateRacers: decorateRacers,
-						parseCommentary: parseCommentary
+						parseCommentary: parseCommentary,
+						restreamStatus: restreamStatus
 					}
 				});
 			}
@@ -64,19 +65,9 @@ router.get('/races/:id', (req, res) => {
 					helpers: {
 						decorateRacers: decorateRacers,
 						parseCommentary: parseCommentary,
-						restreamStatus: (channel) => {
-							if (channel) {
-					    	if (channel.slug.match(/^speedgaming/)) {
-					    		return `On <a href="https://twitch.tv/${channel.slug}" class="card-link" target="_blank">${channel.name}</a>`;
-					    	} else {
-				    			return channel.name;
-				    		}
-				    	} else {
-				    		return "<em>Restream Undecided</em>";
-				    	}
-						}
+						restreamStatus: restreamStatus
 					}
-				})
+				});
 			}
 		});
 });
@@ -108,6 +99,9 @@ router.post('/races', (req, res) => {
 									res.status(500).send({"error": err});
 								} else {
 									res.send({"raceLink": SRTV.raceUrl(raceGuid)})
+
+									// fetch new race info and store as well
+									updateSRTVRace(raceId, raceGuid).catch(console.error);
 								}
 							});
 					})
@@ -116,24 +110,28 @@ router.post('/races', (req, res) => {
 		});
 });
 
-router.get('/races/:guid/announce', (req, res) => {
-	SRTV.getRace(req.params.guid)
-		.then(race => {
-			console.log(`Sending announcements for race ${req.params.guid}...`);
-			SRTV.say(race.announcements, raceAnnouncements)
-				.then(sent => {
-					res.send(`Sent race announcements for race ${req.params.guid}`);
-					console.log("Sent.");
-				})
-				.catch(err => {
-					res.send("An error has occurred. Check the logs for more info.");
-					console.error(err);
-				});
-		})
-		.catch(err => {
-			res.send("An error has occurred. Check the logs for more info.");
-			console.error(err);
-		})
+router.post('/races/announce', (req, res) => {
+	var raceId = req.body.id;
+	db.get().collection("tourney-events")
+		.findOne({"_id": db.oid(raceId)}, (err, race) => {
+			if (!err) {
+				if (race && race.srtvRace && race.srtvRace.guid) {
+					// check if race info was already fetched
+					if (race.srtvRace.announcements) {
+						sendRaceAnnouncements(race.srtvRace, res);
+					} else {
+						updateSRTVRace(raceId, race.srtvRace.guid)
+							.then(updatedRace => {
+								sendRaceAnnouncements(updatedRace, res);
+							})
+							.catch(console.error);	
+					}
+				}
+			} else {
+				res.status(500).send({"error": err});
+				console.error(err);
+			}
+		});
 });
 
 // @TODO: Find a better spot/method for doing this
@@ -186,5 +184,53 @@ let parseCommentary = (commentators) => {
 	ret += '</span>';
 	return ret;
 };
+
+let restreamStatus = (channel) => {
+	if (channel) {
+  	if (channel.slug.match(/^speedgaming/)) {
+  		return `On <a href="https://twitch.tv/${channel.slug}" class="card-link" target="_blank">${channel.name}</a>`;
+  	} else {
+			return channel.name;
+		}
+	} else {
+		return "<em>Restream Undecided</em>";
+	}
+}
+
+let updateSRTVRace = (raceId, guid) => {
+	return new Promise((resolve, reject) => {
+		console.log(`Fetching SRTV race info for ${guid} (${raceId})...`);
+		SRTV.getRace(guid)
+			.then(race => {
+				console.log(`Race found, updating DB...`);
+				db.get().collection("tourney-events")
+					.update({"_id": db.oid(raceId)}, {$set: {"srtvRace": race}}, (err, result) => {
+						if (err) {
+							console.error('Unable to fetch race info from SRTV after creation: ', err);
+							reject(err);
+						} else {
+							console.log(`Race updated`);
+							resolve(race);
+						}
+					});
+			})
+			.catch(err => {
+				reject(err);
+			});
+	});
+}
+
+let sendRaceAnnouncements = (race, res) => {
+	console.log(`Sending announcements for race ${race.guid}...`);
+	SRTV.say(race.announcements, raceAnnouncements)
+		.then(sent => {
+			res.send({});
+			console.log("Sent.");
+		})
+		.catch(err => {
+			res.status(500).send({"error": err});
+			console.error(err);
+		});
+}
 
 module.exports = router;

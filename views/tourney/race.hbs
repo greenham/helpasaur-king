@@ -18,7 +18,7 @@
 				<button class="btn btn-secondary" id="btnPingParticipants"{{#unless srtvRace}} disabled{{/unless}}>
 					<i class="fas fa-bell"></i>&nbsp;Ping Participants
 				</button>
-				<button class="btn btn-secondary" id="btnSendRaceAnnouncements"{{#unless srtvRace}} disabled{{/unless}}>
+				<button class="btn btn-secondary" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation"{{#unless srtvRace}} disabled{{/unless}}>
 					<i class="fas fa-bullhorn"></i>&nbsp;Race Announcements
 				</button>
 				<button class="btn btn-secondary" id="btnGenerateFilenames"{{#unless srtvRace}} disabled{{/unless}}>
@@ -37,13 +37,14 @@
 </div>
 
 {{> modal id="createRaceChannelConfirmation" title="Confirmation" body="Are you sure you want to create this race?" affirmativeText="Yes, Create It!"}}
+{{> modal id="sendRaceAnnouncementsConfirmation" title="Confirmation" body="Are you sure you want to send the announcements for this race?" affirmativeText="Yes, Send Them!"}}
 
 <script>
 	$(document).ready(() => {
 		var raceId = $('#raceContainer').data('race-id');
 
 		$('#btncreateRaceChannelConfirmationAffirmative').on('click', (e) => {
-			let btn = $(this);
+			let btn = $(e.target);
 			btn.attr('disabled', 'disabled');
 
 			// make call to server to create the race
@@ -63,6 +64,29 @@
 			})
 			.always(() => {
 				btn.removeAttr('disabled');
+			});
+		});
+
+		$('#btnsendRaceAnnouncementsConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			btn.attr('disabled', 'disabled');
+
+			// make call to server to send the announcements for this race
+			$.ajax({
+				type: "POST",
+				url: `/tourney/races/announce`,
+				data: {"id": raceId},
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Announcements sent!');
+			})
+			.fail((jqXHR, textStatus) => {
+				alert('Request failed: ' + textStatus);
+			})
+			.always(() => {
+				btn.removeAttr('disabled');
+				$('#sendRaceAnnouncementsConfirmation').modal('hide');
 			});
 		});
 	});
