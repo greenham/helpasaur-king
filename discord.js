@@ -135,8 +135,8 @@ client.on('ready', () => {
 
   // Set up alerts for each guild we're a member of
   client.guilds.forEach((guild, index) => {
-    // Make sure it's not the dummy default guild and not already initialized
-    if (guild.id !== "default" && !guild.initialized) {
+    // Make sure it's not the dummy default guild and not already initialized and it's configured
+    if (guild.id !== "default" && !guild.initialized && config.discord.guilds[guild.id]) {
       initGuild(guild, config, (err, res) => {
         if (err) console.error(err);
         if (res) console.log(`Successfully initialized guild: ${guild.name}`);

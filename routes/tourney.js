@@ -29,7 +29,8 @@ router.get('/', (req, res) => {
 	res.render('tourney/index');
 });
 
-router.get('/schedule', (req, res) => {
+// Upcoming Tourney Races
+router.get('/upcoming', (req, res) => {
 	// Get the current time in UTC
   let now = moment().tz("UTC");
   let start = now.subtract({hours: 2}).format();
@@ -113,6 +114,7 @@ router.post('/races', (req, res) => {
 		});
 });
 
+// Send SRTV Race Announcements
 router.post('/races/announce', (req, res) => {
 	var raceId = req.body.id;
 	db.get().collection("tourney-events")
@@ -137,6 +139,7 @@ router.post('/races/announce', (req, res) => {
 		});
 });
 
+// Send Discord Pings to Racers + Commentators
 router.post('/races/discordPing', (req, res) => {
 	var raceId = req.body.id;
 
@@ -192,7 +195,7 @@ router.post('/races/discordPing', (req, res) => {
 		res.status(500).send(err);
 		console.error(err);
 	})
-	.login(req.app.locals.discord.prodToken);
+	.login(req.app.locals.discord.token);
 });
 
 // @TODO: Find a better spot/method for doing this
