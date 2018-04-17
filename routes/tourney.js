@@ -134,6 +134,31 @@ router.post('/races/announce', (req, res) => {
 		});
 });
 
+router.post('/races/discordPing', (req, res) => {
+	var raceId = req.body.id;
+	res.send({raceId: raceId});
+	/*db.get().collection("tourney-events")
+		.findOne({"_id": db.oid(raceId)}, (err, race) => {
+			if (!err) {
+				if (race && race.srtvRace && race.srtvRace.guid) {
+					// check if race info was already fetched
+					if (race.srtvRace.announcements) {
+						sendRaceAnnouncements(race.srtvRace, res);
+					} else {
+						updateSRTVRace(raceId, race.srtvRace.guid)
+							.then(updatedRace => {
+								sendRaceAnnouncements(updatedRace, res);
+							})
+							.catch(console.error);	
+					}
+				}
+			} else {
+				res.status(500).send({"error": err});
+				console.error(err);
+			}
+		});*/
+});
+
 // @TODO: Find a better spot/method for doing this
 let parseRacers = (players) => {
 	if (!players) { return null; }
@@ -151,12 +176,10 @@ let parseRacers = (players) => {
 };
 
 let decorateRacers = (players) => {
-
 	let parsed = parseRacers(players);
 	if (!parsed) {
 		return '';
 	}
-
 
 	let ret = '<span class="racers">';
 
@@ -188,12 +211,12 @@ let parseCommentary = (commentators) => {
 let restreamStatus = (channel) => {
 	if (channel) {
   	if (channel.slug.match(/^speedgaming/)) {
-  		return `On <a href="https://twitch.tv/${channel.slug}" class="card-link" target="_blank">${channel.name}</a>`;
+  		return `<a href="https://twitch.tv/${channel.slug}" class="card-link" target="_blank">${channel.name}</a>`;
   	} else {
 			return channel.name;
 		}
 	} else {
-		return "<em>Restream Undecided</em>";
+		return "<em>Undecided</em>";
 	}
 }
 

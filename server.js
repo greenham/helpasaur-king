@@ -36,9 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Homepage
-app.get('/', (req, res) => {
-	res.render('index');
-});
+app.get('/', (req, res) => {res.render('index')});
 
 // Tourney Routes
 const tourney = require('./routes/tourney.js');
