@@ -1,11 +1,12 @@
 const express = require('express'),
   router = express.Router(),
-  SG = require('../lib/speedgaming.js'),
-  SRTV = require('../lib/srtv.js'),
   DISCORD = require('discord.js'),
   moment = require('moment-timezone'),
   db = require('../db'),
-  tasks = require('../lib/tasks.js');
+  SG = require('../lib/speedgaming.js'),
+  SRTV = require('../lib/srtv.js'),
+  tasks = require('../lib/tasks.js'),
+  util = require('../lib/util.js');
 
 // Upcoming Tourney Races
 // Between 2 Hours Ago and 3 Days From Now
@@ -94,13 +95,11 @@ router.post('/races', (req, res) => {
 						// store guid of race in DB
 						db.get().collection("tourney-events")
 							.update({"_id": db.oid(raceId)}, {$set: {"srtvRace": {"guid": raceGuid}}}, (err, result) => {
-								if (err) {
-									res.status(500).send({"error": err});
-								} else {
+								if (!err) {
 									res.send({"raceLink": SRTV.raceUrl(raceGuid)})
-
-									// fetch new race info and store as well
 									updateSRTVRace(raceId, raceGuid).catch(console.error);
+								} else {
+									res.status(500).send({"error": err});
 								}
 							});
 					})
@@ -167,7 +166,7 @@ router.post('/races/discordPing', (req, res) => {
 	// check config first
 	if (!req.app.locals.discord.token || !req.app.locals.tourney.racePings.guildId || !req.app.locals.tourney.racePings.textChannelName) {
 		console.error("/races/discordPing: discord is not configured properly - check config.json");
-		res.status(400).send({"error": "Discord has not been configured! Check config.json"});
+		res.status(500).send({"error": "Discord has not been configured! Check config.json"});
 		return;
 	}
 
@@ -210,18 +209,69 @@ router.post('/races/discordPing', (req, res) => {
 								res.status(500).send({"error": err});
 								console.error(err);
 							}).then(() => {client.destroy()});
+					} else {
+						res.status(404).send({"error": "No race found matching this ID"});
 					}
 				} else {
-					res.status(500).send({"error": err});
 					console.error(err);
+					res.status(500).send({"error": err});
 				}
 			});
 	})
 	.on('error', err => {
-		res.status(500).send({"error": err});
 		console.error(err);
+		res.status(500).send({"error": err});
 	})
 	.login(req.app.locals.discord.token);
+});
+
+// Generate Random Filenames for Racers
+router.post('/races/filenames', (req, res) => {
+	// get race ID from post
+	var raceId = req.body.id;
+	// fetch race from database
+	db.get().collection("tourney-events")
+		.findOne({"_id": db.oid(raceId)}, (err, race) => {
+			if (!err) {
+				if (race) {
+					// generate a random filename for each racer
+					let choices = util.range('A', 'Z');
+					let racers = extractRacers(race);
+					let generateFilenames = async () => {
+						let filenames = [];
+						await util.asyncForEach(racers, async (racer) => {
+							filenames.push({
+								"racerId": racer.id,
+								"racerName": racer.displayName,
+								"filename": util.randElement(choices)
+							});
+						});
+
+						// store filenames with race
+						db.get().collection("tourney-events")
+							.update({"_id": db.oid(raceId)}, {$set: {"filenames": filenames}}, (err, result) => {
+								if (!err) {
+									res.send(filenames);
+								} else {
+									res.status(500).send({"error": err});
+								}
+							});
+					};
+					generateFilenames();
+				} else {
+					res.status(404).send({"error": "No race found matching this ID"});
+				}
+			} else {
+				console.error(err);
+				res.status(500).send({"error": err});
+			}
+		});
+});
+
+// Send Individual Chat Messages
+router.post('/races/chat', (req, res) => {
+	// get race ID, message from post
+	// send via SRTV
 });
 
 // ez refresh
@@ -314,6 +364,19 @@ let extractDiscordTags = (players) => {
 		res.push(target);
 	}
 	return res;
+};
+
+let extractRacers = (race) => {
+	let racers = [];
+
+	if (race.match1 && race.match1.players) {
+		racers = racers.concat(race.match1.players);
+	}
+	if (race.match2 && race.match2.players) {
+		racers = racers.concat(race.match2.players);
+	}
+
+	return racers;
 };
 
 // Handlebars Helpers

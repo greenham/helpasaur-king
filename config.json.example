@@ -45,5 +45,27 @@
   },
   "src": {
     "gameSlug": "alttp"
+  },
+  "srtv": {
+    "username": "USERNAME",
+    "password": "PASSWORD"
+  },
+  "tourney": {
+    "racePings": {
+      "guildId": "GUILD_TO_PING",
+      "textChannelName": "CHANNEL_TO_PING"
+    },
+    "raceNamePrefix": "RACE_PREFIX",
+    "srtvRaceDefaults": {
+      "category": "RACE_CATEGORY",
+      "startupMode": "READY_UP",
+      "ranked": false,
+      "unlisted": true,
+      "streamed": false
+    },
+    "raceAnnouncements": [
+      "Welcome, Racers!",
+      "Good luck and have fun!"
+    ]
   }
 }
