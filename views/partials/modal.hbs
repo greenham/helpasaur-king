@@ -11,8 +11,8 @@
         <p>{{body}}</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="btn{{id}}Affirmative">{{affirmativeText}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-{{#if affirmativeClass}}{{affirmativeClass}}{{else}}primary{{/if}}" id="btn{{id}}Affirmative">{{affirmativeText}}</button>
       </div>
     </div>
   </div>

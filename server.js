@@ -19,13 +19,16 @@ const hbs = Handlebars.create({
 	helpers: {
 		localize: (time) => {
 			// @TODO: determine the user's timezone? might not be possible until after the req object is available
-			return moment(time).tz("America/Los_Angeles").calendar();
+			return moment(time).tz("America/Los_Angeles").format('LLLL');
 		},
-		srtvUrl: (guid) => {
-			return SRTV.raceUrl(guid);
+		calendarize: (time) => {
+			return moment(time).tz("America/Los_Angeles").calendar();
 		},
 		timeago: (time) => {
 			return `<time class="timeago" datetime="${moment(time).format()}">${moment(time).calendar()}</time>`;
+		},
+		srtvUrl: (guid) => {
+			return SRTV.raceUrl(guid);
 		}
 	}
 });

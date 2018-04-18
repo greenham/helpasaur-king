@@ -4,11 +4,13 @@ const express = require('express'),
   SRTV = require('../lib/srtv.js'),
   DISCORD = require('discord.js'),
   moment = require('moment-timezone'),
-  db = require('../db');
+  db = require('../db'),
+  tasks = require('../lib/tasks.js');
 
 const raceAnnouncements = [
 	"Welcome, Racers!",
 	"Reminder: Disable all alerts/overlays covering your game feed or timer and please use game audio only!",
+	"If there is a restream, DO NOT READY UP until a broadcaster joins the race or lets you know it's okay to do so!",
 	"Please choose a single character for your opponent to use for their filename ASAP."
 ];
 
@@ -22,9 +24,11 @@ let raceDefaults = {
 
 let raceNamePrefix = "NMG Tourney";
 
-let guildId = "395628442017857536";	// NMG Tourney Discord
-//let guildPingChannel = "bot-testing";
-let guildPingChannel = "tourney-talk";
+//let guildId = "395628442017857536";	// NMG Tourney Discord
+let guildId = "88301149672718336"; // Curing Chamber
+
+//let guildPingChannel = "tourney-talk";
+let guildPingChannel = "bot-testing";
 
 // Upcoming Tourney Races
 router.get(['/', '/upcoming'], (req, res) => {
@@ -125,10 +129,33 @@ router.post('/races', (req, res) => {
 		});
 });
 
-// Delete Race
+// "Delete" Race
 router.delete('/races', (req, res) => {
 	var raceId = req.body.id;
+
 	// @TODO
+	db.get().collection("tourney-events")
+		.findOne({"_id": db.oid(raceId)}, (err, race) => {
+			if (!err) {
+				if (race) {
+					// don't actually delete, just set to "deleted"
+					db.get().collection("tourney-events")
+						.update({"_id": db.oid(raceId)}, {$set: {"deleted": true}}, (err, result) => {
+							if (!err) {
+								res.send({});
+							} else {
+								res.status(500).send({"error": err});
+								console.error(err);
+							}
+						});
+				} else {
+					res.status(404).send({"error": `No race found matching this ID: ${raceId}`});
+				}
+			} else {
+				res.status(500).send({"error": err});
+				console.error(err);
+			}
+		});
 });
 
 // Send SRTV Race Announcements
@@ -168,22 +195,11 @@ router.post('/races/discordPing', (req, res) => {
 			.findOne({"_id": db.oid(raceId)}, (err, race) => {
 				if (!err) {
 					if (race) {
-						let pingUsers = [];
-						if (race.match1 && race.match1.players) {
-							pingUsers = pingUsers.concat(extractDiscordTags(race.match1.players));
-						}
-						if (race.match2 && race.match2.players) {
-							pingUsers = pingUsers.concat(extractDiscordTags(race.match2.players));
-						}
-						if (race.commentators.length > 0) {
-							pingUsers = pingUsers.concat(extractDiscordTags(race.commentators));
-						}
+						let pingUsers = getDiscordUsersFromRace(race);
 
 						pingUsers.map(e => {
 							// if it's an ID, return
-							if (e.match(/^\d+$/)) {
-								return e;
-							}
+							if (e.match(/^\d+$/)) return e;
 
 							// lookup ID from tag otherwise
 							return client.users.find('tag', e).id;
@@ -197,8 +213,13 @@ router.post('/races/discordPing', (req, res) => {
 						let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
 							+ ` ${SRTV.raceUrl(race.srtvRace.guid)}`;
 
-						notificationChannel.send(message).then(() => {
-							res.send({sent: message});
+						// SEND
+						notificationChannel.send(message).then((sentMessage) => {
+							res.send(sentMessage);
+							client.destroy();
+						})
+						.catch(err => {
+							res.status(500).send({"error": err});
 							client.destroy();
 						});
 					}
@@ -215,11 +236,23 @@ router.post('/races/discordPing', (req, res) => {
 	.login(req.app.locals.discord.token);
 });
 
+// ez refresh
+router.get('/refresh', (req, res) => {
+	tasks.refreshSpeedgamingEvents()
+		.then(result => {
+			res.send({"result": result});
+		})
+		.catch(console.error);
+});
+
 // @TODO: Find a better spot/method for these helper functions
 let fetchRaces = (start, end) => {
 	return new Promise((resolve, reject) => {
 		db.get().collection("tourney-events")
-			.find({when: {$gte: start, $lte: end}})
+			.find({
+				when: {$gte: start, $lte: end},
+				deleted: {$ne: true}
+			})
 			.sort({when: 1})
 			.toArray((err, events) => {
 				if (err) {
@@ -265,6 +298,20 @@ let sendRaceAnnouncements = (race, res) => {
 			res.status(500).send({"error": err});
 			console.error(err);
 		});
+};
+
+let getDiscordUsersFromRace = (race) => {
+	let discordUsers = [];
+	if (race.match1 && race.match1.players) {
+		discordUsers = discordUsers.concat(extractDiscordTags(race.match1.players));
+	}
+	if (race.match2 && race.match2.players) {
+		discordUsers = discordUsers.concat(extractDiscordTags(race.match2.players));
+	}
+	if (race.commentators.length > 0) {
+		discordUsers = discordUsers.concat(extractDiscordTags(race.commentators));
+	}
+	return discordUsers;
 };
 
 let extractDiscordTags = (players) => {
@@ -323,9 +370,11 @@ let getRacersPlain = (race) => {
 };
 
 let parseCommentary = (commentators) => {
-	if (commentators === null || commentators.length === 0) { return '<span class="text-danger"><em>None</em></span>'; }
-	let ret = '<span>';
-	ret += commentators.map(e => e.displayName).join(', ');
+	if (commentators === null || commentators.length === 0) { return '<span class="text-muted"><em>None</em></span>'; }
+	let ret = '<span class="commentators">';
+	ret += commentators.map(e => {
+		return '<span' + ((!e.approved) ? 'class="text-warning"':'') + '>' + e.displayName + '</span>';
+	}).join(', ');
 	ret += '</span>';
 	return ret;
 };
@@ -338,7 +387,7 @@ let restreamStatus = (channel) => {
 			return channel.name;
 		}
 	} else {
-		return "<em>Undecided</em>";
+		return '<span class="text-muted"><em>Undecided</em></span>';
 	}
 };
 
