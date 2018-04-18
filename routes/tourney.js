@@ -136,23 +136,33 @@ router.delete('/races', (req, res) => {
 		});
 });
 
-// Send SRTV Race Announcements
+// Send Default SRTV Race Announcements
 router.post('/races/announce', (req, res) => {
+	let defaultAnnouncements = req.app.locals.tourney.raceAnnouncements || false;
+	if (!defaultAnnouncements) {
+		res.status(500).send({"error": "No default announcements configured! Check config.json"});
+	}
+
 	var raceId = req.body.id;
 	db.get().collection("tourney-events")
 		.findOne({"_id": db.oid(raceId)}, (err, race) => {
 			if (!err) {
 				if (race && race.srtvRace && race.srtvRace.guid) {
-					// check if race info was already fetched
-					if (race.srtvRace.announcements) {
-						sendRaceAnnouncements(race.srtvRace, req.app.locals.tourney.raceAnnouncements, res);
-					} else {
-						updateSRTVRace(raceId, race.srtvRace.guid)
-							.then(updatedRace => {
-								sendRaceAnnouncements(updatedRace, req.app.locals.tourney.raceAnnouncements, res);
-							})
-							.catch(console.error);	
-					}
+					updateSRTVRace(raceId, race.srtvRace.guid)
+						.then(updatedRace => {
+							if (updatedRace.announcements) {
+								console.log(`Sending announcements for race ${updatedRace.guid}...`);
+								SRTV.say(updatedRace.announcements, defaultAnnouncements)
+									.then(sent => {
+										res.send({sent: true});
+									})
+									.catch(err => {
+										console.error(err);
+										res.status(500).send({"error": err});
+									});
+								}
+						})
+						.catch(console.error);	
 				}
 			} else {
 				res.status(500).send({"error": err});
@@ -268,6 +278,60 @@ router.post('/races/filenames', (req, res) => {
 		});
 });
 
+router.post('/races/sendFilenames', (req, res) => {
+	// get race ID from post
+	var raceId = req.body.id;
+	// fetch race from database
+	db.get().collection("tourney-events")
+		.findOne({"_id": db.oid(raceId)}, (err, race) => {
+			// Check for query errors
+			if (err) {
+				console.error(err);
+				res.status(500).send({"error": "An error occurred during this request. It has been logged for further investigation."});
+				return;
+			}
+			// Make sure this race exists
+			if (!race) {
+				res.status(404).send({"error": "No race found matching this ID"});
+				return;
+			}
+			// Make sure a race channel exists
+			if (!race.srtvRace || !race.srtvRace.guid) {
+				res.status(400).send({"error": "Race channel does not exist yet!"});
+				return;
+			}
+			// Make sure filenames have been generated
+			if (!race.filenames) {
+				res.status(400).send({"error": "Filenames have not been generated yet!"});
+				return;
+			}
+
+			// Update SRTV race before proceeding
+			updateSRTVRace(raceId, race.srtvRace.guid)
+				.then(updatedRace => {
+					if (updatedRace.announcements) {
+						// construct messages
+						let messages = race.filenames.map(e => {
+							return `${e.racerName}, your filename name is: ${e.filename}`;
+						});
+
+						// send messages
+						SRTV.say(race.srtvRace.announcements, messages)
+							.then(sent => {
+								res.send({sent: true});
+							})
+							.catch(err => {
+								console.error(err);
+								res.status(500).send({"error": err});
+							});
+					} else {
+						res.status(500).send({"error": "No announcements channel to post to on SRTV!"})
+					}
+				})
+				.catch(console.error);
+		});
+});
+
 // Send Individual Chat Messages
 router.post('/races/chat', (req, res) => {
 	// get race ID, message from post
@@ -304,38 +368,19 @@ let fetchRaces = (start, end) => {
 
 let updateSRTVRace = (raceId, guid) => {
 	return new Promise((resolve, reject) => {
-		console.log(`Fetching SRTV race info for ${guid} (${raceId})...`);
 		SRTV.getRace(guid)
 			.then(race => {
-				console.log(`Race found, updating DB...`);
 				db.get().collection("tourney-events")
 					.update({"_id": db.oid(raceId)}, {$set: {"srtvRace": race}}, (err, result) => {
-						if (err) {
-							console.error('Unable to fetch race info from SRTV after creation: ', err);
-							reject(err);
-						} else {
-							console.log(`Race updated`);
+						if (!err) {
 							resolve(race);
+						} else {
+							reject(err);
 						}
 					});
 			})
-			.catch(err => {
-				reject(err);
-			});
+			.catch(reject);
 	});
-};
-
-let sendRaceAnnouncements = (race, announcements, res) => {
-	console.log(`Sending announcements for race ${race.guid}...`);
-	SRTV.say(race.announcements, announcements)
-		.then(sent => {
-			res.send({});
-			console.log("Sent.");
-		})
-		.catch(err => {
-			res.status(500).send({"error": err});
-			console.error(err);
-		});
 };
 
 let getDiscordUsersFromRace = (race) => {
