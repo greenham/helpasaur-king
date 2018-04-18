@@ -11,6 +11,7 @@ const port = process.env.PORT || 3000;
 
 app.locals.botName = config.botName;
 app.locals.discord = config.discord;
+app.locals.tourney = config.tourney;
 
 // Set up the template engine (Handlebars)
 const hbs = Handlebars.create({

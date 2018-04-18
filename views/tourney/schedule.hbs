@@ -4,27 +4,16 @@
 	<table class="table table-hover">
 		<thead class="thead-light">
 			<tr>
+				<th></th>
 				<th>When</th>
 				<th>Racers</th>
 				<th>Commentary</th>
 				<th>Restream</th>
-				<th></th>
 			</tr>
 		</thead>
 		{{#each events}}
 			<!-- todo: add contextual classes here based on race upcoming/started/finished -->
 			<tr class="race-row" data-href="/tourney/races/{{_id}}">
-				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
-				<td>
-					{{{decorateRacers match1.players}}}
-					{{#if match2}}
-						<br>{{{decorateRacers match2.players}}}
-					{{/if}}
-				</td>
-				<td>
-					{{{parseCommentary commentators}}}
-				</td>
-				<td>{{{restreamStatus channel}}}</td>
 				<td>
 					<div class="dropdown">
 					  <button class="btn btn-secondary dropdown-toggle" type="button" id="raceActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -44,6 +33,17 @@
 					  </div>
 					</div>
 				</td>
+				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
+				<td>
+					{{{decorateRacers match1.players}}}
+					{{#if match2}}
+						<br>{{{decorateRacers match2.players}}}
+					{{/if}}
+				</td>
+				<td>
+					{{{parseCommentary commentators}}}
+				</td>
+				<td>{{{restreamStatus channel}}}</td>
 			</tr>
 		{{/each}}
 	</table>

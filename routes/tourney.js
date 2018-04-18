@@ -7,30 +7,8 @@ const express = require('express'),
   db = require('../db'),
   tasks = require('../lib/tasks.js');
 
-const raceAnnouncements = [
-	"Welcome, Racers!",
-	"Reminder: Disable all alerts/overlays covering your game feed or timer and please use game audio only!",
-	"If there is a restream, DO NOT READY UP until a broadcaster joins the race or lets you know it's okay to do so!",
-	"Please choose a single character for your opponent to use for their filename ASAP."
-];
-
-let raceDefaults = {
-	"category": "253d897e-3fc2-4cb1-945c-a24e6c423663",	// ALttP Any% NMG No S+Q
-	"startupMode": "READY_UP",
-	"ranked": false,
-	"unlisted": false,
-	"streamed": false
-};
-
-let raceNamePrefix = "NMG Tourney";
-
-//let guildId = "395628442017857536";	// NMG Tourney Discord
-let guildId = "88301149672718336"; // Curing Chamber
-
-//let guildPingChannel = "tourney-talk";
-let guildPingChannel = "bot-testing";
-
 // Upcoming Tourney Races
+// Between 2 Hours Ago and 3 Days From Now
 router.get(['/', '/upcoming'], (req, res) => {
 	// Get the current time in UTC
   let start = moment().tz("UTC").subtract({hours: 2}).format();
@@ -51,6 +29,8 @@ router.get(['/', '/upcoming'], (req, res) => {
 		.catch(console.error);
 });
 
+// Recent Tourney Races
+// Between 7 Days Ago and Now
 router.get('/recent', (req, res) => {
 	// Get the current time in UTC
   let start = moment().tz("UTC").subtract({days: 7}).format();
@@ -102,10 +82,10 @@ router.post('/races', (req, res) => {
 			} else {
 				// create race via SRTV
 				let racers = getRacersPlain(race);
-				let raceName = `${raceNamePrefix} | ${racers}`;
-				let newRace = Object.assign(raceDefaults, {"name": raceName});
+				let raceName = `${req.app.locals.tourney.raceNamePrefix} | ${racers}`;
+				let newRace = Object.assign(req.app.locals.tourney.srtvRaceDefaults, {"name": raceName});
 
-				console.log("Starting race creation...");
+				console.log("Starting SRTV race creation...");
 
 				SRTV.createRace(newRace)
 					.then(raceGuid => {
@@ -166,11 +146,11 @@ router.post('/races/announce', (req, res) => {
 				if (race && race.srtvRace && race.srtvRace.guid) {
 					// check if race info was already fetched
 					if (race.srtvRace.announcements) {
-						sendRaceAnnouncements(race.srtvRace, res);
+						sendRaceAnnouncements(race.srtvRace, req.app.locals.tourney.raceAnnouncements, res);
 					} else {
 						updateSRTVRace(raceId, race.srtvRace.guid)
 							.then(updatedRace => {
-								sendRaceAnnouncements(updatedRace, res);
+								sendRaceAnnouncements(updatedRace, req.app.locals.tourney.raceAnnouncements, res);
 							})
 							.catch(console.error);	
 					}
@@ -184,6 +164,13 @@ router.post('/races/announce', (req, res) => {
 
 // Send Discord Pings to Racers + Commentators
 router.post('/races/discordPing', (req, res) => {
+	// check config first
+	if (!req.app.locals.discord.token || !req.app.locals.tourney.racePings.guildId || !req.app.locals.tourney.racePings.textChannelName) {
+		console.error("/races/discordPing: discord is not configured properly - check config.json");
+		res.status(400).send({"error": "Discord has not been configured! Check config.json"});
+		return;
+	}
+
 	var raceId = req.body.id;
 
 	// Set up Discord client
@@ -205,8 +192,8 @@ router.post('/races/discordPing', (req, res) => {
 						});
 
 						// find the correct text channel in the correct guild to send the message
-						let guild = client.guilds.find('id', guildId);
-						let notificationChannel = guild.channels.find('name', guildPingChannel);
+						let guild = client.guilds.find('id', req.app.locals.tourney.racePings.guildId);
+						let notificationChannel = guild.channels.find('name', req.app.locals.tourney.racePings.textChannelName);
 
 						// construct and send the message
 						let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
@@ -222,7 +209,7 @@ router.post('/races/discordPing', (req, res) => {
 							.catch(err => {
 								res.status(500).send({"error": err});
 								console.error(err);
-							});
+							}).then(() => {client.destroy()});
 					}
 				} else {
 					res.status(500).send({"error": err});
@@ -288,9 +275,9 @@ let updateSRTVRace = (raceId, guid) => {
 	});
 };
 
-let sendRaceAnnouncements = (race, res) => {
+let sendRaceAnnouncements = (race, announcements, res) => {
 	console.log(`Sending announcements for race ${race.guid}...`);
-	SRTV.say(race.announcements, raceAnnouncements)
+	SRTV.say(race.announcements, announcements)
 		.then(sent => {
 			res.send({});
 			console.log("Sent.");
