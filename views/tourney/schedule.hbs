@@ -14,7 +14,7 @@
 		{{#each events}}
 			<!-- todo: add contextual classes here based on race upcoming/started/finished -->
 			<tr class="race-row" data-href="/tourney/races/{{_id}}">
-				<td>{{calendarize when}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
+				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
 				<td>
 					{{{decorateRacers match1.players}}}
 					{{#if match2}}
@@ -28,7 +28,7 @@
 				<td>
 					<div class="dropdown">
 					  <button class="btn btn-secondary dropdown-toggle" type="button" id="raceActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					    Actions
+					    <i class="fas fa-cogs"></i>
 					  </button>
 					  <div class="dropdown-menu" aria-labelledby="raceActionsDropdown">
 					    <a href="/tourney/races/{{_id}}" title="Manage Race" class="dropdown-item"><i class="fas fa-clipboard-list"></i>&nbsp;Manage Race</a>
@@ -38,7 +38,7 @@
 								</a>
 							{{/if}}
 							<div class="dropdown-divider"></div>
-							<a href="#" class="dropdown-item bg-danger" id="linkDeleteRace" title="Delete Race" data-toggle="modal" data-target="#deleteRaceConfirmation" data-race-id="{{_id}}">
+							<a href="#" class="dropdown-item bg-danger delete-race-link" title="Delete Race" data-race-id="{{_id}}">
 								<i class="fas fa-trash"></i>&nbsp;Delete Race
 							</a>
 					  </div>
@@ -71,22 +71,43 @@ $(document).ready(() => {
 	  e.stopPropagation();
 	});*/
 
-	$('#linkDeleteRace').on('click', (e) => {
+	$('.delete-race-link').on('click', (e) => {
+		var raceId = $(e.target).data('race-id');
 		var $modalEl = $('#deleteRaceConfirmation');
 
-		$modalEl.on('shown.bs.modal', (e) => {
-			// add a hidden input field with the ID
+		$modalEl.on('show.bs.modal', (e) => {
+			$modalEl.find('#btndeleteRaceConfirmationAffirmative').attr('data-race-id', raceId);
+		});
+
+		$modalEl.on('hidden.bs.modal', (e) => {
+			$modalEl.find('#btndeleteRaceConfirmationAffirmative').removeAttr('data-race-id');
 		});
 
 		$modalEl.modal('show');
 	});
 
 	$('#btndeleteRaceConfirmationAffirmative').on('click', (e) => {
+		let btn = $(e.target);
+		let originalBtnText = btn.html();
+		btn.attr('disabled', 'disabled').html('Deleting...');
+
+		var raceId = $(e.target).data('race-id');
 		$.ajax({
 			method: "DELETE",
 			url: "/tourney/races",
-			data: {}
+			data: {id: raceId}
 		})
+		.done((data, textStatus, jqXHR) => {
+			alert('Race deleted!');
+			location.reload();
+		})
+		.fail((jqXHR, textStatus) => {
+			alert('Request failed: ' + textStatus);
+		})
+		.always(() => {
+			btn.removeAttr('disabled').html(originalBtnText);
+			$('#deleteRaceConfirmation').modal('hide');
+		});
 	});
 
 	// refresh the page every 15 minutes
