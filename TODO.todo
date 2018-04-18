@@ -6,9 +6,9 @@ Planned Features:
  ☐ Create a web interface for editing commands / settings
  ☐ Integration with ALttP Wiki search
  ☐ Support for pulling category rules from SRC
- ☐ Add a !treerupees command
 
 Ideas:
+  ☐ Move conf/* files to mongo
 
 DevOps:
  

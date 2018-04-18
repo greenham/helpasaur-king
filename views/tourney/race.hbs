@@ -110,9 +110,11 @@
 				dataType: "json"
 			})
 			.done((data, textStatus, jqXHR) => {
+				console.log(data);
 				alert('Pings sent!');
 			})
 			.fail((jqXHR, textStatus) => {
+				console.log(textStatus);
 				alert('Request failed: ' + textStatus);
 			})
 			.always(() => {

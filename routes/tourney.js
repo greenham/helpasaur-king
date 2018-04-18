@@ -133,7 +133,6 @@ router.post('/races', (req, res) => {
 router.delete('/races', (req, res) => {
 	var raceId = req.body.id;
 
-	// @TODO
 	db.get().collection("tourney-events")
 		.findOne({"_id": db.oid(raceId)}, (err, race) => {
 			if (!err) {
@@ -197,7 +196,7 @@ router.post('/races/discordPing', (req, res) => {
 					if (race) {
 						let pingUsers = getDiscordUsersFromRace(race);
 
-						pingUsers.map(e => {
+						pingUsers = pingUsers.map(e => {
 							// if it's an ID, return
 							if (e.match(/^\d+$/)) return e;
 
@@ -214,14 +213,16 @@ router.post('/races/discordPing', (req, res) => {
 							+ ` ${SRTV.raceUrl(race.srtvRace.guid)}`;
 
 						// SEND
-						notificationChannel.send(message).then((sentMessage) => {
-							res.send(sentMessage);
-							client.destroy();
-						})
-						.catch(err => {
-							res.status(500).send({"error": err});
-							client.destroy();
-						});
+						console.log(`Sending message via Discord: ${message}`);
+						notificationChannel.send(message)
+							.then(sentMessage => {
+								console.log('Sent!');
+								res.send({sent: sentMessage.content});
+							})
+							.catch(err => {
+								res.status(500).send({"error": err});
+								console.error(err);
+							});
 					}
 				} else {
 					res.status(500).send({"error": err});
@@ -230,7 +231,7 @@ router.post('/races/discordPing', (req, res) => {
 			});
 	})
 	.on('error', err => {
-		res.status(500).send(err);
+		res.status(500).send({"error": err});
 		console.error(err);
 	})
 	.login(req.app.locals.discord.token);
