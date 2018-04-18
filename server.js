@@ -42,9 +42,12 @@ app.use(express.urlencoded({extended: true}));
 // Homepage
 app.get('/', (req, res) => {res.render('index')});
 
-// Tourney Routes
-const tourney = require('./routes/tourney.js');
-app.use('/tourney', tourney);
+// Routes
+app.use('/tourney', require('./routes/tourney.js'));
+app.use('/discord', require('./routes/discord.js'));
+app.use('/srtv', require('./routes/srtv.js'));
+app.use('/twitch', require('./routes/twitch.js'));
+app.use('/settings', require('./routes/settings.js'));
 
 // Connect to Mongo and start listening on the configured port
 // @TODO: Move url to config

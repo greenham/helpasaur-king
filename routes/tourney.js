@@ -23,20 +23,14 @@ let raceDefaults = {
 let raceNamePrefix = "NMG Tourney";
 
 let guildId = "395628442017857536";	// NMG Tourney Discord
-let guildPingChannel = "bot-testing";
-
-router.get('/', (req, res) => {
-	res.render('tourney/index');
-});
+//let guildPingChannel = "bot-testing";
+let guildPingChannel = "tourney-talk";
 
 // Upcoming Tourney Races
-router.get('/upcoming', (req, res) => {
+router.get(['/', '/upcoming'], (req, res) => {
 	// Get the current time in UTC
-  let now = moment().tz("UTC");
-  let start = now.subtract({hours: 2}).format();
-
-  now = moment().tz("UTC");
-  let end = now.add({days: 3}).format();
+  let start = moment().tz("UTC").subtract({hours: 2}).format();
+  let end = moment().tz("UTC").add({days: 3}).format();
 
 	fetchRaces(start, end)
 		.then(events => {
@@ -55,11 +49,8 @@ router.get('/upcoming', (req, res) => {
 
 router.get('/recent', (req, res) => {
 	// Get the current time in UTC
-  let now = moment().tz("UTC");
-  let start = now.subtract({days: 7}).format();
-
-  now = moment().tz("UTC");
-  let end = now.format();
+  let start = moment().tz("UTC").subtract({days: 7}).format();
+  let end = moment().tz("UTC").format();
 
 	fetchRaces(start, end)
 		.then(events => {
@@ -147,6 +138,11 @@ router.post('/races', (req, res) => {
 					.catch(console.error);
 			}
 		});
+});
+
+// Delete Race
+router.delete('/races', (req, res) => {
+	var raceId = req.body.id;
 });
 
 // Send SRTV Race Announcements

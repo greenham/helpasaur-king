@@ -12,23 +12,23 @@
 		  </ul>
 		  <div class="card-body" id="raceAction">
 				{{#if srtvRace}}
-					<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary" title="Go to Race Channel">
+					<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary btn-lg" title="Go to Race Channel">
 						<i class="fas fa-external-link-alt"></i><!-- &nbsp;Go To Race Channel -->
 					</a>
-					<button class="btn btn-primary" id="btnDiscordPing" data-toggle="modal" data-target="#discordPingConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Discord Ping">
-						<i class="fas fa-bell"></i><!-- &nbsp;Discord Ping -->
+					<button class="btn btn-primary btn-lg" id="btnDiscordPing" data-toggle="modal" data-target="#discordPingConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Discord Ping">
+						<i class="fab fa-discord"></i><!-- &nbsp;Discord Ping -->
 					</button>
-					<button class="btn btn-primary" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Race Announcements">
+					<button class="btn btn-primary btn-lg" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Race Announcements">
 						<i class="fas fa-bullhorn"></i><!-- &nbsp;Race Announcements -->
 					</button>
-					<button class="btn btn-primary" id="btnGenerateFilenames"{{#unless srtvRace}} disabled{{/unless}} title="Generate Filenames">
+					<button class="btn btn-primary btn-lg" id="btnGenerateFilenames"{{#unless srtvRace}} disabled{{/unless}} title="Generate Filenames">
 						<i class="fas fa-file"></i><!-- &nbsp;Generate Filenames -->
 					</button>
-					<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary" title="Report Scores">
+					<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary btn-lg" title="Report Scores">
 						<i class="fas fa-clipboard-check"></i><!-- &nbsp;Report Results -->
 					</a>
 				{{else}}
-					<button class="btn btn-primary" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
+					<button class="btn btn-primary btn-lg" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
 						<i class="fas fa-plus"></i>&nbsp;Create Race Channel
 					</button>
 				{{/if}}

@@ -154,8 +154,10 @@ client.on('ready', () => {
 // Listen for commands for the bot to respond to across all channels
 .on('message', msg => {
   // Ignore messages from unconfigured guilds
-  if (msg.guild && !config.discord.guilds[msg.guild.id]) {
-    return;
+  if (msg.guild) {
+    if (!config.discord.guilds[msg.guild.id]) {
+      return;
+    }
   } else if (config.discord.handleDMs === false) {
     return;
   }
@@ -199,6 +201,15 @@ client.on('ready', () => {
 })
 // Create an event listener for new guild members
 .on('guildMemberAdd', member => {
+  // Ignore events from unconfigured guilds
+  if (member.guild) {
+    if (!config.discord.guilds[member.guild.id]) {
+      return;
+    }
+  } else if (config.discord.handleDMs === false) {
+    return;
+  }
+
   console.log(`A new member has joined '${member.guild.name}': ${member.displayName}`);
   // Check to see if this guild has welcome DM's enabled
   let guildConfig = (member.guild) ? config.discord.guilds[member.guild.id] : config.discord.guilds.default;
@@ -366,6 +377,7 @@ Discord.RichEmbed.prototype.setRaceAlertDefaults = function (raceChannel, srlUrl
 };
 
 Discord.Client.prototype.setRandomActivity = function() {
+  if (!config.discord.master) return;
   let activity = config.discord.activities[Math.floor(Math.random() * config.discord.activities.length)];
   this.user.setActivity(activity, {url: `https://www.twitch.tv/${config.twitch.username}`, type: "STREAMING"});
 };
