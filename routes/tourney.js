@@ -67,21 +67,6 @@ router.get('/recent', (req, res) => {
 		.catch(console.error);
 });
 
-let fetchRaces = (start, end) => {
-	return new Promise((resolve, reject) => {
-		db.get().collection("tourney-events")
-			.find({when: {$gte: start, $lte: end}})
-			.sort({when: 1})
-			.toArray((err, events) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve(events);
-				}
-			});
-	});
-}
-
 // Manage Race
 router.get('/races/:id', (req, res) => {
 	db.get().collection("tourney-events")
@@ -143,6 +128,7 @@ router.post('/races', (req, res) => {
 // Delete Race
 router.delete('/races', (req, res) => {
 	var raceId = req.body.id;
+	// @TODO
 });
 
 // Send SRTV Race Announcements
@@ -229,7 +215,73 @@ router.post('/races/discordPing', (req, res) => {
 	.login(req.app.locals.discord.token);
 });
 
-// @TODO: Find a better spot/method for doing this
+// @TODO: Find a better spot/method for these helper functions
+let fetchRaces = (start, end) => {
+	return new Promise((resolve, reject) => {
+		db.get().collection("tourney-events")
+			.find({when: {$gte: start, $lte: end}})
+			.sort({when: 1})
+			.toArray((err, events) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(events);
+				}
+			});
+	});
+};
+
+let updateSRTVRace = (raceId, guid) => {
+	return new Promise((resolve, reject) => {
+		console.log(`Fetching SRTV race info for ${guid} (${raceId})...`);
+		SRTV.getRace(guid)
+			.then(race => {
+				console.log(`Race found, updating DB...`);
+				db.get().collection("tourney-events")
+					.update({"_id": db.oid(raceId)}, {$set: {"srtvRace": race}}, (err, result) => {
+						if (err) {
+							console.error('Unable to fetch race info from SRTV after creation: ', err);
+							reject(err);
+						} else {
+							console.log(`Race updated`);
+							resolve(race);
+						}
+					});
+			})
+			.catch(err => {
+				reject(err);
+			});
+	});
+};
+
+let sendRaceAnnouncements = (race, res) => {
+	console.log(`Sending announcements for race ${race.guid}...`);
+	SRTV.say(race.announcements, raceAnnouncements)
+		.then(sent => {
+			res.send({});
+			console.log("Sent.");
+		})
+		.catch(err => {
+			res.status(500).send({"error": err});
+			console.error(err);
+		});
+};
+
+let extractDiscordTags = (players) => {
+	let res = [];
+	let racers = parseRacers(players);
+	if (racers.player1 !== null && (racers.player1.discordTag || racers.player1.discordId)) {
+		let target = racers.player1.discordId || racers.player1.discordTag;
+		res.push(target);
+	}
+	if (racers.player2 !== null && (racers.player2.discordTag || racers.player2.discordId)) {
+		let target = racers.player2.discordId || racers.player2.discordTag;
+		res.push(target);
+	}
+	return res;
+};
+
+// Handlebars Helpers
 let parseRacers = (players) => {
 	if (!players) { return null; }
 	let player1 = (typeof players[0] !== 'undefined') ? players[0] : null;
@@ -288,56 +340,6 @@ let restreamStatus = (channel) => {
 	} else {
 		return "<em>Undecided</em>";
 	}
-}
-
-let updateSRTVRace = (raceId, guid) => {
-	return new Promise((resolve, reject) => {
-		console.log(`Fetching SRTV race info for ${guid} (${raceId})...`);
-		SRTV.getRace(guid)
-			.then(race => {
-				console.log(`Race found, updating DB...`);
-				db.get().collection("tourney-events")
-					.update({"_id": db.oid(raceId)}, {$set: {"srtvRace": race}}, (err, result) => {
-						if (err) {
-							console.error('Unable to fetch race info from SRTV after creation: ', err);
-							reject(err);
-						} else {
-							console.log(`Race updated`);
-							resolve(race);
-						}
-					});
-			})
-			.catch(err => {
-				reject(err);
-			});
-	});
-}
-
-let sendRaceAnnouncements = (race, res) => {
-	console.log(`Sending announcements for race ${race.guid}...`);
-	SRTV.say(race.announcements, raceAnnouncements)
-		.then(sent => {
-			res.send({});
-			console.log("Sent.");
-		})
-		.catch(err => {
-			res.status(500).send({"error": err});
-			console.error(err);
-		});
-}
-
-let extractDiscordTags = (players) => {
-	let res = [];
-	let racers = parseRacers(players);
-	if (racers.player1 !== null && (racers.player1.discordTag || racers.player1.discordId)) {
-		let target = racers.player1.discordId || racers.player1.discordTag;
-		res.push(target);
-	}
-	if (racers.player2 !== null && (racers.player2.discordTag || racers.player2.discordId)) {
-		let target = racers.player2.discordId || racers.player2.discordTag;
-		res.push(target);
-	}
-	return res;
-}
+};
 
 module.exports = router;
