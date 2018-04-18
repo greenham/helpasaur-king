@@ -22,7 +22,7 @@ let raceDefaults = {
 
 let raceNamePrefix = "NMG Tourney";
 
-let guildId = "395628442017857536";
+let guildId = "395628442017857536";	// NMG Tourney Discord
 let guildPingChannel = "bot-testing";
 
 router.get('/', (req, res) => {
@@ -34,27 +34,62 @@ router.get('/upcoming', (req, res) => {
 	// Get the current time in UTC
   let now = moment().tz("UTC");
   let start = now.subtract({hours: 2}).format();
+
+  now = moment().tz("UTC");
   let end = now.add({days: 3}).format();
 
-	db.get().collection("tourney-events")
-		.find({when: {$gte: start, $lte: end}})
-		.sort({when: 1})
-		.toArray((err, events) => {
-			if (err) {
-				res.send('Error!');
-				console.log(err);
-			} else {
-				res.render('tourney/schedule', {
-					events: events,
-					helpers: {
-						decorateRacers: decorateRacers,
-						parseCommentary: parseCommentary,
-						restreamStatus: restreamStatus
-					}
-				});
-			}
-		});
+	fetchRaces(start, end)
+		.then(events => {
+			res.render('tourney/schedule', {
+				pageHeader: "Upcoming Races",
+				events: events,
+				helpers: {
+					decorateRacers: decorateRacers,
+					parseCommentary: parseCommentary,
+					restreamStatus: restreamStatus
+				}
+			});
+		})
+		.catch(console.error);
 });
+
+router.get('/recent', (req, res) => {
+	// Get the current time in UTC
+  let now = moment().tz("UTC");
+  let start = now.subtract({days: 7}).format();
+
+  now = moment().tz("UTC");
+  let end = now.format();
+
+	fetchRaces(start, end)
+		.then(events => {
+			res.render('tourney/schedule', {
+				pageHeader: "Recent Races",
+				events: events,
+				helpers: {
+					decorateRacers: decorateRacers,
+					parseCommentary: parseCommentary,
+					restreamStatus: restreamStatus
+				}
+			});
+		})
+		.catch(console.error);
+});
+
+let fetchRaces = (start, end) => {
+	return new Promise((resolve, reject) => {
+		db.get().collection("tourney-events")
+			.find({when: {$gte: start, $lte: end}})
+			.sort({when: 1})
+			.toArray((err, events) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(events);
+				}
+			});
+	});
+}
 
 // Manage Race
 router.get('/races/:id', (req, res) => {

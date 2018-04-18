@@ -153,6 +153,13 @@ client.on('ready', () => {
 })
 // Listen for commands for the bot to respond to across all channels
 .on('message', msg => {
+  // Ignore messages from unconfigured guilds
+  if (msg.guild && !config.discord.guilds[msg.guild.id]) {
+    return;
+  } else if (config.discord.handleDMs === false) {
+    return;
+  }
+
   msg.originalContent = msg.content;
   msg.content = msg.content.toLowerCase();
 
