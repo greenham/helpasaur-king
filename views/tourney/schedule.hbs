@@ -5,7 +5,7 @@
 		<thead>
 			<tr>
 				<th></th>
-				<th>Scheduled For</th>
+				<th>When</th>
 				<th>Racers</th>
 				<th>Commentary</th>
 				<th>Restream</th>
@@ -19,7 +19,7 @@
 						<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary btn-sm"><img src="/img/srtv-logo-16x16.png" /></a>
 					{{/if}}
 				</td>
-				<td>{{localize when}}</td>
+				<td>{{localize when}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
 				<td>
 					{{{decorateRacers match1.players}}}
 					{{#if match2}}
@@ -34,3 +34,10 @@
 		{{/each}}
 	</table>
 </div>
+
+<script>
+$(document).ready(() => {
+	$.timeago.settings.allowFuture = true;
+	$("time.timeago").timeago();
+});
+</script>

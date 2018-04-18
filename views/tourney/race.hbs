@@ -1,10 +1,10 @@
 <div class="container" data-race-id="{{race._id}}" id="raceContainer">
 	<h1>Tourney Race Management</h1>
 	{{#with race}}
-		<div class="card" style="width: 20rem;" id="raceHeader">
+		<div class="card" style="width: 28rem;" id="raceHeader">
 		  <div class="card-body">
 		    <h5 class="card-title">{{{decorateRacers match1.players}}}{{#if match2}}<br>{{{decorateRacers match2.players}}}{{/if}}</h5>
-		    <h6 class="card-subtitle mb-2 text-muted">{{localize when}}</h6>
+		    <h6 class="card-subtitle mb-2 text-muted">{{localize when}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></h6>
 		  </div>
 	    <ul class="list-group list-group-flush">
 		    <li class="list-group-item"><i class="fas fa-microphone"></i>&nbsp;{{{parseCommentary commentators}}}</li>
@@ -43,6 +43,9 @@
 
 <script>
 	$(document).ready(() => {
+		$.timeago.settings.allowFuture = true;
+		$("time.timeago").timeago();
+
 		var raceId = $('#raceContainer').data('race-id');
 
 		$('#btncreateRaceChannelConfirmationAffirmative').on('click', (e) => {

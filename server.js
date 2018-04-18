@@ -23,6 +23,9 @@ const hbs = Handlebars.create({
 		},
 		srtvUrl: (guid) => {
 			return SRTV.raceUrl(guid);
+		},
+		timeago: (time) => {
+			return `<time class="timeago" datetime="${moment(time).format()}">${moment(time).calendar()}</time>`;
 		}
 	}
 });
