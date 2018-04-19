@@ -8,48 +8,42 @@ const express = require('express'),
   tasks = require('../lib/tasks.js'),
   util = require('../lib/util.js');
 
-// Upcoming Tourney Races
-// Between 2 Hours Ago and 3 Days From Now
-router.get(['/', '/upcoming'], (req, res) => {
-	// Get the current time in UTC
-  let start = moment().tz("UTC").subtract({hours: 2}).format();
-  let end = moment().tz("UTC").add({days: 3}).format();
+// Tourney Schedule
+router.get(['/', '/upcoming', '/recent', '/today'], (req, res) => {
+	// Determine start/end/sort based on URL
+	let start, end, sort, headerText;
+	switch(req.path.slice(1, req.path.length)) {
+		case "upcoming":
+			start = moment().tz("UTC").subtract({hours: 2}).format();
+  		end = moment().tz("UTC").add({days: 3}).format();
+  		headerText = "Upcoming";
+			break;
+		case "recent":
+			start = moment().tz("UTC").subtract({days: 7}).format();
+  		end = moment().tz("UTC").format();
+  		sort = {when: -1};
+  		headerText = "Recent";
+			break;
+		case "":
+		case "today":
+		default:
+			start = moment().startOf('day').tz("UTC").format();
+			end = moment().endOf('day').tz("UTC").format();
+			headerText = "Today's";
+			break;
+	}
 
-	fetchRaces(start, end)
+	getRaces(start, end, sort)
 		.then(events => {
 			res.render('tourney/schedule', {
-				pageHeader: "Upcoming Races",
-				events: events,
-				helpers: {
-					decorateRacers: decorateRacers,
-					parseCommentary: parseCommentary,
-					restreamStatus: restreamStatus
-				}
+				pageHeader: `${headerText} Races`,
+				events: events
 			});
 		})
-		.catch(console.error);
-});
-
-// Recent Tourney Races
-// Between 7 Days Ago and Now
-router.get('/recent', (req, res) => {
-	// Get the current time in UTC
-  let start = moment().tz("UTC").subtract({days: 7}).format();
-  let end = moment().tz("UTC").format();
-
-	fetchRaces(start, end)
-		.then(events => {
-			res.render('tourney/schedule', {
-				pageHeader: "Recent Races",
-				events: events,
-				helpers: {
-					decorateRacers: decorateRacers,
-					parseCommentary: parseCommentary,
-					restreamStatus: restreamStatus
-				}
-			});
-		})
-		.catch(console.error);
+		.catch(err => {
+			console.error(err);
+			// @TODO: render schedule page with error
+		});
 });
 
 // Manage Race
@@ -57,23 +51,25 @@ router.get('/races/:id', (req, res) => {
 	db.get().collection("tourney-events")
 		.findOne({"_id": db.oid(req.params.id)}, (err, result) => {
 			if (err) {
-				res.send('Error!');
 				console.error(err);
+				res.send({"error": err});
+				// @TODO: render race page with error
 			} else {
-				res.render('tourney/race', {
-					race: result,
-					helpers: {
-						decorateRacers: decorateRacers,
-						parseCommentary: parseCommentary,
-						restreamStatus: restreamStatus
-					}
-				});
+				res.render('tourney/race', {race: result});
 			}
 		});
 });
 
 // Create Race
 router.post('/races', (req, res) => {
+	// @TODO: Validate tourney config
+	if (typeof req.app.locals.tourney.srtvRaceDefaults === "undefined") {
+		res.status(500).send({"error": "SRTV race defaults are not configured!"});
+		return;
+	}
+
+	let raceNamePrefix = req.app.locals.tourney.raceNamePrefix || "";
+
 	var raceId = req.body.id;
 	db.get().collection("tourney-events")
 		.findOne({"_id": db.oid(raceId)}, (err, race) => {
@@ -82,15 +78,15 @@ router.post('/races', (req, res) => {
 				console.error(err);
 			} else {
 				// create race via SRTV
-				let racers = getRacersPlain(race);
+				let racers = getMatchesText(race);
 				let raceName = `${req.app.locals.tourney.raceNamePrefix} | ${racers}`;
 				let newRace = Object.assign(req.app.locals.tourney.srtvRaceDefaults, {"name": raceName});
 
-				console.log("Starting SRTV race creation...");
+				console.log(`Creating race on SRTV '${newRace.name}'`);
 
 				SRTV.createRace(newRace)
 					.then(raceGuid => {
-						console.log(`Race '${newRace.name}' created successfully: ${raceGuid}`);
+						console.log(`Race created successfully: ${raceGuid}`);
 
 						// store guid of race in DB
 						db.get().collection("tourney-events")
@@ -245,7 +241,7 @@ router.post('/races/filenames', (req, res) => {
 				if (race) {
 					// generate a random filename for each racer
 					let choices = util.range('A', 'Z');
-					let racers = extractRacers(race);
+					let racers = getRacersFromRace(race);
 					let generateFilenames = async () => {
 						let filenames = [];
 						await util.asyncForEach(racers, async (racer) => {
@@ -277,6 +273,7 @@ router.post('/races/filenames', (req, res) => {
 		});
 });
 
+// Send Filenames to SRTV Announcements
 router.post('/races/sendFilenames', (req, res) => {
 	// get race ID from post
 	var raceId = req.body.id;
@@ -331,13 +328,13 @@ router.post('/races/sendFilenames', (req, res) => {
 		});
 });
 
-// Send Individual Chat Messages
+// Send Individual Chat Messages to SRTV
 router.post('/races/chat', (req, res) => {
 	// get race ID, message from post
 	// send via SRTV
 });
 
-// ez refresh
+// ez SG schedule refresh
 router.get('/refresh', (req, res) => {
 	tasks.refreshSpeedgamingEvents()
 		.then(result => {
@@ -347,14 +344,16 @@ router.get('/refresh', (req, res) => {
 });
 
 // @TODO: Find a better spot/method for these helper functions
-let fetchRaces = (start, end) => {
+let getRaces = (start, end, sort) => {
+	sort = sort || {when: 1};
+
 	return new Promise((resolve, reject) => {
 		db.get().collection("tourney-events")
 			.find({
 				when: {$gte: start, $lte: end},
 				deleted: {$ne: true}
 			})
-			.sort({when: 1})
+			.sort(sort)
 			.toArray((err, events) => {
 				if (err) {
 					reject(err);
@@ -369,13 +368,11 @@ let updateSRTVRace = (raceId, guid) => {
 	return new Promise((resolve, reject) => {
 		SRTV.getRace(guid)
 			.then(race => {
-				db.get().collection("tourney-events")
+				db.get()
+					.collection("tourney-events")
 					.update({"_id": db.oid(raceId)}, {$set: {"srtvRace": race}}, (err, result) => {
-						if (!err) {
-							resolve(race);
-						} else {
-							reject(err);
-						}
+						if (err) reject(err);
+						resolve(race);
 					});
 			})
 			.catch(reject);
@@ -385,32 +382,24 @@ let updateSRTVRace = (raceId, guid) => {
 let getDiscordUsersFromRace = (race) => {
 	let discordUsers = [];
 	if (race.match1 && race.match1.players) {
-		discordUsers = discordUsers.concat(extractDiscordTags(race.match1.players));
+		discordUsers = discordUsers.concat(getDiscordTags(race.match1.players));
 	}
 	if (race.match2 && race.match2.players) {
-		discordUsers = discordUsers.concat(extractDiscordTags(race.match2.players));
+		discordUsers = discordUsers.concat(getDiscordTags(race.match2.players));
 	}
 	if (race.commentators.length > 0) {
-		discordUsers = discordUsers.concat(extractDiscordTags(race.commentators));
+		discordUsers = discordUsers.concat(getDiscordTags(race.commentators));
 	}
 	return discordUsers;
 };
 
-let extractDiscordTags = (players) => {
-	let res = [];
-	let racers = parseRacers(players);
-	if (racers.player1 !== null && (racers.player1.discordTag || racers.player1.discordId)) {
-		let target = racers.player1.discordId || racers.player1.discordTag;
-		res.push(target);
-	}
-	if (racers.player2 !== null && (racers.player2.discordTag || racers.player2.discordId)) {
-		let target = racers.player2.discordId || racers.player2.discordTag;
-		res.push(target);
-	}
-	return res;
+let getDiscordTags = (players) => {
+	return players.map(e => {
+		return e.discordTag || e.discordId || null;
+	});
 };
 
-let extractRacers = (race) => {
+let getRacersFromRace = (race) => {
 	let racers = [];
 
 	if (race.match1 && race.match1.players) {
@@ -423,67 +412,17 @@ let extractRacers = (race) => {
 	return racers;
 };
 
-// Handlebars Helpers
-let parseRacers = (players) => {
-	if (!players) { return null; }
-	let player1 = (typeof players[0] !== 'undefined') ? players[0] : null;
-	let player2 = (typeof players[1] !== 'undefined') ? players[1] : null;
-
-	if (player1 === null && player2 === null) {
-		return null;
+let getMatchesText = (race) => {
+	let ret = '';
+	if (race.match1 && race.match1.players) {
+		ret += `${race.match1.players[0].displayName} v ${race.match1.players[1].displayName}`;
 	}
 
-	return {
-		player1: player1,
-		player2: player2
-	};
-};
-
-let decorateRacers = (players) => {
-	let parsed = parseRacers(players);
-	if (!parsed) {
-		return '';
+	if (race.match2 && race.match2.players) {
+		ret += `. ${race.match2.players[0].displayName} v ${race.match2.players[1].displayName}`;
 	}
-
-	let ret = '<span class="racers">';
-
-	if (parsed.player1 !== null) {
-		ret += `<span class="racer">${parsed.player1.displayName}</span> <small>v</small> `;
-	}
-
-	if (parsed.player2 !== null) {
-		ret += `<span class="racer">${parsed.player2.displayName}</span>`;
-	}
-
-	ret += '</span>';
 
 	return ret;
-};
-
-let getRacersPlain = (race) => {
-	return decorateRacers(race.match1.players).replace(/<(?:.|\n)*?>/gm, '') + ((race.match2) ? `. ${decorateRacers(race.match2.players).replace(/<(?:.|\n)*?>/gm, '')}` : '')
-};
-
-let parseCommentary = (commentators) => {
-	if (commentators === null || commentators.length === 0) { return '<span class="text-muted"><em>None</em></span>'; }
-	let ret = '<span class="commentators">';
-	ret += commentators.map(e => {
-		return '<span' + ((!e.approved) ? 'class="text-warning"':'') + '>' + e.displayName + '</span>';
-	}).join(', ');
-	ret += '</span>';
-	return ret;
-};
-
-let restreamStatus = (channel) => {
-	if (channel) {
-  	if (channel.slug.match(/^speedgaming/)) {
-  		return `<a href="https://twitch.tv/${channel.slug}" target="_blank">${channel.name}</a>`;
-  	} else {
-			return channel.name;
-		}
-	} else {
-		return '<span class="text-muted"><em>Undecided</em></span>';
-	}
 };
 
 module.exports = router;

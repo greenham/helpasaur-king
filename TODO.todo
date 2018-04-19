@@ -14,6 +14,10 @@ Tourney Control Panel:
   ☐ Pull in race results from SRTV
     ☐ Store to the race itself
     ☐ Report win on challonge?
+  ☐ Order recent races by most recent
+    ☐ Allow for sorting options to be passed in to fetchRaces
+  ☐ Parse results from SG API and transpose into a native format
+    ☐ Store racer info separately so that future updates don't overwrite our own
 
 DevOps:
  

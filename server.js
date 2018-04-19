@@ -1,6 +1,6 @@
 const express = require('express'),
-  Handlebars = require('express-handlebars'),
-  moment = require('moment-timezone'),
+  exphbs = require('express-handlebars'),
+  handlebars = require('./helpers/handlebars.js')(exphbs),
   db = require('./db'),
   SRTV = require('./lib/srtv.js');
 
@@ -9,31 +9,14 @@ let config = require('./config.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// @TODO: make this not dumb
+// app.locals.config = config;
 app.locals.botName = config.botName;
 app.locals.discord = config.discord;
 app.locals.tourney = config.tourney;
 
-// Set up the template engine (Handlebars)
-const hbs = Handlebars.create({
-	defaultLayout: 'main',
-	extname: '.hbs',
-	helpers: {
-		localize: (time) => {
-			// @TODO: determine the user's timezone? might not be possible until after the req object is available
-			return moment(time).tz("America/Los_Angeles").format('LLLL');
-		},
-		calendarize: (time) => {
-			return moment(time).tz("America/Los_Angeles").calendar();
-		},
-		timeago: (time) => {
-			return `<time class="timeago" datetime="${moment(time).format()}">${moment(time).calendar()}</time>`;
-		},
-		srtvUrl: (guid) => {
-			return SRTV.raceUrl(guid);
-		}
-	}
-});
-app.engine('.hbs', hbs.engine);
+// Use Handlebars for templating
+app.engine('.hbs', handlebars.engine);
 app.set('view engine', '.hbs');
 
 // Routing for static files

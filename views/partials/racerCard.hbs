@@ -1,0 +1,9 @@
+<div class="card-body">
+  <!-- <h5 class="card-title">{{displayName}}</h5> -->
+  <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+  <a href="#" class="btn btn-primary">Go somewhere</a> -->
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><i class="fab fa-twitch"></i>&nbsp;<a href="https://www.twitch.tv/{{streamingFrom}}" target="_blank">{{streamingFrom}}</a></li>
+    <li class="list-group-item"><i class="fab fa-discord"></i>&nbsp;{{#if discordTag}}{{discordTag}}{{else}}{{#if discordId}}{{discordId}}{{/if}}{{/if}}</li>
+  </ul>
+</div>

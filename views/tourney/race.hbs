@@ -1,61 +1,76 @@
 <div class="container" data-race-id="{{race._id}}" id="raceContainer">
 	<h1>Tourney Race Management</h1>
 	{{#with race}}
-		<div class="row">
-			<div class="col-sm">
-				<div class="card">
-					<div class="card-header">
-				    Race Information
-				  </div>
-				  <div class="card-body">
-				    <h5 class="card-title">{{{decorateRacers match1.players}}}{{#if match2}}<br>{{{decorateRacers match2.players}}}{{/if}}</h5>
-				    <h6 class="card-subtitle mb-2 text-muted">{{localize when}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></h6>
-				  </div>
-			    <ul class="list-group list-group-flush">
-				    <li class="list-group-item"><i class="fas fa-microphone"></i>&nbsp;{{{parseCommentary commentators}}}</li>
-				    <li class="list-group-item"><i class="fas fa-tv"></i>&nbsp;{{{restreamStatus channel}}}</li>
-				    {{#if filenames}}
-				    	{{#each filenames}}
-				    		<li class="list-group-item"><i class="far fa-file"></i>&nbsp;<strong>{{filename}}</strong>&nbsp;<i class="far fa-arrow-alt-circle-right"></i>&nbsp;<small>{{racerName}}</small></li>
-				    	{{/each}}
-						{{/if}}
-				  </ul>
-				</div>
-			</div>
-			<div class="col-sm">
-		  	<div class="btn-group-vertical" role="group" aria-label="Race Actions">
-					{{#if srtvRace}}
-						<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary btn-lg" title="Go to Race Channel">
-							<i class="fas fa-external-link-alt"></i>&nbsp;Go To Race Channel
-						</a>
-						<button class="btn btn-primary btn-lg" id="btnDiscordPing" data-toggle="modal" data-target="#discordPingConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Discord Ping">
-							<i class="fab fa-discord"></i>&nbsp;Discord Ping
-						</button>
-						<button class="btn btn-primary btn-lg" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Race Announcements">
-							<i class="fas fa-bullhorn"></i>&nbsp;Race Announcements
-						</button>
-						{{#unless filenames}}
-							<button class="btn btn-primary btn-lg" id="btnGenerateFilenames" data-toggle="modal" data-target="#generateFilenamesConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Generate Filenames">
-								<i class="fas fa-random"></i>&nbsp;Generate Filenames
-							</button>
-						{{else}}
-							<button class="btn btn-primary btn-lg" id="btnSendFilenames" data-toggle="modal" data-target="#sendFilenamesConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Send Filenames">
-								<i class="fas fa-share-square"></i>&nbsp;Send Filenames
-							</button>
-						{{/unless}}
-						<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary btn-lg" title="Report Scores">
-							<i class="fas fa-clipboard-check"></i>&nbsp;Report Results
-						</a>
-					{{else}}
-						<button class="btn btn-primary btn-lg" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
-							<i class="fas fa-plus"></i>&nbsp;Create Race Channel
-						</button>
+		<div class="btn-group mt-3 mb-3" role="group" aria-label="Race Actions">
+			{{#if srtvRace}}
+				<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary btn-lg" title="Go to Race Channel">
+					<i class="fas fa-external-link-alt"></i> Go To Race Channel
+				</a>
+				<button class="btn btn-primary btn-lg" id="btnDiscordPing" data-toggle="modal" data-target="#discordPingConfirmation" title="Discord Ping">
+					<i class="fab fa-discord"></i> Discord Ping
+				</button>
+				<button class="btn btn-primary btn-lg" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation" title="Race Announcements">
+					<i class="fas fa-bullhorn"></i> Race Announcements
+				</button>
+				{{#unless filenames}}
+					<button class="btn btn-primary btn-lg" id="btnGenerateFilenames" data-toggle="modal" data-target="#generateFilenamesConfirmation" title="Generate Filenames">
+						<i class="fas fa-random"></i> Generate Filenames
+					</button>
+				{{else}}
+					<button class="btn btn-primary btn-lg" id="btnSendFilenames" data-toggle="modal" data-target="#sendFilenamesConfirmation" title="Send Filenames">
+						<i class="fas fa-share-square"></i> Send Filenames
+					</button>
+				{{/unless}}
+				<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary btn-lg" title="Report Scores">
+					<i class="fas fa-clipboard-check"></i> Report Results
+				</a>
+			{{else}}
+				<button class="btn btn-primary btn-lg" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
+					<i class="fas fa-plus"></i> Create Race Channel
+				</button>
+			{{/if}}
+		</div>
+		<div class="card-deck">
+			<div class="card" id="raceCard">
+				<div class="card-header">Race Information</div>
+			  <div class="card-body">
+			    <h5 class="card-title">{{{decorateRacers match1.players}}}{{#if match2}}<br>{{{decorateRacers match2.players}}}{{/if}}</h5>
+			    <h6 class="card-subtitle mb-2 text-muted">{{localize when}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></h6>
+			  </div>
+		    <ul class="list-group list-group-flush">
+			    <li class="list-group-item"><i class="fas fa-microphone"></i> {{{parseCommentary commentators}}}</li>
+			    <li class="list-group-item"><i class="fas fa-tv"></i> {{{restreamStatus channel}}}</li>
+			    {{#if filenames}}
+			    	{{#each filenames}}
+			    		<li class="list-group-item"><i class="far fa-file"></i> <strong>{{filename}}</strong> <i class="far fa-arrow-alt-circle-right"></i> <small>{{racerName}}</small></li>
+			    	{{/each}}
 					{{/if}}
+			  </ul>
+			</div>
+			<div class="card" id="racerCard">
+			  <div class="card-header">
+			    <ul class="nav nav-tabs card-header-tabs" id="racerInfoCard" role="tablist">
+			    	{{#each match1.players}}
+                <li class="nav-item">
+					        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}">{{displayName}}</a>
+					      </li>
+		        {{/each}}
+		        {{#each match2.players}}
+		          <li class="nav-item">
+				        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}">{{displayName}}</a>
+				      </li>
+		        {{/each}}
+			    </ul>
+			  </div>
+			  <div class="card-body tab-content" id="racerInfoContent">
+			  	{{#each match1.players}}
+				  	<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
+			  	{{/each}}
+			  	{{#each match2.players}}
+			  		<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
+			  	{{/each}}
 				</div>
-			</div>
-			<div class="col-sm">
-				
-			</div>
+		  </div>
 		</div>
 	{{/with}}
 </div>
@@ -68,6 +83,13 @@
 
 <script>
 	$(document).ready(() => {
+		$('#racerInfoCard a').on('click', function (e) {
+		  e.preventDefault();
+		  $(this).tab('show');
+		});
+		// show first tab of racer info
+		$('#racerInfoCard li:first-child a').tab('show');
+
 		$.timeago.settings.allowFuture = true;
 		$("time.timeago").timeago();
 
