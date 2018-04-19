@@ -185,7 +185,6 @@ router.post('/races/discordPing', (req, res) => {
 	// Set up Discord client
 	const client = new DISCORD.Client();
 	client.on('ready', () => {
-		console.log('Connected to discord');
 		db.get().collection("tourney-events")
 			.findOne({"_id": db.oid(raceId)}, (err, race) => {
 				if (!err) {
@@ -206,13 +205,13 @@ router.post('/races/discordPing', (req, res) => {
 
 						// construct and send the message
 						let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
-							+ ` ${SRTV.raceUrl(race.srtvRace.guid)}`;
+							+ ` Here is the race channel for the upcoming race starting ${moment(race.when).fromNow()}:`
+							+ ` <${SRTV.raceUrl(race.srtvRace.guid)}>`;
 
 						// SEND
-						console.log(`Sending message via Discord: ${message}`);
+						console.log(`Sending race pings via Discord: ${message}`);
 						notificationChannel.send(message)
 							.then(sentMessage => {
-								console.log('Sent!');
 								res.send({sent: sentMessage.content});
 							})
 							.catch(err => {
@@ -312,7 +311,7 @@ router.post('/races/sendFilenames', (req, res) => {
 					if (updatedRace.announcements) {
 						// construct messages
 						let messages = race.filenames.map(e => {
-							return `${e.racerName}, your filename name is: ${e.filename}`;
+							return `@${e.racerName}, your filename name is: ${e.filename}`;
 						});
 
 						// send messages

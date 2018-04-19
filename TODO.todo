@@ -11,7 +11,9 @@ Ideas:
   ☐ Move conf/* files to mongo
 
 Tourney Control Panel:
-  ☐ 
+  ☐ Pull in race results from SRTV
+    ☐ Store to the race itself
+    ☐ Report win on challonge?
 
 DevOps:
  
