@@ -21,9 +21,15 @@
 					<button class="btn btn-primary btn-lg" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Race Announcements">
 						<i class="fas fa-bullhorn"></i><!-- &nbsp;Race Announcements -->
 					</button>
-					<button class="btn btn-primary btn-lg" id="btnGenerateFilenames"{{#unless srtvRace}} disabled{{/unless}} title="Generate Filenames">
-						<i class="fas fa-file"></i><!-- &nbsp;Generate Filenames -->
-					</button>
+					{{#unless filenames}}
+						<button class="btn btn-primary btn-lg" id="btnGenerateFilenames" data-toggle="modal" data-target="#generateFilenamesConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Generate Filenames">
+							<i class="fas fa-random"></i><!-- &nbsp;Generate Filenames -->
+						</button>
+					{{else}}
+						<button class="btn btn-primary btn-lg" id="btnSendFilenames" data-toggle="modal" data-target="#sendFilenamesConfirmation"{{#unless srtvRace}} disabled{{/unless}} title="Send Filenames">
+							<i class="fas fa-share-square"></i><!-- &nbsp;Send Filenames -->
+						</button>
+					{{/unless}}
 					<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary btn-lg" title="Report Scores">
 						<i class="fas fa-clipboard-check"></i><!-- &nbsp;Report Results -->
 					</a>
@@ -40,6 +46,8 @@
 {{> modal id="createRaceChannelConfirmation" title="Confirmation" body="Are you sure you want to create this race?" affirmativeText="Yes, Create It!"}}
 {{> modal id="discordPingConfirmation" title="Confirmation" body="Are you sure you want to ping the racers and commentators in discord with the race channel?" affirmativeText="Yes, One Ping Only, Vasili!"}}
 {{> modal id="sendRaceAnnouncementsConfirmation" title="Confirmation" body="Are you sure you want to send the announcements for this race?" affirmativeText="Yes, Send Them!"}}
+{{> modal id="generateFilenamesConfirmation" title="Confirmation" body="Are you sure you want to generate the filenames for this race?" affirmativeText="Yes, Generate Them!"}}
+{{> modal id="sendFilenamesConfirmation" title="Confirmation" body="Are you sure you want to send the filenames for this race?" affirmativeText="Yes, Send Them!"}}
 
 <script>
 	$(document).ready(() => {
@@ -120,6 +128,58 @@
 			.always(() => {
 				btn.removeAttr('disabled').html(originalBtnText);
 				$('#discordPingConfirmation').modal('hide');
+			});
+		});
+
+		$('#btngenerateFilenamesConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Generating...');
+
+			// make call to server to generate the filenames for this race
+			$.ajax({
+				type: "POST",
+				url: `/tourney/races/filenames`,
+				data: {"id": raceId},
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Filenames generated!');
+				location.reload();
+			})
+			.fail((jqXHR, textStatus) => {
+				console.log(textStatus);
+				alert('An error occurred while generating filenames!');
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#generateFilenamesConfirmation').modal('hide');
+			});
+		});
+
+		$('#btnsendFilenamesConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Sending...');
+
+			// make call to server to send the filenames for this race
+			$.ajax({
+				type: "POST",
+				url: `/tourney/races/sendFilenames`,
+				data: {"id": raceId},
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Filenames sent!');
+				location.reload();
+			})
+			.fail((jqXHR, textStatus) => {
+				console.log(textStatus);
+				alert('An error occurred while sending filenames!');
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#sendFilenamesConfirmation').modal('hide');
 			});
 		});
 	});
