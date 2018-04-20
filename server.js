@@ -1,44 +1,37 @@
 const express = require('express'),
   exphbs = require('express-handlebars'),
   handlebars = require('./helpers/handlebars.js')(exphbs),
-  db = require('./db'),
-  SRTV = require('./lib/srtv.js');
+  db = require('./db');
 
 let config = require('./config.json');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || config.webapp.port || 3000;
 
-// @TODO: make this not dumb
-// app.locals.config = config;
-app.locals.botName = config.botName;
-app.locals.discord = config.discord;
-app.locals.tourney = config.tourney;
+// Make app config available everywhere
+app.locals.config = config;
 
 // Use Handlebars for templating
 app.engine('.hbs', handlebars.engine);
 app.set('view engine', '.hbs');
 
-// Routing for static files
-app.use(express.static('public'));
-
 // Easy form request parsing
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// Homepage
-app.get('/', (req, res) => {res.render('index')});
+// Routing for static files
+app.use(express.static('public'));
 
-// Routes
-app.use('/tourney', require('./routes/tourney.js'));
-app.use('/discord', require('./routes/discord.js'));
-app.use('/srtv', require('./routes/srtv.js'));
-app.use('/twitch', require('./routes/twitch.js'));
-app.use('/settings', require('./routes/settings.js'));
+// Routing for everything else
+app.use(require('./routes'));
 
 // Connect to Mongo and start listening on the configured port
-// @TODO: Move url to config
-db.connect('mongodb://127.0.0.1:27017/alttpbot', (err, db) => {
+if (!config.db || !config.db.host || !config.db.db) {
+	console.error("Database has not been properly configured -- check config.json!");
+	process.exit(1);
+}
+
+db.connect(`${config.db.host}/${config.db.db}`, (err, db) => {
 	if (err) {
 		console.error('Unable to connect to Mongo.');
 		process.exit(1);
