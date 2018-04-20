@@ -46,6 +46,10 @@ router.get(['/', '/upcoming', '/recent', '/today'], (req, res) => {
 		});
 });
 
+router.get('/brackets', (req, res) => {
+	res.render('tourney/challonge');
+});
+
 // Manage Race
 router.get('/races/:id', (req, res) => {
 	db.get().collection("tourney-events")
@@ -62,13 +66,14 @@ router.get('/races/:id', (req, res) => {
 
 // Create Race
 router.post('/races', (req, res) => {
-	// @TODO: Validate tourney config
-	if (typeof req.app.locals.tourney.srtvRaceDefaults === "undefined") {
+	// Validate tourney config
+	let tourneyConfig = req.app.locals.config.tourney || false;
+	if (!tourneyConfig || !tourneyConfig.srtvRaceDefaults) {
 		res.status(500).send({"error": "SRTV race defaults are not configured!"});
 		return;
 	}
 
-	let raceNamePrefix = req.app.locals.tourney.raceNamePrefix || "";
+	let raceNamePrefix = tourneyConfig.raceNamePrefix || "";
 
 	var raceId = req.body.id;
 	db.get().collection("tourney-events")
@@ -79,10 +84,10 @@ router.post('/races', (req, res) => {
 			} else {
 				// create race via SRTV
 				let racers = getMatchesText(race);
-				let raceName = `${req.app.locals.tourney.raceNamePrefix} | ${racers}`;
-				let newRace = Object.assign(req.app.locals.tourney.srtvRaceDefaults, {"name": raceName});
+				let raceName = `${raceNamePrefix} ${racers}`;
+				let newRace = Object.assign(tourneyConfig.srtvRaceDefaults, {"name": raceName});
 
-				console.log(`Creating race on SRTV '${newRace.name}'`);
+				console.log(`Creating race on SRTV: '${newRace.name}'`);
 
 				SRTV.createRace(newRace)
 					.then(raceGuid => {
@@ -134,9 +139,11 @@ router.delete('/races', (req, res) => {
 
 // Send Default SRTV Race Announcements
 router.post('/races/announce', (req, res) => {
-	let defaultAnnouncements = req.app.locals.tourney.raceAnnouncements || false;
-	if (!defaultAnnouncements) {
+	// Validate tourney config
+	let tourneyConfig = req.app.locals.config.tourney || false;
+	if (!tourneyConfig || !tourneyConfig.raceAnnouncements) {
 		res.status(500).send({"error": "No default announcements configured! Check config.json"});
+		return;
 	}
 
 	var raceId = req.body.id;
@@ -148,7 +155,7 @@ router.post('/races/announce', (req, res) => {
 						.then(updatedRace => {
 							if (updatedRace.announcements) {
 								console.log(`Sending announcements for race ${updatedRace.guid}...`);
-								SRTV.say(updatedRace.announcements, defaultAnnouncements)
+								SRTV.say(updatedRace.announcements, tourneyConfig.raceAnnouncements)
 									.then(sent => {
 										res.send({sent: true});
 									})
@@ -170,9 +177,19 @@ router.post('/races/announce', (req, res) => {
 // Send Discord Pings to Racers + Commentators
 router.post('/races/discordPing', (req, res) => {
 	// check config first
-	if (!req.app.locals.discord.token || !req.app.locals.tourney.racePings.guildId || !req.app.locals.tourney.racePings.textChannelName) {
-		console.error("/races/discordPing: discord is not configured properly - check config.json");
-		res.status(500).send({"error": "Discord has not been configured! Check config.json"});
+	let discordConfig = req.app.locals.config.discord || false;
+	let tourneyConfig = req.app.locals.config.tourney || false;
+
+	if (
+		!discordConfig 
+		|| !discordConfig.token
+		|| !tourneyConfig 
+		|| !tourneyConfig.racePings 
+		|| !tourneyConfig.racePings.guildId 
+		|| !tourneyConfig.racePings.textChannelName
+	) {
+		console.error("/races/discordPing: discord/tourney is not configured properly - check config.json");
+		res.status(500).send({"error": "Discord/tourney has not been configured! Check config.json"});
 		return;
 	}
 
@@ -196,8 +213,8 @@ router.post('/races/discordPing', (req, res) => {
 						});
 
 						// find the correct text channel in the correct guild to send the message
-						let guild = client.guilds.find('id', req.app.locals.tourney.racePings.guildId);
-						let notificationChannel = guild.channels.find('name', req.app.locals.tourney.racePings.textChannelName);
+						let guild = client.guilds.find('id', tourneyConfig.racePings.guildId);
+						let notificationChannel = guild.channels.find('name', tourneyConfig.racePings.textChannelName);
 
 						// construct and send the message
 						let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
@@ -227,7 +244,7 @@ router.post('/races/discordPing', (req, res) => {
 		console.error(err);
 		res.status(500).send({"error": err});
 	})
-	.login(req.app.locals.discord.token);
+	.login(discordConfig.token);
 });
 
 // Generate Random Filenames for Racers
