@@ -30,46 +30,48 @@
 				</button>
 			{{/if}}
 		</div>
-		<div class="card-deck">
-			<div class="card" id="raceCard">
-				<div class="card-header">Race Information</div>
-			  <div class="card-body">
-			    <h5 class="card-title">{{{decorateRacers match1.players}}}{{#if match2}}<br>{{{decorateRacers match2.players}}}{{/if}}</h5>
-			    <h6 class="card-subtitle mb-2 text-muted">{{localize when}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></h6>
-			  </div>
-		    <ul class="list-group list-group-flush">
-			    <li class="list-group-item"><i class="fas fa-microphone"></i> {{{parseCommentary commentators}}}</li>
-			    <li class="list-group-item"><i class="fas fa-tv"></i> {{{restreamStatus channel}}}</li>
-			    {{#if filenames}}
+		<div class="row">
+  		<div class="col-sm-4">
+				<div class="card" id="raceCard">
+					<div class="card-header">Race Information</div>
+				  <div class="card-body">
+				    <h5 class="card-title">{{{decorateRacers match1.players}}}{{#if match2}}<br>{{{decorateRacers match2.players}}}{{/if}}</h5>
+				    <h6 class="card-subtitle mb-2 text-muted">{{localize when}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></h6>
+				  </div>
+			    <ul class="list-group list-group-flush">
+				    <li class="list-group-item"><i class="fas fa-microphone"></i> {{{parseCommentary commentators}}}</li>
+				    <li class="list-group-item"><i class="fas fa-tv"></i> {{{restreamStatus channel}}}</li>
 			    	{{#each filenames}}
 			    		<li class="list-group-item"><i class="far fa-file"></i> <strong>{{filename}}</strong> <i class="far fa-arrow-alt-circle-right"></i> <small>{{racerName}}</small></li>
 			    	{{/each}}
-					{{/if}}
-			  </ul>
-			</div>
-			<div class="card" id="racerCard">
-			  <div class="card-header">
-			    <ul class="nav nav-tabs card-header-tabs" id="racerInfoCard" role="tablist">
-			    	{{#each match1.players}}
-                <li class="nav-item">
-					        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}">{{displayName}}</a>
-					      </li>
-		        {{/each}}
-		        {{#each match2.players}}
-		          <li class="nav-item">
-				        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}">{{displayName}}</a>
-				      </li>
-		        {{/each}}
-			    </ul>
-			  </div>
-			  <div class="card-body tab-content" id="racerInfoContent">
-			  	{{#each match1.players}}
-				  	<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
-			  	{{/each}}
-			  	{{#each match2.players}}
-			  		<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
-			  	{{/each}}
+				  </ul>
 				</div>
+			</div>
+		  <div class="col-sm-8">
+				<div class="card" id="racerCard">
+				  <div class="card-header">
+				    <ul class="nav nav-tabs card-header-tabs" id="racerInfoCard" role="tablist">
+				    	{{#each match1.players}}
+	                <li class="nav-item">
+						        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}"><i class="far fa-user-circle"></i> {{displayName}}</a>
+						      </li>
+			        {{/each}}
+			        {{#each match2.players}}
+			          <li class="nav-item">
+					        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}"><i class="far fa-user-circle"></i> {{displayName}}</a>
+					      </li>
+			        {{/each}}
+				    </ul>
+				  </div>
+				  <div class="card-body tab-content" id="racerInfoContent">
+				  	{{#each match1.players}}
+					  	<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
+				  	{{/each}}
+				  	{{#each match2.players}}
+				  		<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
+				  	{{/each}}
+					</div>
+			  </div>
 		  </div>
 		</div>
 	{{/with}}

@@ -10,7 +10,7 @@
     <script src="/js/moment.js"></script>
     <link rel="stylesheet" href="/css/custom.css" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  	<title>{{botName}} Control Panel</title>
+  	<title>{{config.botName}} Control Panel</title>
 	</head>
   <body>
   	<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -27,9 +27,11 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="/tourney/upcoming" id="tourneyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-calendar-alt"></i>&nbsp;2018 NMG Tourney</a>
             <div class="dropdown-menu" aria-labelledby="tourneyDropdown">
-              <a class="dropdown-item" href="/tourney/today">Today's Races</a>
-              <a class="dropdown-item" href="/tourney/upcoming">Upcoming Races</a>
-              <a class="dropdown-item" href="/tourney/recent">Recent Races</a>
+              <a href="/tourney/today" class="dropdown-item">Today's Races</a>
+              <a href="/tourney/upcoming" class="dropdown-item">Upcoming Races</a>
+              <a href="/tourney/recent" class="dropdown-item">Recent Races</a>
+              <div class="dropdown-divider"></div>
+              <a href="/tourney/brackets" class="dropdown-item">Challonge Brackets</a>
             </div>
           </li>
           <li class="nav-item">
