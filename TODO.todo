@@ -3,26 +3,51 @@ Bugs:
 Planned Features:
  ☐ Update SR.C functionality to reflect new Extensions board
  ☐ Integrate with speedrun.tv once API is available/documented
- ☐ Create a web interface for editing commands / settings
  ☐ Integration with ALttP Wiki search
  ☐ Support for pulling category rules from SRC
+
+
+Web Control Panel:
+  Tourney:
+    ☐ Pull in race results from SRTV
+      ☐ Store to the race itself
+      ☐ Report win on challonge?
+    ☐ Parse results from SG API and transpose into a native format
+      ☐ Store racer info separately so that future updates don't overwrite our own
+    ☐ Add more details to race information
+      ☐ Multitwitch link
+    ☐ Add more details to racer card
+      ☐ Racer filenames
+      ☐ Groups stage times
+      ☐ Groups record
+    ☐ Integrate tourney seeder / results tracker
+      ☐ Migrate people.json into DB, match up with SG person ID
+      ☐ Migrate PB's, challonge info, SRC username, groups times
+      ☐ Migrate groups?
+      ☐ Show bracket seeds
+    ☐ Change 500 errors to render error pages
+    ☐ Show/Hide specific race actions based on the race state
+      ☐ Once the race is over (>2 hours past)
+        ☐ Hide Discord Ping
+        ☐ Hide Race Announcements
+        ☐ Hide Send Filename
+        ☐ Show "Report Results"
+  Discord:
+  Twitch:
+  SRTV:
+  Settings:
 
 Ideas:
   ☐ Move conf/* files to mongo
 
-Tourney Control Panel:
-  ☐ Pull in race results from SRTV
-    ☐ Store to the race itself
-    ☐ Report win on challonge?
-  ☐ Order recent races by most recent
-    ☐ Allow for sorting options to be passed in to fetchRaces
-  ☐ Parse results from SG API and transpose into a native format
-    ☐ Store racer info separately so that future updates don't overwrite our own
-
 DevOps:
+  Production:
+    ☐ Install Mongo, create alttpbot DB
  
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Order recent races by most recent @done (18-04-20 08:06) @project(Tourney Control Panel)
+ ✔ Allow for sorting options to be passed in to fetchRaces @done (18-04-20 08:06) @project(Tourney Control Panel)
  ✔ On next release, push config.production.json and run npm update (new discord.js version) @done (18-02-03 07:43) @project(DevOps)
  ✔ Set a random activity every hour in discord @done (18-02-01 14:22) @project(Planned Features)
  ✔ Double stream alerts -- maybe the event listener is being attached twice somehow during a restart? @done (18-02-01 14:19) @project(Bugs)
