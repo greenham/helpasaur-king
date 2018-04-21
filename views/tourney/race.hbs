@@ -3,29 +3,29 @@
 	{{#with race}}
 		<div class="btn-group mt-3 mb-3" role="group" aria-label="Race Actions">
 			{{#if srtvRace}}
-				<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary btn-lg" title="Go to Race Channel">
+				<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary" title="Go to Race Channel">
 					<i class="fas fa-external-link-alt"></i> Go To Race Channel
 				</a>
-				<button class="btn btn-primary btn-lg" id="btnDiscordPing" data-toggle="modal" data-target="#discordPingConfirmation" title="Discord Ping">
-					<i class="fab fa-discord"></i> Discord Ping
+				<button class="btn btn-primary" id="btnDiscordPings" data-toggle="modal" data-target="#discordPingsConfirmation" title="Discord Pings">
+					<i class="fab fa-discord"></i> Discord Pings
 				</button>
-				<button class="btn btn-primary btn-lg" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation" title="Race Announcements">
+				<button class="btn btn-primary" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation" title="Race Announcements">
 					<i class="fas fa-bullhorn"></i> Race Announcements
 				</button>
 				{{#unless filenames}}
-					<button class="btn btn-primary btn-lg" id="btnGenerateFilenames" data-toggle="modal" data-target="#generateFilenamesConfirmation" title="Generate Filenames">
+					<button class="btn btn-primary" id="btnGenerateFilenames" data-toggle="modal" data-target="#generateFilenamesConfirmation" title="Generate Filenames">
 						<i class="fas fa-random"></i> Generate Filenames
 					</button>
 				{{else}}
-					<button class="btn btn-primary btn-lg" id="btnSendFilenames" data-toggle="modal" data-target="#sendFilenamesConfirmation" title="Send Filenames">
+					<button class="btn btn-primary" id="btnSendFilenames" data-toggle="modal" data-target="#sendFilenamesConfirmation" title="Send Filenames">
 						<i class="fas fa-share-square"></i> Send Filenames
 					</button>
 				{{/unless}}
-				<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary btn-lg" title="Report Scores">
+				<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary" title="Report Scores">
 					<i class="fas fa-clipboard-check"></i> Report Results
 				</a>
 			{{else}}
-				<button class="btn btn-primary btn-lg" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
+				<button class="btn btn-primary" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
 					<i class="fas fa-plus"></i> Create Race Channel
 				</button>
 			{{/if}}
@@ -41,9 +41,12 @@
 			    <ul class="list-group list-group-flush">
 				    <li class="list-group-item"><i class="fas fa-microphone"></i> {{{parseCommentary commentators}}}</li>
 				    <li class="list-group-item"><i class="fas fa-tv"></i> {{{restreamStatus channel}}}</li>
-			    	{{#each filenames}}
-			    		<li class="list-group-item"><i class="far fa-file"></i> <strong>{{filename}}</strong> <i class="far fa-arrow-alt-circle-right"></i> <small>{{racerName}}</small></li>
-			    	{{/each}}
+				    {{#if match1.note}}
+				    	<li class="list-group-item" title="Match 1 Note"><i class="far fa-comment-alt"></i> {{match1.note}}</li>
+				    {{/if}}
+				    {{#if match2.note}}
+				    	<li class="list-group-item" title="Match 2 Note"><i class="far fa-comment-alt"></i> {{match2.note}}</li>
+				    {{/if}}
 				  </ul>
 				</div>
 			</div>
@@ -65,10 +68,10 @@
 				  </div>
 				  <div class="card-body tab-content" id="racerInfoContent">
 				  	{{#each match1.players}}
-					  	<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
+					  	<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this filenames=../filenames}}</div>
 				  	{{/each}}
 				  	{{#each match2.players}}
-				  		<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this}}</div>
+				  		<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this filenames=../filenames}}</div>
 				  	{{/each}}
 					</div>
 			  </div>
@@ -78,7 +81,7 @@
 </div>
 
 {{> modal id="createRaceChannelConfirmation" title="Confirmation" body="Are you sure you want to create this race?" affirmativeText="Yes, Create It!"}}
-{{> modal id="discordPingConfirmation" title="Confirmation" body="Are you sure you want to ping the racers and commentators in discord with the race channel?" affirmativeText="Yes, Ping Them!"}}
+{{> modal id="discordPingsConfirmation" title="Confirmation" body="Are you sure you want to ping the racers and commentators in Discord with the race channel?" affirmativeText="Yes, Ping Them!"}}
 {{> modal id="sendRaceAnnouncementsConfirmation" title="Confirmation" body="Are you sure you want to send the announcements for this race?" affirmativeText="Yes, Send Them!"}}
 {{> modal id="generateFilenamesConfirmation" title="Confirmation" body="Are you sure you want to generate the filenames for this race?" affirmativeText="Yes, Generate Them!"}}
 {{> modal id="sendFilenamesConfirmation" title="Confirmation" body="Are you sure you want to send the filenames for this race?" affirmativeText="Yes, Send Them!"}}
@@ -146,7 +149,7 @@
 			});
 		});
 
-		$('#btndiscordPingConfirmationAffirmative').on('click', (e) => {
+		$('#btndiscordPingsConfirmationAffirmative').on('click', (e) => {
 			let btn = $(e.target);
 			let originalBtnText = btn.html();
 			btn.attr('disabled', 'disabled').html('Pinging...');
@@ -168,7 +171,7 @@
 			})
 			.always(() => {
 				btn.removeAttr('disabled').html(originalBtnText);
-				$('#discordPingConfirmation').modal('hide');
+				$('#discordPingsConfirmation').modal('hide');
 			});
 		});
 

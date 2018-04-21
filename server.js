@@ -32,12 +32,12 @@ if (!config.db || !config.db.host || !config.db.db) {
 }
 
 db.connect(`${config.db.host}/${config.db.db}`, (err, db) => {
-	if (err) {
-		console.error('Unable to connect to Mongo.');
-		process.exit(1);
-	} else {
+	if (!err) {
 		app.listen(port, () => {
 			console.log(`Listening on port ${port}`);
 		});
+	} else {
+		console.error('Unable to connect to Mongo.');
+		process.exit(1);
 	}
 });

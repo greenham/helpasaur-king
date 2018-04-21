@@ -12,17 +12,16 @@ Web Control Panel:
     ☐ Pull in race results from SRTV
       ☐ Store to the race itself
       ☐ Report win on challonge?
-    ☐ Parse results from SG API and transpose into a native format
-      ☐ Store racer info separately so that future updates don't overwrite our own
     ☐ Add more details to race information
       ☐ Multitwitch link
     ☐ Add more details to racer card
-      ☐ Racer filenames
+      ✔ Racer filenames @done (18-04-20 16:03)
       ☐ Groups stage times
       ☐ Groups record
     ☐ Integrate tourney seeder / results tracker
-      ☐ Migrate people.json into DB, match up with SG person ID
-      ☐ Migrate PB's, challonge info, SRC username, groups times
+      ✔ Migrate people.json into DB, match up with SG person ID @done (18-04-20 16:03)
+      ✔ Migrate PB's, challonge info, SRC username @done (18-04-20 16:03)
+      ☐ Migrate groups times
       ☐ Migrate groups?
       ☐ Show bracket seeds
     ☐ Change 500 errors to render error pages

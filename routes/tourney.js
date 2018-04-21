@@ -222,7 +222,7 @@ router.post('/races/discordPing', (req, res) => {
 							+ ` <${SRTV.raceUrl(race.srtvRace.guid)}>`;
 
 						// SEND
-						console.log(`Sending race pings via Discord: ${message}`);
+						console.log(`Sending race pings via Discord to [${guild.name}]#${notificationChannel.name}: ${message}`);
 						notificationChannel.send(message)
 							.then(sentMessage => {
 								res.send({sent: sentMessage.content});
@@ -353,7 +353,7 @@ router.post('/races/chat', (req, res) => {
 
 // ez SG schedule refresh
 router.get('/refresh', (req, res) => {
-	tasks.refreshSpeedgamingEvents()
+	tasks.refreshSpeedgamingEvents('alttp')
 		.then(result => {
 			res.send({"result": result});
 		})
@@ -363,11 +363,11 @@ router.get('/refresh', (req, res) => {
 // @TODO: Find a better spot/method for these helper functions
 let getRaces = (start, end, sort) => {
 	sort = sort || {when: 1};
-
 	return new Promise((resolve, reject) => {
 		db.get().collection("tourney-events")
 			.find({
 				when: {$gte: start, $lte: end},
+				approved: true,
 				deleted: {$ne: true}
 			})
 			.sort(sort)

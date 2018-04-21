@@ -2,8 +2,25 @@
   <!-- <h5 class="card-title">{{displayName}}</h5> -->
   <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
   <a href="#" class="btn btn-primary">Go somewhere</a> -->
+  {{#if streamingFrom}}
+  	<div class="embed-responsive embed-responsive-16by9">
+  		<iframe
+  			class="embed-responsive-item"
+		    src="http://player.twitch.tv/?channel={{streamingFrom}}&autoplay=false&muted=true"
+		    height="533"
+		    width="300"
+		    scrolling="no"
+		    allowfullscreen="true">
+			</iframe>
+		</div>
+  {{/if}}
   <ul class="list-group list-group-flush">
-    <li class="list-group-item"><i class="fab fa-twitch"></i>&nbsp;<a href="https://www.twitch.tv/{{streamingFrom}}" target="_blank">{{streamingFrom}}</a></li>
-    <li class="list-group-item"><i class="fab fa-discord"></i>&nbsp;{{#if discordTag}}{{discordTag}}{{else}}{{#if discordId}}{{discordId}}{{/if}}{{/if}}</li>
+    <li class="list-group-item"><i class="fab fa-twitch"></i> <a href="https://www.twitch.tv/{{streamingFrom}}" target="_blank">{{streamingFrom}}</a></li>
+    <li class="list-group-item"><i class="fab fa-discord"></i> {{#if discordTag}}{{discordTag}}{{else}}{{#if discordId}}{{discordId}}{{/if}}{{/if}}</li>
+    {{#each filenames}}
+	  	{{#if (eq racerId ../id)}}
+	  		<li class="list-group-item"><i class="fas fa-file"></i> <span class="badge badge-info">{{filename}}</span></li>
+	  	{{/if}}
+	  {{/each}}
   </ul>
 </div>
