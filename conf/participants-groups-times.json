@@ -8,11 +8,12 @@
     "losses": 1
   },
   {
+    "_comment": "Needs another time due to forfeit from barnowl",
     "challongeId": 66510098,
     "challongeUsername": "V0oid",
     "srcUsername": "V0oid",
     "raceTimes": [5274, 5306],
-    "wins": 2,
+    "wins": 3,
     "losses": 0
   },
   {
@@ -43,9 +44,9 @@
     "challongeId": 66757564,
     "challongeUsername": "MrWunder",
     "srcUsername": "MrWunder",
-    "raceTimes": [5608],
+    "raceTimes": [5608, 6025],
     "wins": 0,
-    "losses": 1
+    "losses": 2
   },
   {
     "challongeId": 66519264,
@@ -107,8 +108,8 @@
     "challongeId": 66480494,
     "challongeUsername": "ThunderMustache",
     "srcUsername": "ThunderMustache",
-    "raceTimes": [5530, 5712],
-    "wins": 2,
+    "raceTimes": [5530, 5712, 5452],
+    "wins": 3,
     "losses": 0
   },
   {
@@ -124,9 +125,9 @@
     "challongeId": 66611302,
     "challongeUsername": "SpaceKatUniverse",
     "srcUsername": "SpaceKatUniverse",
-    "raceTimes": [6645, 6590],
+    "raceTimes": [6645, 6590, 10800],
     "wins": 0,
-    "losses": 2
+    "losses": 3
   },
   {
     "challongeId": 66493198,
@@ -137,11 +138,10 @@
     "losses": 0
   },
   {
-    "_comment": "needs another time due to forfeit by smbai",
     "challongeId": 66609593,
     "challongeUsername": "MaltZi",
     "srcUsername": "MaltZi",
-    "raceTimes": [5869, 6030],
+    "raceTimes": [5869, 6030, 5692],
     "wins": 2,
     "losses": 1
   },
@@ -158,9 +158,9 @@
     "challongeId": 66484523,
     "challongeUsername": "kruskader",
     "srcUsername": "kruskader",
-    "raceTimes": [7445, 7259],
+    "raceTimes": [7445, 7259, 7572],
     "wins": 0,
-    "losses": 2
+    "losses": 3
   },
   {
     "challongeId": 66483917,
@@ -222,9 +222,9 @@
     "challongeId": 66475639,
     "challongeUsername": "tinahacks",
     "srcUsername": "tinahacks",
-    "raceTimes": [5825, 5764],
+    "raceTimes": [5825, 5764, 5720],
     "wins": 1,
-    "losses": 1
+    "losses": 2
   },
   {
     "challongeId": 66470570,
@@ -275,11 +275,12 @@
     "losses": 1
   },
   {
+    "_comment": "Needs another time due to forfeit from Shaerila",
     "challongeId": 67310229,
     "challongeUsername": "AND4H",
     "srcUsername": "AND4H",
     "raceTimes": [5572, 5581],
-    "wins": 1,
+    "wins": 2,
     "losses": 1
   },
   {
@@ -310,9 +311,9 @@
     "challongeId": 67627808,
     "challongeUsername": "barnowl",
     "srcUsername": "barnowl",
-    "raceTimes": [5959],
+    "raceTimes": [5959, 10800, 10800],
     "wins": 0,
-    "losses": 1
+    "losses": 3
   },
   {
     "challongeId": 66520632,
@@ -359,8 +360,8 @@
     "challongeId": 66512848,
     "challongeUsername": "Walrus_Prime",
     "srcUsername": "Walrus_Prime",
-    "raceTimes": [5314, 5322],
-    "wins": 2,
+    "raceTimes": [5314, 5322, 5351],
+    "wins": 3,
     "losses": 0
   },
   {
@@ -391,8 +392,8 @@
     "challongeId": 66989890,
     "challongeUsername": "Z4T0X",
     "srcUsername": "Z4T0X",
-    "raceTimes": [5601, 5536],
-    "wins": 2,
+    "raceTimes": [5601, 5536, 5468],
+    "wins": 3,
     "losses": 0
   },
   {
@@ -407,8 +408,8 @@
     "challongeId": 66550514,
     "challongeUsername": "shadyforce",
     "srcUsername": "shadyforce",
-    "raceTimes": [5780, 5816],
-    "wins": 0,
+    "raceTimes": [5780, 5816, 6311],
+    "wins": 1,
     "losses": 2
   },
   {
@@ -447,9 +448,9 @@
     "challongeId": 66559101,
     "challongeUsername": "simpol",
     "srcUsername": "Simpoldood",
-    "raceTimes": [6267, 6070],
+    "raceTimes": [6267, 6070, 10800],
     "wins": 0,
-    "losses": 2
+    "losses": 3
   },
   {
     "challongeId": 66633151,
@@ -463,9 +464,9 @@
     "challongeId": 66567813,
     "challongeUsername": "DoDeChehedron",
     "srcUsername": "DoDeChehedron",
-    "raceTimes": [5514],
+    "raceTimes": [5514, 10800, 10800],
     "wins": 1,
-    "losses": 0
+    "losses": 2
   },
   {
     "challongeId": 66598953,
@@ -576,17 +577,17 @@
     "challongeId": 66620498,
     "challongeUsername": "nathacsa",
     "srcUsername": "nathacsa",
-    "raceTimes": [7546, 10800],
+    "raceTimes": [7546, 10800, 10800],
     "wins": 0,
-    "losses": 2
+    "losses": 3
   },
   {
     "challongeId": 66472317,
     "challongeUsername": "Muttski",
     "srcUsername": "Muttski",
-    "raceTimes": [5396, 5365],
+    "raceTimes": [5396, 5365, 5680],
     "wins": 2,
-    "losses": 0
+    "losses": 1
   },
   {
     "challongeId": 66470209,
@@ -621,6 +622,7 @@
     "losses": 0
   },
   {
+    "_comment": "needs another time due to forfeit by Shaerila",
     "challongeId": 66685609,
     "challongeUsername": "eLmaGus",
     "srcUsername": "eLmaGus",
@@ -770,9 +772,9 @@
     "challongeId": 66566737,
     "challongeUsername": "Shaerila",
     "srcUsername": "Shaerila",
-    "raceTimes": [8968],
+    "raceTimes": [8968, 10800, 10800],
     "wins": 0,
-    "losses": 1
+    "losses": 3
   },
   {
     "challongeId": 66471012,
@@ -834,8 +836,8 @@
     "challongeId": 66550438,
     "challongeUsername": "Kohrek",
     "srcUsername": "Kohrek",
-    "raceTimes": [6062, 6233],
-    "wins": 1,
+    "raceTimes": [6062, 6233, 6020],
+    "wins": 2,
     "losses": 1
   },
   {
@@ -898,17 +900,16 @@
     "challongeId": 66471796,
     "challongeUsername": "Mageius",
     "srcUsername": "Mageius",
-    "raceTimes": [10800, 6886],
+    "raceTimes": [10800, 6886, 8258],
     "wins": 0,
-    "losses": 2
+    "losses": 3
   },
   {
-    "_comment": "needs another time due to dode drop",
     "challongeId": 66474943,
     "challongeUsername": "JoeDamillio",
     "srcUsername": "JoeDamillio",
-    "raceTimes": [5305],
-    "wins": 1,
+    "raceTimes": [5305, 5274, 5274],
+    "wins": 3,
     "losses": 0
   },
   {
@@ -955,8 +956,8 @@
     "challongeId": 66961178,
     "challongeUsername": "negaZeus",
     "srcUsername": "negaZeus",
-    "raceTimes": [5778, 5604],
-    "wins": 0,
+    "raceTimes": [5778, 5604, 5875],
+    "wins": 1,
     "losses": 2
   },
   {

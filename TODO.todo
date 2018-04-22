@@ -9,11 +9,13 @@ Planned Features:
 
 Web Control Panel:
   Tourney:
-    ☐ Pull in race results from SRTV
+    ☐ Pull out discordTags from the SG race info so it doesn't get overwritten after we update it
+      - look up from local DB if there's no tag
+      - should probably be done each time the race is loaded
+    ☐ Ability to pull in race results from SRTV
       ☐ Store to the race itself
       ☐ Report win on challonge?
-    ☐ Add more details to race information
-      ☐ Multitwitch link
+    ☐ Add multitwitch link to race information
     ☐ Add more details to racer card
       ✔ Racer filenames @done (18-04-20 16:03)
       ☐ Groups stage times
@@ -22,7 +24,6 @@ Web Control Panel:
       ✔ Migrate people.json into DB, match up with SG person ID @done (18-04-20 16:03)
       ✔ Migrate PB's, challonge info, SRC username @done (18-04-20 16:03)
       ☐ Migrate groups times
-      ☐ Migrate groups?
       ☐ Show bracket seeds
     ☐ Change 500 errors to render error pages
     ☐ Show/Hide specific race actions based on the race state
@@ -31,10 +32,27 @@ Web Control Panel:
         ☐ Hide Race Announcements
         ☐ Hide Send Filename
         ☐ Show "Report Results"
+    ☐ Add a multistream view
+    ☐ Allow for the race channel to be manually updated from the race page
+    ☐ Allow for the filenames to be edited after generation (or re-generated)
+    ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
+    ☐ Option to send specific messages as DMs
+    ☐ Option to pick and choose announcements to send to race channel
+    ☐ Option to send messages directly to announcements
+    ☐ Option to auto-create / announce / generate / etc.
+    ☐ Button to show/hide twitch feed in racer card
+    ☐ Create a user / role system
+    ☐ Create interface for managing people
+    ☐ Page to display filtered ALttP directory
+    ☐ Provide a 'merged' chat feed for the race channel
   Discord:
   Twitch:
   SRTV:
+    ☐ Quick race creation
+      ☐ One-button one creation for popular race categories of ALttP
   Settings:
+  Logs:
+    ☐ Realtime log viewing
 
 Ideas:
   ☐ Move conf/* files to mongo

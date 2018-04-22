@@ -42,7 +42,7 @@ function mergePeople()
 
 				// see if they're manually mapped
 				if (peopleMap.hasOwnProperty(person.speedgamingId)) {
-					foundParticipant = peopleMap[person.speedgamingId];
+					foundParticipant = searchParticipants(participants, peopleMap[person.speedgamingId].toLowerCase().trim());
 				} else {
 					// try to match by displayname first
 					if (person.displayname) {
@@ -74,9 +74,10 @@ function mergePeople()
 						"pb": foundParticipant.pb,
 						"displayName": person.displayname,
 						"streams": {
-							"main": {
-								"type": "twitch",
-								"username": person.publicstream || person.displayname
+							"default": {
+								"service": "twitch",
+								"username": person.publicstream || person.displayname,
+								"alt": false
 							}
 						}
 					};
@@ -109,5 +110,21 @@ function searchParticipants(participants, searchName)
 		) {
 			return e;
 		}
+	});
+}
+
+function importGroupsTimes()
+{
+	return new Promise((resolve, reject) => {
+		// pull in the file
+		let groupsTimes = require('./conf/participants-groups-times.json');
+
+
+		await util.asyncForEach(groupsTimes, async (entry) => {
+			// find the matching person in the DB
+			// update the new collection with personId, times
+		});
+
+		resolve();
 	});
 }
