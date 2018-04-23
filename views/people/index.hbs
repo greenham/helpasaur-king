@@ -1,5 +1,5 @@
 <div class="container">
-	<h1>People</h1>
+	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}People{{/if}}</h1>
 	{{#each people}}
 		{{#multipleOf 3 @index}}
 			{{#if (ne @index 0)}}
@@ -11,6 +11,9 @@
 		<div class="card">
 			<div class="card-body">
 	      <h5 class="card-title text-center">{{displayName}}</h5>
+	      {{#if bestGroupsTime}}
+	      	<h6 class="card-subtitle mb-2 text-muted text-center">#{{math @index "+" 1}} ({{hrt bestGroupsTime}})</h6>
+	      {{/if}}
 	    </div>
 	    <ul class="list-group list-group-flush">
 		    <li class="list-group-item text-right"><span class="badge badge-secondary float-left"><i class="fab fa-twitch"></i> Twitch</span> <a href="https://twitch.tv/{{streams.default.username}}" target="_blank">{{streams.default.username}}</a></li>

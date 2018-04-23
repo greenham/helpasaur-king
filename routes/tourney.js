@@ -8,6 +8,9 @@ const express = require('express'),
   tasks = require('../lib/tasks.js'),
   util = require('../lib/util.js');
 
+// Tourney People
+router.use('/people', require('./people.js'));
+
 // Tourney Schedule
 router.get(['/', '/upcoming', '/recent', '/today'], (req, res) => {
 	// Determine start/end/sort based on URL

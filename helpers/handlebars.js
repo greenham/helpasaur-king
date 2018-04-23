@@ -42,7 +42,8 @@ let hbsHelpers = (hbs) => {
 			"restreamStatus": restreamStatus,
 			"racerInfo": racerInfo,
 			"hrt": hrt,
-			"multipleOf": multipleOf
+			"multipleOf": multipleOf,
+			"math": math
 		}
 	});
 };
@@ -127,6 +128,19 @@ let multipleOf = (mult, check, options) => {
 	} else {
 		return options.inverse(this);
 	}
+};
+
+let math = function(lvalue, operator, rvalue, options) {
+  lvalue = parseFloat(lvalue);
+  rvalue = parseFloat(rvalue);
+      
+  return {
+      "+": lvalue + rvalue,
+      "-": lvalue - rvalue,
+      "*": lvalue * rvalue,
+      "/": lvalue / rvalue,
+      "%": lvalue % rvalue
+  }[operator];
 };
 
 module.exports = hbsHelpers;

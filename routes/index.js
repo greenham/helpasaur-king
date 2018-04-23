@@ -10,6 +10,5 @@ router.use('/discord', require('./discord.js'));
 router.use('/srtv', require('./srtv.js'));
 router.use('/twitch', require('./twitch.js'));
 router.use('/settings', require('./settings.js'));
-router.use('/people', require('./people.js'));
 
 module.exports = router;
