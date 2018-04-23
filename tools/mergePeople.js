@@ -1,7 +1,7 @@
-const	db = require('./db.js'),
-  util = require('./lib/util.js');
+const	db = require('../db.js'),
+  util = require('../lib/util.js');
 
-let config = require('./config.json');
+let config = require('../config.json');
 
 db.connect(config.db.host, config.db.db, (err) => {
 	if (!err) {
@@ -23,8 +23,8 @@ db.connect(config.db.host, config.db.db, (err) => {
 function mergePeople()
 {
 	return new Promise((resolve, reject) => {
-		let people = require('./conf/people.json'); // SG list
-		let participants = require('./conf/participants.json'); // tourney-seeder list
+		let people = require('../conf/people.json'); // SG list
+		let participants = require('../conf/participants.json'); // tourney-seeder list
 
 		let peopleMap = {
 			4755: "mikethev",
@@ -119,7 +119,7 @@ function importGroupsTimes()
 {
 	return new Promise((resolve, reject) => {
 		// pull in the file
-		let groupsTimes = require('./conf/participants-groups-times.json');
+		let groupsTimes = require('../conf/participants-groups-times.json');
 
 		const start = async () => {
 			let processedCount = 0;

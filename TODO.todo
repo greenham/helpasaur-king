@@ -1,29 +1,22 @@
 Bugs:
  
-Planned Features:
- ☐ Update SR.C functionality to reflect new Extensions board
- ☐ Integrate with speedrun.tv once API is available/documented
- ☐ Integration with ALttP Wiki search
- ☐ Support for pulling category rules from SRC
-
+Bots:
+  Global:
+    ☐ Update SR.C functionality to reflect new Extensions board
+  Discord:
+    ☐ Integrate with speedrun.tv once API is available/documented
+    ☐ Integration with ALttP Wiki search
+    ☐ Support for pulling category rules from SRC
+  Twitch:
 
 Web Control Panel:
+  General:
+    ☐ Render error pages where appropriate
   Tourney:
-    ✔ Pull out discordTags from the SG race info so it doesn't get overwritten after we update it @done (18-04-23 10:57)
     ☐ Ability to pull in race results from SRTV
       ☐ Store to the race itself
       ☐ Report win on challonge?
     ☐ Add multitwitch link to race information
-    ✔ Add more details to racer card @done (18-04-23 10:56)
-      ✔ Racer filenames @done (18-04-20 16:03)
-      ✔ Groups stage times @done (18-04-23 10:56)
-      ✔ Groups record @done (18-04-23 10:56)
-    ☐ Integrate tourney seeder / results tracker
-      ✔ Migrate people.json into DB, match up with SG person ID @done (18-04-20 16:03)
-      ✔ Migrate PB's, challonge info, SRC username @done (18-04-20 16:03)
-      ✔ Migrate groups times @done (18-04-22 15:08)
-      ☐ Show bracket seeds
-    ☐ Change 500 errors to render error pages
     ☐ Show/Hide specific race actions based on the race state
       ☐ Once the race is over (>2 hours past)
         ☐ Hide Discord Ping
@@ -42,7 +35,6 @@ Web Control Panel:
     ☐ Create a user / role system
     ☐ Create interface for managing people
     ☐ Provide a 'merged' chat feed for the race channel
-    ✔ Link to twitch chat popout @done (18-04-22 15:10)
   Discord:
   Twitch:
     ☐ Page to display filtered ALttP directory
@@ -51,18 +43,33 @@ Web Control Panel:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
   Settings:
+    ☐ Move conf/* files to mongo
+    ☐ Ability to update Twitch channel list for the bot to join
+    ☐ Ability to update the text commands used across twitch/discord
+    ☐ Ability to update the Twitch channel list for the bot to alert about in discord
+    ☐ Ability to update the filter parameters for stream alerts
+    ☐ Basically... anything reasonable in config.json that would want to be controlled without having to update the file
   Logs:
     ☐ Realtime log viewing
-
-Ideas:
-  ☐ Move conf/* files to mongo
 
 DevOps:
   Production:
     ☐ Install Mongo, create alttpbot DB, npm update
  
+Ideas:
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Show bracket seeds @done (18-04-23 12:02) @project(Web Control Panel / Tourney)
+ ✔ Integrate tourney seeder / results tracker @done (18-04-23 12:02) @project(Web Control Panel / Tourney)
+ ✔ Pull out discordTags from the SG race info so it doesn't get overwritten after we update it @done (18-04-23 10:57) @project(Web Control Panel / Tourney)
+ ✔ Groups stage times @done (18-04-23 10:56) @project(Web Control Panel / Tourney)
+ ✔ Groups record @done (18-04-23 10:56) @project(Web Control Panel / Tourney)
+ ✔ Add more details to racer card @done (18-04-23 10:56) @project(Web Control Panel / Tourney)
+ ✔ Link to twitch chat popout @done (18-04-22 15:10) @project(Web Control Panel / Tourney)
+ ✔ Migrate groups times @done (18-04-22 15:08) @project(Web Control Panel / Tourney)
+ ✔ Racer filenames @done (18-04-20 16:03) @project(Web Control Panel / Tourney)
+ ✔ Migrate people.json into DB, match up with SG person ID @done (18-04-20 16:03) @project(Web Control Panel / Tourney)
+ ✔ Migrate PB's, challonge info, SRC username @done (18-04-20 16:03) @project(Web Control Panel / Tourney)
  ✔ Order recent races by most recent @done (18-04-20 08:06) @project(Tourney Control Panel)
  ✔ Allow for sorting options to be passed in to fetchRaces @done (18-04-20 08:06) @project(Tourney Control Panel)
  ✔ On next release, push config.production.json and run npm update (new discord.js version) @done (18-02-03 07:43) @project(DevOps)

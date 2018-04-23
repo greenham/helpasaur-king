@@ -6,7 +6,7 @@
 const irc = require('irc'),
   fs = require('fs'),
   path = require('path'),
-  staticCommands = require('./lib/static-commands.js'),
+  staticCommands = require('./lib/commands.js'),
   cooldowns = require('./lib/cooldowns.js');
 
 // Read in bot configuration
@@ -46,7 +46,7 @@ client.addListener('message', function (from, to, message) {
   if (message.startsWith(config.twitch.cmdPrefix)) {
     let commandNoPrefix = message.slice(config.twitch.cmdPrefix.length).split(' ')[0];
     // Check for basic static command first
-    if (staticCommands.exists(commandNoPrefix)) {
+    if (result = staticCommands.get(commandNoPrefix)) {
       console.log(`received command in ${to} from ${from}: ${message}`);
 
       // Make sure this command isn't on cooldown
@@ -54,7 +54,7 @@ client.addListener('message', function (from, to, message) {
       cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
         .then(onCooldown => {
           if (onCooldown === false) {
-            client.say(to, staticCommands.get(commandNoPrefix));
+            client.say(to, result.response);
             cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
           } else {
             // command is on cooldown in this channel

@@ -9,7 +9,7 @@ const request = require('request'),
   path = require('path'),
   moment = require('moment'),
   Discord = require('discord.js'),
-  staticCommands = require('./lib/static-commands.js'),
+  staticCommands = require('./lib/commands.js'),
   cooldowns = require('./lib/cooldowns.js'),
   StreamAlerts = require('./lib/stream-alerts.js'),
   RaceAlerts = require('./lib/race-alerts.js'),
@@ -181,12 +181,11 @@ client.on('ready', () => {
         console.log(`'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`);
         if (commands.hasOwnProperty(commandNoPrefix)) {
           commands[commandNoPrefix](msg, guildConfig);
-        } else if (staticCommands.exists(commandNoPrefix)) {
-          let result = staticCommands.get(commandNoPrefix);
+        } else if (result = staticCommands.get(commandNoPrefix)) {
           msg.channel.send({embed: {
             "title": commandNoPrefix,
             "color": 0xff9f25,
-            "description": result
+            "description": result.response
           }}).then(sentMessage => cooldowns.set(cooldownKey, guildConfig.textCmdCooldown))
           .catch(console.error);
         } else {
