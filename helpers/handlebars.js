@@ -1,35 +1,38 @@
 const moment = require('moment-timezone'),
-  SRTV = require('../lib/srtv.js');
+  SRTV = require('../lib/srtv.js'),
+  util = require('../lib/util.js');
 
 let hbsHelpers = (hbs) => {
 	return hbs.create({
 		defaultLayout: 'main',
 		extname: '.hbs',
 		helpers: {
-			eq: (v1, v2) => {
+			"eq": (v1, v2) => {
         return v1 === v2;
 	    },
-	    ne: (v1, v2) => {
+	    "ne": (v1, v2) => {
         return v1 !== v2;
 	    },
-	    lt: (v1, v2) => {
+	    "lt": (v1, v2) => {
         return v1 < v2;
 	    },
-	    gt: (v1, v2) => {
+	    "gt": (v1, v2) => {
         return v1 > v2;
 	    },
-	    lte: (v1, v2) => {
+	    "lte": (v1, v2) => {
         return v1 <= v2;
 	    },
-	    gte: (v1, v2) => {
+	    "gte": (v1, v2) => {
         return v1 >= v2;
 	    },
-	    and: (v1, v2) => {
+	    "and": (v1, v2) => {
         return v1 && v2;
 	    },
-	    or: (v1, v2) => {
+	    "or": (v1, v2) => {
         return v1 || v2;
 	    },
+	    "sum": util.sum,
+	    "avg": util.average,
 			"localize": localize,
 			"calendarize": calendarize,
 			"timeago": timeago,
@@ -115,15 +118,7 @@ let racerInfo = (racer) => {
 };
 
 let hrt = (s) => {
-  let sec_num = parseInt(s, 10);
-  let hours   = Math.floor(sec_num / 3600);
-  let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-  let seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-  if (hours   < 10) {hours   = "0"+hours;}
-  if (minutes < 10) {minutes = "0"+minutes;}
-  if (seconds < 10) {seconds = "0"+seconds;}
-  return hours+':'+minutes+':'+seconds;
+	return s.toString().toHHMMSS();
 };
 
 let multipleOf = (mult, check, options) => {

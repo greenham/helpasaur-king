@@ -9,17 +9,15 @@ Planned Features:
 
 Web Control Panel:
   Tourney:
-    ☐ Pull out discordTags from the SG race info so it doesn't get overwritten after we update it
-      - look up from local DB if there's no tag
-      - should probably be done each time the race is loaded
+    ✔ Pull out discordTags from the SG race info so it doesn't get overwritten after we update it @done (18-04-23 10:57)
     ☐ Ability to pull in race results from SRTV
       ☐ Store to the race itself
       ☐ Report win on challonge?
     ☐ Add multitwitch link to race information
-    ☐ Add more details to racer card
+    ✔ Add more details to racer card @done (18-04-23 10:56)
       ✔ Racer filenames @done (18-04-20 16:03)
-      ☐ Groups stage times
-      ☐ Groups record
+      ✔ Groups stage times @done (18-04-23 10:56)
+      ✔ Groups record @done (18-04-23 10:56)
     ☐ Integrate tourney seeder / results tracker
       ✔ Migrate people.json into DB, match up with SG person ID @done (18-04-20 16:03)
       ✔ Migrate PB's, challonge info, SRC username @done (18-04-20 16:03)
@@ -48,6 +46,7 @@ Web Control Panel:
   Discord:
   Twitch:
     ☐ Page to display filtered ALttP directory
+    ☐ Ability to join/leave channels
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
@@ -60,7 +59,7 @@ Ideas:
 
 DevOps:
   Production:
-    ☐ Install Mongo, create alttpbot DB
+    ☐ Install Mongo, create alttpbot DB, npm update
  
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

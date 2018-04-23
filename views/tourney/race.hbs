@@ -54,24 +54,16 @@
 				<div class="card" id="racerCard">
 				  <div class="card-header" style="padding-top: 6px;">
 				    <ul class="nav nav-tabs card-header-tabs" id="racerInfoCard" role="tablist">
-				    	{{#each match1.players}}
-	                <li class="nav-item">
-						        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}"><i class="far fa-user-circle"></i> {{displayName}}</a>
-						      </li>
-			        {{/each}}
-			        {{#each match2.players}}
-			          <li class="nav-item">
-					        <a class="nav-link" id="racer-{{id}}-tab" data-toggle="tab" href="#racer-{{id}}" role="tab" aria-controls="racer-{{id}}"><i class="far fa-user-circle"></i> {{displayName}}</a>
+				    	{{#each racers}}
+				    		<li class="nav-item">
+					        <a class="nav-link" id="racer-{{_id}}-tab" data-toggle="tab" href="#racer-{{_id}}" role="tab" aria-controls="racer-{{_id}}"><i class="far fa-user-circle"></i> {{displayName}}</a>
 					      </li>
-			        {{/each}}
+				    	{{/each}}
 				    </ul>
 				  </div>
 				  <div class="card-body tab-content" id="racerInfoContent">
-				  	{{#each match1.players}}
-					  	<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this filenames=../filenames}}</div>
-				  	{{/each}}
-				  	{{#each match2.players}}
-				  		<div class="tab-pane fade" id="racer-{{id}}" role="tabpanel" aria-labelledby="racer-{{id}}-tab">{{> racerCard this filenames=../filenames}}</div>
+				  	{{#each racers}}
+			  			<div class="tab-pane fade" id="racer-{{_id}}" role="tabpanel" aria-labelledby="racer-{{_id}}-tab">{{> racerCard this filenames=../filenames}}</div>
 				  	{{/each}}
 					</div>
 			  </div>

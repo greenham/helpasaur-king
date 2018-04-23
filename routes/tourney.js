@@ -46,10 +46,6 @@ router.get(['/', '/upcoming', '/recent', '/today'], (req, res) => {
 		});
 });
 
-router.get('/brackets', (req, res) => {
-	res.render('tourney/challonge');
-});
-
 // Manage Race
 router.get('/races/:id', (req, res) => {
 	db.get().collection("tourney-events")
@@ -139,6 +135,11 @@ router.delete('/races', (req, res) => {
 				console.error(err);
 			}
 		});
+});
+
+// Challonge Brackets
+router.get('/brackets', (req, res) => {
+	res.render('tourney/challonge');
 });
 
 // Send Default SRTV Race Announcements
@@ -349,13 +350,13 @@ router.post('/races/sendFilenames', (req, res) => {
 		});
 });
 
-// Send Individual Chat Messages to SRTV
+// @TODO: Send Individual Chat Messages to SRTV
 router.post('/races/chat', (req, res) => {
 	// get race ID, message from post
 	// send via SRTV
 });
 
-// ez SG schedule refresh
+// Manual SG schedule refresh
 router.get('/refresh', (req, res) => {
 	tasks.refreshSpeedgamingEvents('alttp')
 		.then(result => {
@@ -448,17 +449,15 @@ let getMatchesText = (race) => {
 
 let getRacerInfoFromRace = (race) => {
 	let racers = getRacersFromRace(race);
-	//console.log(racers);
-	let speedgamingIds = racers.map(e => e.id);
-
-	//console.log(speedgamingIds);
+	// @TODO: once SG IDs are reliable, change back to this method
+	//let speedgamingIds = racers.map(e => e.id);
+	let displayNames = racers.map(e => e.displayName);
 	
 	return new Promise((resolve, reject) => {
 		db.get().collection("tourney-people")
-			.find({"speedgamingId": {"$in": speedgamingIds}})
+			.find({"displayName": {"$in": displayNames}})
 			.toArray((err, res) => {
 				if (!err) {
-					//console.log(res);
 					resolve(res);
 				} else {
 					reject(err);
