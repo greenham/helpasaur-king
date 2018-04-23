@@ -59,7 +59,11 @@ router.get('/races/:id', (req, res) => {
 				res.send({"error": err});
 				// @TODO: render race page with error
 			} else {
-				res.render('tourney/race', {race: result});
+				// TODO: Populate additional racer info
+				getRacerInfoFromRace(result).then(racersInfo => {
+					result.racers = racersInfo;
+					res.render('tourney/race', {race: result});
+				});
 			}
 		});
 });
@@ -440,6 +444,27 @@ let getMatchesText = (race) => {
 	}
 
 	return ret;
+};
+
+let getRacerInfoFromRace = (race) => {
+	let racers = getRacersFromRace(race);
+	//console.log(racers);
+	let speedgamingIds = racers.map(e => e.id);
+
+	//console.log(speedgamingIds);
+	
+	return new Promise((resolve, reject) => {
+		db.get().collection("tourney-people")
+			.find({"speedgamingId": {"$in": speedgamingIds}})
+			.toArray((err, res) => {
+				if (!err) {
+					//console.log(res);
+					resolve(res);
+				} else {
+					reject(err);
+				}
+			});
+	});
 };
 
 module.exports = router;

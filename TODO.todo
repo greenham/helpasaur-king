@@ -23,7 +23,7 @@ Web Control Panel:
     ☐ Integrate tourney seeder / results tracker
       ✔ Migrate people.json into DB, match up with SG person ID @done (18-04-20 16:03)
       ✔ Migrate PB's, challonge info, SRC username @done (18-04-20 16:03)
-      ☐ Migrate groups times
+      ✔ Migrate groups times @done (18-04-22 15:08)
       ☐ Show bracket seeds
     ☐ Change 500 errors to render error pages
     ☐ Show/Hide specific race actions based on the race state
@@ -43,10 +43,11 @@ Web Control Panel:
     ☐ Button to show/hide twitch feed in racer card
     ☐ Create a user / role system
     ☐ Create interface for managing people
-    ☐ Page to display filtered ALttP directory
     ☐ Provide a 'merged' chat feed for the race channel
+    ✔ Link to twitch chat popout @done (18-04-22 15:10)
   Discord:
   Twitch:
+    ☐ Page to display filtered ALttP directory
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP

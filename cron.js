@@ -4,7 +4,7 @@ const schedule = require('node-schedule'),
 
 let config = require('./config.json');
 
-db.connect(`${config.db.host}/${config.db.db}`, (err) => {
+db.connect(config.db.host, config.db.db, (err) => {
 	if (!err) {
 		scheduleJobs();
 	} else {

@@ -31,7 +31,7 @@ if (!config.db || !config.db.host || !config.db.db) {
 	process.exit(1);
 }
 
-db.connect(`${config.db.host}/${config.db.db}`, (err, db) => {
+db.connect(config.db.host, config.db.db, (err) => {
 	if (!err) {
 		app.listen(port, () => {
 			console.log(`Listening on port ${port}`);

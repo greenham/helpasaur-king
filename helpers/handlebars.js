@@ -63,12 +63,14 @@ let srtvUrl = (guid) => {
 let decorateRacers = (players) => {
 	let ret = '<span class="racers">';
 
-	if (players[0] !== null) {
-		ret += `<span class="racer">${players[0].displayName}</span> <small>v</small> `;
-	}
+	if (players) {
+		if (players[0] !== null) {
+			ret += `<span class="racer">${players[0].displayName}</span> <small>v</small> `;
+		}
 
-	if (players[1] !== null) {
-		ret += `<span class="racer">${players[1].displayName}</span>`;
+		if (players[1] !== null) {
+			ret += `<span class="racer">${players[1].displayName}</span>`;
+		}
 	}
 
 	ret += '</span>';

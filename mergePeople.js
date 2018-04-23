@@ -3,14 +3,16 @@ const	db = require('./db.js'),
 
 let config = require('./config.json');
 
-db.connect(`${config.db.host}/${config.db.db}`, (err) => {
+db.connect(config.db.host, config.db.db, (err) => {
 	if (!err) {
-		mergePeople().then(foundCount => {
-			console.log(`Found ${foundCount}`);
+		/*mergePeople().then(foundCount => {
+			console.log(`Found ${foundCount}`);*/
 
-			db.close((err) => {
+		importGroupsTimes().then(processedCount => {
+			console.log(`Processed ${processedCount}`);
+			/*db.close((err) => {
 				if (err) console.error(err)
-			});
+			});*/
 		}).catch(console.error);
 	} else {
 		console.error('Unable to connect to Mongo.');
@@ -37,7 +39,7 @@ function mergePeople()
 		// manually map everything else
 		const start = async () => {
 			let foundCount = 0;
-			await util.asyncForEach(people, async (person, index) => {
+			await util.asyncForEach(people, async (person) => {
 				let foundParticipant = null;
 
 				// see if they're manually mapped
@@ -66,12 +68,12 @@ function mergePeople()
 
 					// MERGE
 					let merged = {
-						"speedgamingId": person.speedgamingId,
-						"challongeId": foundParticipant.challongeId,
+						"speedgamingId": parseInt(person.speedgamingId),
+						"challongeId": parseInt(foundParticipant.challongeId),
 						"challongeUsername": foundParticipant.challongeUsername,
 						"srcUsername": foundParticipant.srcUsername,
 						"discordTag": person.discordtag,
-						"pb": foundParticipant.pb,
+						"pb": parseInt(foundParticipant.pb),
 						"displayName": person.displayname,
 						"streams": {
 							"default": {
@@ -82,7 +84,7 @@ function mergePeople()
 						}
 					};
 
-					db.get().collection("people").insert(merged, (err, res) => {
+					db.get().collection("tourney-people").insert(merged, (err, res) => {
 						if (!err) {
 							console.log(`Created new person for ${merged.speedgamingId}`);
 						} else {
@@ -119,12 +121,35 @@ function importGroupsTimes()
 		// pull in the file
 		let groupsTimes = require('./conf/participants-groups-times.json');
 
+		const start = async () => {
+			let processedCount = 0;
+			await util.asyncForEach(groupsTimes, async (entry) => {
+				processedCount++;
+				// find the matching person in the DB
+				db.get().collection("tourney-people").findOne({"challongeId": entry.challongeId}, (err, person) => {
+					if (!err && person) {
+						let update = {"$set": {
+							"groupsRaceTimes": entry.raceTimes,
+							"groupsRecord": {"wins": entry.wins, "losses": entry.losses}
+						}};
 
-		await util.asyncForEach(groupsTimes, async (entry) => {
-			// find the matching person in the DB
-			// update the new collection with personId, times
-		});
+						db.get().collection("tourney-people")
+							.update({"_id": db.oid(person._id)}, update, (err, res) => {
+								if (err) {
+									console.error(err);
+								}
+							});
+					} else if (err) {
+						console.error(err);
+					} else {
+						console.error(`No person matching this challongeId: ${entry.challongeId}`);
+					}
+				});
+			});
 
-		resolve();
+			resolve(processedCount);
+		};
+
+		start();
 	});
 }
