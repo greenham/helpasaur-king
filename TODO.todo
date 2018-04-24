@@ -51,10 +51,13 @@ Web Control Panel:
       ☐ twitch_bot_channels
       ☐ src_categories
       ✔ text_commands @done (18-04-23 16:22)
-    ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41)
-    ☐ Ability to enable/disable/delete text commands
-    ☐ Ability to update Twitch channel list for the bot to join
-    ☐ Ability to update the Twitch channel list for the bot to alert about in discord
+    ☐ Bot Commands
+      ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41)
+      ✔ Delete Command @done (18-04-24 09:26)
+      ☐ Enable/Disable Command
+      ☐ Add New Command
+    ☐ Manage Twitch channel list for bot to join
+    ☐ Manage Twitch channel list for stream alerts
     ☐ Ability to update the filter parameters for stream alerts
     ☐ Basically... anything reasonable in config.json that would want to be controlled without having to update the file
   Logs:
