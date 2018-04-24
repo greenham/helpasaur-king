@@ -135,8 +135,8 @@ client.on('ready', () => {
 
   // Set up alerts for each guild we're a member of
   client.guilds.forEach((guild, index) => {
-    // Make sure it's not the dummy default guild and not already initialized
-    if (guild.id !== "default" && !guild.initialized) {
+    // Make sure it's not the dummy default guild and not already initialized and it's configured
+    if (guild.id !== "default" && !guild.initialized && config.discord.guilds[guild.id]) {
       initGuild(guild, config, (err, res) => {
         if (err) console.error(err);
         if (res) console.log(`Successfully initialized guild: ${guild.name}`);
@@ -153,6 +153,15 @@ client.on('ready', () => {
 })
 // Listen for commands for the bot to respond to across all channels
 .on('message', msg => {
+  // Ignore messages from unconfigured guilds
+  if (msg.guild) {
+    if (!config.discord.guilds[msg.guild.id]) {
+      return;
+    }
+  } else if (config.discord.handleDMs === false) {
+    return;
+  }
+
   msg.originalContent = msg.content;
   msg.content = msg.content.toLowerCase();
 
@@ -172,8 +181,7 @@ client.on('ready', () => {
         console.log(`'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`);
         if (commands.hasOwnProperty(commandNoPrefix)) {
           commands[commandNoPrefix](msg, guildConfig);
-        } else if (staticCommands.exists(commandNoPrefix)) {
-          let result = staticCommands.get(commandNoPrefix);
+        } else if (result = staticCommands.get(commandNoPrefix)) {
           msg.channel.send({embed: {
             "title": commandNoPrefix,
             "color": 0xff9f25,
@@ -192,6 +200,15 @@ client.on('ready', () => {
 })
 // Create an event listener for new guild members
 .on('guildMemberAdd', member => {
+  // Ignore events from unconfigured guilds
+  if (member.guild) {
+    if (!config.discord.guilds[member.guild.id]) {
+      return;
+    }
+  } else if (config.discord.handleDMs === false) {
+    return;
+  }
+
   console.log(`A new member has joined '${member.guild.name}': ${member.displayName}`);
   // Check to see if this guild has welcome DM's enabled
   let guildConfig = (member.guild) ? config.discord.guilds[member.guild.id] : config.discord.guilds.default;
@@ -359,6 +376,7 @@ Discord.RichEmbed.prototype.setRaceAlertDefaults = function (raceChannel, srlUrl
 };
 
 Discord.Client.prototype.setRandomActivity = function() {
+  if (!config.discord.master) return;
   let activity = config.discord.activities[Math.floor(Math.random() * config.discord.activities.length)];
   this.user.setActivity(activity, {url: `https://www.twitch.tv/${config.twitch.username}`, type: "STREAMING"});
 };
