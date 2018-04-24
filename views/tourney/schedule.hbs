@@ -101,8 +101,8 @@ $(document).ready(() => {
 			alert('Race deleted!');
 			location.reload();
 		})
-		.fail((jqXHR, textStatus) => {
-			alert('Request failed: ' + textStatus);
+		.fail((jqXHR, textStatus, errorThrown) => {
+			alert('Error: ' + jqXHR.responseText);
 		})
 		.always(() => {
 			btn.removeAttr('disabled').html(originalBtnText);

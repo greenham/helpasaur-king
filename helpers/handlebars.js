@@ -43,7 +43,8 @@ let hbsHelpers = (hbs) => {
 			"racerInfo": racerInfo,
 			"hrt": hrt,
 			"multipleOf": multipleOf,
-			"math": math
+			"math": math,
+			"join": join
 		}
 	});
 };
@@ -142,5 +143,9 @@ let math = function(lvalue, operator, rvalue, options) {
       "%": lvalue % rvalue
   }[operator];
 };
+
+let join = function(arr, glue, options) {
+	return arr.join(glue);
+}
 
 module.exports = hbsHelpers;

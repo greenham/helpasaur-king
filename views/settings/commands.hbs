@@ -12,7 +12,7 @@
 		<tbody>
 			{{#each commands}}
 				<tr>
-					<th scope="row">{{command}}</th>
+					<th scope="row"><a href="/settings/commands/{{_id}}">{{command}}</a></th>
 					<td>{{#each aliases}}<span class="badge badge-secondary">{{this}}</span>{{/each}}</td>
 					<td>{{response}}</td>
 					<td></td>

@@ -45,7 +45,7 @@ router.get(['/', '/upcoming', '/recent', '/today'], (req, res) => {
 		})
 		.catch(err => {
 			console.error(err);
-			// @TODO: render schedule page with error
+			res.render('error', {"error": err});
 		});
 });
 
@@ -56,9 +56,7 @@ router.get('/races/:id', (req, res) => {
 			if (err) {
 				console.error(err);
 				res.send({"error": err});
-				// @TODO: render race page with error
 			} else {
-				// TODO: Populate additional racer info
 				getRacerInfoFromRace(result).then(racersInfo => {
 					result.racers = racersInfo;
 					res.render('tourney/race', {race: result});
@@ -72,7 +70,7 @@ router.post('/races', (req, res) => {
 	// Validate tourney config
 	let tourneyConfig = req.app.locals.config.tourney || false;
 	if (!tourneyConfig || !tourneyConfig.srtvRaceDefaults) {
-		res.status(500).send({"error": "SRTV race defaults are not configured!"});
+		res.status(500).send("SRTV race defaults are not configured!");
 		return;
 	}
 
@@ -82,8 +80,8 @@ router.post('/races', (req, res) => {
 	db.get().collection("tourney-events")
 		.findOne({"_id": db.oid(raceId)}, (err, race) => {
 			if (err) {
-				res.send('Error!');
 				console.error(err);
+				res.status(500).send(err);
 			} else {
 				// create race via SRTV
 				let racers = getMatchesText(race);
@@ -103,7 +101,7 @@ router.post('/races', (req, res) => {
 									res.send({"raceLink": SRTV.raceUrl(raceGuid)})
 									updateSRTVRace(raceId, raceGuid).catch(console.error);
 								} else {
-									res.status(500).send({"error": err});
+									res.status(500).send(err);
 								}
 							});
 					})
@@ -126,16 +124,16 @@ router.delete('/races', (req, res) => {
 							if (!err) {
 								res.send({});
 							} else {
-								res.status(500).send({"error": err});
 								console.error(err);
+								res.status(500).send(err);
 							}
 						});
 				} else {
-					res.status(404).send({"error": `No race found matching this ID: ${raceId}`});
+					res.status(404).send(`No race found matching this ID: ${raceId}`);
 				}
 			} else {
-				res.status(500).send({"error": err});
 				console.error(err);
+				res.status(500).send(err);
 			}
 		});
 });
@@ -150,7 +148,7 @@ router.post('/races/announce', (req, res) => {
 	// Validate tourney config
 	let tourneyConfig = req.app.locals.config.tourney || false;
 	if (!tourneyConfig || !tourneyConfig.raceAnnouncements) {
-		res.status(500).send({"error": "No default announcements configured! Check config.json"});
+		res.status(500).send("No default announcements configured! Check config.json");
 		return;
 	}
 
@@ -169,14 +167,14 @@ router.post('/races/announce', (req, res) => {
 									})
 									.catch(err => {
 										console.error(err);
-										res.status(500).send({"error": err});
+										res.status(500).send(err);
 									});
 								}
 						})
 						.catch(console.error);	
 				}
 			} else {
-				res.status(500).send({"error": err});
+				res.status(500).send(err);
 				console.error(err);
 			}
 		});
@@ -197,7 +195,7 @@ router.post('/races/discordPing', (req, res) => {
 		|| !tourneyConfig.racePings.textChannelName
 	) {
 		console.error("/races/discordPing: discord/tourney is not configured properly - check config.json");
-		res.status(500).send({"error": "Discord/tourney has not been configured! Check config.json"});
+		res.status(500).send("Discord/tourney has not been configured! Check config.json");
 		return;
 	}
 
@@ -236,21 +234,21 @@ router.post('/races/discordPing', (req, res) => {
 								res.send({sent: sentMessage.content});
 							})
 							.catch(err => {
-								res.status(500).send({"error": err});
+								res.status(500).send(err);
 								console.error(err);
 							}).then(() => {client.destroy()});
 					} else {
-						res.status(404).send({"error": "No race found matching this ID"});
+						res.status(404).send("No race found matching this ID");
 					}
 				} else {
 					console.error(err);
-					res.status(500).send({"error": err});
+					res.status(500).send(err);
 				}
 			});
 	})
 	.on('error', err => {
 		console.error(err);
-		res.status(500).send({"error": err});
+		res.status(500).send(err);
 	})
 	.login(discordConfig.token);
 });
@@ -283,17 +281,17 @@ router.post('/races/filenames', (req, res) => {
 								if (!err) {
 									res.send(filenames);
 								} else {
-									res.status(500).send({"error": err});
+									res.status(500).send(err);
 								}
 							});
 					};
 					generateFilenames();
 				} else {
-					res.status(404).send({"error": "No race found matching this ID"});
+					res.status(404).send("No race found matching this ID");
 				}
 			} else {
 				console.error(err);
-				res.status(500).send({"error": err});
+				res.status(500).send(err);
 			}
 		});
 });
@@ -308,22 +306,22 @@ router.post('/races/sendFilenames', (req, res) => {
 			// Check for query errors
 			if (err) {
 				console.error(err);
-				res.status(500).send({"error": "An error occurred during this request. It has been logged for further investigation."});
+				res.status(500).send(err);
 				return;
 			}
 			// Make sure this race exists
 			if (!race) {
-				res.status(404).send({"error": "No race found matching this ID"});
+				res.status(404).send("No race found matching this ID");
 				return;
 			}
 			// Make sure a race channel exists
 			if (!race.srtvRace || !race.srtvRace.guid) {
-				res.status(400).send({"error": "Race channel does not exist yet!"});
+				res.status(400).send("Race channel does not exist yet!");
 				return;
 			}
 			// Make sure filenames have been generated
 			if (!race.filenames) {
-				res.status(400).send({"error": "Filenames have not been generated yet!"});
+				res.status(400).send("Filenames have not been generated yet!");
 				return;
 			}
 
@@ -343,13 +341,16 @@ router.post('/races/sendFilenames', (req, res) => {
 							})
 							.catch(err => {
 								console.error(err);
-								res.status(500).send({"error": err});
+								res.status(500).send(err);
 							});
 					} else {
-						res.status(500).send({"error": "No announcements channel to post to on SRTV!"})
+						res.status(500).send("No announcements channel to post to on SRTV!");
 					}
 				})
-				.catch(console.error);
+				.catch(err => {
+					console.error(err);
+					res.status(500).send(err);
+				});
 		});
 });
 
@@ -365,7 +366,10 @@ router.get('/refresh', (req, res) => {
 		.then(result => {
 			res.send({"result": result});
 		})
-		.catch(console.error);
+		.catch(err => {
+			console.error(err);
+			res.status(500).send(err);
+		});
 });
 
 // @TODO: Find a better spot/method for these helper functions

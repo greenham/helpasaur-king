@@ -36,6 +36,7 @@ Web Control Panel:
     ☐ Create interface for managing people
     ☐ Provide a 'merged' chat feed for the race channel
   Discord:
+    ☐ UI to send a message (canned/custom) to a specific guild+channel
   Twitch:
     ☐ Page to display filtered ALttP directory
     ☐ Ability to join/leave channels
@@ -44,8 +45,12 @@ Web Control Panel:
       ☐ One-button one creation for popular race categories of ALttP
   Settings:
     ☐ Move conf/* files to mongo
-    ☐ Ability to update Twitch channel list for the bot to join
+      ☐ twitch_streams
+      ☐ twitch_bot_channels
+      ☐ src_categories
+      ✔ text_commands @done (18-04-23 16:22)
     ☐ Ability to update the text commands used across twitch/discord
+    ☐ Ability to update Twitch channel list for the bot to join
     ☐ Ability to update the Twitch channel list for the bot to alert about in discord
     ☐ Ability to update the filter parameters for stream alerts
     ☐ Basically... anything reasonable in config.json that would want to be controlled without having to update the file

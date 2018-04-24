@@ -28,6 +28,11 @@
 				<button class="btn btn-primary" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
 					<i class="fas fa-plus"></i> Create Race Channel
 				</button>
+				{{#unless filenames}}
+					<button class="btn btn-primary" id="btnGenerateFilenames" data-toggle="modal" data-target="#generateFilenamesConfirmation" title="Generate Filenames">
+						<i class="fas fa-random"></i> Generate Filenames
+					</button>
+				{{/unless}}
 			{{/if}}
 		</div>
 		<div class="row">
@@ -108,9 +113,8 @@
 				alert('Race created!');
 				location.reload();
 			})
-			.fail((jqXHR, textStatus) => {
-				alert('Request failed: ' + textStatus);
-				location.reload();
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
 			})
 			.always(() => {
 				btn.removeAttr('disabled').html(originalBtnText);
@@ -132,8 +136,8 @@
 			.done((data, textStatus, jqXHR) => {
 				alert('Announcements sent!');
 			})
-			.fail((jqXHR, textStatus) => {
-				alert('Request failed: ' + textStatus);
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
 			})
 			.always(() => {
 				btn.removeAttr('disabled').html(originalBtnText);
@@ -157,9 +161,8 @@
 				console.log(data);
 				alert('Pings sent!');
 			})
-			.fail((jqXHR, textStatus) => {
-				console.log(textStatus);
-				alert('Request failed: ' + textStatus);
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
 			})
 			.always(() => {
 				btn.removeAttr('disabled').html(originalBtnText);
@@ -183,9 +186,8 @@
 				alert('Filenames generated!');
 				location.reload();
 			})
-			.fail((jqXHR, textStatus) => {
-				console.log(textStatus);
-				alert('An error occurred while generating filenames!');
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
 			})
 			.always(() => {
 				btn.removeAttr('disabled').html(originalBtnText);
@@ -209,9 +211,8 @@
 				alert('Filenames sent!');
 				location.reload();
 			})
-			.fail((jqXHR, textStatus) => {
-				console.log(textStatus);
-				alert('An error occurred while sending filenames!');
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
 			})
 			.always(() => {
 				btn.removeAttr('disabled').html(originalBtnText);
