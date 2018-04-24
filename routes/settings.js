@@ -57,6 +57,33 @@ router.patch('/commands', (req, res) => {
 		update.aliases = req.body.aliases;
 
 		db.get().collection("bot-commands")
+			.findOne({"_id": db.oid(id)}, (err, cmd) => {
+				if (err) {
+					console.error(err);
+					res.status(500).send(err);
+				} else if (!res) {
+					res.status(404).send("No command matching this ID found");
+				} else {
+					db.get().collection("bot-commands")
+						.update({"_id": db.oid(id)}, {$set: update}, (err, result) => {
+							if (err) {
+								res.status(500).send(err);
+							} else {
+								res.send({"result": result});
+								staticCommands.refresh();
+							}
+						});
+				}
+			});	
+	}	
+});
+
+// Delete Command
+router.delete('/commands', (req, res) => {
+	let id = req.body.id || false;
+	if (!id) return res.status(400).send("Invalid ID provided");
+
+	db.get().collection("bot-commands")
 		.findOne({"_id": db.oid(id)}, (err, cmd) => {
 			if (err) {
 				console.error(err);
@@ -65,7 +92,7 @@ router.patch('/commands', (req, res) => {
 				res.status(404).send("No command matching this ID found");
 			} else {
 				db.get().collection("bot-commands")
-					.update({"_id": db.oid(id)}, {$set: update}, (err, result) => {
+					.update({"_id": db.oid(id)}, {$set: {"deleted": true}}, (err, result) => {
 						if (err) {
 							res.status(500).send(err);
 						} else {
@@ -75,7 +102,6 @@ router.patch('/commands', (req, res) => {
 					});
 			}
 		});	
-	}	
 });
 
 module.exports = router;

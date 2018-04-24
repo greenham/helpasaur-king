@@ -12,29 +12,31 @@ Bots:
 Web Control Panel:
   General:
     ☐ Render error pages where appropriate
-  Tourney:
-    ☐ Ability to pull in race results from SRTV
-      ☐ Store to the race itself
-      ☐ Report win on challonge?
-    ☐ Add multitwitch link to race information
-    ☐ Show/Hide specific race actions based on the race state
-      ☐ Once the race is over (>2 hours past)
-        ☐ Hide Discord Ping
-        ☐ Hide Race Announcements
-        ☐ Hide Send Filename
-        ☐ Show "Report Results"
-    ☐ Add a multistream view
-    ☐ Allow for the race channel to be manually updated from the race page
-    ☐ Allow for the filenames to be edited after generation (or re-generated)
-    ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
-    ☐ Option to send specific messages as DMs
-    ☐ Option to pick and choose announcements to send to race channel
-    ☐ Option to send messages directly to announcements
-    ☐ Option to auto-create / announce / generate / etc.
-    ☐ Button to show/hide twitch feed in racer card
     ☐ Create a user / role system
-    ☐ Create interface for managing people
-    ☐ Provide a 'merged' chat feed for the race channel
+  Tourney:
+    Race Page:
+      ☐ Ability to pull in race results from SRTV
+        ☐ Store to the race itself
+        ☐ Report win on challonge?
+      ☐ Add multitwitch link to race information
+      ☐ Show/Hide specific race actions based on the race state
+        ☐ Once the race is over (>2 hours past)
+          ☐ Hide Discord Ping
+          ☐ Hide Race Announcements
+          ☐ Hide Send Filename
+          ☐ Show "Report Results"
+      ☐ Add a multistream view
+      ☐ Allow for the race channel to be manually updated from the race page
+      ☐ Allow for the filenames to be edited after generation (or re-generated)
+      ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
+      ☐ Option to send specific messages as DMs
+      ☐ Option to pick and choose announcements to send to race channel
+      ☐ Option to send messages directly to announcements
+      ☐ Option to auto-create / announce / generate / etc.
+      ☐ Button to show/hide twitch feed in racer card
+      ☐ Provide a 'merged' chat feed for the race channel
+    People:
+      ☐ Allow for people to be edited
   Discord:
     ☐ UI to send a message (canned/custom) to a specific guild+channel
   Twitch:
@@ -49,7 +51,8 @@ Web Control Panel:
       ☐ twitch_bot_channels
       ☐ src_categories
       ✔ text_commands @done (18-04-23 16:22)
-    ☐ Ability to update the text commands used across twitch/discord
+    ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41)
+    ☐ Ability to enable/disable/delete text commands
     ☐ Ability to update Twitch channel list for the bot to join
     ☐ Ability to update the Twitch channel list for the bot to alert about in discord
     ☐ Ability to update the filter parameters for stream alerts
