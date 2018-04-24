@@ -9,7 +9,7 @@ const express = require('express'),
   util = require('../lib/util.js');
 
 // Tourney People
-router.use('/people', require('./people.js'));
+router.use('/people', require('./tourney/people.js'));
 
 // Tourney Schedule
 router.get(['/', '/upcoming', '/recent', '/today'], (req, res) => {

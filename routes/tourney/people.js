@@ -1,6 +1,6 @@
 const express = require('express'),
   router = express.Router(),
-  db = require('../db');
+  db = require('../../db.js');
 
 router.get('/', (req, res) => {
 	db.get().collection("tourney-people")

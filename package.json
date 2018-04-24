@@ -4,9 +4,11 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "discord.js": "^11.3.2",
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
+    "express-sanitizer": "^1.0.4",
     "irc": "^0.5.2",
     "md5": "^2.2.1",
     "memcache": "^0.3.0",

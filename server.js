@@ -1,7 +1,9 @@
 const express = require('express'),
   exphbs = require('express-handlebars'),
   handlebars = require('./helpers/handlebars.js')(exphbs),
-  db = require('./db');
+  db = require('./db'),
+  bodyParser = require('body-parser'),
+  expressSanitizer = require('express-sanitizer');
 
 let config = require('./config.json');
 
@@ -16,8 +18,11 @@ app.engine('.hbs', handlebars.engine);
 app.set('view engine', '.hbs');
 
 // Easy form request parsing
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+// Sanitize form inputs
+app.use(expressSanitizer());
 
 // Routing for static files
 app.use(express.static('public'));
