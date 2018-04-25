@@ -30,7 +30,11 @@ router.get('/brackets', (req, res) => {
 				console.error(err);
 				res.render('error', {"error": err});
 			} else {
-				res.render('people/index', {"people": people, "pageHeader": "Brackets Participants"});
+				if (req.query.format == 'seedlist') {
+					res.render('people/bracket-seeds', {"people": people, "pageHeader": "Bracket Seeds"});
+				} else {
+					res.render('people/index', {"people": people, "pageHeader": "Brackets Participants"});
+				}
 			}
 		});
 });
