@@ -20,6 +20,8 @@ router.post('/', (req, res) => {
 		return res.status(400).send("No data received");
 	}
 
+	// @TODO: Check if the command exists already (or any aliases)
+
 	let newCommand = {
 		command: req.sanitize(req.body.command),
 		response: req.sanitize(req.body.response),

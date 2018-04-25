@@ -54,7 +54,7 @@ Web Control Panel:
     ☐ Bot Commands
       ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41)
       ✔ Delete Command @done (18-04-24 09:26)
-      ☐ Add New Command
+      ✔ Add New Command @done (18-04-24 13:10)
       ☐ Enable/Disable Command
     ☐ Manage Twitch channel list for bot to join
     ☐ Manage Twitch channel list for stream alerts
