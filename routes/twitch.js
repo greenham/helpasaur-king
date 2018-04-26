@@ -7,4 +7,9 @@ router.get('/', (req, res) => {
 	res.render('twitch/index');
 });
 
+// Twitch Settings Control
+router.get('/settings', (req, res) => {
+	res.send(req.app.locals.config.twitch);
+});
+
 module.exports = router;

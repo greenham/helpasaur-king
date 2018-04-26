@@ -11,6 +11,10 @@ const irc = require('irc'),
 // Read internal configuration
 let config = require('./config.json');
 
+let config.twitch.blacklistedUsers = [
+  "chaos_lord2"
+];
+
 // Connect to DB
 db.connect(config.db.host, config.db.db, (err) => {
   if (!err) {
@@ -49,6 +53,9 @@ const init = (config) => {
   });
 
   client.addListener('message', (from, to, message) => {
+    // Ignore everything from blacklisted users
+    if (config.twitch.blacklistedUsers.includes(from)) return;
+
     // Listen for commands that start with the designated prefix
     if (message.startsWith(config.twitch.cmdPrefix)) {
       let commandNoPrefix = message.slice(config.twitch.cmdPrefix.length).split(' ')[0];

@@ -49,6 +49,7 @@ Web Control Panel:
     ☐ Manage Twitch channel list for stream alerts
     ☐ Ability to update the filter parameters for stream alerts
     ☐ One-click bot restart
+    ☐ Create a user blacklist (ignore all commands from a specific user)
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP

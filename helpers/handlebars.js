@@ -69,11 +69,11 @@ let decorateRacers = (players) => {
 	let ret = '<span class="racers">';
 
 	if (players) {
-		if (players[0] !== null) {
+		if (typeof players[0] !== "undefined") {
 			ret += `<span class="racer">${players[0].displayName}</span> <small>v</small> `;
 		}
 
-		if (players[1] !== null) {
+		if (typeof players[1] !== "undefined") {
 			ret += `<span class="racer">${players[1].displayName}</span>`;
 		}
 	}

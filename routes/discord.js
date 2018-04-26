@@ -4,11 +4,13 @@ const express = require('express'),
   moment = require('moment-timezone'),
   db = require('../db');
 
-let guildId = "395628442017857536";	// NMG Tourney Discord
-let guildPingChannel = "bot-testing";
-
 router.get('/', (req, res) => {
 	res.render('discord/index');
+});
+
+// Discord Settings Control
+router.get('/settings', (req, res) => {
+	res.render('settings/discord', req.app.locals.config);
 });
 
 module.exports = router;

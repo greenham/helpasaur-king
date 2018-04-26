@@ -66,4 +66,16 @@ router.get('/brackets', (req, res) => {
 		});
 });
 
+router.get('/comm', (req, res) => {
+	db.get().collection('tourney-events').aggregate([
+    {$project: { _id: 0, commentators: 1}},
+    {$unwind: "$commentators"},
+    {$group: {_id: "$commentators.displayName", sessions: {$sum: 1}}},
+    {$sort: { sessions: -1 } }
+	])
+	.toArray((err, commentators) => {
+		res.render('people/commentators', {people: commentators});
+	});
+});
+
 module.exports = router;
