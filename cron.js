@@ -14,6 +14,6 @@ db.connect(config.db.host, config.db.db, (err) => {
 });
 
 let scheduleJobs = () => {
-	const refreshSpeedgamingEventsJob = schedule.scheduleJob('*/15 * * * *', () => {tasks.refreshSpeedgamingEvents('alttp')});
+	const refreshSpeedgamingEventsJob = schedule.scheduleJob('0 * * * *', () => {tasks.refreshSpeedgamingEvents('alttp')});
 	console.log(`Scheduled task 'refreshSpeedgamingEvents' for: ${refreshSpeedgamingEventsJob.nextInvocation()}`);
 }

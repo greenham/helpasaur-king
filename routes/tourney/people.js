@@ -1,7 +1,9 @@
 const express = require('express'),
   router = express.Router(),
-  db = require('../../db.js');
+  db = require('../../db.js'),
+  util = require('../../lib/util.js');
 
+//@TODO: DRY this out
 router.get('/', (req, res) => {
 	db.get().collection("tourney-people")
 		.aggregate([
@@ -22,8 +24,12 @@ router.get('/brackets', (req, res) => {
 	db.get().collection("tourney-people")
 		.aggregate([
 			{"$match": {"inBrackets": true}},
-			{"$addFields": {"bestGroupsTime": {"$min": "$groupsRaceTimes"}}},
-			{"$sort": {"bestGroupsTime": 1}}
+			{"$addFields": {
+				"bestGroupsTime": {"$min": "$groupsRaceTimes"},
+				"averageGroupsTime": {"$avg": "$groupsRaceTimes"}
+			}},
+			{"$sort": {"bestGroupsTime": 1, "averageGroupsTime": 1}}
+			//{"$sort": {"averageGroupsTime": 1}}
 		])
 		.toArray((err, people) => {
 			if (err) {
@@ -31,7 +37,28 @@ router.get('/brackets', (req, res) => {
 				res.render('error', {"error": err});
 			} else {
 				if (req.query.format == 'seedlist') {
-					res.render('people/bracket-seeds', {"people": people, "pageHeader": "Bracket Seeds"});
+					// some dumb shit here to place dropouts at the bottom of the list
+					let dropouts = [
+						"5add1b4da5542065972435be", // Cransoon
+						"5add1b4da554206597243629", // Zatox
+						"5add1b4da5542065972435b3" // Benteezy
+					];
+
+					const reorder = async () => {
+						let newList = [];
+						let addAtEnd = [];
+						await util.asyncForEach(people, async (person, index) => {
+							if (dropouts.includes(person._id.toString())) {
+								addAtEnd.push(person);
+							} else {
+								newList.push(person);
+							}
+						});
+
+						res.render('people/bracket-seeds', {"people": newList.concat(addAtEnd), "pageHeader": "Bracket Seeds"});
+					};
+
+					reorder();
 				} else {
 					res.render('people/index', {"people": people, "pageHeader": "Brackets Participants"});
 				}

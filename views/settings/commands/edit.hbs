@@ -1,4 +1,4 @@
-<div class="container col-md-8" id="commandContainer" data-id="{{command._id}}">
+<div class="container" id="commandContainer" data-id="{{command._id}}">
 	<nav aria-label="breadcrumb">
 	  <ol class="breadcrumb">
 	    <li class="breadcrumb-item"><a href="/settings/commands">Bot Commands</a></li>
@@ -10,7 +10,10 @@
 			<div class="form-row">
 			  <div class="form-group col-md-6">
 			    <label for="commandInput">Command</label>
-			    <input type="text" class="form-control" id="commandInput" placeholder="Enter command" name="command" value="{{command}}">
+			    <input type="text" class="form-control" id="commandInput" aria-describedby="commandHelpBlock" placeholder="Enter command" name="command" value="{{command}}">
+			    <small id="commandHelpBlock" class="form-text text-muted">
+					  Do not include a prefix of any sort
+					</small>
 			  </div>
 			  <div class="form-group col-md-6">
 			    <label for="aliasesInput">Aliases</label>

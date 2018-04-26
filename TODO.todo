@@ -38,12 +38,17 @@ Web Control Panel:
     People:
       ☐ Allow for people to be edited
       ✔ Show simple bracket listing @done (18-04-26 07:45)
-      ☐ Update simple bracket listing to use average time for tiebreakers
+      ✔ Update simple bracket listing to use average time for tiebreakers @done (18-04-26 10:35)
   Discord:
     ☐ UI to send a message (canned/custom) to a specific guild+channel
+    ☐ One-click bot restart
   Twitch:
     ☐ Page to display filtered ALttP directory
     ☐ Ability to join/leave channels
+    ☐ Manage Twitch channel list for bot to join
+    ☐ Manage Twitch channel list for stream alerts
+    ☐ Ability to update the filter parameters for stream alerts
+    ☐ One-click bot restart
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
@@ -58,10 +63,8 @@ Web Control Panel:
       ✔ Delete Command @done (18-04-24 09:26)
       ✔ Add New Command @done (18-04-24 13:10)
       ☐ Enable/Disable Command
-    ☐ Manage Twitch channel list for bot to join
-    ☐ Manage Twitch channel list for stream alerts
-    ☐ Ability to update the filter parameters for stream alerts
-    ☐ Basically... anything reasonable in config.json that would want to be controlled without having to update the file
+      ☐ Filtering/searching
+    ☐ Guilds
   Logs:
     ☐ Realtime log viewing
 
