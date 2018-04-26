@@ -54,10 +54,10 @@ Web Control Panel:
       ☐ One-button one creation for popular race categories of ALttP
   Settings:
     ☐ Move conf/* files to mongo
-      ☐ twitch_streams
-      ☐ twitch_bot_channels
-      ☐ src_categories
+      ✔ twitch_streams @done (18-04-26 13:21)
+      ✔ twitch_bot_channels @done (18-04-26 13:21)
       ✔ text_commands @done (18-04-23 16:22)
+      ☐ src_categories
     ☐ Bot Commands
       ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41)
       ✔ Delete Command @done (18-04-24 09:26)

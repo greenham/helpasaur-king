@@ -38,11 +38,20 @@ if (!config.db || !config.db.host || !config.db.db) {
 
 db.connect(config.db.host, config.db.db, (err) => {
 	if (!err) {
-		app.listen(port, () => {
-			console.log(`Listening on port ${port}`);
-		});
+		// Read external configuration from DB
+    db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
+      if (!err) {
+        config = Object.assign(config, userConfig);
+        app.listen(port, () => {
+					console.log(`Listening on port ${port}`);
+				});
+      } else {
+        console.error(`Unable to read config from database: ${err}`);
+        process.exit(1);
+      }
+    });
 	} else {
-		console.error('Unable to connect to Mongo.');
+		console.error('Unable to connect to database. Check config.json!');
 		process.exit(1);
 	}
 });
