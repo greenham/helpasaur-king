@@ -37,7 +37,8 @@ Web Control Panel:
       ☐ Provide a 'merged' chat feed for the race channel
     People:
       ☐ Allow for people to be edited
-      ☐ Show simple bracket listing
+      ✔ Show simple bracket listing @done (18-04-26 07:45)
+      ☐ Update simple bracket listing to use average time for tiebreakers
   Discord:
     ☐ UI to send a message (canned/custom) to a specific guild+channel
   Twitch:
