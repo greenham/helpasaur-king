@@ -21,7 +21,7 @@ router.get(['/', '/upcoming', '/recent', '/today', '/all'], (req, res) => {
 	switch(req.path.slice(1, req.path.length)) {
 		case "upcoming":
 			start = moment().tz("UTC").subtract({hours: 2}).format();
-  		end = moment().tz("UTC").add({days: 3}).format();
+  		end = moment().tz("UTC").add({days: 7}).format();
   		headerText = "Upcoming";
 			break;
 		case "recent":
