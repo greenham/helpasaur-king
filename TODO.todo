@@ -42,18 +42,24 @@ Web Control Panel:
   Discord:
     ☐ UI to send a message (canned/custom) to a specific guild+channel
     ☐ One-click bot restart
+    ☐ Settings Page
+      ☐ Config
+      ☐ Stream Alerts
+      ☐ Race Alerts
+      ☐ Guilds
   Twitch:
     ☐ Page to display filtered ALttP directory
     ☐ Ability to join/leave channels
-    ☐ Manage Twitch channel list for bot to join
-    ☐ Manage Twitch channel list for stream alerts
-    ☐ Ability to update the filter parameters for stream alerts
     ☐ One-click bot restart
     ☐ Create a user blacklist (ignore all commands from a specific user)
+    ☐ Settings Page
+      ☐ Manage Twitch channel list for bot to join
+      ☐ Manage Twitch channel list for stream alerts
+      ☐ Ability to update the filter parameters for stream alerts
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
-  Settings:
+  Global Settings:
     ☐ Move conf/* files to mongo
       ✔ twitch_streams @done (18-04-26 13:21)
       ✔ twitch_bot_channels @done (18-04-26 13:21)
@@ -65,7 +71,6 @@ Web Control Panel:
       ✔ Add New Command @done (18-04-24 13:10)
       ☐ Enable/Disable Command
       ☐ Filtering/searching
-    ☐ Guilds
   Logs:
     ☐ Realtime log viewing
 
