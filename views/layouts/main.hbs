@@ -21,49 +21,58 @@
 
       <div class="collapse navbar-collapse" id="topNav">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/"><i class="fa fa-home"></i> Home</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="/tourney/upcoming" id="tourneyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fas fa-calendar-alt"></i> 2018 NMG Tourney
-            </a>
-            <div class="dropdown-menu" aria-labelledby="tourneyDropdown">
-              <a href="/tourney/today" class="dropdown-item"><i class="fas fa-calendar-check"></i> Today's Races</a>
-              <a href="/tourney/upcoming" class="dropdown-item"><i class="fas fa-calendar-plus"></i> Upcoming Races</a>
-              <a href="/tourney/recent" class="dropdown-item"><i class="fas fa-calendar-minus"></i> Recent Races</a>
-              <a href="/tourney/all" class="dropdown-item"><i class="fas fa-calendar"></i> All Races</a>
-              <div class="dropdown-divider"></div>
-              <a href="/tourney/people" class="dropdown-item"><i class="fas fa-users"></i> All Participants</a>
-              <a href="/tourney/people/brackets" class="dropdown-item"><i class="fas fa-certificate"></i> Brackets Participants</a>
-              <a href="/tourney/people/brackets?format=seedlist" class="dropdown-item"><i class="fas fa-list"></i> Seed List</a>
-              <div class="dropdown-divider"></div>
-              <a href="/tourney/brackets" class="dropdown-item"><i class="fas fa-chevron-right"></i> Challonge Brackets</a>
-              <div class="dropdown-divider"></div>
-              <a href="/tourney/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
-            </div>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="/discord" id="discordDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fab fa-discord"></i> Discord</a>
-            <div class="dropdown-menu" aria-labelledby="discordDropdown">
-              <a href="/discord/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
-            </div>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="/twitch" id="twitchDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fab fa-twitch"></i> Twitch</a>
-            <div class="dropdown-menu" aria-labelledby="twitchDropdown">
-              <a href="/twitch/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/srtv"><i class="fas fa-flag-checkered"></i> SRTV</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="/settings" id="settingsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cog"></i> Settings</a>
-            <div class="dropdown-menu" aria-labelledby="settingsDropdown">
-              <a href="/settings/commands" class="dropdown-item"><i class="fas fa-terminal"></i> Bot Commands</a>
-            </div>
-          </li>
+          {{#if user}}
+            <li class="nav-item">
+              <a class="nav-link" href="/"><i class="fa fa-home"></i> Home</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="/tourney/upcoming" id="tourneyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-calendar-alt"></i> 2018 NMG Tourney
+              </a>
+              <div class="dropdown-menu" aria-labelledby="tourneyDropdown">
+                <a href="/tourney/today" class="dropdown-item"><i class="fas fa-calendar-check"></i> Today's Races</a>
+                <a href="/tourney/upcoming" class="dropdown-item"><i class="fas fa-calendar-plus"></i> Upcoming Races</a>
+                <a href="/tourney/recent" class="dropdown-item"><i class="fas fa-calendar-minus"></i> Recent Races</a>
+                <a href="/tourney/all" class="dropdown-item"><i class="fas fa-calendar"></i> All Races</a>
+                <div class="dropdown-divider"></div>
+                <a href="/tourney/people" class="dropdown-item"><i class="fas fa-users"></i> All Participants</a>
+                <a href="/tourney/people/brackets" class="dropdown-item"><i class="fas fa-certificate"></i> Brackets Participants</a>
+                <a href="/tourney/people/brackets?format=seedlist" class="dropdown-item"><i class="fas fa-list"></i> Seed List</a>
+                <div class="dropdown-divider"></div>
+                <a href="/tourney/brackets" class="dropdown-item"><i class="fas fa-chevron-right"></i> Challonge Brackets</a>
+                <div class="dropdown-divider"></div>
+                <a href="/tourney/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="/discord" id="discordDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fab fa-discord"></i> Discord</a>
+              <div class="dropdown-menu" aria-labelledby="discordDropdown">
+                <a href="/discord/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="/twitch" id="twitchDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fab fa-twitch"></i> Twitch</a>
+              <div class="dropdown-menu" aria-labelledby="twitchDropdown">
+                <a href="/twitch/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/srtv"><i class="fas fa-flag-checkered"></i> SRTV</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="/settings" id="settingsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cog"></i> Settings</a>
+              <div class="dropdown-menu" aria-labelledby="settingsDropdown">
+                <a href="/settings/commands" class="dropdown-item"><i class="fas fa-terminal"></i> Bot Commands</a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </li>
+          {{else}}
+            <li class="nav-item">
+              <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+            </li>
+          {{/if}}
         </ul>
       </div>
     </nav>

@@ -1,0 +1,39 @@
+<div class="container">
+	<form class="form-signin" id="loginForm" action="/login" method="POST">
+    <h2 class="form-signin-heading">Please sign in</h2>
+    <label for="inputEmail" class="sr-only">Username</label>
+    <input name="username" type="username" id="inputEmail" class="form-control" placeholder="Username" required="" autofocus="">
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  </form>
+</div>
+
+<script>
+	$(document).ready(() => {
+		$('#loginForm').on('submit', e => {
+			let submitBtn = $(e.target).find('button[type="submit"]');
+			let originalBtnText = submitBtn.html();
+			submitBtn.attr('disabled', 'disabled').html('Please Wait...');
+
+			$.ajax({
+				type: "POST",
+				url: $(e.target).attr('action'),
+				data: $(e.target).serialize(),
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				console.log(data);
+				window.location.assign('/');
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				submitBtn.removeAttr('disabled').html(originalBtnText);
+			});
+
+			e.preventDefault();
+		});
+	});
+</script>

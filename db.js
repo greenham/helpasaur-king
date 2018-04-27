@@ -26,9 +26,12 @@ exports.close = function(done) {
     mongoose.disconnect()
     .then(() => {
       state.db = null;
-      return done();
+      if (done) return done();
     })
-    .catch(done);
+    .catch(err => {
+      if (done) return done(err);
+      console.error(err);
+    });
   }
 }
 
