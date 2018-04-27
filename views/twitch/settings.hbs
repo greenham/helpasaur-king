@@ -1,0 +1,22 @@
+<div class="container">
+	<ul class="nav nav-pills" id="myTab" role="tablist">
+	  <li class="nav-item">
+	    <a class="nav-link active" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="true">Config</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" id="channels-tab" data-toggle="tab" href="#channels" role="tab" aria-controls="channels" aria-selected="false">Channels</a>
+	  </li>
+	</ul>
+
+	<!-- Tab panes -->
+	<div class="tab-content">
+	  <div class="tab-pane active" id="config" role="tabpanel" aria-labelledby="config-tab">
+	  	
+	  </div>
+	  <div class="tab-pane" id="channels" role="tabpanel" aria-labelledby="channels-tab">
+	  	{{#each channels}}
+	  		<li>{{this}}</li>
+	  	{{/each}}
+	  </div>
+	</div>
+</div>

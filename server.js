@@ -46,7 +46,11 @@ if (config.webapp.session && config.webapp.session.secret) {
     secret: config.webapp.session.secret,
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({url: `${config.db.host}/${config.db.db}`})
+    store: new MongoStore({
+      url: `${config.db.host}/${config.db.db}`,
+      ttl: 14 * 24 * 60 * 60, // = 14 days. Default
+      stringify: false
+    })
   }));
 }
 

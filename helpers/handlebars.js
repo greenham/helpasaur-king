@@ -49,12 +49,14 @@ let hbsHelpers = (hbs) => {
 	});
 };
 
-let localize = (time) => {
-	return moment(time).tz("America/Los_Angeles").format('LLLL');
+let localize = (time, timezone) => {
+	timezone = timezone || "America/Los_Angeles";
+	return moment(time).tz(timezone).format('LLLL');
 };
 
-let calendarize = (time) => {
-	return moment(time).tz("America/Los_Angeles").calendar();
+let calendarize = (time, timezone) => {
+	timezone = timezone || "America/Los_Angeles";
+	return moment(time).tz(timezone).calendar();
 };
 
 let timeago = (time) => {

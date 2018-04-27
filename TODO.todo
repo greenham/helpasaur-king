@@ -45,6 +45,8 @@ Web Control Panel:
     ☐ Settings Page
       ☐ Config
       ☐ Stream Alerts
+        ☐ Manage Twitch channel list for stream alerts
+        ☐ Ability to update the filter parameters for stream alerts
       ☐ Race Alerts
       ☐ Guilds
   Twitch:
@@ -54,8 +56,7 @@ Web Control Panel:
     ☐ Create a user blacklist (ignore all commands from a specific user)
     ☐ Settings Page
       ☐ Manage Twitch channel list for bot to join
-      ☐ Manage Twitch channel list for stream alerts
-      ☐ Ability to update the filter parameters for stream alerts
+      ☐ Cooldown
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP

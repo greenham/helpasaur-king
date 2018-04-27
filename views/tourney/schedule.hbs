@@ -1,6 +1,7 @@
 <div class="container">
 	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}Tourney Schedule{{/if}}</h1>
 
+	{{#if events}}
 	<table class="table table-hover">
 		<thead>
 			<tr>
@@ -33,7 +34,7 @@
 					  </div>
 					</div>
 				</td>
-				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
+				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when user.timezone}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
 				<td>
 					{{{decorateRacers match1.players}}}
 					{{#if match2}}
@@ -47,6 +48,9 @@
 			</tr>
 		{{/each}}
 	</table>
+	{{else}}
+		{{> alert class="info" body="No matches found!"}}
+	{{/if}}
 </div>
 
 {{> modal 
@@ -61,15 +65,6 @@
 $(document).ready(() => {
 	$.timeago.settings.allowFuture = true;
 	$("time.timeago").timeago();
-
-	/*$("main").on('click-row.bs.table', function (e, row, $element) {
-		console.log(e);
-    window.location = $element.data('href');
-	});
-
-	$("td > a, td > button").on("click",function(e){
-	  e.stopPropagation();
-	});*/
 
 	$('.delete-race-link').on('click', (e) => {
 		var raceId = $(e.target).data('race-id');

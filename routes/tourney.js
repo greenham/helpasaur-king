@@ -77,7 +77,7 @@ router.get('/refresh', (req, res) => {
 
 // Tourney Settings Control
 router.get('/settings', (req, res) => {
-	res.send(req.app.locals.config.tourney);
+	res.render('tourney/settings', req.app.locals.config.tourney);
 });
 
 // @TODO: Find a better spot/method for these helper functions

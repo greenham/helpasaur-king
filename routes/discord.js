@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 
 // Discord Settings Control
 router.get('/settings', (req, res) => {
-	res.render('settings/discord', req.app.locals.config);
+	res.render('discord/settings', req.app.locals.config);
 });
 
 module.exports = router;
