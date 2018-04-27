@@ -8,7 +8,8 @@ var express = require('express'),
   expressSanitizer = require('express-sanitizer'),
   session = require('express-session'),
   passport = require('passport'),
-  LocalStrategy = require('passport-local').Strategy;
+  LocalStrategy = require('passport-local').Strategy,
+  MongoStore = require('connect-mongo')(session);
 
 // Read local config
 let config = require('./config.json');
@@ -44,12 +45,20 @@ if (config.webapp.session && config.webapp.session.secret) {
   app.use(session({
     secret: config.webapp.session.secret,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: new MongoStore({url: `${config.db.host}/${config.db.db}`})
   }));
 }
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// inject logged-in user data to all requests
+function viewWithUser(req, res, next) {
+  res.locals.user = req.user || null;
+  next();
+}
+app.use(viewWithUser);
 
 // Routing for static files
 app.use(express.static('public'));

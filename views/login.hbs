@@ -24,6 +24,7 @@
 			})
 			.done((data, textStatus, jqXHR) => {
 				console.log(data);
+				submitBtn.attr('disabled', 'disabled').html('Redirecting...');
 				window.location.assign('/');
 			})
 			.fail((jqXHR, textStatus, errorThrown) => {

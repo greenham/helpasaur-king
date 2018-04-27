@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
 	if (!req.user) {
 		res.redirect('/login');
 	} else {
-		res.render('index', { user : req.user })
+		res.render('index')
 	}
 });
 
@@ -18,30 +18,36 @@ router.get('/login', (req, res) => {
 		res.redirect('/');
 	}
 
-	res.render('login', { user: req.user });
+	res.render('login');
 });
 
+// Login POST
 router.post('/login',
   passport.authenticate('local'),
   (req, res) => {
-  	res.send({ user: req.user });
+  	res.send({ result: true });
   }
 );
 
+// Logout
 router.get('/logout', (req, res) => {
 	req.logout();
 	res.redirect('/');
 });
 
-router.get('/ping', (req, res) => {
-	res.status(200).send("pong!");
-})
+var isLoggedIn = (req, res, next) => {
+	if (req.isAuthenticated()) {
+		return next();
+	} else {
+		res.redirect('/login');
+	}
+}
 
 // Routes
-router.use('/tourney', require('./tourney.js'));
-router.use('/discord', require('./discord.js'));
-router.use('/srtv', require('./srtv.js'));
-router.use('/twitch', require('./twitch.js'));
-router.use('/settings', require('./settings.js'));
+router.use('/tourney', isLoggedIn, require('./tourney.js'));
+router.use('/discord', isLoggedIn, require('./discord.js'));
+router.use('/srtv', isLoggedIn, require('./srtv.js'));
+router.use('/twitch', isLoggedIn, require('./twitch.js'));
+router.use('/settings', isLoggedIn, require('./settings.js'));
 
 module.exports = router;
