@@ -11,8 +11,8 @@ Bots:
 
 Web Control Panel:
   General:
-    ☐ Render error pages where appropriate
     ☐ Create a user / role system
+    ☐ Render error pages where appropriate
   Tourney:
     Race Page:
       ☐ Ability to pull in race results from SRTV

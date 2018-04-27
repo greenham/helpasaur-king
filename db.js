@@ -1,5 +1,6 @@
-var MongoClient = require('mongodb').MongoClient;
-var ObjectId = require('mongodb').ObjectId;
+const mongoose = require('mongoose');
+const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId;
 
 var state = {
   db: null
@@ -8,11 +9,12 @@ var state = {
 exports.connect = function(url, dbName, done) {
   if (state.db) return done()
 
-  MongoClient.connect(url, function(err, client) {
-    if (err) return done(err)
-    state.db = client.db(dbName)
-    done()
+  mongoose.connect(`${url}/${dbName}`)
+  .then(() => {
+    state.db = mongoose.connection.db;
+    return done();
   })
+  .catch(done);
 }
 
 exports.get = function() {
@@ -21,11 +23,12 @@ exports.get = function() {
 
 exports.close = function(done) {
   if (state.db) {
-    state.db.close(function(err, result) {
-      state.db = null
-      state.mode = null
-      done(err)
+    mongoose.disconnect()
+    .then(() => {
+      state.db = null;
+      return done();
     })
+    .catch(done);
   }
 }
 
