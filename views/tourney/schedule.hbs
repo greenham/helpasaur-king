@@ -1,5 +1,4 @@
 <div class="container">
-	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}Tourney Schedule{{/if}}</h1>
 
 	<nav aria-label="breadcrumb">
 	  <ol class="breadcrumb">
@@ -9,6 +8,8 @@
 	    <li class="breadcrumb-item"><a href="/tourney/all">All</a></li>
 	  </ol>
 	</nav>
+	
+	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}Tourney Schedule{{/if}}</h1>
 
 	{{#if events}}
 	<table class="table table-hover">
@@ -23,7 +24,6 @@
 			</tr>
 		</thead>
 		{{#each events}}
-			<!-- todo: add contextual classes here based on race upcoming/started/finished -->
 			<tr class="race-row" data-href="/tourney/races/{{_id}}">
 				<td>
 					<div class="dropdown">
