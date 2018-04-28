@@ -50,6 +50,7 @@ let hbsHelpers = (hbs) => {
 };
 
 let localize = (time, timezone) => {
+	console.log(timezone);
 	timezone = timezone || "America/Los_Angeles";
 	return moment(time).tz(timezone).format('LLLL');
 };

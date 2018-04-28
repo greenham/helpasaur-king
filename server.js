@@ -59,7 +59,7 @@ app.use(passport.session());
 
 // inject logged-in user data to all requests
 function viewWithUser(req, res, next) {
-  res.locals.user = req.user || null;
+  res.locals.user = req.user;
   next();
 }
 app.use(viewWithUser);
