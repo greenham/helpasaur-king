@@ -308,6 +308,41 @@ router.post('/sendFilenames', (req, res) => {
 		});
 });
 
+router.post('/srtvSync', (req, res) => {
+	// get race ID from post
+	var raceId = req.body.id;
+	// fetch race from database
+	db.get().collection("tourney-events")
+		.findOne({"_id": db.oid(raceId)}, (err, race) => {
+			// Check for query errors
+			if (err) {
+				console.error(err);
+				return res.status(500).send(err);
+			}
+			// Make sure this race exists
+			if (!race) {
+				return res.status(404).send("No race found matching this ID");
+			}
+			// Make sure a race channel exists
+			if (!race.srtvRace || !race.srtvRace.guid) {
+				return res.status(400).send("Race channel does not exist yet!");
+			}
+
+			updateSRTVRace(raceId, race.srtvRace.guid)
+				.then(updatedRace => {
+					if (updatedRace) {
+						res.send(updatedRace);
+					} else {
+						throw new Error("SRTV race could not be updated!");
+					}
+				})
+				.catch(err => {
+					console.error(err);
+					res.status(500).send(err);
+				});
+		});
+});
+
 // @TODO: Send Individual Chat Messages to SRTV
 router.post('/chat', (req, res) => {
 	// get race ID, message from post

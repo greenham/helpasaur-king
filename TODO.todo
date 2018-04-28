@@ -11,20 +11,19 @@ Bots:
 
 Web Control Panel:
   General:
-    ☐ Create a user / role system
     ☐ Render error pages where appropriate
   Tourney:
     Race Page:
-      ☐ Ability to pull in race results from SRTV
-        ☐ Store to the race itself
-        ☐ Report win on challonge?
-      ☐ Add multitwitch link to race information
       ☐ Show/Hide specific race actions based on the race state
         ☐ Once the race is over (>2 hours past)
           ☐ Hide Discord Ping
           ☐ Hide Race Announcements
           ☐ Hide Send Filename
           ☐ Show "Report Results"
+      ☐ Ability to pull in race results from SRTV
+        ☐ Store to the race itself
+        ☐ Report win on challonge?
+      ☐ Add multitwitch link to race information
       ☐ Add a multistream view
       ☐ Allow for the race channel to be manually updated from the race page
       ☐ Allow for the filenames to be edited after generation (or re-generated)
@@ -37,8 +36,6 @@ Web Control Panel:
       ☐ Provide a 'merged' chat feed for the race channel
     People:
       ☐ Allow for people to be edited
-      ✔ Show simple bracket listing @done (18-04-26 07:45)
-      ✔ Update simple bracket listing to use average time for tiebreakers @done (18-04-26 10:35)
   Discord:
     ☐ UI to send a message (canned/custom) to a specific guild+channel
     ☐ One-click bot restart
@@ -53,25 +50,17 @@ Web Control Panel:
     ☐ Page to display filtered ALttP directory
     ☐ Ability to join/leave channels
     ☐ One-click bot restart
-    ☐ Create a user blacklist (ignore all commands from a specific user)
     ☐ Settings Page
       ☐ Manage Twitch channel list for bot to join
       ☐ Cooldown
+      ☐ User Blacklist
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
-  Global Settings:
-    ☐ Move conf/* files to mongo
-      ✔ twitch_streams @done (18-04-26 13:21)
-      ✔ twitch_bot_channels @done (18-04-26 13:21)
-      ✔ text_commands @done (18-04-23 16:22)
-      ☐ src_categories
-    ☐ Bot Commands
-      ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41)
-      ✔ Delete Command @done (18-04-24 09:26)
-      ✔ Add New Command @done (18-04-24 13:10)
-      ☐ Enable/Disable Command
-      ☐ Filtering/searching
+  Bot Commands:
+    ☐ Inline editing
+    ☐ Enable/Disable Command
+    ☐ Filtering/searching
   Logs:
     ☐ Realtime log viewing
 
@@ -82,6 +71,16 @@ DevOps:
 Ideas:
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Move conf/* files to mongo @done (18-04-28 08:24) @project(Web Control Panel / Bot Commands)
+ ✔ Create a user / role system @done (18-04-27 17:23) @project(Web Control Panel / General)
+ ✔ twitch_streams @done (18-04-26 13:21) @project(Web Control Panel / Bot Commands)
+ ✔ twitch_bot_channels @done (18-04-26 13:21) @project(Web Control Panel / Bot Commands)
+ ✔ Update simple bracket listing to use average time for tiebreakers @done (18-04-26 10:35) @project(Web Control Panel / Tourney / People)
+ ✔ Show simple bracket listing @done (18-04-26 07:45) @project(Web Control Panel / Tourney / People)
+ ✔ Add New Command @done (18-04-24 13:10) @project(Web Control Panel / Bot Commands)
+ ✔ Delete Command @done (18-04-24 09:26) @project(Web Control Panel / Bot Commands)
+ ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41) @project(Web Control Panel / Bot Commands)
+ ✔ text_commands @done (18-04-23 16:22) @project(Web Control Panel / Bot Commands)
  ✔ Show bracket seeds @done (18-04-23 12:02) @project(Web Control Panel / Tourney)
  ✔ Integrate tourney seeder / results tracker @done (18-04-23 12:02) @project(Web Control Panel / Tourney)
  ✔ Pull out discordTags from the SG race info so it doesn't get overwritten after we update it @done (18-04-23 10:57) @project(Web Control Panel / Tourney)

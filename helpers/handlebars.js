@@ -44,13 +44,13 @@ let hbsHelpers = (hbs) => {
 			"hrt": hrt,
 			"multipleOf": multipleOf,
 			"math": math,
-			"join": join
+			"join": join,
+			"raceStatus": raceStatus
 		}
 	});
 };
 
 let localize = (time, timezone) => {
-	console.log(timezone);
 	timezone = timezone || "America/Los_Angeles";
 	return moment(time).tz(timezone).format('LLLL');
 };
@@ -93,7 +93,7 @@ let parseCommentary = (commentators) => {
 
 	let ret = '<span class="commentators">';
 	ret += commentators.map(e => {
-		return '<span' + ((!e.approved) ? 'class="text-warning"':'') + '>' + e.displayName + '</span>';
+		return '<span' + ((!e.approved) ? ' class="text-warning"':'') + '>' + e.displayName + '</span>';
 	}).join(', ');
 	ret += '</span>';
 	return ret;
@@ -149,6 +149,26 @@ let math = function(lvalue, operator, rvalue, options) {
 
 let join = function(arr, glue, options) {
 	return arr.join(glue);
+}
+
+let raceStatus = function(srtvRace) {
+	let ret = '<span class="badge badge-';
+
+	if (!srtvRace) {
+		ret += 'light">Pending';
+	} else if (!srtvRace.started) {
+		ret += 'info">Waiting on Players';
+	} else if (!srtvRace.ended) {
+		ret += 'primary">In Progress';
+	} else if (srtvRace.ended) {
+		ret += 'success">Ended';
+	} else {
+		ret += 'warning">?';
+	}
+
+	ret += '</span>'
+
+	return ret;
 }
 
 module.exports = hbsHelpers;

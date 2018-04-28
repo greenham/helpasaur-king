@@ -18,4 +18,9 @@ let scheduleJobs = () => {
 		tasks.refreshSpeedgamingEvents('alttp').catch(console.error);
 	});
 	console.log(`Scheduled task 'refreshSpeedgamingEvents' for: ${refreshSpeedgamingEventsJob.nextInvocation()}`);
+
+	const syncSRTVRacesJob = schedule.scheduleJob('*/5 * * * *', () => {
+		tasks.syncSRTVRaces().catch(console.error);
+	});
+	console.log(`Scheduled task 'syncSRTVRaces' for: ${syncSRTVRacesJob.nextInvocation()}`);
 }

@@ -1,6 +1,15 @@
 <div class="container">
 	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}Tourney Schedule{{/if}}</h1>
 
+	<nav aria-label="breadcrumb">
+	  <ol class="breadcrumb">
+	    <li class="breadcrumb-item"><a href="/tourney/today">Today</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/upcoming">Upcoming</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/recent">Recent</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/all">All</a></li>
+	  </ol>
+	</nav>
+
 	{{#if events}}
 	<table class="table table-hover">
 		<thead>
@@ -10,6 +19,7 @@
 				<th>Racers</th>
 				<th>Commentary</th>
 				<th>Restream</th>
+				<th>Race Status</th>
 			</tr>
 		</thead>
 		{{#each events}}
@@ -45,6 +55,7 @@
 					{{{parseCommentary commentators}}}
 				</td>
 				<td>{{{restreamStatus channel}}}</td>
+				<td>{{{raceStatus srtvRace}}}
 			</tr>
 		{{/each}}
 	</table>

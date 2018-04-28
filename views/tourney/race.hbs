@@ -1,29 +1,45 @@
 <div class="container" data-race-id="{{race._id}}" id="raceContainer">
-	<h1>Tourney Race Management</h1>
+	<nav aria-label="breadcrumb">
+	  <ol class="breadcrumb">
+	    <li class="breadcrumb-item"><a href="/tourney/today">Today</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/upcoming">Upcoming</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/recent">Recent</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/all">All</a></li>
+	  </ol>
+	</nav>
 	{{#with race}}
-		<div class="btn-group mt-3 mb-3" role="group" aria-label="Race Actions">
+		<div class="btn-group mb-3 border rounded p-1" role="group" aria-label="Race Actions">
 			{{#if srtvRace}}
 				<a href="{{srtvUrl srtvRace.guid}}" target="_blank" class="btn btn-primary" title="Go to Race Channel">
 					<i class="fas fa-external-link-alt"></i> Go To Race Channel
 				</a>
-				<button class="btn btn-primary" id="btnDiscordPings" data-toggle="modal" data-target="#discordPingsConfirmation" title="Discord Pings">
-					<i class="fab fa-discord"></i> Discord Pings
+				<button class="btn btn-primary" id="btnUpdateRace" data-toggle="modal" data-target="#updateRaceConfirmation" title="Update Race">
+					<i class="fas fa-sync"></i> Update Race
 				</button>
-				<button class="btn btn-primary" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation" title="Race Announcements">
-					<i class="fas fa-bullhorn"></i> Race Announcements
-				</button>
+				{{#unless srtvRace.started}}
+					<button class="btn btn-primary" id="btnDiscordPings" data-toggle="modal" data-target="#discordPingsConfirmation" title="Discord Pings">
+						<i class="fab fa-discord"></i> Discord Pings
+					</button>
+					<button class="btn btn-primary" id="btnSendRaceAnnouncements" data-toggle="modal" data-target="#sendRaceAnnouncementsConfirmation" title="Race Announcements">
+						<i class="fas fa-bullhorn"></i> Race Announcements
+					</button>
+				{{/unless}}
 				{{#unless filenames}}
 					<button class="btn btn-primary" id="btnGenerateFilenames" data-toggle="modal" data-target="#generateFilenamesConfirmation" title="Generate Filenames">
 						<i class="fas fa-random"></i> Generate Filenames
 					</button>
 				{{else}}
-					<button class="btn btn-primary" id="btnSendFilenames" data-toggle="modal" data-target="#sendFilenamesConfirmation" title="Send Filenames">
-						<i class="fas fa-share-square"></i> Send Filenames
-					</button>
+					{{#unless srtvRace.started}}
+						<button class="btn btn-primary" id="btnSendFilenames" data-toggle="modal" data-target="#sendFilenamesConfirmation" title="Send Filenames">
+							<i class="fas fa-share-square"></i> Send Filenames
+						</button>
+					{{/unless}}
 				{{/unless}}
-				<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary" title="Report Scores">
-					<i class="fas fa-clipboard-check"></i> Report Results
-				</a>
+				{{#if srtvRace.ended}}
+					<a href="https://challonge.com/ALTTP2018/report_scores" target="_blank" class="btn btn-primary" title="Report Scores">
+						<i class="fas fa-clipboard-check"></i> Report Results
+					</a>
+				{{/if}}
 			{{else}}
 				<button class="btn btn-primary" id="btnCreateRaceChannel" data-toggle="modal" data-target="#createRaceChannelConfirmation">
 					<i class="fas fa-plus"></i> Create Race Channel
@@ -38,7 +54,9 @@
 		<div class="row">
   		<div class="col-sm-4">
 				<div class="card" id="raceCard">
-					<div class="card-header">Race Information</div>
+					<div class="card-header">
+						Race Information <span class="float-right">{{{raceStatus srtvRace}}}</span>
+					</div>
 				  <div class="card-body">
 				    <h5 class="card-title">{{{decorateRacers match1.players}}}{{#if match2}}<br>{{{decorateRacers match2.players}}}{{/if}}</h5>
 				    <h6 class="card-subtitle mb-2 text-muted">{{localize when ../user.timezone}}<br><small class="text-muted"><em>{{{timeago when}}}</em></small></h6>
@@ -78,6 +96,7 @@
 </div>
 
 {{> modal id="createRaceChannelConfirmation" title="Confirmation" body="Are you sure you want to create this race?" affirmativeText="Yes, Create It!"}}
+{{> modal id="updateRaceConfirmation" title="Confirmation" body="Do you want to sync race details with SRTV?" affirmativeText="Yes, Update!"}}
 {{> modal id="discordPingsConfirmation" title="Confirmation" body="Are you sure you want to ping the racers and commentators in Discord with the race channel?" affirmativeText="Yes, Ping Them!"}}
 {{> modal id="sendRaceAnnouncementsConfirmation" title="Confirmation" body="Are you sure you want to send the announcements for this race?" affirmativeText="Yes, Send Them!"}}
 {{> modal id="generateFilenamesConfirmation" title="Confirmation" body="Are you sure you want to generate the filenames for this race?" affirmativeText="Yes, Generate Them!"}}
@@ -111,6 +130,30 @@
 			})
 			.done((data, textStatus, jqXHR) => {
 				alert('Race created!');
+				location.reload();
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+			});
+		});
+
+		$('#btnupdateRaceConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Updating...');
+
+			// make call to server to update the SRTV race
+			$.ajax({
+				type: "POST",
+				url: "/tourney/races/srtvSync",
+				data: {id: raceId},
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Race updated!');
 				location.reload();
 			})
 			.fail((jqXHR, textStatus, errorThrown) => {
