@@ -64,6 +64,20 @@ function viewWithUser(req, res, next) {
 }
 app.use(viewWithUser);
 
+// Refresh userConfig on each request
+function refreshConfig(req, res, next) {
+  db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
+    if (!err) {
+      config = Object.assign(config, userConfig);
+      res.locals.config = config;
+      next();
+    } else {
+      console.error(`Unable to read config from database: ${err}`);
+    }
+  });
+}
+app.use(refreshConfig);
+
 // Routing for static files
 app.use(express.static('public'));
 
@@ -114,19 +128,7 @@ if (!config.db || !config.db.host || !config.db.db) {
 
 db.connect(config.db.host, config.db.db, (err) => {
 	if (!err) {
-		// Read external configuration from DB
-    db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
-      if (!err) {
-        config = Object.assign(config, userConfig);
-        app.locals.config = config;
-        app.listen(port, () => {
-					console.log(`Listening on port ${port}`);
-				});
-      } else {
-        console.error(`Unable to read config from database: ${err}`);
-        process.exit(1);
-      }
-    });
+    app.listen(port, () => {console.log(`Listening on port ${port}`);});
 	} else {
 		console.error('Unable to connect to database. Check config.json!', err);
 		process.exit(1);

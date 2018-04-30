@@ -77,19 +77,7 @@ router.get('/refresh', (req, res) => {
 
 // Tourney Settings Control
 router.get('/settings', (req, res) => {
-	// get freshest settings
-  db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
-    if (err) {
-    	console.error(err);
-    	return res.render('error', {"error": err});
-		}
-
-		if (userConfig && userConfig.tourney) {
-			res.render('tourney/settings', userConfig.tourney);
-		} else {
-			res.render('error', {"error": "Invalid config"});
-		}
-	});
+	res.render('tourney/settings', req.app.locals.config.tourney);
 });
 
 router.post('/settings', (req, res) => {
