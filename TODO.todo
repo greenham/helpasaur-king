@@ -15,7 +15,7 @@ Web Control Panel:
     ☐ Render error pages where appropriate
   Tourney:
     Races:
-      ☐ Sync chat logs when updating srtv race
+      ☐ Sync race entries + chat logs when updating srtv race
       ☐ Option to auto-create / announce / generate / etc.
       ☐ Allow for the race channel GUID to be manually updated from the race page
       ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
