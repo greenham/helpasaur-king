@@ -11,10 +11,6 @@ const irc = require('irc'),
 // Read internal configuration
 let config = require('./config.json');
 
-config.twitch.blacklistedUsers = [
-  "chaos_lord2"
-];
-
 // Connect to DB
 db.connect(config.db.host, config.db.db, (err) => {
   if (!err) {
@@ -22,6 +18,8 @@ db.connect(config.db.host, config.db.db, (err) => {
     db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
       if (!err) {
         config = Object.assign(config, userConfig);
+        // TODO: FIX
+        config.twitch.blacklistedUsers = ["chaos_lord2"];
         init(config);
       } else {
         console.error(`Unable to read config from database: ${err}`);
