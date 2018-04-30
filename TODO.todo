@@ -67,6 +67,13 @@ DevOps:
     ✔ Install Mongo, create alttpbot DB, npm update @done (18-04-30 11:41)
  
 Ideas:
+  // script to update old speedgaming IDs to new ones
+
+// match by displayName
+
+// go through each tourney-events
+// for each match.players match their displayName to tourney-people
+// update the id in the match with the speedgamingId from tourney-people
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
  ✔ Store to the race itself @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)

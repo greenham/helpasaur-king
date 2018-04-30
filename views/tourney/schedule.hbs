@@ -15,20 +15,32 @@
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th></th>
 				<th>When</th>
 				<th>Racers</th>
 				<th>Commentary</th>
 				<th>Restream</th>
 				<th>Race Status</th>
+				<th></th>
 			</tr>
 		</thead>
 		{{#each events}}
 			<tr class="race-row" data-href="/tourney/races/{{_id}}">
+				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when ../user.timezone}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
+				<td>
+					{{{decorateRacers match1.players}}}
+					{{#if match2}}
+						<br>{{{decorateRacers match2.players}}}
+					{{/if}}
+				</td>
+				<td>
+					{{{parseCommentary commentators}}}
+				</td>
+				<td>{{{restreamStatus channel}}}</td>
+				<td>{{{raceStatus srtvRace}}}
 				<td>
 					<div class="dropdown">
 					  <button class="btn btn-secondary dropdown-toggle" type="button" id="raceActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					    <i class="fas fa-cogs"></i>
+					    <i class="fas fa-bars"></i>
 					  </button>
 					  <div class="dropdown-menu" aria-labelledby="raceActionsDropdown">
 					    <a href="/tourney/races/{{_id}}" title="Manage Race" class="dropdown-item"><i class="fas fa-clipboard-list"></i>&nbsp;Manage Race</a>
@@ -44,18 +56,6 @@
 					  </div>
 					</div>
 				</td>
-				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when ../user.timezone}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
-				<td>
-					{{{decorateRacers match1.players}}}
-					{{#if match2}}
-						<br>{{{decorateRacers match2.players}}}
-					{{/if}}
-				</td>
-				<td>
-					{{{parseCommentary commentators}}}
-				</td>
-				<td>{{{restreamStatus channel}}}</td>
-				<td>{{{raceStatus srtvRace}}}
 			</tr>
 		{{/each}}
 	</table>
