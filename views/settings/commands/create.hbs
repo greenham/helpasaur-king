@@ -1,0 +1,62 @@
+<div class="container">
+	<nav aria-label="breadcrumb">
+	  <ol class="breadcrumb">
+	    <li class="breadcrumb-item"><a href="/settings/commands">Bot Commands</a></li>
+	    <li class="breadcrumb-item active" aria-current="page">Create Command</li>
+	  </ol>
+	</nav>
+	<form action="/settings/commands" id="commandCreateForm">
+		<div class="form-row">
+		  <div class="form-group col-md-6">
+		    <label for="commandInput">Command</label>
+		    <input type="text" class="form-control" id="commandInput" aria-describedby="commandHelpBlock" placeholder="Enter command" name="command">
+		    <small id="commandHelpBlock" class="form-text text-muted">
+				  Do not include a prefix of any sort
+				</small>
+		  </div>
+		  <div class="form-group col-md-6">
+		    <label for="aliasesInput">Aliases</label>
+		    <input type="text" class="form-control" id="aliasesInput" aria-describedby="aliasesHelpBlock" placeholder="Enter command aliases" name="aliases">
+		    <small id="aliasesHelpBlock" class="form-text text-muted">
+				  Separate multiple aliases with a comma
+				</small>
+		  </div>
+		</div>
+
+		<div class="form-group">
+			<label for="responseInput">Response</label>
+			<textarea class="form-control" id="responseInput" rows="5" name="response"></textarea>
+		</div>
+
+	  <p class="text-right"><button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Create</button></p>
+	</form>
+</div>
+
+<script>
+	$(document).ready(() => {
+		$('#commandCreateForm').on('submit', e => {
+			let submitBtn = $(e.target).find('button[type="submit"]');
+			let originalBtnText = submitBtn.html();
+			submitBtn.attr('disabled', 'disabled').html('Creating...');
+
+			$.ajax({
+				type: "POST",
+				url: $(e.target).attr('action'),
+				data: $(e.target).serialize(),
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Success! Command was created!');
+				window.location.assign(`/settings/commands/${data.id}`);
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				submitBtn.removeAttr('disabled').html(originalBtnText);
+			});
+
+			e.preventDefault();
+		});
+	});
+</script>

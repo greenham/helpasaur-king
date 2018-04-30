@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="/css/themes/darkly/bootstrap.min.css" />
+    <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="/js/jquery.timeago.js"></script>
+    <script src="/js/moment.js"></script>
+    <link rel="stylesheet" href="/css/custom.css" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  	<title>{{config.botName}} Control Panel</title>
+	</head>
+  <body>
+  	<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/"><img src="/img/logo.png" alt="{{config.botName}}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#topNav" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        {{#if user}}
+          <div class="collapse navbar-collapse" id="topNav">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/"><i class="fa fa-home"></i> Home</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="/tourney/upcoming" id="tourneyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fas fa-calendar-alt"></i> 2018 NMG Tourney
+                </a>
+                <div class="dropdown-menu" aria-labelledby="tourneyDropdown">
+                  <a href="/tourney/today" class="dropdown-item"><i class="fas fa-calendar-check"></i> Today's Races</a>
+                  <a href="/tourney/upcoming" class="dropdown-item"><i class="fas fa-calendar-plus"></i> Upcoming Races</a>
+                  <a href="/tourney/recent" class="dropdown-item"><i class="fas fa-calendar-minus"></i> Recent Races</a>
+                  <a href="/tourney/all" class="dropdown-item"><i class="fas fa-calendar"></i> All Races</a>
+                  <div class="dropdown-divider"></div>
+                  <a href="/tourney/people" class="dropdown-item"><i class="fas fa-users"></i> All Participants</a>
+                  <a href="/tourney/people/brackets" class="dropdown-item"><i class="fas fa-certificate"></i> Brackets Participants</a>
+                  <a href="/tourney/people/brackets?format=seedlist" class="dropdown-item"><i class="fas fa-list"></i> Seed List</a>
+                  <div class="dropdown-divider"></div>
+                  <a href="/tourney/brackets" class="dropdown-item"><i class="fas fa-chevron-right"></i> Challonge Brackets</a>
+                  <div class="dropdown-divider"></div>
+                  <a href="/tourney/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="/discord" id="discordDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fab fa-discord"></i> Discord</a>
+                <div class="dropdown-menu" aria-labelledby="discordDropdown">
+                  <a href="/discord/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="/twitch" id="twitchDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fab fa-twitch"></i> Twitch</a>
+                <div class="dropdown-menu" aria-labelledby="twitchDropdown">
+                  <a href="#" class="dropdown-item"><i class="fas fa-video"></i> Live Streams</a>
+                  <a href="/twitch/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</a>
+                </div>
+              </li>
+              <li class="nav-item">
+                <a href="/srtv" class="nav-link"><i class="fas fa-flag-checkered"></i> SRTV</a>
+              </li>
+              <li class="nav-item">
+                <a href="/settings/commands" class="nav-link"><i class="fas fa-terminal"></i> Commands</a>
+              </li>
+            </ul>
+            <ul class="navbar-nav">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="/settings" id="settingsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user-circle"></i> {{user.username}}</a>
+                <div class="dropdown-menu" aria-labelledby="settingsDropdown">
+                  <a href="/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                  <div class="dropdown-divider"></div>
+                  <span class="dropdown-item"><small><i class="fas fa-clock"></i> {{user.timezone}}</small></span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        {{else}}
+          <span class="navbar-text">
+            Welcome!
+          </span>
+        {{/if}}
+      </div>
+    </nav>
+
+    <main role="main" class="container">
+      {{{body}}}
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+	</body>
+</html>

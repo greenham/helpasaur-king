@@ -1,19 +1,95 @@
 Bugs:
  
-Planned Features:
- ☐ Update SR.C functionality to reflect new Extensions board
- ☐ Integrate with speedrun.tv once API is available/documented
- ☐ Create a web interface for editing commands / settings
- ☐ Integration with ALttP Wiki search
- ☐ Support for pulling category rules from SRC
- ☐ Add a !treerupees command
+Bots:
+  Global:
+    ☐ Update SR.C functionality to reflect new Extensions board
+  Discord:
+    ☐ Integrate with speedrun.tv once API is available/documented
+    ☐ Integration with ALttP Wiki search
+    ☐ Support for pulling category rules from SRC
+  Twitch:
+    ☐ Command to host a random channel currently streaming ALttP
 
-Ideas:
+Web Control Panel:
+  General:
+    ☐ Render error pages where appropriate
+  Tourney:
+    Races:
+      ☐ Sync chat logs when updating srtv race
+      ☐ Option to auto-create / announce / generate / etc.
+      ☐ Allow for the race channel to be manually updated from the race page
+      ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
+      ☐ Add multitwitch link to race information
+      ☐ Add a multistream view
+      ☐ Allow for the filenames to be edited after generation (or re-generated)
+      ☐ Option to send specific messages as DMs
+      ☐ Option to pick and choose announcements to send to race channel
+      ☐ Option to send messages directly to announcements
+      ☐ Button to show/hide twitch feed in racer card
+      ☐ Provide a 'merged' chat feed for the race channel
+    People:
+      ☐ Allow for people to be edited
+  Discord:
+    ☐ UI to send a message (canned/custom) to a specific guild+channel
+    ☐ One-click bot restart
+    ☐ Settings Page
+      ☐ Config
+      ☐ Stream Alerts
+        ☐ Manage Twitch channel list for stream alerts
+        ☐ Ability to update the filter parameters for stream alerts
+      ☐ Race Alerts
+      ☐ Guilds
+  Twitch:
+    ☐ Page to display filtered ALttP directory
+    ☐ Ability to join/leave channels
+    ☐ One-click bot restart
+    ☐ Settings Page
+      ☐ Manage Twitch channel list for bot to join
+      ☐ Cooldown
+      ☐ User Blacklist
+  SRTV:
+    ☐ Quick race creation
+      ☐ One-button one creation for popular race categories of ALttP
+  Bot Commands:
+    ☐ Inline editing
+    ☐ Enable/Disable Command
+    ☐ Filtering/searching
+  Logs:
+    ☐ Realtime log viewing
 
 DevOps:
+  Production:
+    ☐ Install Mongo, create alttpbot DB, npm update
  
+Ideas:
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Store to the race itself @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
+ ✔ Show/Hide specific race actions based on the race state @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
+ ✔ Ability to pull in race results from SRTV @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
+ ✔ Move conf/* files to mongo @done (18-04-28 08:24) @project(Web Control Panel / Bot Commands)
+ ✔ Create a user / role system @done (18-04-27 17:23) @project(Web Control Panel / General)
+ ✔ twitch_streams @done (18-04-26 13:21) @project(Web Control Panel / Bot Commands)
+ ✔ twitch_bot_channels @done (18-04-26 13:21) @project(Web Control Panel / Bot Commands)
+ ✔ Update simple bracket listing to use average time for tiebreakers @done (18-04-26 10:35) @project(Web Control Panel / Tourney / People)
+ ✔ Show simple bracket listing @done (18-04-26 07:45) @project(Web Control Panel / Tourney / People)
+ ✔ Add New Command @done (18-04-24 13:10) @project(Web Control Panel / Bot Commands)
+ ✔ Delete Command @done (18-04-24 09:26) @project(Web Control Panel / Bot Commands)
+ ✔ Ability to update the text commands used across twitch/discord @done (18-04-24 07:41) @project(Web Control Panel / Bot Commands)
+ ✔ text_commands @done (18-04-23 16:22) @project(Web Control Panel / Bot Commands)
+ ✔ Show bracket seeds @done (18-04-23 12:02) @project(Web Control Panel / Tourney)
+ ✔ Integrate tourney seeder / results tracker @done (18-04-23 12:02) @project(Web Control Panel / Tourney)
+ ✔ Pull out discordTags from the SG race info so it doesn't get overwritten after we update it @done (18-04-23 10:57) @project(Web Control Panel / Tourney)
+ ✔ Groups stage times @done (18-04-23 10:56) @project(Web Control Panel / Tourney)
+ ✔ Groups record @done (18-04-23 10:56) @project(Web Control Panel / Tourney)
+ ✔ Add more details to racer card @done (18-04-23 10:56) @project(Web Control Panel / Tourney)
+ ✔ Link to twitch chat popout @done (18-04-22 15:10) @project(Web Control Panel / Tourney)
+ ✔ Migrate groups times @done (18-04-22 15:08) @project(Web Control Panel / Tourney)
+ ✔ Racer filenames @done (18-04-20 16:03) @project(Web Control Panel / Tourney)
+ ✔ Migrate people.json into DB, match up with SG person ID @done (18-04-20 16:03) @project(Web Control Panel / Tourney)
+ ✔ Migrate PB's, challonge info, SRC username @done (18-04-20 16:03) @project(Web Control Panel / Tourney)
+ ✔ Order recent races by most recent @done (18-04-20 08:06) @project(Tourney Control Panel)
+ ✔ Allow for sorting options to be passed in to fetchRaces @done (18-04-20 08:06) @project(Tourney Control Panel)
  ✔ On next release, push config.production.json and run npm update (new discord.js version) @done (18-02-03 07:43) @project(DevOps)
  ✔ Set a random activity every hour in discord @done (18-02-01 14:22) @project(Planned Features)
  ✔ Double stream alerts -- maybe the event listener is being attached twice somehow during a restart? @done (18-02-01 14:19) @project(Bugs)

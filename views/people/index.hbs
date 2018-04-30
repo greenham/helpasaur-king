@@ -1,0 +1,40 @@
+<div class="container">
+	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}People{{/if}}</h1>
+	{{#each people}}
+		{{#multipleOf 3 @index}}
+			{{#if (ne @index 0)}}
+				</div><div class="card-deck mt-2">
+			{{else}}
+				<div class="card-deck">
+			{{/if}}
+		{{/multipleOf}}
+		<div class="card">
+			<div class="card-body">
+	      <h5 class="card-title text-center">{{displayName}}</h5>
+	      {{#if bestGroupsTime}}
+	      	<h6 class="card-subtitle mb-2 text-muted text-center">#{{math @index "+" 1}} ({{hrt bestGroupsTime}})</h6>
+	      {{/if}}
+	    </div>
+	    <ul class="list-group list-group-flush">
+		    <li class="list-group-item text-right"><span class="badge badge-secondary float-left"><i class="fab fa-twitch"></i> Twitch</span> <a href="https://twitch.tv/{{streams.default.username}}" target="_blank">{{streams.default.username}}</a></li>
+		    <li class="list-group-item text-right"><span class="badge badge-secondary float-left"><i class="fab fa-discord"></i> Discord</span> {{discordTag}}</li>
+		    <li class="list-group-item text-right"><span class="badge badge-secondary float-left">SRC</span> <a href="https://www.speedrun.com/user/{{srcUsername}}" target="_blank">{{hrt pb}}</a></li>
+		    <li class="list-group-item text-right"><span class="badge badge-secondary float-left">Challonge</span> <a href="https://challonge.com/users/{{challongeUsername}}" target="_blank" title="{{challongeId}}">{{challongeUsername}}</a></li>
+		    {{#if groupsRaceTimes}}
+		      <li class="list-group-item text-right">
+		        <i class="fas fa-stopwatch"></i> {{#each groupsRaceTimes}} <span class="badge badge-secondary">{{hrt this}}</span> {{/each}}
+		        <br><span class="text-muted">Average Groups Time:</span> {{hrt (avg groupsRaceTimes)}}
+		      </li>
+		    {{/if}}
+		    {{#if groupsRecord}}
+		      <li class="list-group-item text-right">
+		        <span class="text-muted">Groups Record:</span> {{groupsRecord.wins}}-{{groupsRecord.losses}}
+		      </li>
+		    {{/if}}
+		  </ul>
+	    <div class="card-footer">
+	      <small class="text-muted">{{_id}}</small>
+	    </div>
+		</div>
+	{{/each}}
+</div>

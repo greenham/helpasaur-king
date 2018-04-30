@@ -1,0 +1,100 @@
+<div class="container" id="commandContainer" data-id="{{command._id}}">
+	<nav aria-label="breadcrumb">
+	  <ol class="breadcrumb">
+	    <li class="breadcrumb-item"><a href="/settings/commands">Bot Commands</a></li>
+	    <li class="breadcrumb-item active" aria-current="page">{{command.command}}</li>
+	  </ol>
+	</nav>
+	{{#with command}}
+		<form action="/settings/commands" id="commandEditForm">
+			<div class="form-row">
+			  <div class="form-group col-md-6">
+			    <label for="commandInput">Command</label>
+			    <input type="text" class="form-control" id="commandInput" aria-describedby="commandHelpBlock" placeholder="Enter command" name="command" value="{{command}}">
+			    <small id="commandHelpBlock" class="form-text text-muted">
+					  Do not include a prefix of any sort
+					</small>
+			  </div>
+			  <div class="form-group col-md-6">
+			    <label for="aliasesInput">Aliases</label>
+			    <input type="text" class="form-control" id="aliasesInput" aria-describedby="aliasesHelpBlock" placeholder="Enter command aliases" name="aliases" value="{{join aliases ","}}">
+			    <small id="aliasesHelpBlock" class="form-text text-muted">
+					  Separate multiple aliases with a comma
+					</small>
+			  </div>
+			</div>
+
+			<div class="form-group">
+				<label for="responseInput">Response</label>
+				<textarea class="form-control" id="responseInput" rows="5" name="response">{{response}}</textarea>
+			</div>
+
+			<input type="hidden" name="id" value="{{_id}}" />
+		  <p class="text-right"><button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Update</button></p>
+		</form>
+		<hr>
+		<div class="btn-group">
+			{{#if enabled}}
+				<button class="btn btn-light" id="disableCommandBtn" disabled><i class="fas fa-power-off"></i> Disable Command</button>
+			{{else}}
+				<button class="btn btn-success" id="enableCommandBtn" disabled><i class="fas fa-bolt"></i> Enable Command</button>
+			{{/if}}
+			<button class="btn btn-danger" id="deleteCommandBtn" data-toggle="modal" data-target="#deleteCommandConfirmation"><i class="fas fa-trash"></i> Delete Command</button>
+		</div>
+	{{/with}}
+</div>
+
+{{> modal id="deleteCommandConfirmation" title="Confirmation" body="Are you sure you want to delete this command?" affirmativeText="Yes, Delete It!" affirmativeClass="danger"}}
+
+<script>
+	$(document).ready(() => {
+		var commandId = $('#commandContainer').data('id');
+
+		$('#commandEditForm').on('submit', e => {
+			let submitBtn = $(e.target).find('button[type="submit"]');
+			let originalBtnText = submitBtn.html();
+			submitBtn.attr('disabled', 'disabled').html('Updating...');
+
+			$.ajax({
+				type: "PATCH",
+				url: $(e.target).attr('action'),
+				data: $(e.target).serialize(),
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Success! Command was updated!');
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				submitBtn.removeAttr('disabled').html(originalBtnText);
+			});
+
+			e.preventDefault();
+		});
+
+		$('#btndeleteCommandConfirmationAffirmative').on('click', e => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Deleting...');
+
+			$.ajax({
+				method: "DELETE",
+				url: "/settings/commands",
+				data: {id: commandId}
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Command deleted!');
+				window.location.assign('/settings/commands');
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#deleteCommandConfirmation').modal('hide');
+			});
+		});
+	});
+</script>
