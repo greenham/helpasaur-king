@@ -350,6 +350,7 @@ router.post('/chat', (req, res) => {
 });
 
 // @TODO: Find a better spot/method for these helper functions
+// This function is used in multiple spots: tasks is the other right now
 let updateSRTVRace = (raceId, guid) => {
 	return new Promise((resolve, reject) => {
 		SRTV.getRace(guid)
@@ -414,12 +415,13 @@ let getMatchesText = (race) => {
 let getRacerInfoFromRace = (race) => {
 	let racers = getRacersFromRace(race);
 	// @TODO: once SG IDs are reliable, change back to this method
-	//let speedgamingIds = racers.map(e => e.id);
-	let displayNames = racers.map(e => e.displayName);
+	//let displayNames = racers.map(e => e.displayName);
+	let speedgamingIds = racers.map(e => e.id);
 	
 	return new Promise((resolve, reject) => {
 		db.get().collection("tourney-people")
-			.find({"displayName": {"$in": displayNames}})
+			//.find({"displayName": {"$in": displayNames}})
+			.find({"speedgamingId": {"$in": speedgamingIds}})
 			.toArray((err, res) => {
 				if (!err) {
 					resolve(res);
