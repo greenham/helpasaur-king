@@ -52,6 +52,7 @@ Web Control Panel:
   SRTV:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
+    ☐ Update lib to use passed in config
   Bot Commands:
     ☐ Uniqueness check when new commands are added
     ☐ Inline editing
@@ -63,7 +64,7 @@ Web Control Panel:
 
 DevOps:
   Production:
-    ☐ Install Mongo, create alttpbot DB, npm update
+    ✔ Install Mongo, create alttpbot DB, npm update @done (18-04-30 11:41)
  
 Ideas:
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿

@@ -156,6 +156,8 @@ let raceStatus = function(srtvRace) {
 
 	if (!srtvRace) {
 		ret += 'light">Pending';
+	} else if (srtvRace.canceled) {
+		ret += 'dark">Canceled';
 	} else if (!srtvRace.started) {
 		ret += 'info">Waiting on Players';
 	} else if (!srtvRace.ended) {
