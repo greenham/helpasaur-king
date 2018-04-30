@@ -11,7 +11,7 @@ const irc = require('irc'),
 // Read internal configuration
 let config = require('./config.json');
 
-let config.twitch.blacklistedUsers = [
+config.twitch.blacklistedUsers = [
   "chaos_lord2"
 ];
 
