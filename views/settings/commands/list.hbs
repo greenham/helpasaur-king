@@ -1,6 +1,7 @@
 <div class="container">
 	<nav aria-label="breadcrumb">
 	  <ol class="breadcrumb">
+	  	<li class="breadcrumb-item"><i class="fas fa-filter"></i></li>
 	    <li class="breadcrumb-item"><a href="/settings/commands">All</a></li>
 	    <li class="breadcrumb-item"><a href="/settings/commands/def">Definitions</a></li>
 	    <li class="breadcrumb-item"><a href="/settings/commands/meme">Memes</a></li>
@@ -17,8 +18,8 @@
 		<thead>
 			<tr>
 				<th scope="col">Command</th>
-				<th scope="col">Aliases</th>
 				<th scope="col">Response</th>
+				<th scope="col">Aliases</th>
 				<th scope="col"></th>
 			</tr>
 		</thead>
@@ -26,8 +27,8 @@
 			{{#each commands}}
 				<tr>
 					<th scope="row"><a href="/settings/commands/{{_id}}">{{command}}</a></th>
+					<td><span class="d-inline-block text-truncate" style="max-width: 30rem;">{{response}}</span></td>
 					<td>{{#each aliases}}<span class="badge badge-secondary">{{this}}</span>{{/each}}</td>
-					<td>{{response}}</td>
 					<td></td>
 				</tr>
 			{{/each}}

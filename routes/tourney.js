@@ -77,7 +77,39 @@ router.get('/refresh', (req, res) => {
 
 // Tourney Settings Control
 router.get('/settings', (req, res) => {
-	res.render('tourney/settings', req.app.locals.config.tourney);
+	// get freshest settings
+  db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
+    if (err) {
+    	console.error(err);
+    	return res.render('error', {"error": err});
+		}
+
+		if (userConfig && userConfig.tourney) {
+			res.render('tourney/settings', userConfig.tourney);
+		} else {
+			res.render('error', {"error": "Invalid config"});
+		}
+	});
+});
+
+router.post('/settings', (req, res) => {
+	// @TODO: validation
+	let update = {
+		"tourney.racePings.guildId": req.body['racePings.guildId'],
+		"tourney.racePings.textChannelName": req.body['racePings.textChannelName'],
+		"tourney.raceNamePrefix": req.body.raceNamePrefix,
+		"tourney.srtvRaceDefaults.unlisted": (req.body['srtvRaceDefaults.unlisted'] == 'true') ? true : false,
+		"tourney.raceAnnouncements": req.body.raceAnnouncements.trim().split('\r\n').filter(e => e.length > 0)
+	};
+
+	db.get().collection('config').update({"default": true}, {"$set": update}, err => {
+		if (err) {
+			console.log(err);
+			return res.status(500).send(err);
+		}
+
+		res.send({"updated": true});
+	});
 });
 
 // @TODO: Find a better spot/method for these helper functions

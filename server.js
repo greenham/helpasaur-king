@@ -118,6 +118,7 @@ db.connect(config.db.host, config.db.db, (err) => {
     db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
       if (!err) {
         config = Object.assign(config, userConfig);
+        app.locals.config = config;
         app.listen(port, () => {
 					console.log(`Listening on port ${port}`);
 				});
