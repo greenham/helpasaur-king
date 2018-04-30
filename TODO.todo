@@ -51,6 +51,7 @@ Web Control Panel:
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
   Bot Commands:
+    ☐ Uniqueness check when new commands are added
     ☐ Inline editing
     ☐ Enable/Disable Command
     ☐ Filtering/searching
