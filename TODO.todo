@@ -8,30 +8,23 @@ Bots:
     ☐ Integration with ALttP Wiki search
     ☐ Support for pulling category rules from SRC
   Twitch:
+    ☐ Command to host a random channel currently streaming ALttP
 
 Web Control Panel:
   General:
     ☐ Render error pages where appropriate
   Tourney:
-    Race Page:
-      ☐ Show/Hide specific race actions based on the race state
-        ☐ Once the race is over (>2 hours past)
-          ☐ Hide Discord Ping
-          ☐ Hide Race Announcements
-          ☐ Hide Send Filename
-          ☐ Show "Report Results"
-      ☐ Ability to pull in race results from SRTV
-        ☐ Store to the race itself
-        ☐ Report win on challonge?
+    Races:
+      ☐ Sync chat logs when updating srtv race
+      ☐ Option to auto-create / announce / generate / etc.
+      ☐ Allow for the race channel to be manually updated from the race page
+      ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
       ☐ Add multitwitch link to race information
       ☐ Add a multistream view
-      ☐ Allow for the race channel to be manually updated from the race page
       ☐ Allow for the filenames to be edited after generation (or re-generated)
-      ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
       ☐ Option to send specific messages as DMs
       ☐ Option to pick and choose announcements to send to race channel
       ☐ Option to send messages directly to announcements
-      ☐ Option to auto-create / announce / generate / etc.
       ☐ Button to show/hide twitch feed in racer card
       ☐ Provide a 'merged' chat feed for the race channel
     People:
@@ -71,6 +64,9 @@ DevOps:
 Ideas:
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Store to the race itself @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
+ ✔ Show/Hide specific race actions based on the race state @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
+ ✔ Ability to pull in race results from SRTV @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
  ✔ Move conf/* files to mongo @done (18-04-28 08:24) @project(Web Control Panel / Bot Commands)
  ✔ Create a user / role system @done (18-04-27 17:23) @project(Web Control Panel / General)
  ✔ twitch_streams @done (18-04-26 13:21) @project(Web Control Panel / Bot Commands)
