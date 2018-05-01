@@ -20,7 +20,6 @@
 				<th scope="col">Command</th>
 				<th scope="col">Response</th>
 				<th scope="col">Aliases</th>
-				<th scope="col"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -29,7 +28,6 @@
 					<th scope="row"><a href="/settings/commands/{{_id}}">{{command}}</a></th>
 					<td><span class="d-inline-block text-truncate" style="max-width: 40rem;">{{response}}</span></td>
 					<td>{{#each aliases}}<span class="badge badge-secondary">{{this}}</span>{{/each}}</td>
-					<td></td>
 				</tr>
 			{{/each}}
 		</tbody>
