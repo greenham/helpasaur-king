@@ -13,18 +13,29 @@ Web Control Panel:
   General:
     ☐ Implement a role/permission system
     ☐ Render error pages where appropriate
+    ☐ Event logging
+      ☐ Log the following events along with who triggered them and when
+        - Race creation
+        - Discord pings
+        - Race announcements
+        - Filename generation
+        - Filename sending
   Tourney:
     Races:
-      ☐ Sync race entries + chat logs when updating srtv race
-      ☐ Option to auto-create / announce / generate / etc.
-      ☐ Allow for the race channel GUID to be manually updated from the race page
+      ☐ Add a button to ping Commentators about an upcoming race that needs commentators
+      ☐ Button on the race page which auto-schedules the following events:
+        ☐ 1 Hour Prior: Race channel creation
+        ☐ 30 Minutes prior: Discord Pings
+        ☐ 20 Minutes prior: Race channel announcements
+        ☐ 15 Minutes prior: Filename generation + sending
       ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
+      ☐ Calculate + display final race time
+      ☐ Allow for the race channel GUID to be manually updated from the race page
       ☐ Add multitwitch link to race information
       ☐ Add a multistream view
       ☐ Allow for the filenames to be edited after generation (or re-generated)
       ☐ Option to send specific messages as DMs
-      ☐ Option to pick and choose announcements to send to race channel
-      ☐ Option to send messages directly to announcements
+      ☐ Option to send messages directly to race announcements
       ☐ Button to show/hide twitch feed in racer card
       ☐ Provide a 'merged' chat feed for the race channel
     People:
@@ -64,7 +75,6 @@ Web Control Panel:
 
 DevOps:
   Production:
-    ✔ Install Mongo, create alttpbot DB, npm update @done (18-04-30 11:41)
  
 Ideas:
   // script to update old speedgaming IDs to new ones
@@ -76,6 +86,8 @@ Ideas:
 // update the id in the match with the speedgamingId from tourney-people
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Sync race entries + chat logs when updating srtv race @done (18-05-01 10:01) @project(Web Control Panel / Tourney / Races)
+ ✔ Install Mongo, create alttpbot DB, npm update @done (18-04-30 11:41) @project(DevOps / Production)
  ✔ Store to the race itself @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
  ✔ Show/Hide specific race actions based on the race state @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)
  ✔ Ability to pull in race results from SRTV @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)

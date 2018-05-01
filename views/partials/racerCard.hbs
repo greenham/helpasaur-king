@@ -40,8 +40,9 @@
 
 <script>
   $(document).ready(() => {
+    var counter = 0;
     $('.twitch-chat-popout').on('click', e => {
-      window.open($(e.target).attr('href'), "twitchChatPopout", "width=400,height=600,toolbar=no,resizable=yes");
+      window.open($(e.target).attr('href'), `twitchChatPopout-${++counter}`, "width=400,height=600,toolbar=no,resizable=yes");
       e.stopPropagation();
       return false;
     });

@@ -25,10 +25,12 @@ router.post('/', (req, res) => {
 	let newCommand = {
 		command: req.sanitize(req.body.command),
 		response: req.sanitize(req.body.response),
-		aliases: req.sanitize(req.body.aliases).replace(/\s/g, "").split(','),
+		aliases: (req.body.aliases) ? req.sanitize(req.body.aliases).replace(/\s/g, "").split(',') : [],
 		enabled: true,
 		deleted: false
 	};
+
+	console.log(newCommand);
 
 	if (!newCommand.command) {
 		return res.status(400).send("Command is required!");
