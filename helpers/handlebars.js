@@ -104,8 +104,10 @@ helpers.raceEntryStatus = (raceEntry, raceStarted) => {
 		case 'READY':
 			if (raceStarted) {
 				badgeClass = 'primary';
+				status = 'RACING';
 			} else {
 				badgeClass = 'info';
+				status = 'READY';
 			}
 			break;
 		case 'DONE':
