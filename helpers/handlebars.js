@@ -124,7 +124,7 @@ helpers.raceEntryStatus = (raceEntry, raceStarted) => {
 	}
 
 	return `<li class="list-group-item">${raceEntry.player.name}`
-	+ ((raceStarted && raceEntry.status == 'DONE') ? ` <code>${helpers.hrt(raceEntry.stamp-raceStarted)}</code>`:'')
+	+ ((raceStarted && raceEntry.status == 'DONE') ? `<br><code>${helpers.hrt(raceEntry.stamp-raceStarted)}</code>`:'')
 	+ `<span class="badge badge-${badgeClass} float-right">${status}</span></li>`;
 	
 };

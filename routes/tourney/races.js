@@ -155,62 +155,63 @@ router.post('/discordPing', (req, res) => {
 		|| !tourneyConfig.racePings.textChannelName
 	) {
 		console.error("tourney/races/discordPing: discord/tourney is not configured properly - check config!");
-		res.status(500).send("Discord/tourney has not been configured!");
-		return;
+		return res.status(500).send("Discord/tourney has not been configured!");
 	}
 
 	var raceId = req.body.id;
-
-	// Set up Discord client
 	const client = new DISCORD.Client();
-	client.on('ready', () => {
-		db.get().collection("tourney-events")
-			.findOne({"_id": db.oid(raceId)}, (err, race) => {
-				if (!err) {
-					if (race) {
-						let pingUsers = getDiscordUsersFromRace(race);
 
-						pingUsers = pingUsers.map(e => {
-							// if it's an ID, return
-							if (e.match(/^\d+$/)) return e;
+	db.get().collection("tourney-events")
+	.findOne({"_id": db.oid(raceId)}, (err, race) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).send(err);
+		}
+		if (!race) {
+			return res.status(404).send("No race found matching this ID");
+		}
 
-							// lookup ID from tag otherwise
-							return client.users.find('tag', e).id;
-						});
+		client.on('ready', () => {
+			let pingUsers = getDiscordUsersFromRace(race);
 
-						// find the correct text channel in the correct guild to send the message
-						let guild = client.guilds.find('id', tourneyConfig.racePings.guildId);
-						let notificationChannel = guild.channels.find('name', tourneyConfig.racePings.textChannelName);
+			pingUsers = pingUsers.map(e => {
+				// if it's null, it was not included in the original match details
+				// @TODO: handle this scenario
+				// search tourney-people on-the-fly?
 
-						// construct and send the message
-						let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
-							+ ` Here is the race channel for the upcoming race starting ${moment(race.when).fromNow()}:`
-							+ ` <${SRTV.raceUrl(race.srtvRace.guid)}>`;
+				// if it's an ID, return
+				if (e.match(/^\d+$/)) return e;
 
-						// SEND
-						console.log(`Sending race pings via Discord to [${guild.name}]#${notificationChannel.name}: ${message}`);
-						notificationChannel.send(message)
-							.then(sentMessage => {
-								res.send({sent: sentMessage.content});
-							})
-							.catch(err => {
-								res.status(500).send(err);
-								console.error(err);
-							}).then(() => {client.destroy()});
-					} else {
-						res.status(404).send("No race found matching this ID");
-					}
-				} else {
-					console.error(err);
-					res.status(500).send(err);
-				}
+				// lookup ID from tag otherwise
+				return client.users.find('tag', e).id;
 			});
-	})
-	.on('error', err => {
-		console.error(err);
-		res.status(500).send(err);
-	})
-	.login(discordConfig.token);
+
+			// find the correct text channel in the correct guild to send the message
+			let guild = client.guilds.find('id', tourneyConfig.racePings.guildId);
+			let notificationChannel = guild.channels.find('name', tourneyConfig.racePings.textChannelName);
+
+			// construct and send the message
+			let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
+				+ ` Here is the race channel for the upcoming race starting ${moment(race.when).fromNow()}:`
+				+ ` <${SRTV.raceUrl(race.srtvRace.guid)}>`;
+
+			// SEND
+			console.log(`Sending race pings via Discord to [${guild.name}]#${notificationChannel.name}: ${message}`);
+			notificationChannel.send(message)
+			.then(sentMessage => {
+				res.send({sent: sentMessage.content});
+			})
+			.catch(err => {
+				res.status(500).send(err);
+				console.error(err);
+			}).then(() => {client.destroy()});
+		})
+		.on('error', err => {
+			console.error(err);
+			res.status(500).send(err);
+		})
+		.login(discordConfig.token);
+	});
 });
 
 // Generate Random Filenames for Racers

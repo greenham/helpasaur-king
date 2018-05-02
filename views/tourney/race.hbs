@@ -71,18 +71,13 @@
 					<div class="card mt-1" id="srtvRaceCard">
 						<div class="card-header">
 							<span class="float-right">
-								<div class="dropdown">
-								  <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								    <i class="fas fa-bars"></i>
-								  </button>
-								  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-								  	<a class="dropdown-item" href="{{srtvUrl srtvRace.guid}}" target="_blank" title="Go to Race Channel"><i class="fas fa-external-link-alt"></i> Go to Channel</a>
-								    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateRaceConfirmation"><i class="fas fa-sync-alt"></i> Sync Details</a>
-								  </div>
-								</div>
+							  <button class="btn btn-sm btn-light" type="button" data-toggle="modal" data-target="#updateRaceConfirmation" title="Sync Race Details"><i class="fas fa-sync-alt"></i></button>
 							</span>
 							SRTV Race
 						</div>
+				  	<div class="card-body">
+				  		<a href="{{srtvUrl srtvRace.guid}}" target="_blank" title="Go to Race Channel" class="card-link"><small>{{srtvRace.guid}}</small></a>
+				  	</div>
 					  {{#if srtvRace.entries.entries}}
 						  <ul class="list-group list-group-flush">
 						  	{{#each srtvRace.entries.entries}}
