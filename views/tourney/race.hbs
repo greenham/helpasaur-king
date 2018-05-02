@@ -86,9 +86,7 @@
 					  {{#if srtvRace.entries.entries}}
 						  <ul class="list-group list-group-flush">
 						  	{{#each srtvRace.entries.entries}}
-						  		{{#if (ne status "DROPPED")}}
-						  			<li class="list-group-item">{{player.name}} <span class="badge badge-secondary float-right">{{status}}</span></li>
-				  				{{/if}}
+						  		{{{raceEntryStatus this ../srtvRace.started}}}
 						  	{{/each}}
 						  </ul>
 					  {{/if}}

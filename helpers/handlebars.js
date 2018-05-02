@@ -2,73 +2,21 @@ const moment = require('moment-timezone'),
   SRTV = require('../lib/srtv.js'),
   util = require('../lib/util.js');
 
-let hbsHelpers = (hbs) => {
-	return hbs.create({
-		defaultLayout: 'main',
-		extname: '.hbs',
-		helpers: {
-			"eq": (v1, v2) => {
-        return v1 === v2;
-	    },
-	    "ne": (v1, v2) => {
-        return v1 !== v2;
-	    },
-	    "lt": (v1, v2) => {
-        return v1 < v2;
-	    },
-	    "gt": (v1, v2) => {
-        return v1 > v2;
-	    },
-	    "lte": (v1, v2) => {
-        return v1 <= v2;
-	    },
-	    "gte": (v1, v2) => {
-        return v1 >= v2;
-	    },
-	    "and": (v1, v2) => {
-        return v1 && v2;
-	    },
-	    "or": (v1, v2) => {
-        return v1 || v2;
-	    },
-	    "sum": util.sum,
-	    "avg": util.average,
-			"localize": localize,
-			"calendarize": calendarize,
-			"timeago": timeago,
-			"srtvUrl": srtvUrl,
-			"decorateRacers": decorateRacers,
-			"parseCommentary": parseCommentary,
-			"restreamStatus": restreamStatus,
-			"racerInfo": racerInfo,
-			"hrt": hrt,
-			"multipleOf": multipleOf,
-			"math": math,
-			"join": join,
-			"raceStatus": raceStatus
-		}
-	});
-};
+let helpers = {};
 
-let localize = (time, timezone) => {
+helpers.localize = (time, timezone) => {
 	timezone = timezone || "America/Los_Angeles";
 	return moment(time).tz(timezone).format('LLLL');
 };
-
-let calendarize = (time, timezone) => {
+helpers.calendarize = (time, timezone) => {
 	timezone = timezone || "America/Los_Angeles";
 	return moment(time).tz(timezone).calendar();
 };
-
-let timeago = (time) => {
+helpers.timeago = (time) => {
 	return `<time class="timeago" datetime="${moment(time).format()}">${moment(time).calendar()}</time>`;
 };
-
-let srtvUrl = (guid) => {
-	return SRTV.raceUrl(guid);
-};
-
-let decorateRacers = (players) => {
+helpers.srtvUrl = (guid) => {return SRTV.raceUrl(guid)};
+helpers.decorateRacers = (players) => {
 	let ret = '<span class="racers">';
 
 	if (players) {
@@ -85,8 +33,7 @@ let decorateRacers = (players) => {
 
 	return ret;
 };
-
-let parseCommentary = (commentators) => {
+helpers.parseCommentary = (commentators) => {
 	if (commentators === null || commentators.length === 0) {
 		return '<span class="text-muted"><em>None</em></span>';
 	}
@@ -98,8 +45,7 @@ let parseCommentary = (commentators) => {
 	ret += '</span>';
 	return ret;
 };
-
-let restreamStatus = (channel) => {
+helpers.restreamStatus = (channel) => {
 	if (channel) {
   	if (channel.slug.match(/^speedgaming/)) {
   		return `<a href="https://twitch.tv/${channel.slug}" target="_blank">${channel.name}</a>`;
@@ -110,8 +56,7 @@ let restreamStatus = (channel) => {
 		return '<span class="text-muted"><em>Undecided</em></span>';
 	}
 };
-
-let racerInfo = (racer) => {
+helpers.racerInfo = (racer) => {
 	ret = '';
 	if (racer.streamingFrom) {
 		ret += `<li class="list-group-item"><i class="fab fa-twitch"></i>&nbsp;<a href="https://www.twitch.tv/${racer.streamingFrom}" target="_blank">${racer.streamingFrom}</a></li>`;
@@ -121,37 +66,15 @@ let racerInfo = (racer) => {
 	}
 	return ret;
 };
-
-let hrt = (s) => {
-	return s.toString().toHHMMSS();
-};
-
-let multipleOf = (mult, check, options) => {
+helpers.hrt = (s) => {return s.toString().toHHMMSS()};
+helpers.multipleOf = (mult, check, options) => {
 	if (check % mult === 0) {
 		return options.fn(this);
 	} else {
 		return options.inverse(this);
 	}
 };
-
-let math = function(lvalue, operator, rvalue, options) {
-  lvalue = parseFloat(lvalue);
-  rvalue = parseFloat(rvalue);
-      
-  return {
-      "+": lvalue + rvalue,
-      "-": lvalue - rvalue,
-      "*": lvalue * rvalue,
-      "/": lvalue / rvalue,
-      "%": lvalue % rvalue
-  }[operator];
-};
-
-let join = function(arr, glue, options) {
-	return arr.join(glue);
-}
-
-let raceStatus = function(srtvRace) {
+helpers.raceStatus = (srtvRace) => {
 	let ret = '<span class="badge badge-';
 
 	if (!srtvRace) {
@@ -171,6 +94,76 @@ let raceStatus = function(srtvRace) {
 	ret += '</span>'
 
 	return ret;
-}
+};
+helpers.raceEntryStatus = (raceEntry, raceStarted) => {
+	if (raceEntry.status != "DROPPED") {
+		let badgeClass = 'secondary';
+		let status = raceEntry.status;
+		switch (raceEntry.status) {
+			case 'JOINED':
+				break;
+			case 'READY':
+				if (raceStarted) {
+					badgeClass = 'primary';
+				} else {
+					badgeClass = 'info';
+				}
+				break;
+			case 'DONE':
+				badgeClass = 'success';
+				break;
+			case 'DNF':
+				badgeClass = 'warning';
+				break;
+			case 'DQ':
+				badgeClass = 'warning';
+				break;
+			case 'REMOVED':
+				badgeClass = 'danger';
+				break;
+		}
+
+		return `<li class="list-group-item">${raceEntry.player.name}`
+		+ ((raceStarted && raceEntry.status == 'DONE') ? ` <code>${helpers.hrt(raceEntry.stamp-raceStarted)}</code>`:'')
+		+ `<span class="badge badge-${badgeClass} float-right">${status}</span></li>`;
+	}
+};
+
+helpers.math = (lvalue, operator, rvalue, options) => {
+  lvalue = parseFloat(lvalue);
+  rvalue = parseFloat(rvalue);
+      
+  return {
+      "+": lvalue + rvalue,
+      "-": lvalue - rvalue,
+      "*": lvalue * rvalue,
+      "/": lvalue / rvalue,
+      "%": lvalue % rvalue
+  }[operator];
+};
+helpers.join =(arr, glue, options) => {return arr.join(glue)};
+
+// comparisons/logic
+helpers.eq = (v1, v2) => {return v1 === v2};
+helpers.ne = (v1, v2) => {return v1 !== v2};
+helpers.lt = (v1, v2) => {return v1 < v2};
+helpers.gt = (v1, v2) => {return v1 > v2};
+helpers.lte = (v1, v2) => {return v1 <= v2};
+helpers.gte = (v1, v2) => {return v1 >= v2};
+helpers.and = (v1, v2) => {return v1 && v2};
+helpers.or = (v1, v2) => {return v1 || v2};
+
+helpers.sum = util.sum;
+helpers.avg = util.average;
+
+helpers.jsonString = (s) => {return JSON.stringify(s)};
+
+let hbsHelpers = (hbs) => {
+	return hbs.create({
+		defaultLayout: 'main',
+		extname: '.hbs',
+		helpers: helpers
+	});
+};
 
 module.exports = hbsHelpers;

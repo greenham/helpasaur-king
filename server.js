@@ -58,14 +58,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // inject logged-in user data to all requests
-function viewWithUser(req, res, next) {
+app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
-}
-app.use(viewWithUser);
+});
 
 // Refresh userConfig on each request
-function refreshConfig(req, res, next) {
+app.use((req, res, next) => {
   db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
     if (!err) {
       config = Object.assign(config, userConfig);
@@ -75,8 +74,7 @@ function refreshConfig(req, res, next) {
       console.error(`Unable to read config from database: ${err}`);
     }
   });
-}
-app.use(refreshConfig);
+});
 
 // Routing for static files
 app.use(express.static('public'));
@@ -84,6 +82,7 @@ app.use(express.static('public'));
 // Routing for everything else
 app.use(require('./routes'));
 
+// User auth
 var Account = require('./models/account');
 passport.use(new LocalStrategy(Account.authenticate()));
 passport.serializeUser(Account.serializeUser());
