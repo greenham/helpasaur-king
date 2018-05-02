@@ -86,7 +86,9 @@
 					  {{#if srtvRace.entries.entries}}
 						  <ul class="list-group list-group-flush">
 						  	{{#each srtvRace.entries.entries}}
-						  		{{{raceEntryStatus this ../srtvRace.started}}}
+						  		{{#if (and (ne status "REMOVED") (ne status "DROPPED"))}}
+						  			{{{raceEntryStatus this ../srtvRace.started}}}
+					  			{{/if}}
 						  	{{/each}}
 						  </ul>
 					  {{/if}}

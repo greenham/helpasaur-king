@@ -96,37 +96,37 @@ helpers.raceStatus = (srtvRace) => {
 	return ret;
 };
 helpers.raceEntryStatus = (raceEntry, raceStarted) => {
-	if (raceEntry.status != "DROPPED") {
-		let badgeClass = 'secondary';
-		let status = raceEntry.status;
-		switch (raceEntry.status) {
-			case 'JOINED':
-				break;
-			case 'READY':
-				if (raceStarted) {
-					badgeClass = 'primary';
-				} else {
-					badgeClass = 'info';
-				}
-				break;
-			case 'DONE':
-				badgeClass = 'success';
-				break;
-			case 'DNF':
-				badgeClass = 'warning';
-				break;
-			case 'DQ':
-				badgeClass = 'warning';
-				break;
-			case 'REMOVED':
-				badgeClass = 'danger';
-				break;
-		}
-
-		return `<li class="list-group-item">${raceEntry.player.name}`
-		+ ((raceStarted && raceEntry.status == 'DONE') ? ` <code>${helpers.hrt(raceEntry.stamp-raceStarted)}</code>`:'')
-		+ `<span class="badge badge-${badgeClass} float-right">${status}</span></li>`;
+	let badgeClass = 'secondary';
+	let status = raceEntry.status;
+	switch (raceEntry.status) {
+		case 'JOINED':
+			break;
+		case 'READY':
+			if (raceStarted) {
+				badgeClass = 'primary';
+			} else {
+				badgeClass = 'info';
+			}
+			break;
+		case 'DONE':
+			badgeClass = 'success';
+			break;
+		case 'DNF':
+			badgeClass = 'warning';
+			break;
+		case 'DQ':
+			badgeClass = 'warning';
+			break;
+		case 'REMOVED':
+		case 'DROPPED':
+			badgeClass = 'danger';
+			break;
 	}
+
+	return `<li class="list-group-item">${raceEntry.player.name}`
+	+ ((raceStarted && raceEntry.status == 'DONE') ? ` <code>${helpers.hrt(raceEntry.stamp-raceStarted)}</code>`:'')
+	+ `<span class="badge badge-${badgeClass} float-right">${status}</span></li>`;
+	
 };
 
 helpers.math = (lvalue, operator, rvalue, options) => {
