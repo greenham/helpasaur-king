@@ -12,6 +12,7 @@ Bots:
 Web Control Panel:
   General:
     ☐ Implement a role/permission system
+    ☐ Don't refresh the entire page when possible, just update elements
     ☐ Render error pages where appropriate
     ☐ Event logging
       ☐ Log the following events along with who triggered them and when
@@ -27,6 +28,8 @@ Web Control Panel:
         ☐ 30 Minutes prior: Discord Pings
         ☐ 20 Minutes prior: Race channel announcements
         ☐ 15 Minutes prior: Filename generation + sending
+      ☐ Display time the race started, it if has started
+      ☐ Add a link to and a way to display chat logs
       ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
       ☐ Add a button to ping Commentators about an upcoming race that needs commentators
       ☐ Allow for the race channel GUID to be manually updated from the race page

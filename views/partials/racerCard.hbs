@@ -1,7 +1,7 @@
 {{#with person}}
   {{#if streams.default.username}}
     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-      <div class="btn-group mr-3" role="group" aria-label="Stream Buttons">
+      <div class="btn-group mr-5" role="group" aria-label="Stream Buttons">
         <button class="btn btn-sm btn-secondary" type="button" data-toggle="collapse" data-target="#{{streams.default.username}}-stream" aria-expanded="false" aria-controls="{{streams.default.username}}-stream"><i class="fa fa-eye"></i> Toggle Stream</button>
       </div>
       <div class="btn-group" role="group" aria-label="Stream Buttons">
@@ -27,6 +27,7 @@
         <li class="list-group-item"><i class="fas fa-file"></i> <span class="badge badge-info">{{filename}}</span></li>
       {{/if}}
     {{/each}}
+    <li class="list-group-item"><i class="fas fa-trophy"></i> <a href="https://www.speedrun.com/user/{{srcUsername}}" target="_blank" class="card-link">{{hrt pb}}</a></li>
     {{#if groupsRaceTimes}}
       <li class="list-group-item">
         <i class="fas fa-stopwatch"></i> {{#each groupsRaceTimes}} <span class="badge badge-secondary">{{hrt this}}</span> {{/each}}
