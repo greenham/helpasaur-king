@@ -1,3 +1,4 @@
+{{#with person}}
 <div class="card-body">
   {{#if streams.default.username}}
     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
@@ -38,6 +39,7 @@
     </li>
   {{/if}}
 </ul>
+{{/with}}
 
 <script>
   $(document).ready(() => {

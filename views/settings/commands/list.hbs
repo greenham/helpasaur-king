@@ -17,17 +17,15 @@
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th scope="col">Command</th>
-				<th scope="col">Response</th>
-				<th scope="col">Aliases</th>
+				<th>Command</th>
+				<th width="75%">Response</th>
 			</tr>
 		</thead>
 		<tbody>
 			{{#each commands}}
-				<tr>
-					<th scope="row"><a href="/settings/commands/{{_id}}">{{command}}</a></th>
-					<td><span class="d-inline-block text-truncate" style="max-width: 40rem;">{{response}}</span></td>
-					<td>{{#each aliases}}<span class="badge badge-secondary">{{this}}</span>{{/each}}</td>
+				<tr href="/settings/commands/{{_id}}">
+					<td><strong>{{command}}</strong><br>{{#each aliases}}<span class="badge badge-secondary">{{this}}</span>{{/each}}</td>
+					<td><a href="/settings/commands/{{_id}}"><span class="d-inline-block text-truncate" style="max-width: 40rem;">{{response}}</span></a></td>
 				</tr>
 			{{/each}}
 		</tbody>

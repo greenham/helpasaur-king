@@ -2,6 +2,7 @@ const express = require('express'),
   router = express.Router(),
   DISCORD = require('discord.js'),
   moment = require('moment-timezone'),
+  async = require('async'),
   db = require('../../db'),
   SG = require('../../lib/speedgaming.js'),
   SRTV = require('../../lib/srtv.js'),
@@ -11,15 +12,15 @@ const express = require('express'),
 // Manage Race
 router.get('/:id', (req, res) => {
 	db.get().collection("tourney-events")
-		.findOne({"_id": db.oid(req.params.id)}, (err, result) => {
+		.findOne({"_id": db.oid(req.params.id)}, (err, race) => {
 			if (err) {
 				console.error(err);
 				res.send({"error": err});
 			} else {
-				getRacerInfoFromRace(result).then(racersInfo => {
-					result.racers = racersInfo;
-					res.render('tourney/race', {race: result});
-				});
+				insetPeople(race).then(race => {
+					race.racers = getRacersFromRace(race);
+					res.render('tourney/race', {race: race});
+				}).catch(console.error);
 			}
 		});
 });
@@ -171,46 +172,49 @@ router.post('/discordPing', (req, res) => {
 			return res.status(404).send("No race found matching this ID");
 		}
 
-		client.on('ready', () => {
-			let pingUsers = getDiscordUsersFromRace(race);
+		insetPeople(race).then(race => {
+			client.on('ready', () => {
+				let pingUsers = getDiscordUsersFromRace(race);
 
-			pingUsers = pingUsers.map(e => {
-				// if it's null, it was not included in the original match details
-				// @TODO: handle this scenario
-				// search tourney-people on-the-fly?
+				pingUsers = pingUsers.map((e, i, a) => {
+					if (e) {
+						// if it's an ID, return
+						if (e.match(/^\d+$/)) return e;
 
-				// if it's an ID, return
-				if (e.match(/^\d+$/)) return e;
+						// lookup ID from tag otherwise
+						return client.users.find('tag', e).id;
+					} else {
+						// no match found, remove from pings
+						a.splice(i, 1);
+					}
+				});
 
-				// lookup ID from tag otherwise
-				return client.users.find('tag', e).id;
-			});
+				// find the correct text channel in the correct guild to send the message
+				let guild = client.guilds.find('id', tourneyConfig.racePings.guildId);
+				let notificationChannel = guild.channels.find('name', tourneyConfig.racePings.textChannelName);
 
-			// find the correct text channel in the correct guild to send the message
-			let guild = client.guilds.find('id', tourneyConfig.racePings.guildId);
-			let notificationChannel = guild.channels.find('name', tourneyConfig.racePings.textChannelName);
-
-			// construct and send the message
-			let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
-				+ ` Here is the race channel for the upcoming race starting ${moment(race.when).fromNow()}:`
+				// construct and send the message
+				let message = pingUsers.map(e => {return `<@${e}>`}).join(' ')
+				+ ` Here is the channel for the race starting ${moment(race.when).fromNow()}:`
 				+ ` <${SRTV.raceUrl(race.srtvRace.guid)}>`;
 
-			// SEND
-			console.log(`Sending race pings via Discord to [${guild.name}]#${notificationChannel.name}: ${message}`);
-			notificationChannel.send(message)
-			.then(sentMessage => {
-				res.send({sent: sentMessage.content});
+				// SEND
+				console.log(`Sending race pings via Discord to [${guild.name}]#${notificationChannel.name}: ${message}`);
+				notificationChannel.send(message)
+				.then(sentMessage => {
+					res.send({sent: sentMessage.content});
+				})
+				.catch(err => {
+					res.status(500).send(err);
+					console.error(err);
+				}).then(() => {client.destroy()});
 			})
-			.catch(err => {
-				res.status(500).send(err);
+			.on('error', err => {
 				console.error(err);
-			}).then(() => {client.destroy()});
-		})
-		.on('error', err => {
-			console.error(err);
-			res.status(500).send(err);
-		})
-		.login(discordConfig.token);
+				res.status(500).send(err);
+			})
+			.login(discordConfig.token);
+		});
 	});
 });
 
@@ -351,24 +355,28 @@ router.post('/chat', (req, res) => {
 });
 
 // @TODO: Find a better spot/method for these helper functions
+// Start by creating some models to encapsulate some of this functionality
 let getDiscordUsersFromRace = (race) => {
-	let discordUsers = [];
-	if (race.match1 && race.match1.players) {
-		discordUsers = discordUsers.concat(getDiscordTags(race.match1.players));
-	}
-	if (race.match2 && race.match2.players) {
-		discordUsers = discordUsers.concat(getDiscordTags(race.match2.players));
-	}
-	if (race.commentators.length > 0) {
-		discordUsers = discordUsers.concat(getDiscordTags(race.commentators));
-	}
-	return discordUsers;
+	let people = getPeopleFromRace(race);
+	return getDiscordTags(people);
 };
 
 let getDiscordTags = (players) => {
 	return players.map(e => {
-		return e.discordTag || e.discordId || null;
+		// see if it's embedded directly in this object first
+		let tag = e.discordTag || e.discordId || null;
+		if (tag === null) {
+			// maybe it's in the person object below
+			if (e.person) {
+				tag = e.person.discordTag || e.person.discordId || null;
+			}
+		}
+		return tag;
 	});
+};
+
+let getPeopleFromRace = (race) => {
+	return getRacersFromRace(race).concat(getCommentatorsFromRace(race));
 };
 
 let getRacersFromRace = (race) => {
@@ -384,6 +392,14 @@ let getRacersFromRace = (race) => {
 	return racers;
 };
 
+let getCommentatorsFromRace = (race) => {
+  if (race.commentators) {
+  	return race.commentators;
+  } else {
+  	return [];
+  }
+};
+
 let getMatchesText = (race) => {
 	let ret = '';
 	if (race.match1 && race.match1.players) {
@@ -397,22 +413,67 @@ let getMatchesText = (race) => {
 	return ret;
 };
 
-let getRacerInfoFromRace = (race) => {
-	let racers = getRacersFromRace(race);
-	//let displayNames = racers.map(e => e.displayName);
-	let speedgamingIds = racers.map(e => e.id);
-	
+let getPersonBySpeedgamingEntry = (entry) => {
 	return new Promise((resolve, reject) => {
 		db.get().collection("tourney-people")
-			//.find({"displayName": {"$in": displayNames}})
-			.find({"speedgamingId": {"$in": speedgamingIds}})
-			.toArray((err, res) => {
-				if (!err) {
-					resolve(res);
-				} else {
-					reject(err);
-				}
+		.findOne({"$or": [{"speedgamingId": entry.id}, {"displayName": entry.displayName}]}, (err, res) => {
+			if (!err) {
+				resolve(res);
+			} else {
+				reject(err);
+			}
+		});
+	});
+};
+
+// a function that insets values from tourney-people with the race itself
+let insetPeople = (race) => {
+	return new Promise((resolve, reject) => {
+		let aTasks = [];
+
+		if (race.match1 && race.match1.players) {
+			aTasks.push((callback) => {
+				async.forEachOf(race.match1.players, (value, index, cb) => {
+					getPersonBySpeedgamingEntry(value)
+					.then(person => {
+						race.match1.players[index].person = person;
+						cb();
+					})
+					.catch(cb);
+				}, callback);
 			});
+		}
+
+		if (race.match2 && race.match2.players) {
+			aTasks.push((callback) => {
+				async.forEachOf(race.match2.players, (value, index, cb) => {
+					getPersonBySpeedgamingEntry(value)
+					.then(person => {
+						race.match2.players[index].person = person;
+						cb();
+					})
+					.catch(cb);
+				}, callback);
+			});
+		}
+
+		if (race.commentators) {
+			aTasks.push((callback) => {
+				async.forEachOf(race.commentators, (value, index, cb) => {
+					getPersonBySpeedgamingEntry(value)
+					.then(person => {
+						race.commentators[index].person = person;
+						cb();
+					})
+					.catch(cb);
+				}, callback);
+			});
+		}
+
+		async.parallel(async.reflectAll(aTasks), (err, results) => {
+			if (err) reject(err);
+			resolve(race);
+		});
 	});
 };
 
