@@ -1,5 +1,4 @@
 {{#with person}}
-<div class="card-body">
   {{#if streams.default.username}}
     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
       <div class="btn-group mr-3" role="group" aria-label="Stream Buttons">
@@ -21,24 +20,23 @@
       </iframe>
     </div>
   {{/if}}
-</div>
-<ul class="list-group list-group-flush">
-  <li class="list-group-item"><i class="fab fa-discord"></i> {{#if discordTag}}{{discordTag}}{{else}}{{#if discordId}}{{discordId}}{{/if}}{{/if}}</li>
-  {{#each ../filenames}}
-    {{#if (eq racerName ../displayName)}}
-      <li class="list-group-item"><i class="fas fa-file"></i> <span class="badge badge-info">{{filename}}</span></li>
-    {{/if}}
-  {{/each}}
-  {{#if groupsRaceTimes}}
-    <li class="list-group-item">
-      <i class="fas fa-stopwatch"></i> {{#each groupsRaceTimes}} <span class="badge badge-secondary">{{hrt this}}</span> {{/each}}
-      <br><span class="text-muted">Average Groups Time:</span> {{hrt (avg groupsRaceTimes)}}
-      {{#if groupsRecord}}
-        <br><span class="text-muted">Groups Record:</span> {{groupsRecord.wins}}-{{groupsRecord.losses}}
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><i class="fab fa-discord"></i> {{#if discordTag}}{{discordTag}}{{else}}{{#if discordId}}{{discordId}}{{/if}}{{/if}}</li>
+    {{#each ../filenames}}
+      {{#if (eq racerName ../displayName)}}
+        <li class="list-group-item"><i class="fas fa-file"></i> <span class="badge badge-info">{{filename}}</span></li>
       {{/if}}
-    </li>
-  {{/if}}
-</ul>
+    {{/each}}
+    {{#if groupsRaceTimes}}
+      <li class="list-group-item">
+        <i class="fas fa-stopwatch"></i> {{#each groupsRaceTimes}} <span class="badge badge-secondary">{{hrt this}}</span> {{/each}}
+        <br><span class="text-muted">Average Groups Time:</span> {{hrt (avg groupsRaceTimes)}}
+        {{#if groupsRecord}}
+          <br><span class="text-muted">Groups Record:</span> {{groupsRecord.wins}}-{{groupsRecord.losses}}
+        {{/if}}
+      </li>
+    {{/if}}
+  </ul>
 {{/with}}
 
 <script>
