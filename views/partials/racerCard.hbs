@@ -24,7 +24,7 @@
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item"><i class="fab fa-discord"></i> {{#if discordTag}}{{discordTag}}{{else}}{{#if discordId}}{{discordId}}{{/if}}{{/if}}</li>
-  {{#each filenames}}
+  {{#each ../filenames}}
     {{#if (eq racerName ../displayName)}}
       <li class="list-group-item"><i class="fas fa-file"></i> <span class="badge badge-info">{{filename}}</span></li>
     {{/if}}
