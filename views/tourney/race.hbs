@@ -79,8 +79,16 @@
 				  		<a href="{{srtvUrl srtvRace.guid}}" target="_blank" title="Go to Race Channel" class="card-link"><small>{{srtvRace.guid}}</small></a>
 				  	</div>
 					  <ul class="list-group list-group-flush">
-				  		{{#if srtvRace.started}}
-						  	<li class="list-group-item text-muted">Started {{{timeago srtvRace.started}}}</li>
+					  	{{#if (or srtvRace.ended srtvRace.canceled)}}
+					  		{{#if srtvRace.ended}}
+					  			<li class="list-group-item text-muted">Ended {{{timeago srtvRace.ended}}}</li>
+				  			{{else}}
+				  				<li class="list-group-item text-muted">Canceled {{{timeago srtvRace.canceled}}}</li>
+				  			{{/if}}
+					  	{{else}}
+					  		{{#if srtvRace.started}}
+							  	<li class="list-group-item text-muted">Started {{{timeago srtvRace.started}}}</li>
+						  	{{/if}}
 					  	{{/if}}
 					  	{{#each srtvRace.entries.entries}}
 					  		{{#if (and (ne status "REMOVED") (ne status "DROPPED"))}}
