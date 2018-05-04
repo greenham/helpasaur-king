@@ -182,7 +182,14 @@ router.post('/discordPing', (req, res) => {
 						if (e.match(/^\d+$/)) return e;
 
 						// lookup ID from tag otherwise
-						return client.users.find('tag', e).id;
+						let foundUser = client.users.find('tag', e);
+						if (foundUser) {
+							return foundUser.id;
+						} else {
+							// no match for this user in Discord, maybe renamed
+							// just return the tag
+							return e;
+						}
 					} else {
 						// no match found, remove from pings
 						a.splice(i, 1);

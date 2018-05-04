@@ -24,10 +24,12 @@ Web Control Panel:
   Tourney:
     Races:
       ☐ Button on the race page which auto-schedules the following events:
-        ☐ 1 Hour Prior: Race channel creation
+        ☐ 45 Minutes prior: Race channel creation
         ☐ 30 Minutes prior: Discord Pings
         ☐ 20 Minutes prior: Race channel announcements
         ☐ 15 Minutes prior: Filename generation + sending
+        ☐ Implementation:
+          ☐ 
       ☐ Display time the race started, it if has started
       ☐ Add a link to and a way to display chat logs
       ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
