@@ -78,15 +78,16 @@
 				  	<div class="card-body">
 				  		<a href="{{srtvUrl srtvRace.guid}}" target="_blank" title="Go to Race Channel" class="card-link"><small>{{srtvRace.guid}}</small></a>
 				  	</div>
-					  {{#if srtvRace.entries.entries}}
-						  <ul class="list-group list-group-flush">
-						  	{{#each srtvRace.entries.entries}}
-						  		{{#if (and (ne status "REMOVED") (ne status "DROPPED"))}}
-						  			{{{raceEntryStatus this ../srtvRace.started}}}
-					  			{{/if}}
-						  	{{/each}}
-						  </ul>
-					  {{/if}}
+					  <ul class="list-group list-group-flush">
+				  		{{#if srtvRace.started}}
+						  	<li class="list-group-item text-muted">Started {{{timeago srtvRace.started}}}</li>
+					  	{{/if}}
+					  	{{#each srtvRace.entries.entries}}
+					  		{{#if (and (ne status "REMOVED") (ne status "DROPPED"))}}
+					  			<li class="list-group-item">{{{raceEntryStatus this ../srtvRace.started}}}</li>
+				  			{{/if}}
+					  	{{/each}}
+					  </ul>
 					</div>
 				{{/if}}
 			</div>

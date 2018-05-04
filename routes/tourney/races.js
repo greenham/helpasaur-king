@@ -370,14 +370,18 @@ let getDiscordUsersFromRace = (race) => {
 
 let getDiscordTags = (players) => {
 	return players.map(e => {
-		// see if it's embedded directly in this object first
-		let tag = e.discordTag || e.discordId || null;
-		if (tag === null) {
-			// maybe it's in the person object below
-			if (e.person) {
-				tag = e.person.discordTag || e.person.discordId || null;
-			}
+		// @TODO: check the person object first, if it exists
+		let tag = null;
+
+		if (e.person) {
+			tag = e.person.discordTag || e.person.discordId || null;
 		}
+
+		// see if it's embedded directly in this object otherwise
+		if (tag === null) {
+			tag = e.discordTag || e.discordId || null;
+		}
+		
 		return tag;
 	});
 };

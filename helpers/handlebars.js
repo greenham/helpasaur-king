@@ -13,7 +13,14 @@ helpers.calendarize = (time, timezone) => {
 	return moment(time).tz(timezone).calendar();
 };
 helpers.timeago = (time) => {
-	return `<time class="timeago" datetime="${moment(time).format()}">${moment(time).calendar()}</time>`;
+	let now = null;
+	// detect unix timestamp and convert appropriately
+	if (time.toString().match(/^[\d]+$/)) {
+		now = moment(time, 'X');
+	} else {
+		now = moment(time);
+	}
+	return `<time class="timeago" datetime="${now.format()}">${now.calendar()}</time>`;
 };
 helpers.srtvUrl = (guid) => {return SRTV.raceUrl(guid)};
 helpers.decorateRacers = (players) => {
@@ -125,9 +132,9 @@ helpers.raceEntryStatus = (raceEntry, raceStarted) => {
 			break;
 	}
 
-	return `<li class="list-group-item">${raceEntry.player.name}`
+	return raceEntry.player.name
 	+ ((raceStarted && raceEntry.status == 'DONE') ? `<br><code>${helpers.hrt(raceEntry.stamp-raceStarted)}</code>`:'')
-	+ `<span class="badge badge-${badgeClass} float-right">${status}</span></li>`;
+	+ `<span class="badge badge-${badgeClass} float-right">${status}</span>`;
 	
 };
 
