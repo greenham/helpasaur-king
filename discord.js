@@ -200,18 +200,21 @@ const init = (config) => {
         if (onCooldown === false) {
           // Not on CD, check for native or static command
           let commandNoPrefix = msg.content.slice(guildConfig.cmdPrefix.length).split(' ')[0];
-          console.log(`'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`);
           if (commands.hasOwnProperty(commandNoPrefix)) {
+            console.log(`'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`);
             commands[commandNoPrefix](msg, guildConfig);
           } else {
             staticCommands.get(commandNoPrefix)
             .then(command => {
-              msg.channel.send({embed: {
-                "title": commandNoPrefix,
-                "color": 0xff9f25,
-                "description": command.response
-              }}).then(sentMessage => cooldowns.set(cooldownKey, guildConfig.textCmdCooldown))
-              .catch(console.error);
+              if (command && command.response) {
+                console.log(`'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`);
+                msg.channel.send({embed: {
+                  "title": commandNoPrefix,
+                  "color": 0xff9f25,
+                  "description": command.response
+                }}).then(sentMessage => cooldowns.set(cooldownKey, guildConfig.textCmdCooldown))
+                .catch(console.error);
+              }
             })
             .catch(console.error);
           }

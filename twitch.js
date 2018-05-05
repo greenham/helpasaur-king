@@ -125,9 +125,11 @@ const init = (config) => {
           if (onCooldown === false) {
             staticCommands.get(commandNoPrefix)
             .then(command => {
-              console.log(`received command in ${to} from ${from}: ${message}`);
-              client.say(to, command.response);
-              cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
+              if (command && command.response) {
+                console.log(`received command in ${to} from ${from}: ${message}`);
+                client.say(to, command.response);
+                cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
+              }
             })
             .catch(console.error);
           } else {
