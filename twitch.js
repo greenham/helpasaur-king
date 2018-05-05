@@ -117,28 +117,28 @@ const init = (config) => {
             process.exit(0);
           }
         }
-      } else {
-        // Make sure this command isn't on cooldown
-        let cooldownIndex = to+message;
-        cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
-        .then(onCooldown => {
-          if (onCooldown === false) {
-            staticCommands.get(commandNoPrefix)
-            .then(command => {
-              if (command && command.response) {
-                console.log(`received command in ${to} from ${from}: ${message}`);
-                client.say(to, command.response);
-                cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
-              }
-            })
-            .catch(console.error);
-          } else {
-            // command is on cooldown in this channel
-            console.log(`${message} is on cooldown in ${to} (sent by ${from})`);
-          }
-        })
-        .catch(console.error);
       }
+
+      // Make sure this command isn't on cooldown
+      let cooldownIndex = to+message;
+      cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
+      .then(onCooldown => {
+        if (onCooldown === false) {
+          staticCommands.get(commandNoPrefix)
+          .then(command => {
+            if (command && command.response) {
+              console.log(`received command in ${to} from ${from}: ${message}`);
+              client.say(to, command.response);
+              cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
+            }
+          })
+          .catch(console.error);
+        } else {
+          // command is on cooldown in this channel
+          console.log(`${message} is on cooldown in ${to} (sent by ${from})`);
+        }
+      })
+      .catch(console.error);
     }
   });
 
