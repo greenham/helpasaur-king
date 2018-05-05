@@ -1,7 +1,8 @@
 const express = require('express'),
   router = express.Router(),
   db = require('../../db.js'),
-  util = require('../../lib/util.js');
+  util = require('../../lib/util.js'),
+  tasks = require('../../lib/tasks.js');
 
 //@TODO: DRY this out
 router.get('/', (req, res) => {
@@ -76,6 +77,11 @@ router.get('/comm', (req, res) => {
 	.toArray((err, commentators) => {
 		res.render('people/commentators', {people: commentators});
 	});
+});
+
+router.get('/refreshSRC', (req, res) => {
+	tasks.updatePBs();
+	res.send({success: true});
 });
 
 module.exports = router;

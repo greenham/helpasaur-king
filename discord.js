@@ -138,8 +138,17 @@ const init = (config) => {
 
       let cooldownKey = msg.content + msg.channel.id;
       src.findPB(username, majorCat, minorCat)
-        .then(result => {
-          msg.reply(result).then(sentMsg => cooldowns.set(cooldownKey, guildConfig.srcCmdCooldown));
+        .then(run => {
+          let response = 'No personal best found for this user/category!';
+          if (run && run.run) {
+            let runner = run.players.data[0].names.international;
+            let runtime = run.run.times.primary_t;
+            response = `The current personal best for **${runner}**`
+            + ` in *${run.category.name} | ${run.subcategory.name}*`
+            + ` is **${runtime.toString().toHHMMSS()}**. Ranking: ${run.place}`
+            + ` | <${run.run.weblink}>`;
+          }
+          msg.reply(response).then(sentMsg => cooldowns.set(cooldownKey, guildConfig.srcCmdCooldown));
         })
         .catch(console.error);
     },
