@@ -19,7 +19,7 @@ db.connect(config.db.host, config.db.db, (err) => {
       if (!err) {
         config = Object.assign(config, userConfig);
         // TODO: FIX
-        config.twitch.blacklistedUsers = ["chaos_lord2", "Mdblz"];
+        config.twitch.blacklistedUsers = ["chaos_lord2", "mdblz"];
         init(config);
       } else {
         console.error(`Unable to read config from database: ${err}`);
