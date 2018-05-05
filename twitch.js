@@ -77,9 +77,9 @@ const init = (config) => {
               }
             });
 
-            client.join(userChannel);
+            return client.join(userChannel);
           } else {
-            client.say(to, '@' + from + ' >> I am already in your channel!');
+            return client.say(to, '@' + from + ' >> I am already in your channel!');
           }
         } else if (commandNoPrefix === 'leave') {
           // leave the requesting user's channel
@@ -98,17 +98,17 @@ const init = (config) => {
               }
             });
 
-            client.part(userChannel, 'Okay, bye! Have a beautiful time!');
+            return client.part(userChannel, 'Okay, bye! Have a beautiful time!');
           } else {
-            client.say(to, '@' + from + ' >> I am not in your channel!');
+            return client.say(to, '@' + from + ' >> I am not in your channel!');
           }
         } else if (commandNoPrefix === 'status') {
           const userChannel = '#' + from;
           let channelIndex = config.twitch.channels.indexOf(userChannel);
           if (channelIndex !== -1) {
-            client.say(to, '@' + from + ' >> I am in your channel!');
+            return client.say(to, '@' + from + ' >> I am in your channel!');
           } else {
-            client.say(to, '@' + from + ' >> I am not in your channel!');
+            return client.say(to, '@' + from + ' >> I am not in your channel!');
           }
         } else if (commandNoPrefix === 'reboot') {
           if (from === 'greenham') {
