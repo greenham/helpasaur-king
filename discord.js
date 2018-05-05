@@ -203,15 +203,17 @@ const init = (config) => {
           console.log(`'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`);
           if (commands.hasOwnProperty(commandNoPrefix)) {
             commands[commandNoPrefix](msg, guildConfig);
-          } else if (result = staticCommands.get(commandNoPrefix)) {
-            msg.channel.send({embed: {
-              "title": commandNoPrefix,
-              "color": 0xff9f25,
-              "description": result.response
-            }}).then(sentMessage => cooldowns.set(cooldownKey, guildConfig.textCmdCooldown))
-            .catch(console.error);
           } else {
-            // Not a command we recognize, ignore
+            staticCommands.get(commandNoPrefix)
+            .then(command => {
+              msg.channel.send({embed: {
+                "title": commandNoPrefix,
+                "color": 0xff9f25,
+                "description": command.response
+              }}).then(sentMessage => cooldowns.set(cooldownKey, guildConfig.textCmdCooldown))
+              .catch(console.error);
+            })
+            .catch(console.error);
           }
         } else {
           // DM the user that it's on CD
@@ -339,11 +341,6 @@ function dmUserFromMsg(originalMessage, newMessage)
     originalMessage.channel.send(newMessage);
   } else {
     dmUser(originalMessage.member, newMessage);
-    /*originalMessage.member.createDM()
-      .then(channel => {
-        channel.send(newMessage);
-      })
-      .catch(console.log);*/
   }
 }
 
@@ -375,6 +372,7 @@ Discord.RichEmbed.prototype.setRaceAlertDefaults = function (raceChannel, srlUrl
 Discord.Client.prototype.setRandomActivity = function() {
   if (!config.discord.master) return;
   let activity = config.discord.activities[Math.floor(Math.random() * config.discord.activities.length)];
+  console.log(`Setting Discord activity to: ${activity}`);
   this.user.setActivity(activity, {url: `https://www.twitch.tv/${config.twitch.username}`, type: "STREAMING"});
 };
 

@@ -57,24 +57,9 @@ const init = (config) => {
     // Listen for commands that start with the designated prefix
     if (message.startsWith(config.twitch.cmdPrefix)) {
       let commandNoPrefix = message.slice(config.twitch.cmdPrefix.length).split(' ')[0];
-      // Check for basic static command first
-      if (result = staticCommands.get(commandNoPrefix)) {
-        console.log(`received command in ${to} from ${from}: ${message}`);
 
-        // Make sure this command isn't on cooldown
-        let cooldownIndex = to+message;
-        cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
-          .then(onCooldown => {
-            if (onCooldown === false) {
-              client.say(to, result.response);
-              cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
-            } else {
-              // command is on cooldown in this channel
-            }
-          })
-          .catch(console.error);
       // Listen for specific commands in the bot's channel
-      } else if (to === botChannel) {
+      if (to === botChannel) {
         if (commandNoPrefix === 'join') {
           // join the requesting user's channel
           const userChannel = '#' + from;
@@ -132,6 +117,25 @@ const init = (config) => {
             process.exit(0);
           }
         }
+      } else {
+        // Make sure this command isn't on cooldown
+        let cooldownIndex = to+message;
+        cooldowns.get(cooldownIndex, config.twitch.textCmdCooldown)
+        .then(onCooldown => {
+          if (onCooldown === false) {
+            staticCommands.get(commandNoPrefix)
+            .then(command => {
+              console.log(`received command in ${to} from ${from}: ${message}`);
+              client.say(to, command.response);
+              cooldowns.set(cooldownIndex, config.twitch.textCmdCooldown);
+            })
+            .catch(console.error);
+          } else {
+            // command is on cooldown in this channel
+            console.log(`${message} is on cooldown in ${to} (sent by ${from})`);
+          }
+        })
+        .catch(console.error);
       }
     }
   });
