@@ -84,4 +84,9 @@ router.get('/refreshSRC', (req, res) => {
 	res.send({success: true});
 });
 
+router.get('/refreshDiscord', (req, res) => {
+	tasks.updateDiscordIds();
+	res.send({success: true});
+});
+
 module.exports = router;

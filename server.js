@@ -32,7 +32,7 @@ app.engine('.hbs', handlebars.engine);
 app.set('view engine', '.hbs');
 
 // Set up logging
-app.use(logger('dev'));
+//app.use(logger('dev'));
 
 // Request parsing + sanitizing
 app.use(bodyParser.json());

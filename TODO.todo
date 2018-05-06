@@ -44,6 +44,7 @@ Web Control Panel:
     People:
       ☐ Allow for people to be edited
       ☐ Button to refresh SRC PB for individual runner as well as everyone
+      ☐ Add discordId to each entry, using discordTag, change over to using ID where possible
     Settings:
       ✔ Allow for settings to be edited @done (18-05-03 11:51)
   Discord:
