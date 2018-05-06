@@ -246,7 +246,6 @@
 				dataType: "json"
 			})
 			.done((data, textStatus, jqXHR) => {
-				console.log(data);
 				alert('Pings sent!');
 			})
 			.fail((jqXHR, textStatus, errorThrown) => {
@@ -297,7 +296,6 @@
 			})
 			.done((data, textStatus, jqXHR) => {
 				alert('Filenames sent!');
-				location.reload();
 			})
 			.fail((jqXHR, textStatus, errorThrown) => {
 				alert('Error: ' + jqXHR.responseText);
