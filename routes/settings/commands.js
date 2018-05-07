@@ -94,27 +94,27 @@ router.patch('/', (req, res) => {
 			req.body.aliases = req.body.aliases.replace(/\s/g, "").split(',');
 		}
 
-		update.aliases = req.body.aliases;
+		update.aliases = (req.body.aliases.length > 0) ? req.body.aliases : [];
 
 		db.get().collection("bot-commands")
-			.findOne({"_id": db.oid(id)}, (err, cmd) => {
-				if (err) {
-					console.error(err);
-					res.status(500).send(err);
-				} else if (!res) {
-					res.status(404).send("No command matching this ID found");
-				} else {
-					db.get().collection("bot-commands")
-						.update({"_id": db.oid(id)}, {$set: update}, (err, result) => {
-							if (err) {
-								res.status(500).send(err);
-							} else {
-								res.send({"result": result});
-								staticCommands.refresh();
-							}
-						});
-				}
-			});	
+		.findOne({"_id": db.oid(id)}, (err, cmd) => {
+			if (err) {
+				console.error(err);
+				res.status(500).send(err);
+			} else if (!res) {
+				res.status(404).send("No command matching this ID found");
+			} else {
+				db.get().collection("bot-commands")
+					.update({"_id": db.oid(id)}, {$set: update}, (err, result) => {
+						if (err) {
+							res.status(500).send(err);
+						} else {
+							res.send({"result": result});
+							staticCommands.refresh();
+						}
+					});
+			}
+		});	
 	}	
 });
 
