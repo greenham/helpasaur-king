@@ -2,6 +2,7 @@ Bugs:
  
 Bots:
   Global:
+    ☐ Update readme-gen to use new commands
     ☐ Update SR.C functionality to reflect new Extensions board
   Discord:
     ☐ Integrate with speedrun.tv once API is available/documented
@@ -30,7 +31,7 @@ Web Control Panel:
         ☐ 15 Minutes prior: Filename generation + sending
         ☐ Implementation:
           ☐ 
-      ☐ Display time the race started, it if has started
+      ✔ Display time the race started, it if has started @done (18-05-07 06:57)
       ☐ Add a link to and a way to display chat logs
       ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
       ☐ Add a button to ping Commentators about an upcoming race that needs commentators
@@ -44,7 +45,7 @@ Web Control Panel:
     People:
       ☐ Allow for people to be edited
       ☐ Button to refresh SRC PB for individual runner as well as everyone
-      ☐ Add discordId to each entry, using discordTag, change over to using ID where possible
+      ✔ Add discordId to each entry, using discordTag, change over to using ID where possible @done (18-05-07 06:57)
     Settings:
       ✔ Allow for settings to be edited @done (18-05-03 11:51)
   Discord:
