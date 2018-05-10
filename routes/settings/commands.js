@@ -30,8 +30,6 @@ router.post('/', (req, res) => {
 		deleted: false
 	};
 
-	console.log(newCommand);
-
 	if (!newCommand.command) {
 		return res.status(400).send("Command is required!");
 	}

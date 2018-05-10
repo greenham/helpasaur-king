@@ -42,15 +42,17 @@ app.use(expressSanitizer());
 
 // Set up sessions if they're configured
 if (config.webapp.session && config.webapp.session.secret) {
+  let sessionExpirationSeconds = config.webapp.session.ttl || (14 * 24 * 60 * 60);  // = 14 days. Default
   app.use(session({
     secret: config.webapp.session.secret,
     resave: false,
     saveUninitialized: false,
     store: new MongoStore({
       url: `${config.db.host}/${config.db.db}`,
-      ttl: 14 * 24 * 60 * 60, // = 14 days. Default
+      ttl: sessionExpirationSeconds,
       stringify: false
-    })
+    }),
+    cookie: {expires: new Date(Date.now() + sessionExpirationSeconds*1000)}
   }));
 }
 
