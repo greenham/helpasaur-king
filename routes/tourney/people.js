@@ -69,6 +69,7 @@ router.get('/brackets', (req, res) => {
 
 router.get('/comm', (req, res) => {
 	db.get().collection('tourney-events').aggregate([
+		{$match: {deleted: {$ne: true}}},
     {$project: { _id: 0, commentators: 1}},
     {$unwind: "$commentators"},
     {$group: {_id: "$commentators.displayName", sessions: {$sum: 1}}},
