@@ -52,12 +52,16 @@ helpers.parseCommentary = (commentators) => {
 	ret += '</span>';
 	return ret;
 };
-helpers.restreamStatus = (channel) => {
-	if (channel) {
-  	if (channel.slug.match(/^speedgaming/)) {
-  		return `<a href="https://twitch.tv/${channel.slug}" target="_blank">${channel.name}</a>`;
+helpers.restreamStatus = (race) => {
+	if (race.channels && race.channels.length > 0) {
+		race.channel = race.channels[0];
+	}
+
+  if (race.channel) {
+  	if (race.channel.slug.match(/^speedgaming/)) {
+  		return `<a href="https://twitch.tv/${race.channel.slug}" target="_blank">${race.channel.name}</a>`;
   	} else {
-			return channel.name;
+			return race.channel.name;
 		}
 	} else {
 		return '<span class="text-muted"><em>Undecided</em></span>';

@@ -82,12 +82,12 @@ router.get('/comm', (req, res) => {
 
 router.get('/refreshSRC', (req, res) => {
 	tasks.updatePBs();
-	res.send({success: true});
+	res.send({started: true});
 });
 
 router.get('/refreshDiscord', (req, res) => {
 	tasks.updateDiscordIds();
-	res.send({success: true});
+	res.send({started: true});
 });
 
 module.exports = router;
