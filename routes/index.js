@@ -2,7 +2,8 @@ const express = require('express'),
   router = express.Router(),
   passport = require('passport'),
   Account = require('../models/account'),
-  staticCommands = require('../lib/commands.js');
+  staticCommands = require('../lib/commands.js'),
+  streamAlerts = require('../lib/stream-alerts.js');
 
 // Homepage
 router.get('/', (req, res) => {
@@ -36,10 +37,33 @@ router.get('/logout', (req, res) => {
 	res.redirect('/');
 });
 
+/******************/
+/** Public Routes */
 // Command List
 router.get('/commands', (req, res) => {
 	res.render('commands', {commands: staticCommands.getCommandsInCategory('all')});
 });
+
+// Livestreams
+router.get('/livestreams', (req, res) => {
+	let config = req.app.locals.config.streamAlerts;
+	config.channels = [];
+	let streamWatcher = new streamAlerts(config);
+	streamWatcher.findStreams()
+	.then(livestreams => {
+		// do some additional filtering?
+		/*let userBlacklist = [];
+		livestreams = livestreams.filter(stream => {
+
+		});*/
+		res.render('twitch/livestreams', {livestreams: livestreams});
+	})
+	.catch(err => {
+		console.log(err);
+		res.render('error', {error: err});
+	});
+});
+/******************/
 
 var isLoggedIn = (req, res, next) => {
 	if (req.isAuthenticated()) {
@@ -49,7 +73,7 @@ var isLoggedIn = (req, res, next) => {
 	}
 }
 
-// Routes
+// Admin Routes
 router.use('/tourney', isLoggedIn, require('./tourney.js'));
 router.use('/discord', isLoggedIn, require('./discord.js'));
 router.use('/srtv', isLoggedIn, require('./srtv.js'));

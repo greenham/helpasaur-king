@@ -2,17 +2,20 @@ Bugs:
  
 Bots:
   Global:
-    ☐ Update readme-gen to use new commands
-    ☐ Update SR.C functionality to reflect new Extensions board
+    ☐ Update readme-gen to use new commands @low
+    ☐ Update SR.C functionality to reflect new Extensions board @low
+    ☐ Integration with strat hub
+      - !strat armos-refight {username} (if no username is specified, returns top X times with links)
   Discord:
     ☐ Integrate with speedrun.tv once API is available/documented
+      - Ability to start and control races from within Discord
     ☐ Integration with ALttP Wiki search
     ☐ Support for pulling category rules from SRC
   Twitch:
 
 Web Control Panel:
   General:
-    ☐ Implement a role/permission system
+    ☐ Implement a role/permission system @high
     ☐ Don't refresh the entire page when possible, just update elements
     ☐ Render error pages where appropriate
     ☐ Event logging
@@ -29,8 +32,6 @@ Web Control Panel:
         ☐ 30 Minutes prior: Discord Pings
         ☐ 20 Minutes prior: Race channel announcements
         ☐ 15 Minutes prior: Filename generation + sending
-        ☐ Implementation:
-          ☐ 
       ✔ Display time the race started, it if has started @done (18-05-07 06:57)
       ☐ Add a link to and a way to display chat logs
       ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
@@ -59,7 +60,7 @@ Web Control Panel:
       ☐ Race Alerts
       ☐ Guilds
   Twitch:
-    ☐ Page to display filtered ALttP directory
+    ☐ Page to display filtered ALttP directory (make public)
     ☐ Ability to join/leave channels
     ☐ One-click bot restart
     ☐ Settings Page
@@ -83,6 +84,7 @@ DevOps:
   Production:
  
 Ideas:
+  ☐ Better interface for SRC?
   
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

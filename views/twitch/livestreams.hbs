@@ -1,0 +1,23 @@
+<div class="container">
+	<h1>ALttP Livestreams ({{livestreams.length}})</h1>
+	{{#each livestreams}}
+		{{#multipleOf 3 @index}}
+			{{#if (ne @index 0)}}
+				</div><div class="card-deck mt-2">
+			{{else}}
+				<div class="card-deck">
+			{{/if}}
+		{{/multipleOf}}
+		<div class="card">
+			<a href="{{channel.url}}" target="_blank"><img class="card-img-top" src="{{preview.medium}}" alt="{{channel.status}}" /></a>
+			<div class="card-body text-center">
+	      <img src="{{channel.logo}}" class="rounded-circle" width="64" height="64">
+	      <a href="{{channel.url}}" target="_blank"><h5 class="card-title text-center">{{channel.display_name}}</h5></a>
+	      <p class="card-text">{{channel.status}}</p>
+	    </div>
+	    <div class="card-footer">
+	      <small class="text-muted">Went live <em>{{{timeago created_at}}}</em>. Streaming to <strong>{{viewers}} viewers</strong>.</small>
+	    </div>
+		</div>
+	{{/each}}
+</div>
