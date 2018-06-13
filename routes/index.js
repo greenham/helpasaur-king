@@ -1,7 +1,8 @@
 const express = require('express'),
   router = express.Router(),
   passport = require('passport'),
-  Account = require('../models/account');
+  Account = require('../models/account'),
+  staticCommands = require('../lib/commands.js');
 
 // Homepage
 router.get('/', (req, res) => {
@@ -33,6 +34,11 @@ router.post('/login',
 router.get('/logout', (req, res) => {
 	req.logout();
 	res.redirect('/');
+});
+
+// Command List
+router.get('/commands', (req, res) => {
+	res.render('commands', {commands: staticCommands.getCommandsInCategory('all')});
 });
 
 var isLoggedIn = (req, res, next) => {
