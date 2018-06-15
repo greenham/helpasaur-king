@@ -61,6 +61,8 @@ Web Control Panel:
       ☐ Guilds
   Twitch:
     ☐ Page to display filtered ALttP directory (make public)
+      ☐ Prioritize streams on the alert list
+      ☐ Add support for a user blacklist
     ☐ Ability to join/leave channels
     ☐ One-click bot restart
     ☐ Settings Page

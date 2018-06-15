@@ -47,16 +47,33 @@ router.get('/commands', (req, res) => {
 // Livestreams
 router.get('/livestreams', (req, res) => {
 	let config = req.app.locals.config.streamAlerts;
+	let alertChannels = config.channels;
 	config.channels = [];
+
 	let streamWatcher = new streamAlerts(config);
 	streamWatcher.findStreams()
 	.then(livestreams => {
-		// do some additional filtering?
-		/*let userBlacklist = [];
+		// do some additional ordering/filtering
+		// 1. remove streams from users on the blacklist
+		let userBlacklist = ["bonta__"];
 		livestreams = livestreams.filter(stream => {
+			return !userBlacklist.includes(stream.channel.name.toLowerCase());
+		});
 
-		});*/
-		res.render('twitch/livestreams', {livestreams: livestreams});
+		// 2. prioritize streams that are in the alert list
+		let topStreams = livestreams.filter(stream => {
+			return alertChannels.includes(stream.channel.name.toLowerCase());
+		});
+
+		// now we want a merged list, with topStreams first, then anything in livestreams that isn't in topStreams
+		let otherStreams = livestreams.filter(stream => {
+			let matchIndex = topStreams.findIndex(s => {
+				return s._id === stream._id;
+			});
+			return matchIndex === -1;
+		});
+
+		res.render('twitch/livestreams', {livestreams: topStreams.concat(otherStreams)});
 	})
 	.catch(err => {
 		console.log(err);
