@@ -22,6 +22,16 @@ helpers.timeago = (time) => {
 	}
 	return `<time class="timeago" datetime="${now.format()}">${now.calendar()}</time>`;
 };
+helpers.fromnow = (time) => {
+	let now = null;
+	// detect unix timestamp and convert appropriately
+	if (time.toString().match(/^[\d]+$/)) {
+		now = moment(time, 'X');
+	} else {
+		now = moment(time);
+	}
+	return now.fromNow();
+};
 helpers.srtvUrl = (guid) => {return SRTV.raceUrl(guid)};
 helpers.decorateRacers = (players) => {
 	let ret = '<span class="racers">';

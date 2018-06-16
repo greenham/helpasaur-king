@@ -55,6 +55,7 @@ router.get('/livestreams', (req, res) => {
 	.then(livestreams => {
 		// do some additional ordering/filtering
 		// 1. remove streams from users on the blacklist
+		// @TODO: move this blacklist to DB config
 		let userBlacklist = ["bonta__"];
 		livestreams = livestreams.filter(stream => {
 			return !userBlacklist.includes(stream.channel.name.toLowerCase());

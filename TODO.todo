@@ -60,9 +60,13 @@ Web Control Panel:
       ☐ Race Alerts
       ☐ Guilds
   Twitch:
-    ☐ Page to display filtered ALttP directory (make public)
-      ☐ Prioritize streams on the alert list
-      ☐ Add support for a user blacklist
+    ✔ Page to display filtered ALttP directory (make public) @done (18-06-15 10:35)
+      ✔ Prioritize streams on the alert list @done (18-06-15 10:35)
+      ✔ Add support for a user blacklist @done (18-06-15 10:35)
+    ☐ Filtered directory improvements
+      ☐ Move update code to client-side
+      ☐ Auto-refresh the page with updates
+      ☐ Change Went Live time to duration of stream
     ☐ Ability to join/leave channels
     ☐ One-click bot restart
     ☐ Settings Page
