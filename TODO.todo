@@ -66,14 +66,19 @@ Web Control Panel:
     ☐ Filtered directory improvements
       ☐ Move update code to client-side
       ☐ Auto-refresh the page with updates
-      ☐ Change Went Live time to duration of stream
+      ✔ Change Went Live time to duration of stream @done (18-06-16 12:24)
     ☐ Ability to join/leave channels
-    ☐ One-click bot restart
+      ☐ Allow whitelisted users to use commands to force join/leave from helpa chat
+      ☐ Have join/leave buttons in the control panel use these commands
+    ☐ One-click bot restart (send chat command)
     ☐ Settings Page
       ☐ Manage Twitch channel list for bot to join
       ☐ Cooldown
       ☐ User Blacklist
   SRTV:
+    ☐ Automated weekly race management
+      ☐ Bot auto-creates race channel at appropriate time
+      ☐ Force starts at 5 minutes after scheduled start time
     ☐ Quick race creation
       ☐ One-button one creation for popular race categories of ALttP
     ☐ Update lib to use passed in config
@@ -88,6 +93,10 @@ Web Control Panel:
 
 DevOps:
   Production:
+    ☐ Update twitch config
+      ☐ Add these properties:
+        - "admins" : ["greenham"], "blacklistedUsers": ["chaos_lord2","mdblz"]
+      ☐ Remove #helpasaurking from channel list (will be auto-joined now)
  
 Ideas:
   ☐ Better interface for SRC?

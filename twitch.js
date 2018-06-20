@@ -18,8 +18,6 @@ db.connect(config.db.host, config.db.db, (err) => {
     db.get().collection("config").findOne({"default": true}, (err, userConfig) => {
       if (!err) {
         config = Object.assign(config, userConfig);
-        // TODO: FIX
-        config.twitch.blacklistedUsers = ["chaos_lord2", "mdblz"];
         init(config);
       } else {
         console.error(`Unable to read config from database: ${err}`);
@@ -34,6 +32,7 @@ db.connect(config.db.host, config.db.db, (err) => {
 
 const init = (config) => {
   let botChannel = '#' + config.twitch.username.toLowerCase();
+  config.twitch.channels.push(botChannel);
 
   // Connect to Twitch IRC server
   let client = new irc.Client(config.twitch.ircServer, config.twitch.username, {
@@ -56,17 +55,23 @@ const init = (config) => {
 
     // Listen for commands that start with the designated prefix
     if (message.startsWith(config.twitch.cmdPrefix)) {
-      let commandNoPrefix = message.slice(config.twitch.cmdPrefix.length).split(' ')[0];
+      let commandParts = message.slice(config.twitch.cmdPrefix.length).split(' ');
+      let commandNoPrefix = commandParts[0] || '';
 
       // Listen for specific commands in the bot's channel
       if (to === botChannel) {
         if (commandNoPrefix === 'join') {
-          // join the requesting user's channel
-          const userChannel = '#' + from;
-          console.log(`Received request to join ${userChannel}`);
+          // join the requesting user's channel by default
+          let userChannel = '#' + from;
+          // check for channel argument if this user is an 'admin'
+          if (commandParts[1] && (config.twitch.admins.includes(from) || from === config.twitch.username.toLowerCase())) {
+            // join this channel instead
+            userChannel = '#' + commandParts[1];
+          }
+          console.log(`Received request from ${from} to join ${userChannel}`);
           let channelIndex = config.twitch.channels.indexOf(userChannel);
           if (channelIndex === -1) {
-            client.say(to, `@${from} >> Joining your channel... please mod ${config.twitch.username} to avoid accidental timeouts or bans!`);
+            client.say(to, `@${from} >> Joining ${userChannel}... please mod ${config.twitch.username} to avoid accidental timeouts or bans!`);
 
             // update config so this channel gets joined upon restart
             db.get().collection("config").update({"default": true}, {"$push": {"twitch.channels": userChannel}}, (err, res) => {
@@ -82,12 +87,17 @@ const init = (config) => {
             return client.say(to, '@' + from + ' >> I am already in your channel!');
           }
         } else if (commandNoPrefix === 'leave') {
-          // leave the requesting user's channel
-          const userChannel = '#' + from;
+          // leave the requesting user's channel by default
+          let userChannel = '#' + from;
+          // check for channel argument if this user is an 'admin'
+          if (commandParts[1] && (config.twitch.admins.includes(from) || from === config.twitch.username.toLowerCase())) {
+            // join this channel instead
+            userChannel = '#' + commandParts[1];
+          }
           console.log(`Received request to leave ${userChannel}`);
           let channelIndex = config.twitch.channels.indexOf(userChannel);
           if (channelIndex !== -1) {
-            client.say(to, `@${from} >> Leaving your channel... use ${config.twitch.cmdPrefix}join in this channel to re-join at any time!`);
+            client.say(to, `@${from} >> Leaving ${userChannel}... use ${config.twitch.cmdPrefix}join in this channel to re-join at any time!`);
 
             // update config so this channel no longer gets joined upon restart
             db.get().collection("config").update({"default": true}, {"$pull": {"twitch.channels": userChannel}}, (err, res) => {
@@ -111,7 +121,7 @@ const init = (config) => {
             return client.say(to, '@' + from + ' >> I am not in your channel!');
           }
         } else if (commandNoPrefix === 'reboot') {
-          if (from === 'greenham') {
+          if (config.twitch.admins.includes(from) || from === config.twitch.username.toLowerCase()) {
             console.log('Received request from admin to reboot...');
             client.say(to, 'Rebooting...');
             process.exit(0);
