@@ -446,6 +446,7 @@ let getRacesBySpeedgamingEntry = (entry) => {
 		  {$match: {
 		    deleted: {$ne: true},
 		    srtvRace: {$ne: null},
+		    when: {$gte: "2018-05-01T00:00:00+00:00"},
 		    $or: [
 		    	{"match1.players.displayName": entry.displayName},
 		    	{"match2.players.displayName": entry.displayName}
