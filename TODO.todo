@@ -12,6 +12,7 @@ Bots:
     ☐ Integration with ALttP Wiki search
     ☐ Support for pulling category rules from SRC
   Twitch:
+    ☐ Support DMs
 
 Web Control Panel:
   General:
@@ -58,8 +59,8 @@ Web Control Panel:
     ☐ Filtered directory improvements
       ☐ Move update code to client-side
       ☐ Auto-refresh the page with updates
-    ☐ One-click bot restart (send chat command)
     ☐ Support per-channel settings
+    ✔ One-click bot restart (send chat command) @done (18-06-21 12:50)
   SRTV:
     ☐ Automated weekly race management
       ☐ Bot auto-creates race channel at appropriate time

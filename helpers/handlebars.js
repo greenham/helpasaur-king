@@ -149,7 +149,9 @@ helpers.raceEntryStatus = (raceEntry, raceStarted) => {
 	return raceEntry.player.name
 	+ ((raceStarted && raceEntry.status == 'DONE') ? `<br><code>${helpers.hrt(raceEntry.stamp-raceStarted)}</code>`:'')
 	+ `<span class="badge badge-${badgeClass} float-right">${status}</span>`;
-	
+};
+helpers.raceEntryTime = (raceEntry, raceStarted) => {
+	return helpers.hrt(raceEntry.stamp-raceStarted);
 };
 
 helpers.math = (lvalue, operator, rvalue, options) => {

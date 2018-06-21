@@ -18,8 +18,10 @@ router.get('/:id', (req, res) => {
 				res.send({"error": err});
 			} else {
 				insetPeople(race).then(race => {
-					race.racers = getRacersFromRace(race);
-					res.render('tourney/race', {race: race});
+					insetRaceResults(race).then(race => {
+						race.racers = getRacersFromRace(race);
+						res.render('tourney/race', {race: race});
+					});
 				}).catch(console.error);
 			}
 		});
@@ -437,6 +439,29 @@ let getPersonBySpeedgamingEntry = (entry) => {
 	});
 };
 
+let getRacesBySpeedgamingEntry = (entry) => {
+	return new Promise((resolve, reject) => {
+		db.get().collection('tourney-events')
+		.aggregate([
+		  {$match: {
+		    deleted: {$ne: true},
+		    srtvRace: {$ne: null},
+		    $or: [
+		    	{"match1.players.displayName": entry.displayName},
+		    	{"match2.players.displayName": entry.displayName}
+		    ]
+		  }},
+		  {$project: {"started": "$srtvRace.started", "entries": "$srtvRace.entries.entries", "name": "$srtvRace.name", "guid": "$srtvRace.guid"}}
+		])
+		.toArray((err, races) => {
+			if (err) {
+				reject(err);
+			}
+			resolve(races);
+		});
+	});
+};
+
 // a function that insets values from tourney-people with the race itself
 let insetPeople = (race) => {
 	return new Promise((resolve, reject) => {
@@ -474,6 +499,44 @@ let insetPeople = (race) => {
 					getPersonBySpeedgamingEntry(value)
 					.then(person => {
 						race.commentators[index].person = person;
+						cb();
+					})
+					.catch(cb);
+				}, callback);
+			});
+		}
+
+		async.parallel(async.reflectAll(aTasks), (err, results) => {
+			if (err) reject(err);
+			resolve(race);
+		});
+	});
+};
+
+let insetRaceResults = (race) => {
+	// pull in SRTV race results for each racer
+	return new Promise((resolve, reject) => {
+		let aTasks = [];
+
+		if (race.match1 && race.match1.players) {
+			aTasks.push((callback) => {
+				async.forEachOf(race.match1.players, (value, index, cb) => {
+					getRacesBySpeedgamingEntry(value)
+					.then(races => {
+						race.match1.players[index].races = races;
+						cb();
+					})
+					.catch(cb);
+				}, callback);
+			});
+		}
+
+		if (race.match2 && race.match2.players) {
+			aTasks.push((callback) => {
+				async.forEachOf(race.match2.players, (value, index, cb) => {
+					getRacesBySpeedgamingEntry(value)
+					.then(races => {
+						race.match2.players[index].races = races;
 						cb();
 					})
 					.catch(cb);

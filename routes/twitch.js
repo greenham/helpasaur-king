@@ -140,6 +140,7 @@ router.post('/restart', (req, res) => {
         client.disconnect();
         res.send({status: 'rebooting'});
       } else {
+        client.disconnect();
         res.send({status: 'error'});
       }
     }
