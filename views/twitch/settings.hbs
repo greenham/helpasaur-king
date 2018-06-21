@@ -1,5 +1,7 @@
 <div class="container">
+	<button type="button" class="btn btn-md btn-danger float-right" id="btnRestart" data-toggle="modal" data-target="#restartConfirmation"><i class="fas fa-redo"></i> Restart Bot</button>
 	<h1>Twitch Bot Settings</h1>
+
 
 	<ul class="nav nav-tabs" role="tablist">
 	  <li class="nav-item">
@@ -101,8 +103,41 @@
 	affirmativeClass="danger"
 }}
 
+{{> modal 
+	id="restartConfirmation" 
+	title="Confirmation" 
+	body="Are you sure you want to restart the bot?" 
+	affirmativeText="Yes, Restart!" 
+	affirmativeClass="danger"
+}}
+
 <script>
 	$(document).ready(() => {
+		$('#btnrestartConfirmationAffirmative').on('click', e => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Restarting...');
+
+			$.ajax({
+				method: "POST",
+				url: "/twitch/restart"
+			})
+			.done((data, textStatus, jqXHR) => {
+				if (data.status === 'rebooting') {
+					alert('Bot is restarting!');
+				} else {
+					alert('Error!');
+				}
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#restartConfirmation').modal('hide');
+			});
+		});
+
 		$('#join-channel-input').on('keyup', (e) => {
 			// trigger new channel confirmation upon pressing Enter
 			if (e.keyCode == 13) {

@@ -12,13 +12,10 @@ Bots:
     ☐ Integration with ALttP Wiki search
     ☐ Support for pulling category rules from SRC
   Twitch:
-    ✔ Allow whitelisted users to use commands to force join/leave from helpa chat @done (18-06-20 12:56)
 
 Web Control Panel:
   General:
-    ☐ Implement a role/permission system @high
     ☐ Don't refresh the entire page when possible, just update elements
-    ☐ Render error pages where appropriate
     ☐ Event logging
       ☐ Log the following events along with who triggered them and when
         - Race creation
@@ -33,7 +30,6 @@ Web Control Panel:
         ☐ 30 Minutes prior: Discord Pings
         ☐ 20 Minutes prior: Race channel announcements
         ☐ 15 Minutes prior: Filename generation + sending
-      ✔ Display time the race started, it if has started @done (18-05-07 06:57)
       ☐ Add a link to and a way to display chat logs
       ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
       ☐ Add a button to ping Commentators about an upcoming race that needs commentators
@@ -47,9 +43,7 @@ Web Control Panel:
     People:
       ☐ Allow for people to be edited
       ☐ Button to refresh SRC PB for individual runner as well as everyone
-      ✔ Add discordId to each entry, using discordTag, change over to using ID where possible @done (18-05-07 06:57)
     Settings:
-      ✔ Allow for settings to be edited @done (18-05-03 11:51)
   Discord:
     ☐ UI to send a message (canned/custom) to a specific guild+channel
     ☐ One-click bot restart
@@ -61,24 +55,10 @@ Web Control Panel:
       ☐ Race Alerts
       ☐ Guilds
   Twitch:
-    ✔ Page to display filtered ALttP directory (make public) @done (18-06-15 10:35)
-      ✔ Prioritize streams on the alert list @done (18-06-15 10:35)
-      ✔ Add support for a user blacklist @done (18-06-15 10:35)
     ☐ Filtered directory improvements
       ☐ Move update code to client-side
       ☐ Auto-refresh the page with updates
-      ✔ Change Went Live time to duration of stream @done (18-06-16 12:24)
     ☐ One-click bot restart (send chat command)
-    ☐ Settings Page
-      ✔ Channel management @done (18-06-21 10:28)
-        ✔ Ability to join/leave channels @done (18-06-21 10:26)
-          ✔ Have join/leave buttons in the control panel use chat commands @done (18-06-21 10:26)
-      ☐ Config
-        ☐ Connection Settings
-        ☐ Command Prefix
-        ☐ Global Cooldown
-        ☐ User Blacklist
-        ☐ Admins
     ☐ Support per-channel settings
   SRTV:
     ☐ Automated weekly race management
@@ -98,18 +78,37 @@ Web Control Panel:
 
 DevOps:
   Production:
-    ✔ Update twitch config @done (18-06-20 12:55)
-      ✔ Add these properties: @done (18-06-20 12:55)
-        - "admins" : ["greenham"], "blacklistedUsers": ["chaos_lord2","mdblz"]
-      ✔ Remove #helpasaurking from channel list (will be auto-joined now) @done (18-06-20 12:55)
  
 Ideas:
   ☐ Better interface for SRC?
   
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ User Blacklist @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
+ ✔ Settings Page @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
+ ✔ Render error pages where appropriate @done (18-06-21 12:26) @project(Web Control Panel / General)
+ ✔ Implement a role/permission system @high @done (18-06-21 12:26) @project(Web Control Panel / General)
+ ✔ Global Cooldown @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
+ ✔ Connection Settings @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
+ ✔ Config @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
+ ✔ Command Prefix @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
+ ✔ Admins @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
+ ✔ Channel management @done (18-06-21 10:28) @project(Web Control Panel / Twitch)
+ ✔ Have join/leave buttons in the control panel use chat commands @done (18-06-21 10:26) @project(Web Control Panel / Twitch)
+ ✔ Ability to join/leave channels @done (18-06-21 10:26) @project(Web Control Panel / Twitch)
+ ✔ Allow whitelisted users to use commands to force join/leave from helpa chat @done (18-06-20 12:56) @project(Bots / Twitch)
+ ✔ Update twitch config @done (18-06-20 12:55) @project(DevOps / Production)
+ ✔ Remove #helpasaurking from channel list (will be auto-joined now) @done (18-06-20 12:55) @project(DevOps / Production)
+ ✔ Add these properties: @done (18-06-20 12:55) @project(DevOps / Production)
+ ✔ Change Went Live time to duration of stream @done (18-06-16 12:24) @project(Web Control Panel / Twitch)
+ ✔ Prioritize streams on the alert list @done (18-06-15 10:35) @project(Web Control Panel / Twitch)
+ ✔ Page to display filtered ALttP directory (make public) @done (18-06-15 10:35) @project(Web Control Panel / Twitch)
+ ✔ Add support for a user blacklist @done (18-06-15 10:35) @project(Web Control Panel / Twitch)
+ ✔ Display time the race started, it if has started @done (18-05-07 06:57) @project(Web Control Panel / Tourney / Races)
+ ✔ Add discordId to each entry, using discordTag, change over to using ID where possible @done (18-05-07 06:57) @project(Web Control Panel / Tourney / People)
  ✔ Calculate + display final race time @done (18-05-03 11:51) @project(Web Control Panel / Tourney / Races)
  ✔ Button to show/hide twitch feed in racer card @done (18-05-03 11:51) @project(Web Control Panel / Tourney / Races)
+ ✔ Allow for settings to be edited @done (18-05-03 11:51) @project(Web Control Panel / Tourney / Settings)
  ✔ Sync race entries + chat logs when updating srtv race @done (18-05-01 10:01) @project(Web Control Panel / Tourney / Races)
  ✔ Install Mongo, create alttpbot DB, npm update @done (18-04-30 11:41) @project(DevOps / Production)
  ✔ Store to the race itself @done (18-04-29 10:36) @project(Web Control Panel / Tourney / Race Page)

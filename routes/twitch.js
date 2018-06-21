@@ -61,7 +61,7 @@ router.post('/channels', (req, res) => {
   });
 
   client.addListener(`message#${config.twitch.username}`, (from, to, msg) => {
-  	console.log(from, to, msg);
+  	//console.log(from, to, msg);
   	if (from === config.twitch.username) {
   		if (msg.includes(`Joining #${req.body.channel}`)) {
 	  		client.disconnect();
@@ -98,7 +98,7 @@ router.delete('/channels', (req, res) => {
   });
 
   client.addListener(`message#${config.twitch.username}`, (from, to, msg) => {
-  	console.log(from, to, msg);
+  	//console.log(from, to, msg);
   	if (from === config.twitch.username) {
   		if (msg.includes(`Leaving ${req.body.channel}`)) {
 	  		client.disconnect();
@@ -108,6 +108,41 @@ router.delete('/channels', (req, res) => {
 				res.send({status: 'missing'});
 			}
   	}
+  });
+});
+
+router.post('/restart', (req, res) => {
+  console.log(`received request to restart the twitch bot`);
+
+  let config = req.app.locals.config;
+
+  // Connect to Twitch IRC server and join our own channel
+  let client = new irc.Client(config.twitch.ircServer, config.twitch.username, {
+    password: config.twitch.oauth,
+    autoConnect: false,
+    channels: ['#'+config.twitch.username]
+  });
+
+  client.connect(10, () => {
+    client.say('#'+config.twitch.username, `${config.twitch.cmdPrefix}reboot`);
+  });
+
+  client.addListener('error', message => {
+    if (message.command != 'err_unknowncommand') {
+      console.error('error from Twitch IRC Server: ', message);
+    }
+  });
+
+  client.addListener(`message#${config.twitch.username}`, (from, msg) => {
+    //console.log(from, msg);
+    if (from === config.twitch.username) {
+      if (msg.includes(`Rebooting`)) {
+        client.disconnect();
+        res.send({status: 'rebooting'});
+      } else {
+        res.send({status: 'error'});
+      }
+    }
   });
 });
 
