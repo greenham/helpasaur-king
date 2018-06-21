@@ -3,7 +3,8 @@ const express = require('express'),
   passport = require('passport'),
   Account = require('../models/account'),
   staticCommands = require('../lib/commands.js'),
-  streamAlerts = require('../lib/stream-alerts.js');
+  streamAlerts = require('../lib/stream-alerts.js'),
+  permit = require("../lib/permission").permit;
 
 // Homepage
 router.get('/', (req, res) => {
@@ -90,10 +91,10 @@ var isLoggedIn = (req, res, next) => {
 }
 
 // Admin Routes
-router.use('/tourney', isLoggedIn, require('./tourney.js'));
-router.use('/discord', isLoggedIn, require('./discord.js'));
-router.use('/srtv', isLoggedIn, require('./srtv.js'));
-router.use('/twitch', isLoggedIn, require('./twitch.js'));
-router.use('/settings', isLoggedIn, require('./settings.js'));
+router.use('/tourney', isLoggedIn, permit('admin', 'tourney-admin'), require('./tourney.js'));
+router.use('/discord', isLoggedIn, permit('admin'), require('./discord.js'));
+router.use('/srtv', isLoggedIn, permit('admin'), require('./srtv.js'));
+router.use('/twitch', isLoggedIn, permit('admin'), require('./twitch.js'));
+router.use('/settings', isLoggedIn, permit('admin'), require('./settings.js'));
 
 module.exports = router;

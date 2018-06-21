@@ -12,6 +12,7 @@ Bots:
     ☐ Integration with ALttP Wiki search
     ☐ Support for pulling category rules from SRC
   Twitch:
+    ✔ Allow whitelisted users to use commands to force join/leave from helpa chat @done (18-06-20 12:56)
 
 Web Control Panel:
   General:
@@ -67,14 +68,18 @@ Web Control Panel:
       ☐ Move update code to client-side
       ☐ Auto-refresh the page with updates
       ✔ Change Went Live time to duration of stream @done (18-06-16 12:24)
-    ☐ Ability to join/leave channels
-      ✔ Allow whitelisted users to use commands to force join/leave from helpa chat @done (18-06-20 12:56)
-      ☐ Have join/leave buttons in the control panel use these commands
     ☐ One-click bot restart (send chat command)
     ☐ Settings Page
-      ☐ Manage Twitch channel list for bot to join
-      ☐ Cooldown
-      ☐ User Blacklist
+      ✔ Channel management @done (18-06-21 10:28)
+        ✔ Ability to join/leave channels @done (18-06-21 10:26)
+          ✔ Have join/leave buttons in the control panel use chat commands @done (18-06-21 10:26)
+      ☐ Config
+        ☐ Connection Settings
+        ☐ Command Prefix
+        ☐ Global Cooldown
+        ☐ User Blacklist
+        ☐ Admins
+    ☐ Support per-channel settings
   SRTV:
     ☐ Automated weekly race management
       ☐ Bot auto-creates race channel at appropriate time

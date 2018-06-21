@@ -5,13 +5,35 @@ const express = require('express'),
   db = require('../db');
 
 router.get('/', (req, res) => {
-	res.render('twitch/index');
+	res.redirect('/livestreams');
 });
 
 // Twitch Settings Control
 router.get('/settings', (req, res) => {
 	req.app.locals.config.twitch.channels.sort();
 	res.render('twitch/settings', req.app.locals.config.twitch);
+});
+
+router.post('/settings', (req, res) => {
+  // @TODO: validation
+  let update = {
+    "twitch.ircServer": req.body.ircServer,
+    "twitch.username": req.body.username,
+    "twitch.oauth": req.body.oauth,
+    "twitch.textCmdCooldown": req.body.cooldown,
+    "twitch.cmdPrefix": req.body.prefix,
+    "twitch.blacklistedUsers": req.body.blacklistedUsers.trim().split(',').filter(e => e.length > 0),
+    "twitch.admins": req.body.admins.trim().split(',').filter(e => e.length > 0)
+  };
+
+  db.get().collection('config').update({"default": true}, {"$set": update}, err => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send(err);
+    }
+
+    res.send({"updated": true});
+  });
 });
 
 router.post('/channels', (req, res) => {
@@ -50,7 +72,6 @@ router.post('/channels', (req, res) => {
   		}
   	}
   });
-
 });
 
 router.delete('/channels', (req, res) => {
@@ -88,7 +109,6 @@ router.delete('/channels', (req, res) => {
 			}
   	}
   });
-
 });
 
 module.exports = router;
