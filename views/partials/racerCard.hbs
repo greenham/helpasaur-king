@@ -46,7 +46,7 @@
             <i class="fas fa-stopwatch"></i> 
             {{#each ../races}}
               {{#each entries}}
-                {{#if (and (eq player.name ../../srtvUsername) (ne status "REMOVED") (ne status "DROPPED"))}}
+                {{#if (and (eq player.name ../../srtvUsername) (eq status "DONE"))}}
                   <span class="badge badge-secondary"><a href="{{srtvUrl ../guid}}" target="_blank" title="Go to Race Channel">{{{raceEntryTime this ../started}}}</a></span>
                 {{/if}}
               {{/each}}
