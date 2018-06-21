@@ -68,7 +68,7 @@ Web Control Panel:
       ☐ Auto-refresh the page with updates
       ✔ Change Went Live time to duration of stream @done (18-06-16 12:24)
     ☐ Ability to join/leave channels
-      ☐ Allow whitelisted users to use commands to force join/leave from helpa chat
+      ✔ Allow whitelisted users to use commands to force join/leave from helpa chat @done (18-06-20 12:56)
       ☐ Have join/leave buttons in the control panel use these commands
     ☐ One-click bot restart (send chat command)
     ☐ Settings Page
@@ -93,10 +93,10 @@ Web Control Panel:
 
 DevOps:
   Production:
-    ☐ Update twitch config
-      ☐ Add these properties:
+    ✔ Update twitch config @done (18-06-20 12:55)
+      ✔ Add these properties: @done (18-06-20 12:55)
         - "admins" : ["greenham"], "blacklistedUsers": ["chaos_lord2","mdblz"]
-      ☐ Remove #helpasaurking from channel list (will be auto-joined now)
+      ✔ Remove #helpasaurking from channel list (will be auto-joined now) @done (18-06-20 12:55)
  
 Ideas:
   ☐ Better interface for SRC?

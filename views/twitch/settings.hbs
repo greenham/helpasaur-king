@@ -1,22 +1,144 @@
 <div class="container">
 	<ul class="nav nav-pills" id="myTab" role="tablist">
 	  <li class="nav-item">
-	    <a class="nav-link active" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="true">Config</a>
+	    <a class="nav-link active" id="channels-tab" data-toggle="tab" href="#channels" role="tab" aria-controls="channels" aria-selected="false">Channels</a>
 	  </li>
 	  <li class="nav-item">
-	    <a class="nav-link" id="channels-tab" data-toggle="tab" href="#channels" role="tab" aria-controls="channels" aria-selected="false">Channels</a>
+	    <a class="nav-link" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="true">Config</a>
 	  </li>
 	</ul>
 
 	<!-- Tab panes -->
-	<div class="tab-content">
-	  <div class="tab-pane active" id="config" role="tabpanel" aria-labelledby="config-tab">
-	  	
-	  </div>
-	  <div class="tab-pane" id="channels" role="tabpanel" aria-labelledby="channels-tab">
+	<div class="tab-content mt-3">
+	  <div class="tab-pane active" id="channels" role="tabpanel" aria-labelledby="channels-tab">
+	  	<ul class="list-group col-4">
+	  		<li class="list-group-item">
+	  			<div class="input-group">
+		  			<div class="input-group-prepend">
+					    <span class="input-group-text">#</span>
+					  </div>
+		  			<input type="text" class="form-control" placeholder="Join Channel" id="join-channel-input" value="">
+	  			</div>
+  			</li>
 	  	{{#each channels}}
-	  		<li>{{this}}</li>
+	  		<li class="list-group-item" data-channel-name="{{this}}">
+	  			{{this}}
+	  			<button type="button" class="btn-md btn-default close leave-channel-btn"><span aria-hidden="true">&times;</span></button>
+  			</li>
 	  	{{/each}}
+	  	</ul>
+	  </div>
+	  <div class="tab-pane" id="config" role="tabpanel" aria-labelledby="config-tab">
+	  	
 	  </div>
 	</div>
 </div>
+
+{{> modal 
+	id="joinChannelConfirmation" 
+	title="Confirmation" 
+	body="Are you sure you want the bot to join #{CHANNEL}?" 
+	affirmativeText="Yes, Join!" 
+	affirmativeClass="success"
+}}
+
+{{> modal 
+	id="leaveChannelConfirmation" 
+	title="Confirmation" 
+	body="Are you sure you want the bot to leave this channel?" 
+	affirmativeText="Yes, Leave!" 
+	affirmativeClass="danger"
+}}
+
+<script>
+	$(document).ready(() => {
+		$('#joinChannelConfirmation').on('hidden.bs.modal', (e) => {
+			var body = $(e.target).find('.modal-body');
+			var channelName = $(e.target).find('#btnjoinChannelConfirmationAffirmative').attr('data-channel-name');
+			/*console.log('body html after hide: ', body.html());
+			console.log(`replacing ${channelName} with {CHANNEL}`);*/
+			var replaced = body.html().replace(channelName, '{CHANNEL}');
+			//console.log('after replace: ', replaced);
+			body.html(replaced);
+		});
+
+		$('#join-channel-input').on('keyup', (e) => {
+			// trigger new channel confirmation upon pressing Enter
+			if (e.keyCode == 13) {
+				var channelName = e.target.value;
+				var $modalEl = $('#joinChannelConfirmation');
+				var body = $modalEl.find('.modal-body');
+				//console.log('body html before replace: ', body.html());
+				var replaced = body.html().replace('{CHANNEL}', channelName);
+				body.html(replaced);
+				//console.log('after replace: ', replaced);
+				$modalEl.find('#btnjoinChannelConfirmationAffirmative').attr('data-channel-name', channelName);
+				$modalEl.modal('show');
+			}
+		});
+
+		$('#btnjoinChannelConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Joining...');
+
+			var channelName = $(e.target).data('channel-name');
+			$.ajax({
+				method: "POST",
+				url: "/twitch/channels",
+				data: {channel: channelName}
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Joined channel!');
+				location.reload();
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#joinChannelConfirmation').modal('hide');
+			});
+		});
+
+		$('.leave-channel-btn').on('click', (e) => {
+			var channelName = $(e.target).parents('.list-group-item').data('channel-name');
+			var $modalEl = $('#leaveChannelConfirmation');
+
+			$modalEl.on('show.bs.modal', (e) => {
+				$modalEl.find('#btnleaveChannelConfirmationAffirmative').attr('data-channel-name', channelName);
+			});
+
+			$modalEl.on('hidden.bs.modal', (e) => {
+				$modalEl.find('#btnleaveChannelConfirmationAffirmative').removeAttr('data-channel-name');
+			});
+
+			$modalEl.modal('show');
+		});
+
+		$('#btnleaveChannelConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Leaving...');
+
+			var channelName = $(e.target).data('channel-name');
+			$.ajax({
+				method: "DELETE",
+				url: "/twitch/channels",
+				data: {channel: channelName}
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Left channel!');
+				// find the list-group-item with the matching channel name and remove it
+				$('.list-group-item[data-channel-name="'+channelName+'"]').remove();
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#leaveChannelConfirmation').modal('hide');
+			});
+		});
+	});
+</script>
