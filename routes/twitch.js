@@ -29,7 +29,9 @@ router.post('/channels', (req, res) => {
 	let message = `${config.twitch.cmdPrefix}join ${req.body.channel}`;
 
   client.connect(10, () => {
-  	client.say('#'+config.twitch.username, message);
+  	console.log('connect to twitch irc, sending message now');
+  	let result = client.say('#'+config.twitch.username, message);
+  	console.log(result);
   });
 
   client.addListener('error', message => {
