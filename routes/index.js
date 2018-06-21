@@ -91,10 +91,10 @@ var isLoggedIn = (req, res, next) => {
 }
 
 // Admin Routes
-router.use('/tourney', isLoggedIn, permit('admin', 'tourney-admin'), require('./tourney.js'));
+router.use('/tourney', isLoggedIn, permit('tourney-admin'), require('./tourney.js'));
 router.use('/discord', isLoggedIn, permit('admin'), require('./discord.js'));
 router.use('/srtv', isLoggedIn, permit('admin'), require('./srtv.js'));
 router.use('/twitch', isLoggedIn, permit('admin'), require('./twitch.js'));
-router.use('/settings', isLoggedIn, permit('admin'), require('./settings.js'));
+router.use('/settings', isLoggedIn, require('./settings.js'));
 
 module.exports = router;
