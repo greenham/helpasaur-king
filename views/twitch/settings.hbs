@@ -89,8 +89,13 @@
 				data: {channel: channelName}
 			})
 			.done((data, textStatus, jqXHR) => {
-				alert('Joined channel!');
-				location.reload();
+				console.log(data);
+				if (data.status === 'joined') {
+					alert('Joined channel!');
+					location.reload();
+				} else if (data.status === 'exists') {
+					alert('Bot is already in this channel!');
+				}
 			})
 			.fail((jqXHR, textStatus, errorThrown) => {
 				alert('Error: ' + jqXHR.responseText);
@@ -128,9 +133,13 @@
 				data: {channel: channelName}
 			})
 			.done((data, textStatus, jqXHR) => {
-				alert('Left channel!');
-				// find the list-group-item with the matching channel name and remove it
-				$('.list-group-item[data-channel-name="'+channelName+'"]').remove();
+				if (data.status === 'left') {
+					alert('Left channel!');
+					// find the list-group-item with the matching channel name and remove it
+					$('.list-group-item[data-channel-name="'+channelName+'"]').remove();
+				} else if (data.status === 'missing') {
+					alert('Bot is not in this channel!');
+				}
 			})
 			.fail((jqXHR, textStatus, errorThrown) => {
 				alert('Error: ' + jqXHR.responseText);

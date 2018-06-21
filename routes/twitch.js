@@ -26,8 +26,9 @@ router.post('/channels', (req, res) => {
     channels: ['#'+config.twitch.username]
   });
 
+	let message = `${config.twitch.cmdPrefix}join ${req.body.channel}`;
+
   client.connect(10, () => {
-  	let message = `${config.twitch.cmdPrefix}join ${req.body.channel}`;
   	client.say('#'+config.twitch.username, message);
   });
 
@@ -39,12 +40,17 @@ router.post('/channels', (req, res) => {
 
   client.addListener('message', (from, to, msg) => {
   	console.log(from, to, msg);
-  	if (from === config.twitch.username && to === '#'+config.twitch.username && msg.includes(`Joining ${req.body.channel}`)) {
-  		client.disconnect();
+  	if (from === config.twitch.username && to === '#'+config.twitch.username) {
+  		if (msg.includes(`Joining #${req.body.channel}`)) {
+	  		client.disconnect();
+	  		res.send({status: 'joined'});
+  		} else if (msg.includes(`already in your channel`)) {
+  			client.disconnect();
+  			res.send({status: 'exists'});
+  		}
   	}
   });
 
-  res.send({result: true});
 });
 
 router.delete('/channels', (req, res) => {
@@ -73,12 +79,17 @@ router.delete('/channels', (req, res) => {
 
   client.addListener('message', (from, to, msg) => {
   	console.log(from, to, msg);
-  	if (from === config.twitch.username && to === '#'+config.twitch.username && msg.includes(`Leaving ${req.body.channel}`)) {
-  		client.disconnect();
+  	if (from === config.twitch.username && to === '#'+config.twitch.username) {
+  		if (msg.includes(`Leaving ${req.body.channel}`)) {
+	  		client.disconnect();
+				res.send({status: 'left'});
+			} else if (msg.includes(`not in your channel`)) {
+				client.disconnect();
+				res.send({status: 'missing'});
+			}
   	}
   });
 
-	res.send({result: true});
 });
 
 module.exports = router;
