@@ -26,12 +26,10 @@ router.post('/channels', (req, res) => {
     channels: ['#'+config.twitch.username]
   });
 
-	let message = `${config.twitch.cmdPrefix}join ${req.body.channel}`;
+	let command = `${config.twitch.cmdPrefix}join ${req.body.channel}`;
 
   client.connect(10, () => {
-  	console.log('connect to twitch irc, sending message now');
-  	let result = client.say('#'+config.twitch.username, message);
-  	console.log(result);
+  	client.say('#'+config.twitch.username, command);
   });
 
   client.addListener('error', message => {
@@ -40,9 +38,9 @@ router.post('/channels', (req, res) => {
     }
   });
 
-  client.addListener('message', (from, to, msg) => {
+  client.addListener(`message#${config.twitch.username}`, (from, to, msg) => {
   	console.log(from, to, msg);
-  	if (from === config.twitch.username && to === '#'+config.twitch.username) {
+  	if (from === config.twitch.username) {
   		if (msg.includes(`Joining #${req.body.channel}`)) {
 	  		client.disconnect();
 	  		res.send({status: 'joined'});
@@ -69,8 +67,7 @@ router.delete('/channels', (req, res) => {
   });
 
   client.connect(10, () => {
-  	let message = `${config.twitch.cmdPrefix}leave ${req.body.channel.substr(1)}`;
-  	client.say('#'+config.twitch.username, message);
+  	client.say('#'+config.twitch.username, `${config.twitch.cmdPrefix}leave ${req.body.channel.substr(1)}`);
   });
 
   client.addListener('error', message => {
@@ -79,9 +76,9 @@ router.delete('/channels', (req, res) => {
     }
   });
 
-  client.addListener('message', (from, to, msg) => {
+  client.addListener(`message#${config.twitch.username}`, (from, to, msg) => {
   	console.log(from, to, msg);
-  	if (from === config.twitch.username && to === '#'+config.twitch.username) {
+  	if (from === config.twitch.username) {
   		if (msg.includes(`Leaving ${req.body.channel}`)) {
 	  		client.disconnect();
 				res.send({status: 'left'});
