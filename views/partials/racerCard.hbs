@@ -47,7 +47,7 @@
             {{#each ../races}}
               {{#each entries}}
                 {{#if (and (eq player.name ../../srtvUsername) (ne status "REMOVED") (ne status "DROPPED"))}}
-                  <span class="badge badge-secondary">{{{raceEntryTime this ../started}}}</span>
+                  <span class="badge badge-secondary"><a href="{{srtvUrl ../guid}}" target="_blank" title="Go to Race Channel">{{{raceEntryTime this ../started}}}</a></span>
                 {{/if}}
               {{/each}}
             {{/each}}
