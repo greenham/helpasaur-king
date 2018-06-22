@@ -1,82 +1,86 @@
 Bugs:
+  ☐ Base cooldown off the command id itself, not the message used @high
+    - !nmg 1 and !nmg 2 would be considered different cooldowns
  
 Bots:
   Global:
     ☐ Update readme-gen to use new commands @low
     ☐ Update SR.C functionality to reflect new Extensions board @low
-    ☐ Integration with strat hub
+    ☐ Integration with strat hub @low
       - !strat armos-refight {username} (if no username is specified, returns top X times with links)
   Discord:
-    ☐ Integrate with speedrun.tv once API is available/documented
+    ☐ Integrate with speedrun.tv once API is available/documented @low
       - Ability to start and control races from within Discord
-    ☐ Integration with ALttP Wiki search
-    ☐ Support for pulling category rules from SRC
+    ☐ Integration with ALttP Wiki search @low
+    ☐ Support for pulling category rules from SRC @low
   Twitch:
-    ☐ Support DMs
+    ☐ Support DMs @low
 
-Web Control Panel:
+Web:
   General:
-    ☐ Don't refresh the entire page when possible, just update elements
-    ☐ Event logging
+    ☐ Don't refresh the entire page when possible, just update elements @low
+    ☐ Event logging @low
       ☐ Log the following events along with who triggered them and when
         - Race creation
         - Discord pings
         - Race announcements
         - Filename generation
         - Filename sending
-  Tourney:
-    Races:
-      ✔ Add bracket results to racer card @done (18-06-21 16:32)
-      ☐ Button on the race page which auto-schedules the following events:
-        ☐ 45 Minutes prior: Race channel creation
-        ☐ 30 Minutes prior: Discord Pings
-        ☐ 20 Minutes prior: Race channel announcements
-        ☐ 15 Minutes prior: Filename generation + sending
-      ☐ Add a link to and a way to display chat logs
-      ☐ Add Discord server / channel / users-to-ping selection to Discord Pings
-      ☐ Add a button to ping Commentators about an upcoming race that needs commentators
-      ☐ Allow for the race channel GUID to be manually updated from the race page
-      ☐ Add multitwitch link to race information
-      ☐ Add a multistream view
-      ☐ Allow for the filenames to be edited after generation (or re-generated)
-      ☐ Option to send specific messages as DMs
-      ☐ Option to send messages directly to race announcements
-      ☐ Provide a 'merged' chat feed for the race channel
-    People:
-      ☐ Allow for people to be edited
-      ☐ Button to refresh SRC PB for individual runner as well as everyone
-    Settings:
+  Public Pages:
+    ☐ Livestreams page improvements
+      ☐ Move update code to client-side
+      ☐ Auto-refresh the page with updates
+    ☐ Commands list improvements
+      ☐ Searching
+      ☐ Auto-linking of URLs
   Discord:
-    ☐ UI to send a message (canned/custom) to a specific guild+channel
-    ☐ One-click bot restart
     ☐ Settings Page
       ☐ Config
       ☐ Stream Alerts
         ☐ Manage Twitch channel list for stream alerts
         ☐ Ability to update the filter parameters for stream alerts
       ☐ Race Alerts
-      ☐ Guilds
-  Twitch:
-    ☐ Filtered directory improvements
-      ☐ Move update code to client-side
-      ☐ Auto-refresh the page with updates
+      ☐ Guild Configs
+      ☐ Activity list
+    ☐ One-click bot restart (sends !reboot command to itself)
+    ☐ UI to send a message (canned/custom) to a specific guild+channel
+  Twitch:    
     ☐ Support per-channel settings
-    ✔ One-click bot restart (send chat command) @done (18-06-21 12:50)
   SRTV:
-    ☐ Automated weekly race management
+    ☐ Automated weekly race management @high
       ☐ Bot auto-creates race channel at appropriate time
       ☐ Force starts at 5 minutes after scheduled start time
-    ☐ Quick race creation
+    ☐ Quick race creation @low
       ☐ One-button one creation for popular race categories of ALttP
-    ☐ Update lib to use passed in config
+    ☐ Update lib to use passed in config @low
   Bot Commands:
-    ☐ Uniqueness check when new commands are added
-    ☐ Inline editing
+    ☐ Uniqueness check when new commands are added (check aliases too) @high
     ☐ Enable/Disable Command
-    ☐ Filtering/searching
     ☐ Category editing
+    ☐ Filtering/searching
+    ☐ Inline editing
   Logs:
-    ☐ Realtime log viewing
+    ☐ Realtime log viewing (read logs/*)
+  Tourney:
+    Races:
+      ☐ Add a link to and a way to display chat logs @low
+      ☐ Add Discord server / channel / users-to-ping selection to Discord Pings @low
+      ☐ Allow for the race channel GUID to be manually updated from the race page @low
+      ☐ Add multitwitch link to race information @low
+      ☐ Add a multistream view @low
+      ☐ Allow for the filenames to be edited after generation (or re-generated) @low
+      ☐ Option to send specific messages as DMs @low
+      ☐ Option to send messages directly to race announcements @low
+      ☐ Provide a 'merged' chat feed for the race channel @low
+      ☐ Add a button to ping Commentators about an upcoming race that needs commentators @low
+      ☐ Button on the race page which auto-schedules the following events: @low
+        ☐ 45 Minutes prior: Race channel creation
+        ☐ 30 Minutes prior: Discord Pings
+        ☐ 20 Minutes prior: Race channel announcements
+        ☐ 15 Minutes prior: Filename generation + sending
+    People:
+      ☐ Allow for people to be edited @low
+      ☐ Button to refresh SRC PB for individual runner as well as everyone @low
 
 DevOps:
   Production:
@@ -86,6 +90,8 @@ Ideas:
   
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ ✔ Add bracket results to racer card @done (18-06-21 16:32) @project(Web / Tourney / Races)
+ ✔ One-click bot restart (send chat command) @done (18-06-21 12:50) @project(Web / Twitch)
  ✔ User Blacklist @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
  ✔ Settings Page @done (18-06-21 12:26) @project(Web Control Panel / Twitch)
  ✔ Render error pages where appropriate @done (18-06-21 12:26) @project(Web Control Panel / General)
