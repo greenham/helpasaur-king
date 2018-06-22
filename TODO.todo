@@ -9,8 +9,10 @@ Bots:
     ☐ Integration with strat hub @low
       - !strat armos-refight {username} (if no username is specified, returns top X times with links)
   Discord:
+    ☐ Move 'master' and 'handleDMs' config items to config.json since they're environment-specific
     ☐ Integrate with speedrun.tv once API is available/documented @low
       - Ability to start and control races from within Discord
+      - Race alerts similar to SRL
     ☐ Integration with ALttP Wiki search @low
     ☐ Support for pulling category rules from SRC @low
   Twitch:
@@ -34,7 +36,7 @@ Web:
       ☐ Searching
       ☐ Auto-linking of URLs
   Discord:
-    ☐ Settings Page
+    ☐ Settings Page @high
       ☐ Config
       ☐ Stream Alerts
         ☐ Manage Twitch channel list for stream alerts
@@ -45,11 +47,12 @@ Web:
     ☐ One-click bot restart (sends !reboot command to itself)
     ☐ UI to send a message (canned/custom) to a specific guild+channel
   Twitch:    
-    ☐ Support per-channel settings
+    ☐ Support per-channel settings (prefix, cooldown)
   SRTV:
     ☐ Automated weekly race management @high
       ☐ Bot auto-creates race channel at appropriate time
       ☐ Force starts at 5 minutes after scheduled start time
+      ☐ Button for admins to force start manually
     ☐ Quick race creation @low
       ☐ One-button one creation for popular race categories of ALttP
     ☐ Update lib to use passed in config @low
@@ -86,7 +89,12 @@ DevOps:
   Production:
  
 Ideas:
-  ☐ Better interface for SRC?
+  ☐ Better interface for SRC Mods?
+    ☐ Sort by date of submission instead of date of run
+    ☐ Cache results for faster loading
+    ☐ Verification assignment / claim
+      - Admin clicks button to indicate they are working on verifying this run
+      - Display reflects that this run is being verified by another mod
   
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

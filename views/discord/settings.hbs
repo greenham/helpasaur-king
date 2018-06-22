@@ -1,26 +1,165 @@
 <div class="container">
-	<ul class="nav nav-pills" id="myTab" role="tablist">
+	<h1>Discord Bot Settings</h1>
+
+	<ul class="nav nav-tabs" role="tablist">
 	  <li class="nav-item">
-	    <a class="nav-link active" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="true">Config</a>
+	    <a class="nav-link active" id="guilds-tab" data-toggle="tab" href="#guildsTab" role="tab" aria-controls="guildsTab" aria-selected="true">Guilds</a>
 	  </li>
 	  <li class="nav-item">
-	    <a class="nav-link" id="streamAlerts-tab" data-toggle="tab" href="#streamAlerts" role="tab" aria-controls="streamAlerts" aria-selected="false">Stream Alerts</a>
+	    <a class="nav-link" id="config-tab" data-toggle="tab" href="#configTab" role="tab" aria-controls="configTab" aria-selected="false">Config</a>
 	  </li>
 	  <li class="nav-item">
-	    <a class="nav-link" id="raceAlerts-tab" data-toggle="tab" href="#raceAlerts" role="tab" aria-controls="raceAlerts" aria-selected="false">Race Alerts</a>
+	    <a class="nav-link" id="streamAlerts-tab" data-toggle="tab" href="#streamAlertsTab" role="tab" aria-controls="streamAlertsTab" aria-selected="false">Stream Alerts</a>
 	  </li>
 	</ul>
 
 	<!-- Tab panes -->
-	<div class="tab-content">
-	  <div class="tab-pane active" id="config" role="tabpanel" aria-labelledby="config-tab">
-	  	
+	<div class="tab-content border border-secondary p-3">
+	  <!-- Guilds -->
+	  <div class="tab-pane active" id="guildsTab" role="tabpanel" aria-labelledby="guilds-tab">
+			<div class="row">
+				<div class="col-3">
+					<div class="list-group" id="guild-list-tab" role="tablist">
+						{{#each discord.guilds}}
+							{{#unless (eq internalName "default")}}
+								<a href="#list-{{internalName}}" class="list-group-item list-group-item-action" id="list-{{internalName}}-list" data-toggle="list" role="tab" aria-controls="list-{{internalName}}">{{internalName}}<br><small class="text-muted">{{id}}</small></a>
+							{{/unless}}
+						{{/each}}		
+					</div>
+				</div>
+				<div class="col-9">
+					<div class="tab-content" id="guilds-tabContent">
+						{{#each discord.guilds}}
+							{{#unless (eq internalName "default")}}
+								<form id="{{internalName}}Form">
+						      <div class="tab-pane fade" id="list-{{internalName}}" role="tabpanel" aria-labelledby="list-{{internalName}}-list">
+						      	<div class="form-row">
+						      		<div class="form-group col-4">
+												<span class="switch switch-sm">
+												  <input type="checkbox" class="switch" id="enableLivestreamAlerts"{{#if enableLivestreamAlerts}} checked{{/if}}>
+												  <label for="enableLivestreamAlerts">Stream Alerts</label>
+												</span>
+												<span class="switch switch-sm">
+												  <input type="checkbox" class="switch" id="enableRaceAlerts"{{#if enableRaceAlerts}} checked{{/if}}>
+												  <label for="enableRaceAlerts">SRL Race Alerts</label>
+												</span>
+												<span class="switch switch-sm">
+												  <input type="checkbox" class="switch" id="enableWeeklyRaceAlert"{{#if enableWeeklyRaceAlert}} checked{{/if}}>
+												  <label for="enableWeeklyRaceAlert">Weekly Alerts</label>
+												</span>
+												<span class="switch switch-sm">
+												  <input type="checkbox" class="switch" id="alertOnConnect"{{#if alertOnConnect}} checked{{/if}}>
+												  <label for="alertOnConnect">Alert On Connect</label>
+												</span>
+											</div>
+											<div class="form-group col-4">
+												<label for="alertsChannelName">Alerts Text Channel</label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<span class="input-group-text">#</span>
+													</div>
+													<input type="text" class="form-control" placeholder="Alerts Text Channel Name" id="alertsChannelName" name="alertsChannelName" value="{{alertsChannelName}}">
+												</div>
+												<small class="form-text text-muted">
+													The text channel where all alerts are posted.
+												</small>
+											</div>
+											<div class="form-group col-4">
+												<label for="weeklyRaceAlertRole">Weekly Alert Role</label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<span class="input-group-text">@</span>
+													</div>
+													<input type="text" class="form-control" placeholder="Weekly Race Alert Role" id="weeklyRaceAlertRole" name="weeklyRaceAlertRole" value="{{weeklyRaceAlertRole}}">
+												</div>
+												<small class="form-text text-muted">
+													The role that will be pinged for the weekly race.
+												</small>
+											</div>
+										</div>
+										<div class="form-row">
+											<div class="form-group col-4">
+												<label for="cmdPrefix">Command Prefix</label>
+			      						<input type="text" class="form-control" id="cmdPrefix" value="{{cmdPrefix}}" name="cmdPrefix">
+											</div>
+											<div class="form-group col-4">
+												<label for="textCmdCooldown">Text Command Cooldown</label>
+									      <div class="input-group">
+									      	<input type="number" class="form-control" id="textCmdCooldown" value="{{textCmdCooldown}}" name="textCmdCooldown">
+									      	<div class="input-group-append">
+												    <span class="input-group-text">seconds</span>
+												  </div>
+									      </div>
+											</div>
+											<div class="form-group col-4">
+												<label for="textCmdCooldown">SRC Command Cooldown</label>
+									      <div class="input-group">
+									      	<input type="number" class="form-control" id="srcCmdCooldown" value="{{srcCmdCooldown}}" name="srcCmdCooldown">
+									      	<div class="input-group-append">
+												    <span class="input-group-text">seconds</span>
+												  </div>
+									      </div>
+											</div>
+										</div>
+										<div class="form-row">
+											<div class="form-group col-8">
+												<label for="allowedRolesForRequest">Allowed Roles for Request</label>
+												<textarea name="allowedRolesForRequest" id="allowedRolesForRequest" rows="3" class="form-control">{{allowedRolesForRequest}}</textarea>
+												<small class="form-text text-muted">
+													Roles that can be added/removed by users using the <code>role add|remove</code> command. Separated by <code>|</code>
+												</small>
+											</div>
+										</div>
+						      </div>
+					    	</form>
+				    	{{/unless}}
+			      {{/each}}
+			    </div>
+				</div>
+			</div>
 	  </div>
-	  <div class="tab-pane" id="streamAlerts" role="tabpanel" aria-labelledby="streamAlerts-tab">
-	  	
+		<!-- Config -->
+	  <div class="tab-pane" id="configTab" role="tabpanel" aria-labelledby="config-tab">
+	  	<form id="configForm" class="p-2">
+			  <div class="form-row">
+			    <div class="form-group col-8">
+			      <label for="inputToken">App Bot User Token <a href="#" class="btn-sm btn-default" id="linkToggleTokenVisibility"><i class="fas fa-eye"></i></a></label> <a href="https://discordapp.com/developers/applications/me" target="_blank" class="float-right"><small>Bot App List</small></a>
+			      <input type="password" class="form-control" id="inputToken" placeholder="App Bot User Token" value="{{discord.token}}" name="token">
+			    </div>
+			  </div>
+			  <div class="form-row">
+			  	<div class="form-group col-8">
+			  		<label for="activities">Activities</label>
+			  		<textarea name="activities" id="textareaActivities" rows="5" class="form-control">{{discord.activities}}</textarea>
+			  	</div>
+			  </div>
+			  <!-- <button type="submit" class="btn btn-primary">Update</button> -->
+			</form>
 	  </div>
-	  <div class="tab-pane" id="raceAlerts" role="tabpanel" aria-labelledby="raceAlerts-tab">
+	  <!-- Stream Alerts -->
+	  <div class="tab-pane" id="streamAlertsTab" role="tabpanel" aria-labelledby="streamAlerts-tab">
 	  	
 	  </div>
 	</div>
 </div>
+
+<script>
+$(document).ready(() => {
+	$('#guild-list-tab a').on('click', function (e) {
+	  e.preventDefault();
+	  $(this).tab('show');
+	});
+	// show first tab of guilds
+	$('#guild-list-tab a:first-child').tab('show');
+
+	$('#linkToggleTokenVisibility').on('click', e => {
+		let $el = $('#inputToken');
+		let currentState = $el.attr('type');
+		if (currentState === 'password') {
+			$el.attr('type', 'text');
+		} else if (currentState === 'text') {
+			$el.attr('type', 'password');
+		}
+	});
+});
+</script>
