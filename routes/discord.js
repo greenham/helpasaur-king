@@ -10,6 +10,7 @@ router.get('/', (req, res) => {
 
 // Discord Settings Control
 router.get('/settings', (req, res) => {
+	req.app.locals.config.streamAlerts.channels.sort();
 	res.render('discord/settings', req.app.locals.config);
 });
 

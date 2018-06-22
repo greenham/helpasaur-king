@@ -9,6 +9,7 @@ Bots:
     ☐ Integration with strat hub @low
       - !strat armos-refight {username} (if no username is specified, returns top X times with links)
   Discord:
+    ☐ Move activities to guild config
     ☐ Move 'master' and 'handleDMs' config items to config.json since they're environment-specific
     ☐ Integrate with speedrun.tv once API is available/documented @low
       - Ability to start and control races from within Discord

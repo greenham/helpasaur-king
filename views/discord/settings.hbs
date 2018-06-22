@@ -1,4 +1,5 @@
 <div class="container">
+	<button type="button" class="btn btn-md btn-danger float-right" id="btnRestart" data-toggle="modal" data-target="#restartConfirmation"><i class="fas fa-redo"></i> Restart Bot</button>
 	<h1>Discord Bot Settings</h1>
 
 	<ul class="nav nav-tabs" role="tablist">
@@ -6,10 +7,10 @@
 	    <a class="nav-link active" id="guilds-tab" data-toggle="tab" href="#guildsTab" role="tab" aria-controls="guildsTab" aria-selected="true">Guilds</a>
 	  </li>
 	  <li class="nav-item">
-	    <a class="nav-link" id="config-tab" data-toggle="tab" href="#configTab" role="tab" aria-controls="configTab" aria-selected="false">Config</a>
+	    <a class="nav-link" id="streamAlerts-tab" data-toggle="tab" href="#streamAlertsTab" role="tab" aria-controls="streamAlertsTab" aria-selected="false">Stream Alerts</a>
 	  </li>
 	  <li class="nav-item">
-	    <a class="nav-link" id="streamAlerts-tab" data-toggle="tab" href="#streamAlertsTab" role="tab" aria-controls="streamAlertsTab" aria-selected="false">Stream Alerts</a>
+	    <a class="nav-link" id="config-tab" data-toggle="tab" href="#configTab" role="tab" aria-controls="configTab" aria-selected="false">Global Config</a>
 	  </li>
 	</ul>
 
@@ -118,12 +119,63 @@
 				</div>
 			</div>
 	  </div>
-		<!-- Config -->
+	  <!-- Stream Alerts -->
+	  <div class="tab-pane" id="streamAlertsTab" role="tabpanel" aria-labelledby="streamAlerts-tab">
+	  	<div class="form-row">
+	  		<div class="form-group col-4">
+	  			<label for="gameName">Game to Alert</label>
+	  			<input type="text" name="gameName" id="gameName" value="{{streamAlerts.gameName}}" class="form-control">
+	  		</div>
+	  		<div class="form-group col-4">
+	  			<label for="clientId">Twitch API Client ID <a href="#" class="btn-sm btn-default" data-toggle="input-mask" data-target="#clientId"><i class="fas fa-eye"></i></a></label>
+	  			<input type="password" name="clientId" id="clientId" value="{{streamAlerts.clientId}}" class="form-control">
+	  		</div>
+	  		<div class="form-group col-2">
+	  			<label for="updateIntervalSeconds">Update Interval</label>
+		      <div class="input-group">
+		      	<input type="number" class="form-control" id="updateIntervalSeconds" value="{{streamAlerts.updateIntervalSeconds}}" name="updateIntervalSeconds">
+		      	<div class="input-group-append">
+					    <span class="input-group-text">seconds</span>
+					  </div>
+		      </div>
+	  		</div>
+	  		<div class="form-group col-2">
+	  			<label for="offlineToleranceSeconds">Offline Tolerance</label>
+		      <div class="input-group">
+		      	<input type="number" class="form-control" id="offlineToleranceSeconds" value="{{streamAlerts.offlineToleranceSeconds}}" name="offlineToleranceSeconds">
+		      	<div class="input-group-append">
+					    <span class="input-group-text">seconds</span>
+					  </div>
+		      </div>
+	  		</div>
+	  	</div>
+	  	<div class="form-row">
+	  		<div class="form-group col-12">
+	  			<label for="statusFilters">Status Filter</label>
+	  			<textarea name="statusFilters" id="statusFilters" rows="3" class="form-control form-control-sm">{{streamAlerts.statusFilters}}</textarea>
+	  		</div>
+	  	</div>
+	  	<hr>
+  		<h5>Channels to Alert</h5>
+  		<div class="input-group mb-3">
+  			<div class="input-group-prepend">
+			    <span class="input-group-text">#</span>
+			  </div>
+  			<input type="text" class="form-control col-4" placeholder="Add Channel" id="add-channel-input" value="">
+			</div>
+			<!-- <p><small>Click a channel below to remove it.</small></p> -->
+	  	<div class="lead">
+	  		{{#each streamAlerts.channels}}
+					<a href="#" class="badge badge-secondary d-inline-block text-truncate alertChannelLink" data-channel-name="{{this}}" style="width: 120px;" title="{{this}}">{{this}}</a>
+		  	{{/each}}
+	  	</div>
+	  </div>
+	  <!-- Config -->
 	  <div class="tab-pane" id="configTab" role="tabpanel" aria-labelledby="config-tab">
 	  	<form id="configForm" class="p-2">
 			  <div class="form-row">
 			    <div class="form-group col-8">
-			      <label for="inputToken">App Bot User Token <a href="#" class="btn-sm btn-default" id="linkToggleTokenVisibility"><i class="fas fa-eye"></i></a></label> <a href="https://discordapp.com/developers/applications/me" target="_blank" class="float-right"><small>Bot App List</small></a>
+			      <label for="inputToken">App Bot User Token <a href="#" class="btn-sm btn-default" data-toggle="input-mask" data-target="#inputToken"><i class="fas fa-eye"></i></a></label> <a href="https://discordapp.com/developers/applications/me" target="_blank" class="float-right"><small>Bot App List</small></a>
 			      <input type="password" class="form-control" id="inputToken" placeholder="App Bot User Token" value="{{discord.token}}" name="token">
 			    </div>
 			  </div>
@@ -136,10 +188,6 @@
 			  <!-- <button type="submit" class="btn btn-primary">Update</button> -->
 			</form>
 	  </div>
-	  <!-- Stream Alerts -->
-	  <div class="tab-pane" id="streamAlertsTab" role="tabpanel" aria-labelledby="streamAlerts-tab">
-	  	
-	  </div>
 	</div>
 </div>
 
@@ -151,15 +199,5 @@ $(document).ready(() => {
 	});
 	// show first tab of guilds
 	$('#guild-list-tab a:first-child').tab('show');
-
-	$('#linkToggleTokenVisibility').on('click', e => {
-		let $el = $('#inputToken');
-		let currentState = $el.attr('type');
-		if (currentState === 'password') {
-			$el.attr('type', 'text');
-		} else if (currentState === 'text') {
-			$el.attr('type', 'password');
-		}
-	});
 });
 </script>

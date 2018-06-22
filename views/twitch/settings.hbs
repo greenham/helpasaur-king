@@ -20,7 +20,7 @@
   			<div class="input-group-prepend">
 			    <span class="input-group-text">#</span>
 			  </div>
-  			<input type="text" class="form-control" placeholder="Join Channel" id="join-channel-input" value="">
+  			<input type="text" class="form-control col-4" placeholder="Join Channel" id="join-channel-input" value="">
 			</div>
 	  	{{#each channels}}
 	  		{{#multipleOf 3 @index}}
@@ -55,7 +55,7 @@
 			      <input type="text" class="form-control" id="inputUsername" placeholder="Username" value="{{username}}" name="username">
 			    </div>
 			    <div class="form-group col-md-6">
-			      <label for="inputOAuthToken">OAuth Token <a href="#" class="btn-sm btn-default" id="linkToggleTokenVisibility"><i class="fas fa-eye"></i></a></label> <a href="https://twitchapps.com/tmi/" target="_blank" class="float-right"><small>OAuth Token Generator</small></a>
+			      <label for="inputOAuthToken">OAuth Token <a href="#" class="btn-sm btn-default" data-toggle="input-mask" data-target="#inputOAuthToken"><i class="fas fa-eye"></i></a></label> <a href="https://twitchapps.com/tmi/" target="_blank" class="float-right"><small>OAuth Token Generator</small></a>
 			      <input type="password" class="form-control" id="inputOAuthToken" placeholder="OAuth Token" value="{{oauth}}" name="oauth">
 			    </div>
 			  </div>
@@ -236,15 +236,6 @@
 				btn.removeAttr('disabled').html(originalBtnText);
 				$('#leaveChannelConfirmation').modal('hide');
 			});
-		});
-
-		$('#linkToggleTokenVisibility').on('click', e => {
-			let currentState = $('#inputOAuthToken').attr('type');
-			if (currentState === 'password') {
-				$('#inputOAuthToken').attr('type', 'text');
-			} else if (currentState === 'text') {
-				$('#inputOAuthToken').attr('type', 'password');
-			}
 		});
 
 		var submitting = false;
