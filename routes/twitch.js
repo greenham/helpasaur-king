@@ -60,7 +60,7 @@ router.post('/channels', (req, res) => {
     }
   });
 
-  client.addListener(`message#${config.twitch.username}`, (from, to, msg) => {
+  client.addListener(`message#${config.twitch.username}`, (from, msg) => {
   	//console.log(from, to, msg);
   	if (from === config.twitch.username) {
   		if (msg.includes(`Joining #${req.body.channel}`)) {
@@ -97,7 +97,7 @@ router.delete('/channels', (req, res) => {
     }
   });
 
-  client.addListener(`message#${config.twitch.username}`, (from, to, msg) => {
+  client.addListener(`message#${config.twitch.username}`, (from, msg) => {
   	//console.log(from, to, msg);
   	if (from === config.twitch.username) {
   		if (msg.includes(`Leaving ${req.body.channel}`)) {

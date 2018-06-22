@@ -90,9 +90,11 @@ helpers.racerInfo = (racer) => {
 helpers.hrt = (s) => {return s.toString().toHHMMSS()};
 helpers.multipleOf = (mult, check, options) => {
 	if (check % mult === 0) {
-		return options.fn(this);
-	} else {
-		return options.inverse(this);
+		if (typeof options.fn == "function") {
+			return options.fn(this);
+		} else {
+			return null;
+		}
 	}
 };
 helpers.raceStatus = (srtvRace) => {

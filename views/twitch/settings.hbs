@@ -16,22 +16,31 @@
 	<div class="tab-content border border-secondary p-3">
 		<!-- Channels -->
 	  <div class="tab-pane active" id="channels" role="tabpanel" aria-labelledby="channels-tab">
-	  	<ul class="list-group col-4">
-	  		<li class="list-group-item">
-	  			<div class="input-group">
-		  			<div class="input-group-prepend">
-					    <span class="input-group-text">#</span>
-					  </div>
-		  			<input type="text" class="form-control" placeholder="Join Channel" id="join-channel-input" value="">
-	  			</div>
-  			</li>
+			<div class="input-group mb-3">
+  			<div class="input-group-prepend">
+			    <span class="input-group-text">#</span>
+			  </div>
+  			<input type="text" class="form-control" placeholder="Join Channel" id="join-channel-input" value="">
+			</div>
 	  	{{#each channels}}
-	  		<li class="list-group-item" data-channel-name="{{this}}">
-	  			{{this}}
-	  			<button type="button" class="btn-md btn-default close leave-channel-btn"><span aria-hidden="true">&times;</span></button>
-  			</li>
+	  		{{#multipleOf 3 @index}}
+					{{#if (ne @index 0)}}
+						</div><div class="card-deck mt-2">
+					{{else}}
+						<div class="card-deck">
+					{{/if}}
+				{{/multipleOf}}
+				<div class="card" data-channel-name="{{this}}">
+					<div class="card-body">
+	  				{{this}} <button type="button" class="btn-md btn-default close leave-channel-btn"><span aria-hidden="true">&times;</span></button>
+  				</div>
+  			</div>
 	  	{{/each}}
-	  	</ul>
+	  	{{#if (gt channels.length 0)}}
+		  	{{#unless (multipleOf channels.length 3)}}
+		  		</div>
+		  	{{/unless}}
+	  	{{/if}}
 	  </div>
 	  <!-- Config -->
 	  <div class="tab-pane" id="config" role="tabpanel" aria-labelledby="config-tab">
@@ -169,7 +178,6 @@
 				data: {channel: channelName}
 			})
 			.done((data, textStatus, jqXHR) => {
-				console.log(data);
 				if (data.status === 'joined') {
 					alert('Joined channel!');
 					location.reload();
@@ -187,7 +195,7 @@
 		});
 
 		$('.leave-channel-btn').on('click', (e) => {
-			var channelName = $(e.target).parents('.list-group-item').data('channel-name');
+			var channelName = $(e.target).parents('.card').data('channel-name');
 			var $modalEl = $('#leaveChannelConfirmation');
 
 			$modalEl.on('show.bs.modal', (e) => {
@@ -215,8 +223,8 @@
 			.done((data, textStatus, jqXHR) => {
 				if (data.status === 'left') {
 					alert('Left channel!');
-					// find the list-group-item with the matching channel name and remove it
-					$('.list-group-item[data-channel-name="'+channelName+'"]').remove();
+					// find the element with the matching channel name and remove it
+					$('.card[data-channel-name="'+channelName+'"]').remove();
 				} else if (data.status === 'missing') {
 					alert('Bot is not in this channel!');
 				}

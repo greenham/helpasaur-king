@@ -452,7 +452,8 @@ let getRacesBySpeedgamingEntry = (entry) => {
 		    	{"match2.players.displayName": entry.displayName}
 		    ]
 		  }},
-		  {$project: {"started": "$srtvRace.started", "entries": "$srtvRace.entries.entries", "name": "$srtvRace.name", "guid": "$srtvRace.guid"}}
+		  {$project: {"started": "$srtvRace.started", "entries": "$srtvRace.entries.entries", "name": "$srtvRace.name", "guid": "$srtvRace.guid"}},
+		  {$sort: {when: 1}}
 		])
 		.toArray((err, races) => {
 			if (err) {

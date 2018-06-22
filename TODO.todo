@@ -26,6 +26,7 @@ Web Control Panel:
         - Filename sending
   Tourney:
     Races:
+      ✔ Add bracket results to racer card @done (18-06-21 16:32)
       ☐ Button on the race page which auto-schedules the following events:
         ☐ 45 Minutes prior: Race channel creation
         ☐ 30 Minutes prior: Discord Pings
