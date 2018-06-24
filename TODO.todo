@@ -38,13 +38,11 @@ Web:
       ☐ Auto-linking of URLs
   Discord:
     ☐ Settings Page @high
-      ☐ Config
+      ☐ Guild Configs
       ☐ Stream Alerts
         ☐ Manage Twitch channel list for stream alerts
         ☐ Ability to update the filter parameters for stream alerts
-      ☐ Race Alerts
-      ☐ Guild Configs
-      ☐ Activity list
+      ☐ Global Config
     ☐ One-click bot restart (sends !reboot command to itself)
     ☐ UI to send a message (canned/custom) to a specific guild+channel
   Twitch:    

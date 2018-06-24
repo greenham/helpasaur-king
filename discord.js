@@ -293,7 +293,7 @@ const init = (config) => {
       let embed = new Discord.RichEmbed();
       runnerWatcher.on('live', stream => {
         embed.setStreamAlertDefaults(stream)
-          .setTitle(`Now live at ${stream.channel.url}!`)
+          .setTitle(`Now live at ${stream.channel.url} !`)
           .setColor('#339e31')
           .setImage(`${stream.preview.medium}?r=${moment().valueOf()}`);
         alertsChannel.send({embed});
