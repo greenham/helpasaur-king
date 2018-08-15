@@ -1,6 +1,8 @@
 Bugs:
+  ☐ Switch over to new Twitch API
   ☐ Base cooldown off the command id itself, not the message used @high
     - !nmg 1 and !nmg 2 would be considered different cooldowns
+  ☐ Add discord command information to /commands
  
 Bots:
   Global:
@@ -11,6 +13,8 @@ Bots:
   Discord:
     ☐ Move activities to guild config
     ☐ Move 'master' and 'handleDMs' config items to config.json since they're environment-specific
+    ☐ Have bot react to certain commands to signify result
+      - !role add/remove --> react with thumbsup/down
     ☐ Integrate with speedrun.tv once API is available/documented @low
       - Ability to start and control races from within Discord
       - Race alerts similar to SRL
