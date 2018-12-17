@@ -1,0 +1,49 @@
+{
+	"categories": [
+		{
+			"id": "100-nmg",
+			"name": "100% NMG"
+		},
+		{
+			"id": "low-nmg",
+			"name": "Low% NMG"
+		},
+		{
+			"id": "ad-nsg",
+			"name": "All Dungeons (No EG/DG/WW)"
+		},
+		{
+			"id": "any-nsg",
+			"name": "Any% (No EG/DG/WW)"
+		},
+		{
+			"id": "ab-noeg",
+			"name": "All Bosses (No EG)"
+		},
+		{
+			"id": "mirror-shield-nmg",
+			"name": "Mirror Shield NMG"
+		},
+		{
+			"id": "master-sword-nmg",
+			"name": "Master Sword S+Q"
+		},
+		{
+			"id": "cob",
+			"name": "Cane of Byrna"
+		},
+		{
+			"id": "any-nmg-sq",
+			"name": "Any% NMG (S+Q)"
+		},
+		{
+			"id": "master-sword-nsg",
+			"name": "Master Sword (No EG/DG/WW)"
+		},
+		{
+			"id": "mirror-shield-nsg",
+			"name": "Mirror Shield (No EG/DG/WW)"
+		}
+	],
+	"lastCategory": "ad-nsg"
+}
