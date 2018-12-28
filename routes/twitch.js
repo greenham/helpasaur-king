@@ -147,4 +147,17 @@ router.post('/restart', (req, res) => {
   });
 });
 
+router.post('/livestreams/blacklist', (req, res) => {
+  console.log(`received request to blacklist ${req.body.id}`);
+
+  db.get().collection('config').updateOne({"default": true}, {"$addToSet": {"streamAlerts.blacklistedUsers": req.body.id.toLowerCase()}}, err => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send(err);
+    }
+
+    res.send({"updated": true});
+  });
+});
+
 module.exports = router;
