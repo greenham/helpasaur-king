@@ -1,3 +1,28 @@
+Steps to add a discord server:
+  ☐ Use discord permissions calculator: https://discordapi.com/permissions.html
+    ☐ Default: https://discordapp.com/oauth2/authorize?client_id=330780962831204354&scope=bot&permissions=268520448
+  ☐ Configure the bot in the database (UI doesn't work yet)
+    ☐ request info from server owner for settings
+      - Guild ID
+      - "GUILD_ID_GOES_HERE" : {
+          "internalName" : "default",
+          "id" : "GUILD_ID_GOES_HERE",
+          "alertsChannelName" : "stream-alerts",
+          "alertOnConnect" : false,
+          "allowedRolesForRequest" : "",
+          "textCmdCooldown" : 10,
+          "srcCmdCooldown" : 10,
+          "cmdPrefix" : "!",
+          "enableLivestreamAlerts" : false,
+          "enableRaceAlerts" : false,
+          "enableWeeklyRaceAlert" : false,
+          "weeklyRaceAlertRole" : "",
+          "enableWelcomeDM" : false,
+          "welcomeDM" : ""
+      }
+    ☐ add an entry to the discord.guilds array in the config collection
+    ☐ restart the bot
+
 Bugs:
   ☐ Switch over to new Twitch API
   ☐ Base cooldown off the command id itself, not the message used @high
