@@ -9,6 +9,7 @@
     "body-parser": "^1.18.3",
     "connect-mongo": "^2.0.3",
     "cookie-parser": "^1.4.3",
+    "cooldowns": "^1.0.1",
     "discord.js": "^11.4.2",
     "express": "^4.16.4",
     "express-handlebars": "^3.0.0",
