@@ -37,7 +37,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "restore-db": "scp root@helpa.alttp.run:./alttpbot-mongodump.tar.gz . && tar -zxvf ./alttpbot-mongodump.tar.gz && mongorestore ./alttpbot-mongodump"
   },
   "author": "https://github.com/greenham",
   "license": "MIT"
