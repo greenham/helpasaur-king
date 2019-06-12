@@ -24,6 +24,7 @@ Steps to add a discord server:
     ☐ restart the bot
 
 Bugs:
+  ☐ memcache node_module uses wrong EventEmitter class for util.inherits
   ☐ Switch over to new Twitch API
   ☐ Base cooldown off the command id itself, not the message used @high
     - !nmg 1 and !nmg 2 would be considered different cooldowns

@@ -37,8 +37,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js",
-    "restore-db": "scp root@helpa.alttp.run:./alttpbot-mongodump.tar.gz . && tar -zxvf ./alttpbot-mongodump.tar.gz && mongorestore ./alttpbot-mongodump"
+    "restore-db": "scp root@helpa.alttp.run:./alttpbot-mongodump.tar.gz . && tar -zxvf ./alttpbot-mongodump.tar.gz && mongorestore ./alttpbot-mongodump",
+    "discord": "pm2 start discord.js --name helpa-discord",
+    "twitch": "pm2 start twitch.js --name helpa-twitch",
+    "web": "pm2 start server.js --name helpa-web"
   },
   "author": "https://github.com/greenham",
   "license": "MIT"
