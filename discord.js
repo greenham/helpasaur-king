@@ -426,13 +426,20 @@ const init = config => {
     // Watch + alert for Twitch streams
     if (alertsChannel && guildConfig.enableLivestreamAlerts) {
       let embed = new Discord.RichEmbed();
+
       runnerWatcher
         .on("live", stream => {
           embed
             .setStreamAlertDefaults(stream)
-            .setTitle(`Now live at ${stream.channel.url} !`)
+            .setTitle(
+              `Now live at twitch.tv/${stream.user_name.toLowerCase()} !`
+            )
             .setColor("#339e31")
-            .setImage(`${stream.preview.medium}?r=${moment().valueOf()}`);
+            .setImage(
+              `${stream.thumbnail_url
+                .replace("{width}", "320")
+                .replace("{height}", "180")}`
+            );
           alertsChannel.send({ embed });
         })
         .on("title", stream => {
@@ -526,12 +533,13 @@ function dmUser(user, message) {
 }
 
 Discord.RichEmbed.prototype.setStreamAlertDefaults = function(stream) {
-  return this.setAuthor(stream.channel.display_name, stream.channel.logo)
-    .setURL(stream.channel.url)
-    .setDescription(stream.channel.status)
+  return this.setAuthor(stream.user_name, stream.user.profile_image_url)
+    .setURL(`https://twitch.tv/${stream.user_name.toLowerCase()}`)
+    .setDescription(stream.title)
     .setTimestamp();
 };
 
+// @TODO Move this hardcoded thumbnail URL to config
 Discord.RichEmbed.prototype.setRaceAlertDefaults = function(
   raceChannel,
   srlUrl
@@ -552,7 +560,7 @@ Discord.Client.prototype.setRandomActivity = function() {
     ];
   console.log(`Setting Discord activity to: ${activity}`);
   this.user.setActivity(activity, {
-    url: `https://www.twitch.tv/${config.twitch.username}`,
+    url: `https://twitch.tv/${config.twitch.username}`,
     type: "STREAMING"
   });
 };

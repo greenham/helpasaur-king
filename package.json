@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^2.6.3",
     "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
     "connect-mongo": "^2.0.3",
