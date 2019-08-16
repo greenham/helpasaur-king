@@ -437,8 +437,8 @@ const init = config => {
             .setColor("#339e31")
             .setImage(
               `${stream.thumbnail_url
-                .replace("{width}", "320")
-                .replace("{height}", "180")}`
+                .replace("{width}", "640")
+                .replace("{height}", "360")}`
             );
           alertsChannel.send({ embed });
         })
