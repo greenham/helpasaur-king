@@ -37,7 +37,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "restore-db": "scp root@helpa.alttp.run:./alttpbot-mongodump.tar.gz . && tar -zxvf ./alttpbot-mongodump.tar.gz && mongorestore ./alttpbot-mongodump",
+    "sync-commands": "scp root@helpa.alttp.run:./alttpbot-mongodump.tar.gz . && tar -zxvf ./alttpbot-mongodump.tar.gz && mongorestore ./alttpbot-mongodump/alttpbot/bot-commands.bson --db alttpbot --collection bot-commands --drop",
     "discord": "pm2 start discord.js --name helpa-discord",
     "twitch": "pm2 start twitch.js --name helpa-twitch",
     "web": "pm2 start server.js --name helpa-web"
