@@ -52,23 +52,23 @@ router.get("/livestreams", (req, res) => {
   let streamWatcher = new streamAlerts(config);
   streamWatcher
     .newFindStreams()
-    .then(livestreams => {
+    .then((livestreams) => {
       // do some additional ordering/filtering
       // 1. remove streams from users on the blacklist
-      livestreams = livestreams.filter(stream => {
+      livestreams = livestreams.filter((stream) => {
         return !config.blacklistedUsers.includes(
           stream.user_name.toLowerCase()
         );
       });
 
       // 2. prioritize streams that are in the alert list
-      let topStreams = livestreams.filter(stream => {
+      let topStreams = livestreams.filter((stream) => {
         return alertChannels.includes(stream.user_name.toLowerCase());
       });
 
       // 3. now create a merged list, with topStreams first, then anything in livestreams that isn't in topStreams
-      let otherStreams = livestreams.filter(stream => {
-        let matchIndex = topStreams.findIndex(s => {
+      let otherStreams = livestreams.filter((stream) => {
+        let matchIndex = topStreams.findIndex((s) => {
           return s.id === stream.id;
         });
         return matchIndex === -1;
@@ -80,7 +80,7 @@ router.get("/livestreams", (req, res) => {
         livestreams: livestreams
       });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.render("error", { error: err });
     });

@@ -1,3 +1,6 @@
+Suggestion from mooglemod on 02/14/2020:
+would it be possible to add a search function to helpa? like search for 'tut' and get a list of commands containing the search term so you dont have to remember the exact command or look up a list
+
 Steps to add a discord server:
   ☐ Use discord permissions calculator: https://discordapi.com/permissions.html
     ☐ Default: https://discordapp.com/oauth2/authorize?client_id=330780962831204354&scope=bot&permissions=268520448
