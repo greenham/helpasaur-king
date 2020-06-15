@@ -1,5 +1,6 @@
 /**
  * ALttP Discord Bot
+ * https://discord.com/api/oauth2/authorize?client_id=719535509386559498&scope=bot&permissions=268486720
  */
 
 // Import modules
@@ -18,7 +19,7 @@ let config = require("./config.json");
 const cooldowns = new Cooldowns("helpa-discord");
 
 // Connect to DB
-db.connect(config.db.host, config.db.db, err => {
+db.connect(config.db.host, config.db.db, (err) => {
   if (!err) {
     // Read external configuration from DB
     db.get()
@@ -38,7 +39,7 @@ db.connect(config.db.host, config.db.db, err => {
   }
 });
 
-const init = config => {
+const init = (config) => {
   // Set up Twitch stream watcher
   const runnerWatcher = new StreamAlerts(config.streamAlerts);
 
@@ -64,9 +65,7 @@ const init = config => {
       if (msg.content === guildConfig.cmdPrefix + "role") {
         return dmUserFromMsg(
           msg,
-          `Useage: ${guildConfig.cmdPrefix}role {add|remove} {${
-            guildConfig.allowedRolesForRequest
-          }}`
+          `Useage: ${guildConfig.cmdPrefix}role {add|remove} {${guildConfig.allowedRolesForRequest}}`
         );
       }
 
@@ -77,9 +76,7 @@ const init = config => {
       if (!roleName) {
         return dmUserFromMsg(
           msg,
-          `You must include a role name! *e.g. ${guildConfig.cmdPrefix}role ${
-            roleName[1]
-          } ${validRoles[0]}*`
+          `You must include a role name! *e.g. ${guildConfig.cmdPrefix}role ${roleName[1]} ${validRoles[0]}*`
         );
       } else {
         let tester = new RegExp(guildConfig.allowedRolesForRequest, "i");
@@ -101,14 +98,12 @@ const init = config => {
           if (roleName[1] === "add") {
             msg.member
               .addRole(role)
-              .then(requestingMember => {
+              .then((requestingMember) => {
                 requestingMember
                   .createDM()
-                  .then(channel => {
+                  .then((channel) => {
                     channel.send(
-                      `You have successfully been added to the ${
-                        roleName[2]
-                      } group!`
+                      `You have successfully been added to the ${roleName[2]} group!`
                     );
                   })
                   .catch(console.error);
@@ -117,14 +112,12 @@ const init = config => {
           } else if (roleName[1] === "remove") {
             msg.member
               .removeRole(role)
-              .then(requestingMember => {
+              .then((requestingMember) => {
                 requestingMember
                   .createDM()
-                  .then(channel => {
+                  .then((channel) => {
                     channel.send(
-                      `You have successfully been removed from the ${
-                        roleName[2]
-                      } group!`
+                      `You have successfully been removed from the ${roleName[2]} group!`
                     );
                   })
                   .catch(console.error);
@@ -133,9 +126,7 @@ const init = config => {
           } else {
             return dmUserFromMsg(
               msg,
-              `You must use add/remove after the role command! *e.g. ${
-                guildConfig.cmdPrefix
-              }role add ${validRoles[0]}*`
+              `You must use add/remove after the role command! *e.g. ${guildConfig.cmdPrefix}role add ${validRoles[0]}*`
             );
           }
         } else {
@@ -175,10 +166,10 @@ const init = config => {
       let cooldownKey = msg.content + msg.channel.id;
       src
         .findWR(config.src.gameSlug, majorCat, minorCat)
-        .then(result => {
+        .then((result) => {
           msg
             .reply(result)
-            .then(sentMsg =>
+            .then((sentMsg) =>
               cooldowns.placeOnCooldown(cooldownKey, guildConfig.srcCmdCooldown)
             );
         })
@@ -188,9 +179,7 @@ const init = config => {
       if (msg.content === guildConfig.cmdPrefix + "pb") {
         return dmUserFromMsg(
           msg,
-          `Useage: ${
-            guildConfig.cmdPrefix
-          }pb {speedrun.com-username} {nmg/mg} {subcategory-code}`
+          `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`
         );
       }
 
@@ -204,16 +193,14 @@ const init = config => {
       ) {
         return dmUserFromMsg(
           msg,
-          `Useage: ${
-            guildConfig.cmdPrefix
-          }pb {speedrun.com-username} {nmg/mg} {subcategory-code}`
+          `Useage: ${guildConfig.cmdPrefix}pb {speedrun.com-username} {nmg/mg} {subcategory-code}`
         );
       }
 
       let cooldownKey = msg.content + msg.channel.id;
       src
         .findPB(username, majorCat, minorCat)
-        .then(run => {
+        .then((run) => {
           let response = "No personal best found for this user/category!";
           if (run && run.run) {
             let runner = run.players.data[0].names.international;
@@ -228,7 +215,7 @@ const init = config => {
           }
           msg
             .reply(response)
-            .then(sentMsg =>
+            .then((sentMsg) =>
               cooldowns.placeOnCooldown(cooldownKey, guildConfig.srcCmdCooldown)
             );
         })
@@ -270,7 +257,7 @@ const init = config => {
       });
     })
     // Listen for commands for the bot to respond to across all channels
-    .on("message", msg => {
+    .on("message", (msg) => {
       // Ignore messages from unconfigured guilds
       if (msg.guild) {
         if (!config.discord.guilds[msg.guild.id]) {
@@ -295,7 +282,7 @@ const init = config => {
       let cooldownKey = msg.content + msg.channel.id;
       cooldowns
         .isOnCooldown(cooldownKey, guildConfig.textCmdCooldown)
-        .then(onCooldown => {
+        .then((onCooldown) => {
           if (onCooldown === false) {
             // Not on CD, check for native or static command
             let commandNoPrefix = msg.content
@@ -303,20 +290,16 @@ const init = config => {
               .split(" ")[0];
             if (commands.hasOwnProperty(commandNoPrefix)) {
               console.log(
-                `'${commandNoPrefix}' received in ${guildConfig.internalName}#${
-                  msg.channel.name
-                } from @${msg.author.username}`
+                `'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`
               );
               commands[commandNoPrefix](msg, guildConfig);
             } else {
               staticCommands
                 .get(commandNoPrefix)
-                .then(command => {
+                .then((command) => {
                   if (command && command.response) {
                     console.log(
-                      `'${commandNoPrefix}' received in ${
-                        guildConfig.internalName
-                      }#${msg.channel.name} from @${msg.author.username}`
+                      `'${commandNoPrefix}' received in ${guildConfig.internalName}#${msg.channel.name} from @${msg.author.username}`
                     );
                     msg.channel
                       .send({
@@ -326,7 +309,7 @@ const init = config => {
                           description: command.response
                         }
                       })
-                      .then(sentMessage =>
+                      .then((sentMessage) =>
                         cooldowns.placeOnCooldown(
                           cooldownKey,
                           guildConfig.textCmdCooldown
@@ -341,16 +324,14 @@ const init = config => {
             // DM the user that it's on CD
             dmUserFromMsg(
               msg,
-              `**${
-                msg.content
-              }** is currently on cooldown for another *${onCooldown} seconds!*`
+              `**${msg.content}** is currently on cooldown for another *${onCooldown} seconds!*`
             );
           }
         })
         .catch(console.error);
     })
     // Handle new members joining one of our guilds
-    .on("guildMemberAdd", member => {
+    .on("guildMemberAdd", (member) => {
       // Ignore events from unconfigured guilds
       if (member.guild) {
         if (!config.discord.guilds[member.guild.id]) {
@@ -375,25 +356,21 @@ const init = config => {
       }
     })
     // Log guild becoming unavailable (usually due to server outage)
-    .on("guildUnavailable", guild => {
+    .on("guildUnavailable", (guild) => {
       console.log(
-        `Guild '${
-          guild.name
-        }' is no longer available! Most likely due to server outage.`
+        `Guild '${guild.name}' is no longer available! Most likely due to server outage.`
       );
     })
     // Log debug messages if enabled
-    .on("debug", info => {
+    .on("debug", (info) => {
       if (config.debug === true) {
         console.log(`[${new Date()}] DEBUG: ${info}`);
       }
     })
     // Log disconnect event
-    .on("disconnect", event => {
+    .on("disconnect", (event) => {
       console.log(
-        `Web Socket disconnected with code ${event.code} and reason '${
-          event.reason
-        }'`
+        `Web Socket disconnected with code ${event.code} and reason '${event.reason}'`
       );
     })
     // Log errors
@@ -428,7 +405,7 @@ const init = config => {
       let embed = new Discord.RichEmbed();
 
       runnerWatcher
-        .on("live", stream => {
+        .on("live", (stream) => {
           embed
             .setStreamAlertDefaults(stream)
             .setTitle(
@@ -442,7 +419,7 @@ const init = config => {
             );
           alertsChannel.send({ embed });
         })
-        .on("title", stream => {
+        .on("title", (stream) => {
           embed
             .setStreamAlertDefaults(stream)
             .setTitle(`Changed title:`)
@@ -526,13 +503,13 @@ function dmUserFromMsg(originalMessage, newMessage) {
 function dmUser(user, message) {
   user
     .createDM()
-    .then(channel => {
+    .then((channel) => {
       channel.send(message);
     })
     .catch(console.error);
 }
 
-Discord.RichEmbed.prototype.setStreamAlertDefaults = function(stream) {
+Discord.RichEmbed.prototype.setStreamAlertDefaults = function (stream) {
   return this.setAuthor(stream.user_name, stream.user.profile_image_url)
     .setURL(`https://twitch.tv/${stream.user_name.toLowerCase()}`)
     .setDescription(stream.title)
@@ -540,7 +517,7 @@ Discord.RichEmbed.prototype.setStreamAlertDefaults = function(stream) {
 };
 
 // @TODO Move this hardcoded thumbnail URL to config
-Discord.RichEmbed.prototype.setRaceAlertDefaults = function(
+Discord.RichEmbed.prototype.setRaceAlertDefaults = function (
   raceChannel,
   srlUrl
 ) {
@@ -552,7 +529,7 @@ Discord.RichEmbed.prototype.setRaceAlertDefaults = function(
     .setTimestamp();
 };
 
-Discord.Client.prototype.setRandomActivity = function() {
+Discord.Client.prototype.setRandomActivity = function () {
   if (!config.discord.master) return;
   let activity =
     config.discord.activities[
