@@ -85,7 +85,7 @@ const init = (config) => {
           if (!msg.guild) return;
 
           // find the role in the member's guild
-          let role = msg.guild.roles.find("name", roleName[2]);
+          let role = msg.guild.roles.find((x) => x.name === roleName[2]);
 
           if (!role) {
             return dmUserFromMsg(
@@ -394,8 +394,7 @@ const init = (config) => {
 
     // Find the text channel(s) where we'll be posting alerts
     let alertsChannel = guild.channels.find(
-      "name",
-      guildConfig.alertsChannelName
+      (x) => x.name === guildConfig.alertsChannelName
     );
     if (guildConfig.alertOnConnect === true)
       alertsChannel.send(config.botName + " has connected. :white_check_mark:");
@@ -470,8 +469,7 @@ const init = (config) => {
     if (alertsChannel && guildConfig.enableWeeklyRaceAlert) {
       let timeToSchedule = { dayOfWeek: 0, hour: 11, minute: 0 };
       let weeklyRaceAlertRole = guild.roles.find(
-        "name",
-        guildConfig.weeklyRaceAlertRole
+        (x) => x.name === guildConfig.weeklyRaceAlertRole
       );
       schedule.scheduleJob(timeToSchedule, () => {
         console.log(
