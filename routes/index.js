@@ -51,7 +51,7 @@ router.get("/livestreams", (req, res) => {
 
   let streamWatcher = new streamAlerts(config);
   streamWatcher
-    .newFindStreams()
+    .findStreams()
     .then((livestreams) => {
       // do some additional ordering/filtering
       // 1. remove streams from users on the blacklist
