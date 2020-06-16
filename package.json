@@ -4,6 +4,7 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "@handlebars/allow-prototype-access": "^1.0.3",
     "async": "^2.6.3",
     "axios": "^0.19.2",
     "bcrypt": "^3.0.8",

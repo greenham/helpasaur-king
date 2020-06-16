@@ -1,15 +1,25 @@
-var express = require("express"),
-  exphbs = require("express-handlebars"),
-  handlebars = require("./helpers/handlebars.js")(exphbs),
-  db = require("./db"),
-  logger = require("morgan"),
-  cookieParser = require("cookie-parser"),
-  bodyParser = require("body-parser"),
-  expressSanitizer = require("express-sanitizer"),
-  session = require("express-session"),
-  passport = require("passport"),
-  LocalStrategy = require("passport-local").Strategy,
-  MongoStore = require("connect-mongo")(session);
+const express = require("express");
+const Handlebars = require("handlebars");
+const expressHandlebars = require("express-handlebars");
+const {
+  allowInsecurePrototypeAccess
+} = require("@handlebars/allow-prototype-access");
+const hbHelpers = require("./helpers/handlebars.js");
+const insecureHandlebars = expressHandlebars({
+  handlebars: allowInsecurePrototypeAccess(Handlebars),
+  defaultLayout: "main",
+  extname: ".hbs",
+  helpers: hbHelpers
+});
+const db = require("./db");
+const logger = require("morgan");
+const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
+const expressSanitizer = require("express-sanitizer");
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const MongoStore = require("connect-mongo")(session);
 
 // Read local config
 let config = require("./config.json");
@@ -28,11 +38,11 @@ app.disable("x-powered-by");
 app.locals.config = config;
 
 // Use Handlebars for templating
-app.engine(".hbs", handlebars.engine);
+app.engine(".hbs", insecureHandlebars);
 app.set("view engine", ".hbs");
 
 // Set up logging
-//app.use(logger('dev'));
+app.use(logger("combined"));
 
 // Request parsing + sanitizing
 app.use(bodyParser.json());
@@ -40,7 +50,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(expressSanitizer());
 
-const getExpirationDate = sessionExpirationSeconds => {
+const getExpirationDate = (sessionExpirationSeconds) => {
   return new Date(Date.now() + sessionExpirationSeconds * 1000);
 };
 
@@ -99,7 +109,7 @@ passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
@@ -110,7 +120,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get("env") === "development") {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     // @TODO: Detect if this request was via ajax, in which case, send the result directly, don't render
     res.render("error", {
@@ -122,7 +132,7 @@ if (app.get("env") === "development") {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   // @TODO: Detect if this request was via ajax, in which case, send the result directly, don't render
   res.render("error", {
@@ -139,7 +149,7 @@ if (!config.db || !config.db.host || !config.db.db) {
   process.exit(1);
 }
 
-db.connect(config.db.host, config.db.db, err => {
+db.connect(config.db.host, config.db.db, (err) => {
   if (!err) {
     app.listen(port, () => {
       console.log(`Listening on port ${port}`);

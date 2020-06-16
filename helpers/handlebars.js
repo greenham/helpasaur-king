@@ -6,17 +6,13 @@ let helpers = {};
 
 helpers.localize = (time, timezone) => {
   timezone = timezone || "America/Los_Angeles";
-  return moment(time)
-    .tz(timezone)
-    .format("LLLL");
+  return moment(time).tz(timezone).format("LLLL");
 };
 helpers.calendarize = (time, timezone) => {
   timezone = timezone || "America/Los_Angeles";
-  return moment(time)
-    .tz(timezone)
-    .calendar();
+  return moment(time).tz(timezone).calendar();
 };
-helpers.timeago = time => {
+helpers.timeago = (time) => {
   let now = null;
   // detect unix timestamp and convert appropriately
   if (time.toString().match(/^[\d]+$/)) {
@@ -26,7 +22,7 @@ helpers.timeago = time => {
   }
   return `<time class="timeago" datetime="${now.format()}">${now.calendar()}</time>`;
 };
-helpers.fromnow = time => {
+helpers.fromnow = (time) => {
   let now = null;
   // detect unix timestamp and convert appropriately
   if (time.toString().match(/^[\d]+$/)) {
@@ -36,17 +32,15 @@ helpers.fromnow = time => {
   }
   return now.fromNow();
 };
-helpers.srtvUrl = guid => {
+helpers.srtvUrl = (guid) => {
   return SRTV.raceUrl(guid);
 };
-helpers.decorateRacers = players => {
+helpers.decorateRacers = (players) => {
   let ret = '<span class="racers">';
 
   if (players) {
     if (typeof players[0] !== "undefined") {
-      ret += `<span class="racer">${
-        players[0].displayName
-      }</span> <small>v</small> `;
+      ret += `<span class="racer">${players[0].displayName}</span> <small>v</small> `;
     }
 
     if (typeof players[1] !== "undefined") {
@@ -58,14 +52,14 @@ helpers.decorateRacers = players => {
 
   return ret;
 };
-helpers.parseCommentary = commentators => {
+helpers.parseCommentary = (commentators) => {
   if (commentators === null || commentators.length === 0) {
     return '<span class="text-muted"><em>None</em></span>';
   }
 
   let ret = '<span class="commentators">';
   ret += commentators
-    .map(e => {
+    .map((e) => {
       return (
         "<span" +
         (!e.approved ? ' class="text-warning"' : "") +
@@ -78,16 +72,14 @@ helpers.parseCommentary = commentators => {
   ret += "</span>";
   return ret;
 };
-helpers.restreamStatus = race => {
+helpers.restreamStatus = (race) => {
   if (race.channels && race.channels.length > 0) {
     race.channel = race.channels[0];
   }
 
   if (race.channel) {
     if (race.channel.slug.match(/^speedgaming/)) {
-      return `<a href="https://twitch.tv/${
-        race.channel.slug
-      }" target="_blank">${race.channel.name}</a>`;
+      return `<a href="https://twitch.tv/${race.channel.slug}" target="_blank">${race.channel.name}</a>`;
     } else {
       return race.channel.name;
     }
@@ -95,20 +87,19 @@ helpers.restreamStatus = race => {
     return '<span class="text-muted"><em>Undecided</em></span>';
   }
 };
-helpers.racerInfo = racer => {
+helpers.racerInfo = (racer) => {
   ret = "";
   if (racer.streamingFrom) {
-    ret += `<li class="list-group-item"><i class="fab fa-twitch"></i>&nbsp;<a href="https://www.twitch.tv/${
-      racer.streamingFrom
-    }" target="_blank">${racer.streamingFrom}</a></li>`;
+    ret += `<li class="list-group-item"><i class="fab fa-twitch"></i>&nbsp;<a href="https://www.twitch.tv/${racer.streamingFrom}" target="_blank">${racer.streamingFrom}</a></li>`;
   }
   if (racer.discordTag || racer.discordId) {
-    ret += `<li class="list-group-item"><i class="fab fa-discord"></i>&nbsp;${racer.discordTag ||
-      racer.discordId}</li>`;
+    ret += `<li class="list-group-item"><i class="fab fa-discord"></i>&nbsp;${
+      racer.discordTag || racer.discordId
+    }</li>`;
   }
   return ret;
 };
-helpers.hrt = s => {
+helpers.hrt = (s) => {
   return s.toString().toHHMMSS();
 };
 helpers.multipleOf = (mult, check, options) => {
@@ -120,7 +111,7 @@ helpers.multipleOf = (mult, check, options) => {
     }
   }
 };
-helpers.raceStatus = srtvRace => {
+helpers.raceStatus = (srtvRace) => {
   let ret = '<span class="badge badge-';
 
   if (!srtvRace) {
@@ -228,7 +219,7 @@ helpers.or = (v1, v2) => {
 helpers.sum = util.sum;
 helpers.avg = util.average;
 
-helpers.jsonString = s => {
+helpers.jsonString = (s) => {
   return JSON.stringify(s);
 };
 
@@ -236,12 +227,12 @@ helpers.sizeStreamThumbnail = (url, width, height) => {
   return url.replace("{width}", width).replace("{height}", height);
 };
 
-let hbsHelpers = hbs => {
-  return hbs.create({
-    defaultLayout: "main",
-    extname: ".hbs",
-    helpers: helpers
-  });
-};
+// let hbsHelpers = (hbs) => {
+//   return hbs.create({
+//     defaultLayout: "main",
+//     extname: ".hbs",
+//     helpers: helpers
+//   });
+// };
 
-module.exports = hbsHelpers;
+module.exports = helpers;
