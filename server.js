@@ -31,6 +31,9 @@ const app = express(),
 // Set app environment
 app.set("env", env);
 
+// Set up logging
+app.use(logger(config.logFormat));
+
 // Discourage exploits
 app.disable("x-powered-by");
 
@@ -40,9 +43,6 @@ app.locals.config = config;
 // Use Handlebars for templating
 app.engine(".hbs", insecureHandlebars);
 app.set("view engine", ".hbs");
-
-// Set up logging
-app.use(logger("combined"));
 
 // Request parsing + sanitizing
 app.use(bodyParser.json());

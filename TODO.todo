@@ -1,3 +1,8 @@
+DevOps:
+  ☐ Set up yarn and switch over
+  ☐ Set up letsencrypt cert on the server
+  ☐ Flesh out the 'deploy' script to restart services
+
 Suggestion from mooglemod on 02/14/2020:
 would it be possible to add a search function to helpa? like search for 'tut' and get a list of commands containing the search term so you dont have to remember the exact command or look up a list
 
@@ -28,8 +33,8 @@ Steps to add a discord server:
     ☐ restart the bot
 
 Bugs:
-  ☐ memcache node_module uses wrong EventEmitter class for util.inherits
-  ☐ Switch over to new Twitch API
+  ☐ memcache node_module uses wrong EventEmitter class for util.inherits -> create fork repo and use that for the package
+  ✔ Switch over to new Twitch API @done(20-06-16 13:15)
   ☐ Base cooldown off the command id itself, not the message used @high
     - !nmg 1 and !nmg 2 would be considered different cooldowns
   ☐ Add discord command information to /commands
