@@ -222,7 +222,7 @@ const init = (config) => {
         .catch(console.error);
     },
     // @todo implement pulling in category rules from SRC
-    rules: (msg, guildConfig) => {}
+    rules: (msg, guildConfig) => {},
   };
 
   // Set up Discord client
@@ -306,8 +306,8 @@ const init = (config) => {
                         embed: {
                           title: commandNoPrefix,
                           color: 0xff9f25,
-                          description: command.response
-                        }
+                          description: command.response,
+                        },
                       })
                       .then((sentMessage) =>
                         cooldowns.placeOnCooldown(
@@ -478,9 +478,10 @@ const init = (config) => {
           )} to ${guild.name}`
         );
         let randomEmoji = guild.emojis.random();
+        // @TODO: Move this message to config
         alertsChannel.send([
           weeklyRaceAlertRole,
-          `The weekly Any% NMG Race is starting in 1 Hour! ${randomEmoji} Information on joining SRL can be found here: http://www.speedrunslive.com/faq/#join`
+          `The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> ${randomEmoji} Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>`,
         ]);
       });
     }
@@ -536,7 +537,7 @@ Discord.Client.prototype.setRandomActivity = function () {
   console.log(`Setting Discord activity to: ${activity}`);
   this.user.setActivity(activity, {
     url: `https://twitch.tv/${config.twitch.username}`,
-    type: "STREAMING"
+    type: "STREAMING",
   });
 };
 
