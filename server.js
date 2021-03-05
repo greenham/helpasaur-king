@@ -2,14 +2,14 @@ const express = require("express");
 const Handlebars = require("handlebars");
 const expressHandlebars = require("express-handlebars");
 const {
-  allowInsecurePrototypeAccess
+  allowInsecurePrototypeAccess,
 } = require("@handlebars/allow-prototype-access");
 const hbHelpers = require("./helpers/handlebars.js");
 const insecureHandlebars = expressHandlebars({
   handlebars: allowInsecurePrototypeAccess(Handlebars),
   defaultLayout: "main",
   extname: ".hbs",
-  helpers: hbHelpers
+  helpers: hbHelpers,
 });
 const db = require("./db");
 const logger = require("morgan");
@@ -32,7 +32,7 @@ const app = express(),
 app.set("env", env);
 
 // Set up logging
-app.use(logger(config.logFormat));
+app.use(logger(config.webapp.logFormat));
 
 // Discourage exploits
 app.disable("x-powered-by");
@@ -65,9 +65,9 @@ if (config.webapp.session && config.webapp.session.secret) {
       store: new MongoStore({
         url: `${config.db.host}/${config.db.db}`,
         ttl: sessionExpirationSeconds,
-        stringify: false
+        stringify: false,
       }),
-      cookie: { expires: getExpirationDate(sessionExpirationSeconds) }
+      cookie: { expires: getExpirationDate(sessionExpirationSeconds) },
     })
   );
 }
@@ -125,7 +125,7 @@ if (app.get("env") === "development") {
     // @TODO: Detect if this request was via ajax, in which case, send the result directly, don't render
     res.render("error", {
       message: err.message,
-      error: err
+      error: err,
     });
   });
 }
@@ -137,7 +137,7 @@ app.use(function (err, req, res, next) {
   // @TODO: Detect if this request was via ajax, in which case, send the result directly, don't render
   res.render("error", {
     message: err.message,
-    error: {}
+    error: {},
   });
 });
 
