@@ -74,7 +74,7 @@ const init = (config) => {
       if (!roleName) {
         return dmUserFromMsg(
           msg,
-          `You must include a role name! *e.g. ${guildConfig.cmdPrefix}role ${roleName[1]} ${validRoles[0]}*`
+          `Useage: ${guildConfig.cmdPrefix}role {add|remove} {${guildConfig.allowedRolesForRequest}}`
         );
       } else {
         let tester = new RegExp(guildConfig.allowedRolesForRequest, "i");
