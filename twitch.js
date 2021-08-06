@@ -13,7 +13,7 @@ let config = require("./config.json");
 const cooldowns = new Cooldowns("helpa-twitch");
 
 // Connect to DB
-db.connect(config.db.host, config.db.db, err => {
+db.connect(config.db.host, config.db.db, (err) => {
   if (!err) {
     // Read external configuration from DB
     db.get()
@@ -33,7 +33,7 @@ db.connect(config.db.host, config.db.db, err => {
   }
 });
 
-const init = config => {
+const init = (config) => {
   let botChannel = "#" + config.twitch.username.toLowerCase();
   config.twitch.channels.push(botChannel);
 
@@ -42,11 +42,10 @@ const init = config => {
     password: config.twitch.oauth,
     autoRejoin: true,
     retryCount: 10,
-    channels: config.twitch.channels,
-    debug: config.debug
+    debug: config.debug,
   });
 
-  client.addListener("error", message => {
+  client.addListener("error", (message) => {
     if (message.command != "err_unknowncommand") {
       console.error("error from Twitch IRC Server: ", message);
     }
@@ -82,9 +81,7 @@ const init = config => {
           if (channelIndex === -1) {
             client.say(
               to,
-              `@${from} >> Joining ${userChannel}... please mod ${
-                config.twitch.username
-              } to avoid accidental timeouts or bans!`
+              `@${from} >> Joining ${userChannel}... please mod ${config.twitch.username} to avoid accidental timeouts or bans!`
             );
 
             // update config so this channel gets joined upon restart
@@ -130,9 +127,7 @@ const init = config => {
           if (channelIndex !== -1) {
             client.say(
               to,
-              `@${from} >> Leaving ${userChannel}... use ${
-                config.twitch.cmdPrefix
-              }join in this channel to re-join at any time!`
+              `@${from} >> Leaving ${userChannel}... use ${config.twitch.cmdPrefix}join in this channel to re-join at any time!`
             );
 
             // update config so this channel no longer gets joined upon restart
@@ -185,11 +180,11 @@ const init = config => {
       let cooldownIndex = to + message;
       cooldowns
         .isOnCooldown(cooldownIndex, config.twitch.textCmdCooldown)
-        .then(onCooldown => {
+        .then((onCooldown) => {
           if (onCooldown === false) {
             staticCommands
               .get(commandNoPrefix)
-              .then(command => {
+              .then((command) => {
                 if (command && command.response) {
                   console.log(
                     `received command in ${to} from ${from}: ${message}`
@@ -211,8 +206,19 @@ const init = config => {
     }
   });
 
-  client.addListener("registered", message => {
+  client.addListener("registered", async (message) => {
     console.log(`Connected to ${message.server}`);
+
+    // Join channels in chunks of 20 every 10 seconds to get around Twitch limits
+    for (i = 0; i < config.twitch.channels.length; i += 20) {
+      // wait for 10 seconds
+      await sleep(10000);
+      // join next 20
+      let chunkedList = config.twitch.channels.slice(i, i + 20);
+      chunkedList.forEach((channelName) => {
+        client.join(channelName);
+      });
+    }
   });
 
   client.addListener("join", (channel, nick, message) => {
@@ -227,10 +233,14 @@ const init = config => {
     }
   });
 
-  client.addListener("motd", motd => {
+  client.addListener("motd", (motd) => {
     console.log(`Received MOTD: ${motd}`);
   });
 };
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 // catches Promise errors
 process.on("unhandledRejection", console.error);
