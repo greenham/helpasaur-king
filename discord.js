@@ -267,6 +267,32 @@ const init = (config) => {
         return;
       }
 
+      // Ban ping spammers
+      // @TODO: Make this a per-guild setting to enable/disable
+      // if (
+      //   msg.member.roles.size < 2 &&
+      //   msg.mentions.members.size + msg.mentions.roles.size > 6
+      // ) {
+      //   msg.member
+      //     .ban({
+      //       days: 7,
+      //       reason: "Spam Bot with mass pings, auto-banned by Helpa!",
+      //     })
+      //     .then(
+      //       console.log(
+      //         "Spam Bot with mass pings banned! Username: " +
+      //           msg.member.user.tag
+      //       )
+      //     )
+      //     .catch((error) =>
+      //       console.error(
+      //         "Couldn't ban bot because of the following error: \n" + error
+      //       )
+      //     );
+
+      //   return;
+      // }
+
       msg.originalContent = msg.content;
       msg.content = msg.content.toLowerCase();
 
