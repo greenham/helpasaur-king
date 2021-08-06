@@ -55,9 +55,7 @@ const init = (config) => {
         typeof guildConfig.allowedRolesForRequest === undefined ||
         guildConfig.allowedRolesForRequest.length === 0
       ) {
-        return msg.reply(
-          "No roles are currently allowed to be added/removed by members."
-        );
+        return;
       }
 
       let validRoles = guildConfig.allowedRolesForRequest.split("|");
@@ -76,7 +74,7 @@ const init = (config) => {
       if (!roleName) {
         return dmUserFromMsg(
           msg,
-          `You must include a role name! *e.g. ${guildConfig.cmdPrefix}role ${roleName[1]} ${validRoles[0]}*`
+          `Useage: ${guildConfig.cmdPrefix}role {add|remove} {${guildConfig.allowedRolesForRequest}}`
         );
       } else {
         let tester = new RegExp(guildConfig.allowedRolesForRequest, "i");
