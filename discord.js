@@ -55,9 +55,7 @@ const init = (config) => {
         typeof guildConfig.allowedRolesForRequest === undefined ||
         guildConfig.allowedRolesForRequest.length === 0
       ) {
-        return msg.reply(
-          "No roles are currently allowed to be added/removed by members."
-        );
+        return;
       }
 
       let validRoles = guildConfig.allowedRolesForRequest.split("|");
