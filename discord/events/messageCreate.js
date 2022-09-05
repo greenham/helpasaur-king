@@ -8,6 +8,8 @@ module.exports = {
     const { author, content, guildId } = interaction;
     let command = false;
 
+    // TODO: See if there's a specific configuration for this guild
+
     // Make sure it starts with the configured prefix
     // @TODO: Support per-guild prefixes
     if (!content.startsWith("!")) return;
@@ -34,7 +36,7 @@ module.exports = {
 
     // Build the command response
     const response = new EmbedBuilder()
-      .setColor(0xbada55)
+      .setColor(0xdedede)
       .setTitle(commandNoPrefix)
       .setDescription(command.response);
 
