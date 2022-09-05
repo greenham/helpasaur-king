@@ -1,0 +1,21 @@
+{
+  "name": "helpasaur-king-discord",
+  "version": "2.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node .",
+    "start:dev": "nodemon ."
+  },
+  "dependencies": {
+    "@discordjs/rest": "^1.1.0",
+    "cooldowns": "^1.0.1",
+    "discord.js": "^14.3.0",
+    "mongodb": "^4.9.1",
+    "mongoose": "^6.5.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.23.0",
+    "nodemon": "^2.0.19"
+  }
+}

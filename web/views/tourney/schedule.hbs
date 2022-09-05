@@ -1,0 +1,123 @@
+<div class="container">
+
+	<nav aria-label="breadcrumb">
+	  <ol class="breadcrumb">
+	  	<li class="breadcrumb-item"><i class="fas fa-filter"></i></li>
+	    <li class="breadcrumb-item"><a href="/tourney/today">Today</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/upcoming">Upcoming</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/recent">Recent</a></li>
+	    <li class="breadcrumb-item"><a href="/tourney/all">All</a></li>
+	  </ol>
+	</nav>
+	
+	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}Tourney Schedule{{/if}}</h1>
+
+	{{#if events}}
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>When</th>
+				<th>Racers</th>
+				<th>Commentary</th>
+				<th>Restream</th>
+				<th>Race Status</th>
+				<th></th>
+			</tr>
+		</thead>
+		{{#each events}}
+			<tr class="race-row" data-href="/tourney/races/{{_id}}">
+				<td><a href="/tourney/races/{{_id}}" title="Manage Race">{{calendarize when ../user.timezone}}</a><br><small class="text-muted"><em>{{{timeago when}}}</em></small></td>
+				<td>
+					{{{decorateRacers match1.players}}}
+					{{#if match2}}
+						<br>{{{decorateRacers match2.players}}}
+					{{/if}}
+				</td>
+				<td>
+					{{{parseCommentary commentators}}}
+				</td>
+				<td>{{{restreamStatus this}}}</td>
+				<td>{{{raceStatus srtvRace}}}
+				<td>
+					<div class="dropdown">
+					  <button class="btn btn-secondary dropdown-toggle" type="button" id="raceActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					    <i class="fas fa-bars"></i>
+					  </button>
+					  <div class="dropdown-menu" aria-labelledby="raceActionsDropdown">
+					    <a href="/tourney/races/{{_id}}" title="Manage Race" class="dropdown-item"><i class="fas fa-clipboard-list"></i>&nbsp;Manage Race</a>
+							{{#if srtvRace}}
+								<a href="{{srtvUrl srtvRace.guid}}" target="_blank" title="Go to Race Channel" class="dropdown-item">
+									<img src="/img/srtv-logo-16x16.png" align="left" />&nbsp;Go to Race Channel
+								</a>
+							{{/if}}
+							<div class="dropdown-divider"></div>
+							<a href="#" class="dropdown-item bg-danger delete-race-link" title="Delete Race" data-race-id="{{_id}}">
+								<i class="fas fa-trash"></i>&nbsp;Delete Race
+							</a>
+					  </div>
+					</div>
+				</td>
+			</tr>
+		{{/each}}
+	</table>
+	{{else}}
+		{{> alert class="info" body="No matches found!"}}
+	{{/if}}
+</div>
+
+{{> modal 
+	id="deleteRaceConfirmation" 
+	title="Confirmation" 
+	body="Are you sure you want to delete this race?" 
+	affirmativeText="Yes, Delete It!" 
+	affirmativeClass="danger"
+}}
+
+<script>
+$(document).ready(() => {
+	$.timeago.settings.allowFuture = true;
+	$("time.timeago").timeago();
+
+	$('.delete-race-link').on('click', (e) => {
+		var raceId = $(e.target).data('race-id');
+		var $modalEl = $('#deleteRaceConfirmation');
+
+		$modalEl.on('show.bs.modal', (e) => {
+			$modalEl.find('#btndeleteRaceConfirmationAffirmative').attr('data-race-id', raceId);
+		});
+
+		$modalEl.on('hidden.bs.modal', (e) => {
+			$modalEl.find('#btndeleteRaceConfirmationAffirmative').removeAttr('data-race-id');
+		});
+
+		$modalEl.modal('show');
+	});
+
+	$('#btndeleteRaceConfirmationAffirmative').on('click', (e) => {
+		let btn = $(e.target);
+		let originalBtnText = btn.html();
+		btn.attr('disabled', 'disabled').html('Deleting...');
+
+		var raceId = $(e.target).data('race-id');
+		$.ajax({
+			method: "DELETE",
+			url: "/tourney/races",
+			data: {id: raceId}
+		})
+		.done((data, textStatus, jqXHR) => {
+			alert('Race deleted!');
+			location.reload();
+		})
+		.fail((jqXHR, textStatus, errorThrown) => {
+			alert('Error: ' + jqXHR.responseText);
+		})
+		.always(() => {
+			btn.removeAttr('disabled').html(originalBtnText);
+			$('#deleteRaceConfirmation').modal('hide');
+		});
+	});
+
+	// refresh the page every 15 minutes
+	setInterval(() => location.reload(), 900000);
+});
+</script>

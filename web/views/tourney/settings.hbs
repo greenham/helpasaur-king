@@ -1,0 +1,113 @@
+<div class="container">
+	<h1>Tourney Settings</h1>
+
+	<ul class="nav nav-tabs" id="tourneySettingsTabs" role="tablist">
+	  <li class="nav-item">
+	    <a class="nav-link active" id="discord-tab" data-toggle="tab" href="#discord" role="tab" aria-controls="discord" aria-selected="true">Discord Pings</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" id="raceDefaults-tab" data-toggle="tab" href="#raceDefaults" role="tab" aria-controls="raceDefaults" aria-selected="false">Race Defaults</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" id="raceAnnouncements-tab" data-toggle="tab" href="#raceAnnouncements" role="tab" aria-controls="raceAnnouncements" aria-selected="false">Race Announcements</a>
+	  </li>
+	</ul>
+
+	<!-- Tab panes -->
+	<form id="tourneySettingsForm">
+		<div class="tab-content border border-secondary p-2">
+		  <div class="tab-pane active" id="discord" role="tabpanel" aria-labelledby="discord-tab">
+			  <div class="form-group col-md-6">
+			    <label for="guildSelect">Guild</label>
+			    <select class="form-control" id="guildSelect" name="racePings.guildId">
+			      <option value="395628442017857536"{{#if (eq racePings.guildId "395628442017857536")}} selected{{/if}}>Tourney Discord</option>
+			      <option value="88301149672718336"{{#if (eq racePings.guildId "88301149672718336")}} selected{{/if}}>Curing Chamber</option>
+			    </select>
+			  </div>
+			  <div class="form-group col-md-6">
+			    <label for="channelSelect">Channel</label>
+			    <select class="form-control" id="channelSelect" name="racePings.textChannelName">
+			      <option value="tourney-talk"{{#if (eq racePings.textChannelName "tourney-talk")}} selected{{/if}}>tourney-talk</option>
+			      <option value="bot-testing"{{#if (eq racePings.textChannelName "bot-testing")}} selected{{/if}}>bot-testing</option>
+			    </select>
+			  </div>
+		  </div>
+		  <div class="tab-pane" id="raceDefaults" role="tabpanel" aria-labelledby="raceDefaults-tab">
+			  <div class="form-group col-md-6">
+			    <label for="raceNamePrefixInput">Race Name Prefix</label>
+			    <input type="text" class="form-control" id="raceNamePrefixInput" name="raceNamePrefix" value="{{raceNamePrefix}}" />
+			  </div>
+			  <div class="form-group col-md-6">
+			    <label for="raceCategoryInput">Race Category GUID</label>
+			    <input type="text" class="form-control" id="raceCategoryInput" name="srtvRaceDefaults.category" value="{{srtvRaceDefaults.category}}" disabled aria-describedby="raceCategoryHelpBlock" />
+			  </div>
+			  <div class="form-group col-md-6">
+			  	Visibility
+				  <div class="form-check">
+					  <input class="form-check-input" type="radio" name="srtvRaceDefaults.unlisted" id="publicRadio" value="false"{{#unless srtvRaceDefaults.unlisted}} checked{{/unless}}>
+					  <label class="form-check-label" for="publicRadio">
+					    Public
+					  </label>
+					</div>
+					<div class="form-check">
+					  <input class="form-check-input" type="radio" name="srtvRaceDefaults.unlisted" id="unlistedRadio" value="true"{{#if srtvRaceDefaults.unlisted}} checked{{/if}}>
+					  <label class="form-check-label" for="unlistedRadio">
+					    Unlisted
+					  </label>
+					</div>
+				</div>
+		  </div>
+		  <div class="tab-pane" id="raceAnnouncements" role="tabpanel" aria-labelledby="raceAnnouncements-tab">
+			  <div class="form-group col-md-9">
+			    <textarea class="form-control" id="raceAnnouncementsTextarea" rows="12" aria-describedby="announcementsHelpBlock" name="raceAnnouncements">{{#each raceAnnouncements}}{{this}}
+{{/each}}</textarea>
+					<small id="announcementsHelpBlock" class="form-text text-muted">
+					  Separate each announcement with a line break.
+					</small>
+			  </div>
+		  </div>
+		</div>
+		<button type="submit" class="btn btn-primary mt-1">Update</button>
+	</form>
+</div>
+
+<script>
+	$(document).ready(() => {
+		$('#tourneySettingsTabs a').on('click', function (e) {
+		  e.preventDefault();
+		  $(this).tab('show');
+		});
+		// show first tab of racer info
+		$('#tourneySettingsTabs li:first-child a').tab('show');
+
+		var submitting = false;
+
+		$('form').on('submit', e => {
+			if (submitting) return false;
+
+			submitting = true;
+			let submitBtn = $(e.target).find('button[type="submit"]');
+			let originalBtnText = submitBtn.html();
+			submitBtn.attr('disabled', 'disabled').html('Updating...');
+
+			$.ajax({
+				type: "POST",
+				url: '/tourney/settings',
+				data: $(e.target).serialize(),
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Success! Settings were updated!');
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				submitBtn.removeAttr('disabled').html(originalBtnText);
+				submitting = false;
+			});
+
+			e.preventDefault();
+		});
+	});
+</script>

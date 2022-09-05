@@ -1,0 +1,71 @@
+{{#with person}}
+  {{#if streams.default.username}}
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+      <div class="btn-group mr-5" role="group" aria-label="Stream Buttons">
+        <button class="btn btn-sm btn-secondary" type="button" data-toggle="collapse" data-target="#{{streams.default.username}}-stream" aria-expanded="false" aria-controls="{{streams.default.username}}-stream"><i class="fa fa-eye"></i> Toggle Stream</button>
+      </div>
+      <div class="btn-group" role="group" aria-label="Stream Buttons">
+        <a href="https://www.twitch.tv/{{streams.default.username}}" target="_blank" class="btn btn-sm btn-secondary"><i class="fab fa-twitch"></i> {{streams.default.username}}</a>
+        <a href="https://www.twitch.tv/popout/{{streams.default.username}}/chat?popout=" target="_blank" class="btn btn-sm btn-secondary twitch-chat-popout"><i class="fas fa-comments"></i> Chat Popout</a>
+      </div>
+    </div>
+    <div class="embed-responsive embed-responsive-16by9 collapse" id="{{streams.default.username}}-stream">
+      <iframe
+        class="embed-responsive-item"
+        src="http://player.twitch.tv/?channel={{streams.default.username}}&autoplay=false&muted=true"
+        height="533"
+        width="300"
+        scrolling="no"
+        allowfullscreen="true">
+      </iframe>
+    </div>
+  {{/if}}
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><i class="fab fa-discord"></i> {{#if discordTag}}{{discordTag}}{{else}}{{#if discordId}}{{discordId}}{{/if}}{{/if}}</li>
+    {{#each ../filenames}}
+      {{#if (eq racerId ../speedgamingId)}}
+        <li class="list-group-item"><i class="fas fa-file"></i> <span class="badge badge-info">{{filename}}</span></li>
+      {{/if}}
+    {{/each}}
+    <li class="list-group-item"><i class="fas fa-trophy"></i> <a href="https://www.speedrun.com/user/{{srcUsername}}" target="_blank" class="card-link">{{hrt pb}}</a></li>
+    <li class="list-group-item">
+      <div class="row">
+        {{#if groupsRaceTimes}}
+          <div class="col-6">
+            <h6>Groups</h6>
+            <i class="fas fa-stopwatch"></i> {{#each groupsRaceTimes}} <span class="badge badge-secondary">{{hrt this}}</span> {{/each}}
+            <br><span class="text-muted">Average Groups Time:</span> {{hrt (avg groupsRaceTimes)}}
+            {{#if groupsRecord}}
+              <br><span class="text-muted">Groups Record:</span> {{groupsRecord.wins}}-{{groupsRecord.losses}}
+            {{/if}}
+          </div>
+        {{/if}}
+        {{#if ../races}}
+          <div class="col-6">
+            <h6>Brackets</h6>
+            <i class="fas fa-stopwatch"></i> 
+            {{#each ../races}}
+              {{#each entries}}
+                {{#if (and (eq player.name ../../srtvUsername) (eq status "DONE"))}}
+                  <span class="badge badge-secondary"><a href="{{srtvUrl ../guid}}" target="_blank" title="Go to Race Channel">{{{raceEntryTime this ../started}}}</a></span>
+                {{/if}}
+              {{/each}}
+            {{/each}}
+            <br>
+          </div>
+        {{/if}}
+      </div>
+    </li>
+  </ul>
+{{/with}}
+
+<script>
+  $(document).ready(() => {
+    var counter = 0;
+    $('.twitch-chat-popout').on('click', e => {
+      window.open($(e.target).attr('href'), `twitchChatPopout-${++counter}`, "width=400,height=600,toolbar=no,resizable=yes");
+      e.stopPropagation();
+      return false;
+    });
+  });
+</script>

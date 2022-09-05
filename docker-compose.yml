@@ -26,17 +26,17 @@ services:
     depends_on:
       - mongo
 
-  discord-bot-dev:
-    build:
-      context: ./
-      target: dev
-    volumes:
-      - .:/src
-    command: yarn discord:dev
-    environment:
-      MONGODB_URL: mongodb://root:rootpassword@mongo:27017/helpa?authSource=admin
-    depends_on:
-      - mongo
+  # discord-bot-dev:
+  #   build:
+  #     context: ./discord
+  #     target: dev
+  #   volumes:
+  #     - ./discord:/src
+  #   command: yarn discord:dev
+  #   environment:
+  #     MONGODB_URL: mongodb://root:rootpassword@mongo:27017/helpa?authSource=admin
+  #   depends_on:
+  #     - mongo
 
 volumes:
   mongodb_data_container:

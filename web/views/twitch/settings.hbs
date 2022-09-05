@@ -1,0 +1,271 @@
+<div class="container">
+	<button type="button" class="btn btn-md btn-danger float-right" id="btnRestart" data-toggle="modal" data-target="#restartConfirmation"><i class="fas fa-redo"></i> Restart Bot</button>
+	<h1>Twitch Bot Settings</h1>
+
+
+	<ul class="nav nav-tabs" role="tablist">
+	  <li class="nav-item">
+	    <a class="nav-link active" id="channels-tab" data-toggle="tab" href="#channels" role="tab" aria-controls="channels" aria-selected="true">Channels</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Config</a>
+	  </li>
+	</ul>
+
+	<!-- Tab panes -->
+	<div class="tab-content border border-secondary p-3">
+		<!-- Channels -->
+	  <div class="tab-pane active" id="channels" role="tabpanel" aria-labelledby="channels-tab">
+			<div class="input-group mb-3">
+  			<div class="input-group-prepend">
+			    <span class="input-group-text">#</span>
+			  </div>
+  			<input type="text" class="form-control col-4" placeholder="Join Channel" id="join-channel-input" value="">
+			</div>
+	  	{{#each channels}}
+	  		{{#multipleOf 3 @index}}
+					{{#if (ne @index 0)}}
+						</div><div class="card-deck mt-2">
+					{{else}}
+						<div class="card-deck">
+					{{/if}}
+				{{/multipleOf}}
+				<div class="card" data-channel-name="{{this}}">
+					<div class="card-body">
+	  				{{this}} <button type="button" class="btn-md btn-default close leave-channel-btn"><span aria-hidden="true">&times;</span></button>
+  				</div>
+  			</div>
+	  	{{/each}}
+	  	{{#if (gt channels.length 0)}}
+		  	{{#unless (multipleOf channels.length 3)}}
+		  		</div>
+		  	{{/unless}}
+	  	{{/if}}
+	  </div>
+	  <!-- Config -->
+	  <div class="tab-pane" id="config" role="tabpanel" aria-labelledby="config-tab">
+	  	<form id="configForm" class="p-2">
+			  <div class="form-row">
+			    <div class="form-group col-md-3">
+			      <label for="inputServer">IRC Server</label>
+			      <input type="text" class="form-control" id="inputServer" placeholder="IRC Server" value="{{ircServer}}" name="ircServer">
+			    </div>
+			    <div class="form-group col-md-3">
+			      <label for="inputUsername">Username</label>
+			      <input type="text" class="form-control" id="inputUsername" placeholder="Username" value="{{username}}" name="username">
+			    </div>
+			    <div class="form-group col-md-6">
+			      <label for="inputOAuthToken">OAuth Token <a href="#" class="btn-sm btn-default" data-toggle="input-mask" data-target="#inputOAuthToken"><i class="fas fa-eye"></i></a></label> <a href="https://twitchapps.com/tmi/" target="_blank" class="float-right"><small>OAuth Token Generator</small></a>
+			      <input type="password" class="form-control" id="inputOAuthToken" placeholder="OAuth Token" value="{{oauth}}" name="oauth">
+			    </div>
+			  </div>
+			  <div class="form-row">
+			    <div class="form-group col-md-6">
+			      <label for="textareaBlacklist">User Blacklist</label>
+    				<textarea class="form-control" id="textareaBlacklist" rows="3" name="blacklistedUsers">{{blacklistedUsers}}</textarea>
+    				<small id="blacklistHelpBlock" class="form-text text-muted">
+						  These users are not allowed to use commands anywhere. Separate each user with a <code>,</code>
+						</small>
+			    </div>
+			    <div class="form-group col-md-6">
+			      <label for="textareaAdmins">Admins</label>
+    				<textarea class="form-control" id="textareaAdmins" rows="3" name="admins">{{admins}}</textarea>
+    				<small id="adminsHelpBlock" class="form-text text-muted">
+  						Admins can join/leave channels and reboot the bot in the chat. Separate each admin with a <code>,</code>
+    				</small>
+			    </div>
+			  </div>
+			  <div class="form-row">
+			  	<div class="form-group col-md-3">
+			      <label for="inputPrefix">Command Prefix</label>
+			      <input type="text" class="form-control" id="inputPrefix" value="{{cmdPrefix}}" name="prefix">
+			    </div>
+			    <div class="form-group col-md-3">
+			      <label for="inputCooldown">Global Cooldown</label>
+			      <div class="input-group">
+			      	<input type="number" class="form-control" id="inputCooldown" value="{{textCmdCooldown}}" name="cooldown">
+			      	<div class="input-group-append">
+						    <span class="input-group-text">seconds</span>
+						  </div>
+			      </div>
+			    </div>
+			  </div>
+			  <button type="submit" class="btn btn-primary">Update</button>
+			</form>
+	  </div>
+	</div>
+</div>
+
+{{> modal 
+	id="joinChannelConfirmation" 
+	title="Confirmation" 
+	body="Are you sure you want the bot to join #{CHANNEL}?" 
+	affirmativeText="Yes, Join!" 
+	affirmativeClass="success"
+}}
+
+{{> modal 
+	id="leaveChannelConfirmation" 
+	title="Confirmation" 
+	body="Are you sure you want the bot to leave this channel?" 
+	affirmativeText="Yes, Leave!" 
+	affirmativeClass="danger"
+}}
+
+{{> modal 
+	id="restartConfirmation" 
+	title="Confirmation" 
+	body="Are you sure you want to restart the bot?" 
+	affirmativeText="Yes, Restart!" 
+	affirmativeClass="danger"
+}}
+
+<script>
+	$(document).ready(() => {
+		$('#btnrestartConfirmationAffirmative').on('click', e => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Restarting...');
+
+			$.ajax({
+				method: "POST",
+				url: "/twitch/restart"
+			})
+			.done((data, textStatus, jqXHR) => {
+				if (data.status === 'rebooting') {
+					alert('Bot is restarting!');
+				} else {
+					alert('Error!');
+				}
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#restartConfirmation').modal('hide');
+			});
+		});
+
+		$('#join-channel-input').on('keyup', (e) => {
+			// trigger new channel confirmation upon pressing Enter
+			if (e.keyCode == 13) {
+				var channelName = e.target.value;
+				var $modalEl = $('#joinChannelConfirmation');
+				var body = $modalEl.find('.modal-body');
+				body.html(body.html().replace('{CHANNEL}', channelName));
+				$modalEl.find('#btnjoinChannelConfirmationAffirmative').attr('data-channel-name', channelName);
+				$modalEl.modal('show');
+			}
+		});
+
+		$('#joinChannelConfirmation').on('hidden.bs.modal', (e) => {
+			var body = $(e.target).find('.modal-body');
+			var channelName = $(e.target).find('#btnjoinChannelConfirmationAffirmative').attr('data-channel-name');
+			var replaced = body.html().replace(channelName, '{CHANNEL}');
+			body.html(replaced);
+		});
+
+		$('#btnjoinChannelConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Joining...');
+
+			var channelName = $(e.target).data('channel-name');
+			$.ajax({
+				method: "POST",
+				url: "/twitch/channels",
+				data: {channel: channelName}
+			})
+			.done((data, textStatus, jqXHR) => {
+				if (data.status === 'joined') {
+					alert('Joined channel!');
+					location.reload();
+				} else if (data.status === 'exists') {
+					alert('Bot is already in this channel!');
+				}
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#joinChannelConfirmation').modal('hide');
+			});
+		});
+
+		$('.leave-channel-btn').on('click', (e) => {
+			var channelName = $(e.target).parents('.card').data('channel-name');
+			var $modalEl = $('#leaveChannelConfirmation');
+
+			$modalEl.on('show.bs.modal', (e) => {
+				$modalEl.find('#btnleaveChannelConfirmationAffirmative').attr('data-channel-name', channelName);
+			});
+
+			$modalEl.on('hidden.bs.modal', (e) => {
+				$modalEl.find('#btnleaveChannelConfirmationAffirmative').removeAttr('data-channel-name');
+			});
+
+			$modalEl.modal('show');
+		});
+
+		$('#btnleaveChannelConfirmationAffirmative').on('click', (e) => {
+			let btn = $(e.target);
+			let originalBtnText = btn.html();
+			btn.attr('disabled', 'disabled').html('Leaving...');
+
+			var channelName = $(e.target).data('channel-name');
+			$.ajax({
+				method: "DELETE",
+				url: "/twitch/channels",
+				data: {channel: channelName}
+			})
+			.done((data, textStatus, jqXHR) => {
+				if (data.status === 'left') {
+					alert('Left channel!');
+					// find the element with the matching channel name and remove it
+					$('.card[data-channel-name="'+channelName+'"]').remove();
+				} else if (data.status === 'missing') {
+					alert('Bot is not in this channel!');
+				}
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				btn.removeAttr('disabled').html(originalBtnText);
+				$('#leaveChannelConfirmation').modal('hide');
+			});
+		});
+
+		var submitting = false;
+
+		$('#configForm').on('submit', e => {
+			if (submitting) return false;
+
+			submitting = true;
+			let submitBtn = $(e.target).find('button[type="submit"]');
+			let originalBtnText = submitBtn.html();
+			submitBtn.attr('disabled', 'disabled').html('Updating...');
+
+			$.ajax({
+				type: "POST",
+				url: '/twitch/settings',
+				data: $(e.target).serialize(),
+				dataType: "json"
+			})
+			.done((data, textStatus, jqXHR) => {
+				alert('Success! Settings were updated!');
+			})
+			.fail((jqXHR, textStatus, errorThrown) => {
+				alert('Error: ' + jqXHR.responseText);
+			})
+			.always(() => {
+				submitBtn.removeAttr('disabled').html(originalBtnText);
+				submitting = false;
+			});
+
+			e.preventDefault();
+		});
+	});
+</script>
