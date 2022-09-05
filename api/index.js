@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const routes = require("./routes");
+const logger = require("morgan");
 const mongoose = require("mongoose");
 const { MONGODB_URL } = process.env;
 
@@ -17,6 +18,9 @@ database.once("connected", () => {
 });
 
 const app = express();
+
+// Set up logging
+app.use(logger("tiny"));
 
 app.use(express.json());
 app.use(routes);

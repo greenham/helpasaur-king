@@ -6,7 +6,8 @@ let aliasList;
 module.exports = {
   name: "messageCreate",
   async execute(interaction) {
-    const { author, content, guildId } = interaction;
+    const { author, content, guildId, client } = interaction;
+    console.log(`client.config from interaction: ${client.config}`);
     let command = false;
 
     // TODO: See if there's a specific configuration for this guild

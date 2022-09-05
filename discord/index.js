@@ -1,7 +1,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, GatewayIntentBits } = require("discord.js");
-const { token } = require("./config.json");
+const axios = require("axios");
+const { API_URL } = process.env;
 
 const client = new Client({
   intents: [
@@ -27,7 +28,19 @@ for (const file of eventFiles) {
   }
 }
 
-client.login(token);
+// Fetch config via API
+axios
+  .get(`${API_URL}/configs/discord`)
+  .then((result) => {
+    // Store the config
+    client.config = Object.assign({}, result.data.config);
+
+    // Log the bot in to Discord
+    client.login(client.config.token);
+  })
+  .catch((err) => {
+    console.error(`Error fetching config: ${err.message}`);
+  });
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled promise rejection:", error);
