@@ -26,6 +26,20 @@ services:
     depends_on:
       - mongo
 
+  api-dev:
+    build:
+      context: ./api
+      target: dev
+    volumes:
+      - ./api:/src
+    command: yarn start
+    ports:
+      - 3000:3000
+    environment:
+      MONGODB_URL: mongodb://root:rootpassword@mongo:27017/helpa?authSource=admin
+    depends_on:
+      - mongo
+
   # discord-bot-dev:
   #   build:
   #     context: ./discord
