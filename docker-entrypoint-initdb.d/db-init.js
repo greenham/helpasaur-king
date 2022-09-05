@@ -2383,26 +2383,10 @@ db.config.insert({
       "NzE5NTM1NTA5Mzg2NTU5NDk4.GZVM-l.L_kZF9QVeXsYLOnWXVeJnbqj7VFTKgnW7ez4Yc",
     handleDMs: true,
     master: true,
-    guilds: {
-      default: {
-        internalName: "default",
-        id: "default",
-        alertsChannelName: "stream-alerts",
-        alertOnConnect: false,
-        allowedRolesForRequest: "",
-        textCmdCooldown: 10,
-        srcCmdCooldown: 10,
-        cmdPrefix: "!",
-        enableLivestreamAlerts: false,
-        enableRaceAlerts: false,
-        enableWeeklyRaceAlert: false,
-        weeklyRaceAlertRole: "",
-        enableWelcomeDM: false,
-        welcomeDM: "",
-      },
-      "138378732376162304": {
-        internalName: "alttp-speedrun",
+    guilds: [
+      {
         id: "138378732376162304",
+        internalName: "alttp-speedrun",
         alertsChannelName: "stream-alerts",
         alertOnConnect: false,
         allowedRolesForRequest: "nmg-race|100-race|bingo-race|ad-race",
@@ -2413,12 +2397,10 @@ db.config.insert({
         enableRaceAlerts: false,
         enableWeeklyRaceAlert: true,
         weeklyRaceAlertRole: "nmg-race",
-        enableWelcomeDM: false,
-        welcomeDM: "",
       },
-      "463331089369399306": {
-        internalName: "doomtap-sunnyvale",
+      {
         id: "463331089369399306",
+        internalName: "doomtap-sunnyvale",
         alertsChannelName: "speedruns",
         alertOnConnect: false,
         allowedRolesForRequest: "",
@@ -2429,12 +2411,10 @@ db.config.insert({
         enableRaceAlerts: false,
         enableWeeklyRaceAlert: false,
         weeklyRaceAlertRole: "",
-        enableWelcomeDM: false,
-        welcomeDM: "",
       },
-      "982502396590698498": {
-        internalName: "nmg-league",
+      {
         id: "982502396590698498",
+        internalName: "nmg-league",
         alertsChannelName: "announcements",
         alertOnConnect: false,
         allowedRolesForRequest: "",
@@ -2445,10 +2425,8 @@ db.config.insert({
         enableRaceAlerts: false,
         enableWeeklyRaceAlert: false,
         weeklyRaceAlertRole: "",
-        enableWelcomeDM: false,
-        welcomeDM: "",
       },
-    },
+    ],
     activities: [
       "DESTROY ALL HUMANS",
       "Handy in the Moth Hole",
