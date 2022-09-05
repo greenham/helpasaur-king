@@ -1,32 +1,27 @@
-const { Collection, EmbedBuilder } = require("discord.js");
-const staticCommands = require("../static-commands.json");
-const commands = new Collection();
-
-staticCommands
-  .filter((c) => c.enabled && !c.deleted)
-  .forEach((command) => {
-    commands.set(command.command, command);
-
-    if (command.aliases.length > 0) {
-      command.aliases.forEach((alias) => {
-        commands.set(alias, command);
-      });
-    }
-  });
+const { EmbedBuilder } = require("discord.js");
+const commands = require("../../lib/commands");
+let aliasList;
 
 module.exports = {
   name: "messageCreate",
   async execute(interaction) {
     const { author, content, guildId } = interaction;
+    let command = false;
 
     // Make sure it starts with the configured prefix
+    // @TODO: Support per-guild prefixes
     if (!content.startsWith("!")) return;
 
     // Sweep out everything that's not the command
     const commandNoPrefix = content.slice(1).split(" ")[0].toLowerCase();
 
-    // Try to find the command in our collection
-    const command = commands.get(commandNoPrefix);
+    // Try to find the command in the database
+    try {
+      command = await commands.get(commandNoPrefix);
+    } catch (err) {
+      console.error(`Error while fetching command: ${err}`);
+      return;
+    }
 
     // Handle command not found
     if (!command) return;
@@ -43,8 +38,16 @@ module.exports = {
       .setTitle(commandNoPrefix)
       .setDescription(command.response);
 
-    if (command.aliases.length > 0) {
-      response.setFooter({ text: `Aliases: ${command.aliases.join(", ")}` });
+    if (command.aliases && command.aliases.length > 0) {
+      aliasList = [...command.aliases];
+
+      // Determine if the original command or an alias was used
+      if (command.aliases.includes(commandNoPrefix)) {
+        // Alias was used, remove it from the list, and add the original command
+        aliasList = aliasList.filter((a) => a != commandNoPrefix);
+        aliasList.push(command.command);
+      }
+      response.setFooter({ text: `Aliases: ${aliasList.join(", ")}` });
     }
 
     // Reply to the user

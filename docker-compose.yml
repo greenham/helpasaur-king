@@ -1,10 +1,42 @@
 version: "3.8"
 
 services:
-  helpa-discord:
+  mongo:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: helpa
+    ports:
+      - 27017:27017
+    volumes:
+      - ./docker-entrypoint-initdb.d/db-init.js:/docker-entrypoint-initdb.d/db-init.js:ro
+      - mongodb_data_container:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: rootpassword
+      ME_CONFIG_MONGODB_URL: mongodb://root:rootpassword@mongo:27017
+    depends_on:
+      - mongo
+
+  discord-bot-dev:
     build:
       context: ./
       target: dev
     volumes:
       - .:/src
     command: yarn discord:dev
+    environment:
+      MONGODB_URL: mongodb://root:rootpassword@mongo:27017/helpa?authSource=admin
+    depends_on:
+      - mongo
+
+volumes:
+  mongodb_data_container:
