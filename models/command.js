@@ -7,6 +7,11 @@ const Command = new mongoose.Schema({
   category: String,
   enabled: Boolean,
   deleted: Boolean,
+  timesUsed: Number,
 });
+
+Command.methods.used = function () {
+  this.$inc("timesUsed", 1).save();
+};
 
 module.exports = mongoose.model("Command", Command);

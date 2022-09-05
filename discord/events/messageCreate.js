@@ -54,5 +54,8 @@ module.exports = {
 
     // Reply to the user
     await interaction.reply({ embeds: [response] });
+
+    // Increment the counter for useage
+    command.used();
   },
 };
