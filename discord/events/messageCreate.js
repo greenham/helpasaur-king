@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
-const commands = require("../../lib/commands");
+const axios = require("axios");
+const { API_URL } = process.env;
 let aliasList;
 
 module.exports = {
@@ -19,7 +20,13 @@ module.exports = {
 
     // Try to find the command in the database
     try {
-      command = await commands.get(commandNoPrefix);
+      const response = await axios.post(`${API_URL}/commands/find`, {
+        command: commandNoPrefix,
+      });
+
+      if (response.status === 200) {
+        command = response.data;
+      }
     } catch (err) {
       console.error(`Error while fetching command: ${err}`);
       return;
@@ -55,7 +62,6 @@ module.exports = {
     // Reply to the user
     await interaction.reply({ embeds: [response] });
 
-    // Increment the counter for useage
-    command.used();
+    // @TODO: Make an API call to increment the counter for useage
   },
 };
