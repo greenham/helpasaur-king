@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  helpa-discord:
+    build:
+      context: ./
+      target: dev
+    volumes:
+      - .:/src
+    command: yarn discord:dev

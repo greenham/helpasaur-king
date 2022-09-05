@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, GatewayIntentBits } = require("discord.js");
-const { token } = require("./config.json");
+const config = require("./config.json");
 
 const client = new Client({
   intents: [
@@ -27,7 +27,7 @@ for (const file of eventFiles) {
   }
 }
 
-client.login(token);
+client.login(config.discord.token);
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled promise rejection:", error);

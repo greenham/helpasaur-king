@@ -41,6 +41,7 @@
   "scripts": {
     "sync-commands": "scp root@helpa.alttp.run:./alttpbot-mongodump.tar.gz . && tar -zxvf ./alttpbot-mongodump.tar.gz && mongorestore ./alttpbot-mongodump/alttpbot/bot-commands.bson --db alttpbot --collection bot-commands --drop",
     "discord": "pm2 start discord-legacy.js --name helpa-discord",
+    "discord:dev": "nodemon discord.js",
     "twitch": "pm2 start twitch.js --name helpa-twitch",
     "web": "pm2 start server.js --name helpa-web"
   },
