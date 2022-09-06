@@ -50,7 +50,19 @@ services:
     environment:
       API_URL: http://api-server:3000/api
     depends_on:
-      - mongo
+      - api-server
+
+  twitch-bot:
+    build:
+      context: ./twitch
+      target: dev
+    volumes:
+      - ./twitch:/src
+    command: yarn start
+    environment:
+      API_URL: http://api-server:3000/api
+    depends_on:
+      - api-server
 
 volumes:
   mongodb_data_container:

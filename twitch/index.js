@@ -1,7 +1,6 @@
 const tmi = require("tmi.js");
 const axios = require("axios");
-// @TODO: set this in docker-compose environment
-const API_URL = "http://localhost:3000/api";
+const { API_URL } = process.env;
 
 // Fetch config via API
 axios
