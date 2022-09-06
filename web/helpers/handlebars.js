@@ -1,5 +1,5 @@
 const moment = require("moment-timezone"),
-  util = require("../../lib/util.js");
+  util = require("../lib/util.js");
 
 let helpers = {};
 

@@ -2,8 +2,9 @@ const express = require("express"),
   router = express.Router(),
   passport = require("passport"),
   // streamAlerts = require("../lib/stream-alerts.js"),
-  permit = require("../../lib/permission").permit,
-  axios = require("axios");
+  // permit = require("../../lib/permission").permit,
+  axios = require("axios"),
+  { API_URL } = process.env;
 
 // Homepage
 router.get("/", (req, res) => {
@@ -39,7 +40,7 @@ router.get("/logout", (req, res) => {
 // Command List
 router.get("/commands", async (req, res) => {
   // @TODO: Use API_URL env var, better error handling
-  const result = await axios.get("http://localhost:3000/api/commands");
+  const result = await axios.get(`${API_URL}/commands`);
   const commands = result.data.sort((a, b) =>
     a.command > b.command ? 1 : b.command > a.command ? -1 : 0
   );

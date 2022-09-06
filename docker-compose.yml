@@ -32,6 +32,7 @@ services:
       target: dev
     volumes:
       - ./api:/src
+    restart: always
     command: yarn start
     ports:
       - 3000:3000
@@ -46,6 +47,7 @@ services:
       target: dev
     volumes:
       - ./discord:/src
+    restart: always
     command: yarn start:dev
     environment:
       API_URL: http://api-server:3000/api
@@ -58,7 +60,23 @@ services:
       target: dev
     volumes:
       - ./twitch:/src
+    restart: always
     command: yarn start
+    environment:
+      API_URL: http://api-server:3000/api
+    depends_on:
+      - api-server
+
+  web-public:
+    build:
+      context: ./web
+      target: dev
+    volumes:
+      - ./web:/src
+    restart: always
+    command: yarn start
+    ports:
+      - 3001:3001
     environment:
       API_URL: http://api-server:3000/api
     depends_on:
