@@ -3,43 +3,55 @@ const axios = require("axios");
 // @TODO: set this in docker-compose environment
 const API_URL = "http://localhost:3000/api";
 
-// @TODO: Get config from API
+// Fetch config via API
+axios
+  .get(`${API_URL}/configs/twitch`)
+  .then((result) => {
+    init(result.data.config);
+  })
+  .catch((err) => {
+    console.error(`Error fetching config: ${err.message}`);
+  });
 
-const client = new tmi.Client({
-  options: { debug: true },
-  identity: {
-    username: "greenham",
-    password: "oauth:113rcpasj0swdeu0759b6at890f359",
-  },
-  channels: ["helpasaurking"],
-});
+function init(config) {
+  // const channelList = config.channels.map((c) => c.slice(1).split(" ")[0]);
 
-client.connect();
+  const client = new tmi.Client({
+    options: { debug: true },
+    identity: {
+      username: config.username,
+      password: config.oauth,
+    },
+    channels: ["helpasaurking"],
+  });
 
-client.on("message", async (channel, tags, message, self) => {
-  if (self || !message.startsWith("!")) return;
+  client.connect();
 
-  const args = message.slice(1).split(" ");
-  const commandNoPrefix = args.shift().toLowerCase();
+  client.on("message", async (channel, tags, message, self) => {
+    if (self || !message.startsWith(config.cmdPrefix)) return;
 
-  // @TODO: Handle join/part requests from helpa's channel
+    const args = message.slice(1).split(" ");
+    const commandNoPrefix = args.shift().toLowerCase();
 
-  // Try to find the command in the database
-  // @TODO: Cache the full list of commands and refresh every 10 minutes or so
-  try {
-    const response = await axios.post(`${API_URL}/commands/find`, {
-      command: commandNoPrefix,
-    });
+    // @TODO: Handle join/part requests from helpa's channel
 
-    if (response.status === 200) {
-      command = response.data;
+    // Try to find the command in the database
+    // @TODO: Cache the full list of commands and refresh every 10 minutes or so
+    try {
+      const response = await axios.post(`${API_URL}/commands/find`, {
+        command: commandNoPrefix,
+      });
+
+      if (response.status === 200) {
+        command = response.data;
+      }
+    } catch (err) {
+      console.error(`Error while fetching command: ${err}`);
+      return;
     }
-  } catch (err) {
-    console.error(`Error while fetching command: ${err}`);
-    return;
-  }
 
-  client.say(channel, command.response);
+    client.say(channel, command.response);
 
-  // @TODO: Call the API to increment use count for this command
-});
+    // @TODO: Call the API to increment use count for this command
+  });
+}
