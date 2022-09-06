@@ -11,28 +11,27 @@ const insecureHandlebars = expressHandlebars({
   extname: ".hbs",
   helpers: hbHelpers,
 });
-const db = require("./db");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
-const session = require("express-session");
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-const MongoStore = require("connect-mongo")(session);
+// const session = require("express-session");
+// const passport = require("passport");
+// const LocalStrategy = require("passport-local").Strategy;
+// const MongoStore = require("connect-mongo")(session);
 
 // Read local config
 let config = require("./config.json");
 
 const app = express(),
-  port = process.env.PORT || config.webapp.port || 3000,
-  env = process.env.NODE_ENV || config.webapp.env || "development";
+  port = process.env.PORT || config.port || 3000,
+  env = process.env.NODE_ENV || config.env || "development";
 
 // Set app environment
 app.set("env", env);
 
 // Set up logging
-app.use(logger(config.webapp.logFormat));
+app.use(logger(config.logFormat));
 
 // Discourage exploits
 app.disable("x-powered-by");
@@ -55,46 +54,46 @@ const getExpirationDate = (sessionExpirationSeconds) => {
 };
 
 // Set up sessions if they're configured
-if (config.webapp.session && config.webapp.session.secret) {
-  let sessionExpirationSeconds = config.webapp.session.ttl || 14 * 24 * 60 * 60; // = 14 days. Default
-  app.use(
-    session({
-      secret: config.webapp.session.secret,
-      resave: false,
-      saveUninitialized: false,
-      store: new MongoStore({
-        url: `${config.db.host}/${config.db.db}`,
-        ttl: sessionExpirationSeconds,
-        stringify: false,
-      }),
-      cookie: { expires: getExpirationDate(sessionExpirationSeconds) },
-    })
-  );
-}
+// if (config.session && config.session.secret) {
+//   let sessionExpirationSeconds = config.session.ttl || 14 * 24 * 60 * 60; // = 14 days. Default
+//   app.use(
+//     session({
+//       secret: config.session.secret,
+//       resave: false,
+//       saveUninitialized: false,
+//       store: new MongoStore({
+//         url: "mongodb://root:rootpassword@localhost:27017/helpa?authSource=admin",
+//         ttl: sessionExpirationSeconds,
+//         stringify: false,
+//       }),
+//       cookie: { expires: getExpirationDate(sessionExpirationSeconds) },
+//     })
+//   );
+// }
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // inject logged-in user data to all requests
-app.use((req, res, next) => {
-  res.locals.user = req.user;
-  next();
-});
+// app.use((req, res, next) => {
+//   res.locals.user = req.user;
+//   next();
+// });
 
 // Refresh userConfig on each request
-app.use((req, res, next) => {
-  db.get()
-    .collection("config")
-    .findOne({ default: true }, (err, userConfig) => {
-      if (!err) {
-        config = Object.assign(config, userConfig);
-        res.locals.config = config;
-        next();
-      } else {
-        console.error(`Unable to read config from database: ${err}`);
-      }
-    });
-});
+// app.use((req, res, next) => {
+//   db.get()
+//     .collection("config")
+//     .findOne({ default: true }, (err, userConfig) => {
+//       if (!err) {
+//         config = Object.assign(config, userConfig);
+//         res.locals.config = config;
+//         next();
+//       } else {
+//         console.error(`Unable to read config from database: ${err}`);
+//       }
+//     });
+// });
 
 // Routing for static files
 app.use(express.static("public"));
@@ -103,10 +102,10 @@ app.use(express.static("public"));
 app.use(require("./routes"));
 
 // User auth
-var Account = require("./models/account");
-passport.use(new LocalStrategy(Account.authenticate()));
-passport.serializeUser(Account.serializeUser());
-passport.deserializeUser(Account.deserializeUser());
+// var Account = require("./models/account");
+// passport.use(new LocalStrategy(Account.authenticate()));
+// passport.serializeUser(Account.serializeUser());
+// passport.deserializeUser(Account.deserializeUser());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -141,21 +140,6 @@ app.use(function (err, req, res, next) {
   });
 });
 
-// Connect to Mongo and start listening on the configured port
-if (!config.db || !config.db.host || !config.db.db) {
-  console.error(
-    "Database has not been properly configured -- check config.json!"
-  );
-  process.exit(1);
-}
-
-db.connect(config.db.host, config.db.db, (err) => {
-  if (!err) {
-    app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
-    });
-  } else {
-    console.error("Unable to connect to database. Check config.json!", err);
-    process.exit(1);
-  }
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });

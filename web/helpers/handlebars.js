@@ -1,6 +1,5 @@
 const moment = require("moment-timezone"),
-  SRTV = require("../lib/srtv.js"),
-  util = require("../lib/util.js");
+  util = require("../../lib/util.js");
 
 let helpers = {};
 
@@ -31,9 +30,6 @@ helpers.fromnow = (time) => {
     now = moment(time);
   }
   return now.fromNow();
-};
-helpers.srtvUrl = (guid) => {
-  return SRTV.raceUrl(guid);
 };
 helpers.decorateRacers = (players) => {
   let ret = '<span class="racers">';
@@ -183,7 +179,7 @@ helpers.math = (lvalue, operator, rvalue, options) => {
     "-": lvalue - rvalue,
     "*": lvalue * rvalue,
     "/": lvalue / rvalue,
-    "%": lvalue % rvalue
+    "%": lvalue % rvalue,
   }[operator];
 };
 helpers.join = (arr, glue, options) => {
