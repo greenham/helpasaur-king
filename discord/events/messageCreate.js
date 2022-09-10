@@ -1,10 +1,12 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, Collection } = require("discord.js");
 const axios = require("axios");
 const { API_URL } = process.env;
 const defaultConfig = {
   cmdPrefix: "!",
+  textCmdCooldown: 10,
 };
 let aliasList;
+let cooldowns = new Collection();
 
 module.exports = {
   name: "messageCreate",
@@ -18,10 +20,12 @@ module.exports = {
       guildConfig = Object.assign({}, defaultConfig);
     }
 
-    // Make sure it starts with the correct prefix
-    if (!content.startsWith(guildConfig.cmdPrefix)) return;
+    const { cmdPrefix, textCmdCooldown } = guildConfig;
 
-    // Sweep out everything that's not the command
+    // Make sure it starts with the correct prefix
+    if (!content.startsWith(cmdPrefix)) return;
+
+    // Sweep out everything that's not the command and make it case-insensitive
     const commandNoPrefix = content.slice(1).split(" ")[0].toLowerCase();
 
     // Try to find the command in the database
@@ -43,7 +47,26 @@ module.exports = {
 
     // @TODO: Make sure the user is permitted to use commands
 
-    // @TODO: Make sure the command isn't on cooldown
+    // @TODO: Make sure the command isn't on cooldown in this guild
+    let onCooldown = false;
+    let cooldownKey = command.command + guildId;
+    let timeUsed = cooldowns.get(cooldownKey);
+    if (timeUsed) {
+      let now = Date.now();
+      // Command was recently used, check timestamp to see if it's on cooldown
+      if (now - timeUsed <= textCmdCooldown * 1000) {
+        // Calculate how much longer it's on cooldown
+        onCooldown = (textCmdCooldown * 1000 - (now - timeUsed)) / 1000;
+      }
+    }
+
+    if (onCooldown !== false) {
+      await interaction.reply({
+        content: `Command is on cooldown for another ${onCooldown} seconds`,
+        ephemeral: true,
+      });
+      return;
+    }
 
     console.log(
       `Received command ${commandNoPrefix} from ${author.username}#${author.discriminator} in guild ${guildId}`
@@ -69,6 +92,9 @@ module.exports = {
 
     // Reply to the user
     await interaction.reply({ embeds: [response] });
+
+    // Place command on cooldown
+    cooldowns.set(cooldownKey, Date.now());
 
     // @TODO: Make an API call to increment the counter for useage
   },
