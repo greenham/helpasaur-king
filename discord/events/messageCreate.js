@@ -28,6 +28,18 @@ module.exports = {
     // Sweep out everything that's not the command and make it case-insensitive
     const commandNoPrefix = content.slice(1).split(" ")[0].toLowerCase();
 
+    if (commandNoPrefix === "auth") {
+      await interaction.reply({
+        content: `https://discord.com/api/oauth2/authorize?client_id=${
+          client.config.clientId
+        }&permissions=${
+          client.config.oauth.permissions
+        }&scope=${client.config.oauth.scopes.join("%20")}`,
+        ephemeral: true,
+      });
+      return;
+    }
+
     // Try to find the command in the database
     try {
       const response = await axios.post(`${API_URL}/commands/find`, {
@@ -47,7 +59,7 @@ module.exports = {
 
     // @TODO: Make sure the user is permitted to use commands
 
-    // @TODO: Make sure the command isn't on cooldown in this guild
+    // Make sure the command isn't on cooldown in this guild
     let onCooldown = false;
     let cooldownKey = command.command + guildId;
     let timeUsed = cooldowns.get(cooldownKey);
