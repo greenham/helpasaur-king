@@ -41,6 +41,7 @@ module.exports = {
     }
 
     // Try to find the command in the database
+    // @TODO: Implement caching
     try {
       const response = await axios.post(`${API_URL}/commands/find`, {
         command: commandNoPrefix,

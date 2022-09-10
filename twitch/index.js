@@ -1,6 +1,7 @@
 const tmi = require("tmi.js");
 const axios = require("axios");
 const { API_URL } = process.env;
+let cooldowns = new Map();
 
 // Fetch config via API
 axios
@@ -10,24 +11,24 @@ axios
   })
   .catch((err) => {
     console.error(`Error fetching config: ${err.message}`);
+
+    // @TODO: build in retry
   });
 
 function init(config) {
   // const channelList = config.channels.map((c) => c.slice(1).split(" ")[0]);
+  const { username, oauth: password, cmdPrefix, textCmdCooldown } = config;
 
   const client = new tmi.Client({
     options: { debug: true },
-    identity: {
-      username: config.username,
-      password: config.oauth,
-    },
+    identity: { username, password },
     channels: ["helpasaurking"],
   });
 
   client.connect();
 
   client.on("message", async (channel, tags, message, self) => {
-    if (self || !message.startsWith(config.cmdPrefix)) return;
+    if (self || !message.startsWith(cmdPrefix)) return;
 
     const args = message.slice(1).split(" ");
     const commandNoPrefix = args.shift().toLowerCase();
@@ -36,6 +37,7 @@ function init(config) {
 
     // Try to find the command in the database
     // @TODO: Cache the full list of commands and refresh every 10 minutes or so
+    let command = false;
     try {
       const response = await axios.post(`${API_URL}/commands/find`, {
         command: commandNoPrefix,
@@ -49,7 +51,32 @@ function init(config) {
       return;
     }
 
+    // Make sure command isn't on cooldown in this channel
+    let onCooldown = false;
+    let cooldownKey = command.command + channel;
+    let timeUsed = cooldowns.get(cooldownKey);
+    if (timeUsed) {
+      let now = Date.now();
+      // Command was recently used, check timestamp to see if it's on cooldown
+      if (now - timeUsed <= textCmdCooldown * 1000) {
+        // Calculate how much longer it's on cooldown
+        onCooldown = (textCmdCooldown * 1000 - (now - timeUsed)) / 1000;
+      }
+    }
+
+    if (onCooldown !== false) {
+      // Command is on cooldown
+      return;
+    }
+
+    if (command === false) {
+      return;
+    }
+
     client.say(channel, command.response);
+
+    // Place command on cooldown
+    cooldowns.set(cooldownKey, Date.now());
 
     // @TODO: Call the API to increment use count for this command
   });

@@ -40,6 +40,8 @@ axios
   })
   .catch((err) => {
     console.error(`Error fetching config: ${err.message}`);
+
+    // @TODO: build in retry
   });
 
 process.on("unhandledRejection", (error) => {
