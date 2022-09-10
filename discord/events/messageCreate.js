@@ -1,20 +1,25 @@
 const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const { API_URL } = process.env;
+const defaultConfig = {
+  cmdPrefix: "!",
+};
 let aliasList;
 
 module.exports = {
   name: "messageCreate",
   async execute(interaction) {
     const { author, content, guildId, client } = interaction;
-    console.log(`client.config from interaction: ${client.config}`);
     let command = false;
 
-    // TODO: See if there's a specific configuration for this guild
+    //  See if there's a specific configuration for this guild
+    let guildConfig = client.config.guilds.find((g) => g.id === guildId);
+    if (!guildConfig) {
+      guildConfig = Object.assign({}, defaultConfig);
+    }
 
-    // Make sure it starts with the configured prefix
-    // @TODO: Support per-guild prefixes
-    if (!content.startsWith("!")) return;
+    // Make sure it starts with the correct prefix
+    if (!content.startsWith(guildConfig.cmdPrefix)) return;
 
     // Sweep out everything that's not the command
     const commandNoPrefix = content.slice(1).split(" ")[0].toLowerCase();
@@ -37,6 +42,8 @@ module.exports = {
     if (!command) return;
 
     // @TODO: Make sure the user is permitted to use commands
+
+    // @TODO: Make sure the command isn't on cooldown
 
     console.log(
       `Received command ${commandNoPrefix} from ${author.username}#${author.discriminator} in guild ${guildId}`
