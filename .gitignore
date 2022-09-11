@@ -6,3 +6,4 @@ conf/twitch_bot_channels
 alttpbot-mongodump*
 *.todo
 docker-entrypoint-initdb.d
+.env*

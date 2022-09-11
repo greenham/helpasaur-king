@@ -3,85 +3,95 @@ version: "3.8"
 services:
   mongo:
     image: mongo:latest
-    restart: always
+    restart: on-failure
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-      MONGO_INITDB_DATABASE: helpa
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
     ports:
-      - 27017:27017
+      - ${MONGO_EXTERNAL_PORT}:27017
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.js:/docker-entrypoint-initdb.d/db-init.js:ro
       - mongodb_data_container:/data/db
 
   mongo-express:
     image: mongo-express
-    restart: always
+    restart: on-failure
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: rootpassword
-      ME_CONFIG_MONGODB_URL: mongodb://root:rootpassword@mongo:27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_EXTERNAL_PORT}
     depends_on:
       - mongo
 
   api-server:
     build:
       context: ./api
-      target: dev
+      target: ${TARGET}
     volumes:
       - ./api:/src
-    restart: always
+    restart: on-failure
     command: yarn start
     ports:
-      - 3001:3001
+      - ${API_SERVER_EXTERNAL_PORT}:3001
     environment:
-      MONGODB_URL: mongodb://root:rootpassword@mongo:27017/helpa?authSource=admin
-      PORT: 3001
+      MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_EXTERNAL_PORT}/${MONGO_DATABASE_NAME}?authSource=admin
+      PORT: ${API_SERVER_EXTERNAL_PORT}
     depends_on:
       - mongo
 
   discord-bot:
     build:
       context: ./discord
-      target: dev
+      target: ${TARGET}
     volumes:
       - ./discord:/src
-    restart: always
-    command: yarn start:dev
+    restart: on-failure
     environment:
-      API_URL: http://api-server:3001/api
+      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
     depends_on:
       - api-server
 
   twitch-bot:
     build:
       context: ./twitch
-      target: dev
+      target: ${TARGET}
     volumes:
       - ./twitch:/src
-    restart: always
-    command: yarn start
+    restart: on-failure
     environment:
-      API_URL: http://api-server:3001/api
+      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
     depends_on:
       - api-server
 
   web-public:
     build:
       context: ./web
-      target: dev
+      target: ${TARGET}
     volumes:
       - ./web:/src
-    restart: always
-    command: yarn start
+    restart: on-failure
     ports:
-      - 3000:3000
+      - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
     environment:
-      API_URL: http://api-server:3001/api
+      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      PORT: ${WEB_PUBLIC_EXTERNAL_PORT}
     depends_on:
       - api-server
+
+  nginx:
+    build:
+      context: ./nginx
+      target: ${TARGET}
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      - WEB_PUBLIC_EXTERNAL_PORT
+    depends_on:
+      - web-public
 
 volumes:
   mongodb_data_container:
