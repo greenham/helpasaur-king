@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node .",
-    "start:dev": "./node_modules/.bin/nodemon ."
+    "start:dev": "nodemon ."
   },
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
