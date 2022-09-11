@@ -1,10 +1,7 @@
-const express = require("express"),
-  router = express.Router(),
-  passport = require("passport"),
-  // streamAlerts = require("../lib/stream-alerts.js"),
-  // permit = require("../../lib/permission").permit,
-  axios = require("axios"),
-  { API_URL } = process.env;
+const express = require("express");
+const router = express.Router();
+const axios = require("axios");
+const { API_URL } = process.env;
 
 // Homepage
 router.get("/", (req, res) => {
@@ -25,9 +22,9 @@ router.get("/login", (req, res) => {
 });
 
 // Login POST
-router.post("/login", passport.authenticate("local"), (req, res) => {
-  res.send({ result: true });
-});
+// router.post("/login", passport.authenticate("local"), (req, res) => {
+//   res.send({ result: true });
+// });
 
 // Logout
 router.get("/logout", (req, res) => {
@@ -39,15 +36,22 @@ router.get("/logout", (req, res) => {
 /** Public Routes */
 // Command List
 router.get("/commands", async (req, res) => {
-  // @TODO: Use API_URL env var, better error handling
-  const result = await axios.get(`${API_URL}/commands`);
-  const commands = result.data.sort((a, b) =>
+  // @TODO: Better error handling
+  const response = await axios.get(`${API_URL}/commands`);
+  // Put the commands in alphabetical order
+  const commands = response.data.sort((a, b) =>
     a.command > b.command ? 1 : b.command > a.command ? -1 : 0
   );
   res.render("commands", { commands });
 });
 
 // Livestreams
+router.get("/livestreams", async (req, res) => {
+  const response = await axios.get(`${API_URL}/streams/live`);
+  const livestreams = response.data || [];
+  res.render("twitch/new-livestreams", { livestreams });
+});
+
 // router.get("/livestreams", (req, res) => {
 //   let config = req.app.locals.config.streamAlerts;
 //   let alertChannels = config.channels;
@@ -90,14 +94,6 @@ router.get("/commands", async (req, res) => {
 //     });
 // });
 /******************/
-
-var isLoggedIn = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  } else {
-    res.redirect("/login");
-  }
-};
 
 // Admin Routes
 // router.use(
