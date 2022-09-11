@@ -35,9 +35,10 @@ services:
     restart: always
     command: yarn start
     ports:
-      - 3000:3000
+      - 3001:3001
     environment:
       MONGODB_URL: mongodb://root:rootpassword@mongo:27017/helpa?authSource=admin
+      PORT: 3001
     depends_on:
       - mongo
 
@@ -50,7 +51,7 @@ services:
     restart: always
     command: yarn start:dev
     environment:
-      API_URL: http://api-server:3000/api
+      API_URL: http://api-server:3001/api
     depends_on:
       - api-server
 
@@ -63,7 +64,7 @@ services:
     restart: always
     command: yarn start
     environment:
-      API_URL: http://api-server:3000/api
+      API_URL: http://api-server:3001/api
     depends_on:
       - api-server
 
@@ -76,9 +77,9 @@ services:
     restart: always
     command: yarn start
     ports:
-      - 3001:3001
+      - 3000:3000
     environment:
-      API_URL: http://api-server:3000/api
+      API_URL: http://api-server:3001/api
     depends_on:
       - api-server
 
