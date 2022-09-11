@@ -8,7 +8,7 @@ FROM base as dev
 ENV NODE_ENV=development
 RUN yarn global add nodemon && yarn install
 COPY . /
-CMD ["nodemon", "index.js"]
+CMD ["yarn", "start:dev"]
 
 FROM base as production
 ENV NODE_ENV=production

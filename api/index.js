@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const express = require("express");
 const routes = require("./routes");
 const logger = require("morgan");
@@ -14,7 +12,7 @@ database.on("error", (error) => {
 });
 
 database.once("connected", () => {
-  console.log("Database Connected");
+  console.log("Connected to MongoDB!");
 });
 
 const app = express();
@@ -26,5 +24,5 @@ app.use(express.json());
 app.use(routes);
 
 app.listen(PORT, () => {
-  console.log(`Server Started at ${PORT}`);
+  console.log(`Helpasaur API Server Started at ${PORT}`);
 });

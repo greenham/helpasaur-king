@@ -33,7 +33,6 @@ services:
     volumes:
       - ./api:/src
     restart: on-failure
-    command: yarn start
     ports:
       - ${API_SERVER_EXTERNAL_PORT}:3001
     environment:
