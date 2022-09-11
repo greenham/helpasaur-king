@@ -1,7 +1,7 @@
 const express = require("express");
-const routes = require("./routes");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const routes = require("./routes");
 const { MONGODB_URL, PORT } = process.env;
 
 mongoose.connect(MONGODB_URL);
