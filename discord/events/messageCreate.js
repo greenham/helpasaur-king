@@ -59,9 +59,11 @@ module.exports = {
         if (response.status === 200) {
           command = response.data;
 
-          // Cache it for 10 minutes
-          command.staleAfter = Date.now() + 10 * 60 * 1000;
-          cachedCommands.set(commandNoPrefix, command);
+          if (command) {
+            // Cache it for 10 minutes
+            command.staleAfter = Date.now() + 10 * 60 * 1000;
+            cachedCommands.set(commandNoPrefix, command);
+          }
         }
       } catch (err) {
         console.error(`Error while fetching command: ${err}`);

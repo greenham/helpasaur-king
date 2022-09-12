@@ -74,7 +74,7 @@ function init(config) {
     const args = message.slice(1).split(" ");
     const commandNoPrefix = args.shift().toLowerCase();
 
-    // @TODO: Handle join/part requests from the bot's channel
+    // Handle join/part requests from the bot's channel
     if (channel === `#${username}`) {
       if (commandNoPrefix === "join") {
         // join the requesting user's channel by default
@@ -170,9 +170,11 @@ function init(config) {
         if (response.status === 200) {
           command = response.data;
 
-          // Cache it for 10 minutes
-          command.staleAfter = Date.now() + 10 * 60 * 1000;
-          cachedCommands.set(commandNoPrefix, command);
+          if (command) {
+            // Cache it for 10 minutes
+            command.staleAfter = Date.now() + 10 * 60 * 1000;
+            cachedCommands.set(commandNoPrefix, command);
+          }
         }
       } catch (err) {
         console.error(`Error while fetching command: ${err}`);
