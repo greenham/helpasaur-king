@@ -49,6 +49,10 @@ router.get("/livestreams", async (req, res) => {
     let topStreams = livestreams.filter((stream) =>
       channels.includes(stream.user_name.toLowerCase())
     );
+    topStreams = topStreams.map((s) => {
+      s.isOnAlertsList = true;
+      return s;
+    });
 
     // 4. now create a merged list, with topStreams first, then anything in livestreams that isn't in topStreams
     let otherStreams = livestreams.filter((stream) => {

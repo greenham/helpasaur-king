@@ -10,7 +10,13 @@
         <div class="card-deck">
       {{/if}}
     {{/multipleOf}}
+
+    {{#if isOnAlertsList}}
+    <div class="card bg-primary">
+    {{else}}
     <div class="card">
+    {{/if}}
+
       <a href="https://twitch.tv/{{user_login}}" target="_blank"><img class="card-img-top"
           src="{{sizeStreamThumbnail thumbnail_url 320 180}}" alt="{{title}}" /></a>
       <div class="card-body text-center">
