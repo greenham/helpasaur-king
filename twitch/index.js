@@ -16,13 +16,21 @@ axios
   });
 
 function init(config) {
-  // const channelList = config.channels.map((c) => c.slice(1).split(" ")[0]);
-  const { username, oauth: password, cmdPrefix, textCmdCooldown } = config;
+  const {
+    username,
+    oauth: password,
+    cmdPrefix,
+    textCmdCooldown,
+    blacklistedUsers,
+  } = config;
+  let channelList = config.channels.map((c) => c.slice(1).split(" ")[0]);
+  channelList.push(username);
+  console.log(channelList);
 
   const client = new tmi.Client({
     options: { debug: true },
     identity: { username, password },
-    channels: ["helpasaurking"],
+    channels: [username],
     // channels: channelList
   });
 
@@ -31,10 +39,115 @@ function init(config) {
   client.on("message", async (channel, tags, message, self) => {
     if (self || !message.startsWith(cmdPrefix)) return;
 
+    // {
+    //   "badge-info": null,
+    //   "badges": { "moderator": "1" },
+    //   "color": "#BADA55",
+    //   "display-name": "greenHam",
+    //   "emotes": null,
+    //   "first-msg": false,
+    //   "flags": null,
+    //   "id": "fe08874b-daa5-4d5c-a572-a113effa306f",
+    //   "mod": true,
+    //   "returning-chatter": false,
+    //   "room-id": "164641928",
+    //   "subscriber": false,
+    //   "tmi-sent-ts": "1662956626462",
+    //   "turbo": false,
+    //   "user-id": "78410627",
+    //   "user-type": "mod",
+    //   "emotes-raw": null,
+    //   "badge-info-raw": null,
+    //   "badges-raw": "moderator/1",
+    //   "username": "greenham",
+    //   "message-type": "chat"
+    // }
+
+    // Ignore everything from blacklisted users
+    if (blacklistedUsers.includes(tags.username)) {
+      console.log(
+        `Received command from blacklisted user: ${tags.username} (${tags["user-id"]})`
+      );
+      return;
+    }
+
     const args = message.slice(1).split(" ");
     const commandNoPrefix = args.shift().toLowerCase();
 
-    // @TODO: Handle join/part requests from helpa's channel
+    // @TODO: Handle join/part requests from the bot's channel
+    if (channel === `#${username}`) {
+      if (commandNoPrefix === "join") {
+        // join the requesting user's channel by default
+        let userChannel = tags.username;
+
+        // check for channel argument if this user is a mod
+        if (args[0] && tags.mod) {
+          // join the specified channel instead
+          userChannel = args[0].toLowerCase();
+        }
+
+        console.log(
+          `Received request from ${tags.username} to join ${userChannel}`
+        );
+
+        if (channelList.includes(userChannel)) {
+          return client.say(
+            channel,
+            `@${tags["display-name"]} >> I am already in ${userChannel}!`
+          );
+        }
+
+        client.say(
+          channel,
+          `@${tags["display-name"]} >> Joining ${userChannel}... please mod ${username} to avoid accidental timeouts or bans!`
+        );
+
+        // Attempt to join the channel
+        client.join(userChannel);
+
+        // Add to local list
+        channelList.push(userChannel);
+
+        // @TODO: call API to add this channel to the list
+
+        return;
+      } else if (commandNoPrefix === "leave") {
+        // leave the requesting user's channel by default
+        let userChannel = tags.username;
+
+        // check for channel argument if this user is a mod
+        if (args[0] && tags.mod) {
+          // leave the specified channel instead
+          userChannel = args[0].toLowerCase();
+        }
+
+        console.log(
+          `Received request from ${tags.username} to leave ${userChannel}`
+        );
+
+        if (!channelList.includes(userChannel)) {
+          return client.say(
+            channel,
+            `@${tags["display-name"]} >> I am not in ${userChannel}!`
+          );
+        }
+
+        client.say(
+          channel,
+          `@${tags["display-name"]} >> Leaving ${userChannel}... use ${cmdPrefix}join in this channel to re-join at any time!`
+        );
+
+        // Attempt to leave the channel
+        client.part(userChannel);
+
+        // Remove from local list
+        channelList = channelList.filter((c) => c !== userChannel);
+
+        // @TODO: call API to add this channel to the list
+
+        return;
+      }
+    }
 
     // Try to find the command in the database
     let command = false;
