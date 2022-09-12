@@ -1,5 +1,6 @@
 <div class="container">
-  <h1>ALttP Livestreams (<span id="livestreamsCount">{{livestreams.length}}</span>)</h1>
+  <h1>ALttP Streams <span class="badge badge-danger">{{livestreams.length}} Live Now</span></h1>
+  <hr style="border-color: #444;" />
   {{#each livestreams}}
     {{#multipleOf 3 @index}}
       {{#if (ne @index 0)}}
@@ -13,19 +14,14 @@
       <a href="https://twitch.tv/{{user_login}}" target="_blank"><img class="card-img-top"
           src="{{sizeStreamThumbnail thumbnail_url 320 180}}" alt="{{title}}" /></a>
       <div class="card-body text-center">
-        {{!-- <img src="https://placekitten.com/64/64" class="rounded-circle" width="64" height="64"> --}}
         <a href="https://twitch.tv/{{user_login}}" target="_blank">
           <h5 class="card-title text-center"><i class="fab fa-twitch"></i> {{user_name}}</h5>
         </a>
         <p class="card-text">{{title}}</p>
       </div>
-      <div class="card-footer">
-        <small class="text-muted">Went live <em>{{{fromnow started_at}}}</em>. Streaming to <strong>{{viewer_count}}
-            viewers</strong>.</small>
-        {{!-- {{#if ../user}}
-        <span class="float-right"><button class="btn btn-sm btn-default stream-ban-btn"
-            data-stream-id="{{user_name}}"><i class="fas fa-eye-slash"></i></button></span>
-        {{/if}} --}}
+      <div class="card-footer" style="display: flex; justify-content: space-between">
+        <small class="text-muted">Started <em>{{{fromnow started_at}}}</em></small>
+        <small class="text-muted"><strong>{{viewer_count}} viewers</strong></small>
       </div>
     </div>
   {{/each}}

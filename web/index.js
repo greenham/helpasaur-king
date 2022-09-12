@@ -3,10 +3,14 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
 const { create } = require("express-handlebars");
+const axios = require("axios");
 
+const { PORT, NODE_ENV, API_URL } = process.env;
+const port = PORT || 3000;
+const env = NODE_ENV || "development";
+
+// Create the app
 const app = express();
-const port = process.env.PORT || 3000;
-const env = process.env.NODE_ENV || "development";
 
 // Set app environment
 app.set("env", env);
@@ -14,11 +18,23 @@ app.set("env", env);
 // Set up logging
 app.use(logger("tiny"));
 
+// Fetch all configs via API and store in app.locals
+axios
+  .get(`${API_URL}/configs`)
+  .then((result) => {
+    let configsMap = new Map();
+    result.data.forEach((config) => {
+      configsMap.set(config.id, config.config);
+    });
+    app.locals.configs = configsMap;
+  })
+  .catch((err) => {
+    console.error(`Error fetching config: ${err.message}`);
+    // @TODO: build in retry
+  });
+
 // Discourage exploits
 app.disable("x-powered-by");
-
-// Make app config available everywhere
-// app.locals.config = config;
 
 // Use Handlebars for templating
 const hbs = create({
