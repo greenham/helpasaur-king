@@ -63,5 +63,11 @@ router.get("/livestreams", async (req, res) => {
 
   res.render("twitch/livestreams", { livestreams });
 });
+router.get("/streams", (req, res) => {
+  res.redirect("/livestreams");
+});
+router.get("/live", (req, res) => {
+  res.redirect("/livestreams");
+});
 
 module.exports = router;
