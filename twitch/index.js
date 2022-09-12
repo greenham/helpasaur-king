@@ -30,8 +30,8 @@ function init(config) {
   const client = new tmi.Client({
     options: { debug: true },
     identity: { username, password },
-    channels: [username],
-    // channels: channelList
+    // channels: [username],
+    channels: channelList,
   });
 
   client.connect();
