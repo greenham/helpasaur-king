@@ -2,6 +2,7 @@ const tmi = require("tmi.js");
 const axios = require("axios");
 const { API_URL } = process.env;
 let cooldowns = new Map();
+let cachedCommands = new Map();
 
 // Fetch config via API
 axios
@@ -11,7 +12,6 @@ axios
   })
   .catch((err) => {
     console.error(`Error fetching config: ${err.message}`);
-
     // @TODO: build in retry
   });
 
@@ -23,6 +23,7 @@ function init(config) {
     options: { debug: true },
     identity: { username, password },
     channels: ["helpasaurking"],
+    // channels: channelList
   });
 
   client.connect();
@@ -36,19 +37,37 @@ function init(config) {
     // @TODO: Handle join/part requests from helpa's channel
 
     // Try to find the command in the database
-    // @TODO: Cache the full list of commands and refresh every 10 minutes or so
     let command = false;
-    try {
-      const response = await axios.post(`${API_URL}/commands/find`, {
-        command: commandNoPrefix,
-      });
 
-      if (response.status === 200) {
-        command = response.data;
+    // Try to find the command in the cache
+    let cachedCommand = cachedCommands.get(commandNoPrefix);
+
+    // If it's cached, make sure it's not too stale
+    if (cachedCommand && Date.now() > cachedCommand.staleAfter) {
+      cachedCommand = false;
+    }
+
+    if (!cachedCommand) {
+      // Not cached, try to find the command in the database
+      try {
+        const response = await axios.post(`${API_URL}/commands/find`, {
+          command: commandNoPrefix,
+        });
+
+        if (response.status === 200) {
+          command = response.data;
+
+          // Cache it for 10 minutes
+          command.staleAfter = Date.now() + 10 * 60 * 1000;
+          cachedCommands.set(commandNoPrefix, command);
+        }
+      } catch (err) {
+        console.error(`Error while fetching command: ${err}`);
+        return;
       }
-    } catch (err) {
-      console.error(`Error while fetching command: ${err}`);
-      return;
+    } else {
+      // Use cached version
+      command = cachedCommand;
     }
 
     // Make sure command isn't on cooldown in this channel

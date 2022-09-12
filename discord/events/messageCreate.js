@@ -6,6 +6,7 @@ const defaultConfig = {
   textCmdCooldown: 10,
 };
 let aliasList;
+let cachedCommands = new Collection();
 let cooldowns = new Collection();
 
 module.exports = {
@@ -40,19 +41,35 @@ module.exports = {
       return;
     }
 
-    // Try to find the command in the database
-    // @TODO: Implement caching
-    try {
-      const response = await axios.post(`${API_URL}/commands/find`, {
-        command: commandNoPrefix,
-      });
+    // Try to find the command in the cache
+    let cachedCommand = cachedCommands.get(commandNoPrefix);
 
-      if (response.status === 200) {
-        command = response.data;
+    // If it's cached, make sure it's not too stale
+    if (cachedCommand && Date.now() > cachedCommand.staleAfter) {
+      cachedCommand = false;
+    }
+
+    if (!cachedCommand) {
+      // Not cached, try to find the command in the database
+      try {
+        const response = await axios.post(`${API_URL}/commands/find`, {
+          command: commandNoPrefix,
+        });
+
+        if (response.status === 200) {
+          command = response.data;
+
+          // Cache it for 10 minutes
+          command.staleAfter = Date.now() + 10 * 60 * 1000;
+          cachedCommands.set(commandNoPrefix, command);
+        }
+      } catch (err) {
+        console.error(`Error while fetching command: ${err}`);
+        return;
       }
-    } catch (err) {
-      console.error(`Error while fetching command: ${err}`);
-      return;
+    } else {
+      // Use cached version
+      command = cachedCommand;
     }
 
     // Handle command not found
@@ -74,10 +91,6 @@ module.exports = {
     }
 
     if (onCooldown !== false) {
-      await interaction.reply({
-        content: `Command is on cooldown for another ${onCooldown} seconds`,
-        ephemeral: true,
-      });
       return;
     }
 
