@@ -23,9 +23,9 @@ function init(config) {
     textCmdCooldown,
     blacklistedUsers,
   } = config;
-  let channelList = config.channels.map((c) => c.slice(1).split(" ")[0]);
+
+  let channelList = [...config.channels];
   channelList.push(username);
-  console.log(channelList);
 
   const client = new tmi.Client({
     options: { debug: true },
@@ -213,3 +213,7 @@ function init(config) {
     // @TODO: Call the API to increment use count for this command
   });
 }
+
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled promise rejection:", error);
+});

@@ -1,20 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const TwitchApi = require("node-twitch").default;
+const Config = require("../../models/config");
 
-// @TODO: Get these from config table
-const twitchApiClient = new TwitchApi({
-  client_id: "p000sp5q14fg2web0dx71p9fbmx5m9",
-  client_secret: "wbnj484yj2c5gfyrxavjpimuqu0xzk",
-});
+const getStreamAlertsConfig = async () => {
+  return await Config.findOne({ id: "streamAlerts" });
+};
 
 // Endpoint: /streams
 
 // GET / -> returns all live alttp streams
 router.get("/live", async (req, res) => {
-  // @TODO: Get game ID from config table
+  const { config: streamAlertsConfig } = await getStreamAlertsConfig();
+  const twitchApiClient = new TwitchApi({
+    client_id: streamAlertsConfig.clientId,
+    client_secret: streamAlertsConfig.clientSecret,
+  });
+
   let filter = {
-    game_id: "9435",
+    game_id: streamAlertsConfig.gameId,
     type: "live",
     first: 100,
   };

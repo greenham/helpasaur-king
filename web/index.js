@@ -92,3 +92,7 @@ app.use(function (err, req, res, next) {
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled promise rejection:", error);
+});

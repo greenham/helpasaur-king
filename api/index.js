@@ -11,7 +11,7 @@ database.on("error", (error) => {
   console.log(error);
 });
 
-database.once("connected", () => {
+database.once("connected", async () => {
   console.log("Connected to MongoDB!");
 });
 
@@ -25,4 +25,8 @@ app.use(routes);
 
 app.listen(PORT, () => {
   console.log(`Helpasaur API Server Started at ${PORT}`);
+});
+
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled promise rejection:", error);
 });
