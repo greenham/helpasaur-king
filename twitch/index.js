@@ -30,8 +30,8 @@ function init(config) {
   const client = new tmi.Client({
     options: { debug: true },
     identity: { username, password },
-    // channels: [username],
-    channels: channelList,
+    channels: [username],
+    // channels: channelList,
   });
 
   client.connect();
@@ -108,7 +108,19 @@ function init(config) {
         // Add to local list
         channelList.push(userChannel);
 
-        // @TODO: call API to add this channel to the list
+        // call API to add this channel to the list
+        axios
+          .post(`${API_URL}/twitch/join`, { channel: userChannel })
+          .then((result) => {
+            console.log(
+              `Result of ${API_URL}/twitch/join: ${JSON.stringify(result.data)}`
+            );
+          })
+          .catch((err) => {
+            console.error(
+              `Error calling ${API_URL}/twitch/join: ${err.message}`
+            );
+          });
 
         return;
       } else if (commandNoPrefix === "leave") {
@@ -143,7 +155,21 @@ function init(config) {
         // Remove from local list
         channelList = channelList.filter((c) => c !== userChannel);
 
-        // @TODO: call API to add this channel to the list
+        // call API to remove this channel to the list
+        axios
+          .post(`${API_URL}/twitch/leave`, { channel: userChannel })
+          .then((result) => {
+            console.log(
+              `Result of ${API_URL}/twitch/leave: ${JSON.stringify(
+                result.data
+              )}`
+            );
+          })
+          .catch((err) => {
+            console.error(
+              `Error calling ${API_URL}/twitch/leave: ${err.message}`
+            );
+          });
 
         return;
       }
