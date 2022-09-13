@@ -8,11 +8,13 @@ const Config = require("../../models/config");
 router.post("/join", async (req, res) => {
   try {
     const twitchConfig = await Config.findOne({ id: "twitch" });
+    console.log(`Received join add for ${req.body.channel}`);
     if (twitchConfig.config.channels.includes(req.body.channel)) {
       return res.status(200).json({ noop: true });
     }
 
     twitchConfig.config.channels.push(req.body.channel);
+    twitchConfig.markModified("config");
     await twitchConfig.save();
 
     res.status(200).json({ result: true });
@@ -32,6 +34,7 @@ router.post("/leave", async (req, res) => {
     twitchConfig.config.channels = twitchConfig.config.channels.filter(
       (c) => c !== req.body.channel
     );
+    twitchConfig.markModified("config");
     await twitchConfig.save();
 
     res.status(200).json({ result: true });
