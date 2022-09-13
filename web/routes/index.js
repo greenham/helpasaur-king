@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const linkifyStr = require("linkify-string");
 const { API_URL } = process.env;
 
 // Homepage
@@ -14,9 +15,14 @@ router.get("/commands", async (req, res) => {
   const response = await axios.get(`${API_URL}/commands`);
 
   // Put the commands in alphabetical order
-  const commands = response.data.sort((a, b) =>
+  let commands = response.data.sort((a, b) =>
     a.command > b.command ? 1 : b.command > a.command ? -1 : 0
   );
+
+  commands = commands.map((c) => {
+    c.response = linkifyStr(c.response);
+    return c;
+  });
 
   res.render("commands", { commands });
 });
