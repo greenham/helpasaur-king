@@ -22,16 +22,16 @@ function init(config) {
     cmdPrefix,
     textCmdCooldown,
     blacklistedUsers,
+    channels: channelsToJoin,
   } = config;
 
-  let channelList = [...config.channels];
-  channelList.push(username);
+  let channelList = [username, ...channelsToJoin];
 
   const client = new tmi.Client({
-    options: { debug: true },
+    options: { debug: false },
     identity: { username, password },
-    channels: [username],
-    // channels: channelList,
+    // channels: [username],
+    channels: [...channelList],
   });
 
   client.connect();
@@ -210,6 +210,8 @@ function init(config) {
       // Use cached version
       command = cachedCommand;
     }
+
+    if (!command) return;
 
     // Make sure command isn't on cooldown in this channel
     let onCooldown = false;
