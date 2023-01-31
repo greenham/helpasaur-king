@@ -27,6 +27,7 @@ axios
       configsMap.set(config.id, config.config);
     });
     app.locals.configs = configsMap;
+    app.locals.botName = configsMap.get("general").botName;
   })
   .catch((err) => {
     console.error(`Error fetching config: ${err.message}`);

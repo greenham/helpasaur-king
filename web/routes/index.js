@@ -28,7 +28,7 @@ router.get("/commands", async (req, res) => {
 });
 
 // Livestreams
-router.get("/live", async (req, res) => {
+router.get("/streams", async (req, res) => {
   // @TODO: Better error handling
   const response = await axios.get(`${API_URL}/streams/live`);
 
@@ -76,11 +76,11 @@ router.get("/live", async (req, res) => {
     title: "ALttP Streams | Helpasaur King",
   });
 });
-router.get("/streams", (req, res) => {
-  res.redirect("/live");
+router.get("/live", (req, res) => {
+  res.redirect("/streams");
 });
 router.get("/livestreams", (req, res) => {
-  res.redirect("/live");
+  res.redirect("/streams");
 });
 
 module.exports = router;
