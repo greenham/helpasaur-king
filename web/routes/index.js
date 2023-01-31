@@ -24,11 +24,11 @@ router.get("/commands", async (req, res) => {
     return c;
   });
 
-  res.render("commands", { commands });
+  res.render("commands", { commands, title: "Commands | Helpasaur King" });
 });
 
 // Livestreams
-router.get("/livestreams", async (req, res) => {
+router.get("/live", async (req, res) => {
   // @TODO: Better error handling
   const response = await axios.get(`${API_URL}/streams/live`);
 
@@ -38,8 +38,6 @@ router.get("/livestreams", async (req, res) => {
   const { blacklistedUsers, channels, statusFilters } = streamAlertsConfig;
   const speedrunTester = new RegExp(statusFilters, "i");
 
-  console.log(`${livestreams.length} streams returned from API`);
-
   if (livestreams.length > 0) {
     // Do some additional ordering/filtering:
 
@@ -47,19 +45,16 @@ router.get("/livestreams", async (req, res) => {
     livestreams = livestreams.filter(
       (stream) => !blacklistedUsers.includes(stream.user_name.toLowerCase())
     );
-    console.log(`- ${livestreams.length} after applying blacklist`);
 
     // 2. attempt to filter out most non-speedrun streams
     livestreams = livestreams.filter(
       (stream) => !speedrunTester.test(stream.title)
     );
-    console.log(`- ${livestreams.length} after applying speedrun filter`);
 
     // 3. prioritize streams that are in the alert list
     let topStreams = livestreams.filter((stream) =>
       channels.includes(stream.user_name.toLowerCase())
     );
-    console.log(`- ${topStreams.length} on the alert list`);
     topStreams = topStreams.map((s) => {
       s.isOnAlertsList = true;
       return s;
@@ -72,19 +67,20 @@ router.get("/livestreams", async (req, res) => {
       });
       return matchIndex === -1;
     });
-    console.log(`- ${otherStreams.length} not on the alert list`);
 
     livestreams = topStreams.concat(otherStreams);
-    console.log(`- ${livestreams.length} after all processing`);
   }
 
-  res.render("twitch/livestreams", { livestreams });
+  res.render("twitch/livestreams", {
+    livestreams,
+    title: "ALttP Streams | Helpasaur King",
+  });
 });
 router.get("/streams", (req, res) => {
-  res.redirect("/livestreams");
+  res.redirect("/live");
 });
-router.get("/live", (req, res) => {
-  res.redirect("/livestreams");
+router.get("/livestreams", (req, res) => {
+  res.redirect("/live");
 });
 
 module.exports = router;
