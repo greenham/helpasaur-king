@@ -27,8 +27,6 @@ router.get("/live", async (req, res) => {
     filter.cursor = req.query.cursor;
   }
 
-  console.log(filter);
-
   try {
     const streams = await twitchApiClient.getStreams(filter);
     res.status(200).json(streams.data);
