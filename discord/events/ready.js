@@ -1,7 +1,10 @@
 const schedule = require("node-schedule");
+// @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304";
 const REZE_ID = "86234074175258624";
 const LJ_SMILE = "<:ljSmile:1069331097193812071>";
+const WEEKLY_ALERT_MESSAGE =
+  "The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>";
 
 module.exports = {
   name: "ready",
@@ -19,7 +22,7 @@ module.exports = {
     // !!!!!!!!!!!!!!!!! DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!
     // timeToSchedule.dayOfWeek = 2;
     // timeToSchedule.hour = 18;
-    // timeToSchedule.minute = 00;
+    // timeToSchedule.minute = 19;
     /////////////////////////////////////////////////////
 
     const job = schedule.scheduleJob(timeToSchedule, () => {
@@ -27,7 +30,7 @@ module.exports = {
 
       // Look up which guilds/channels/roles should be alerted
       let alerts = client.config.guilds
-        .filter((g) => g.enableWeeklyRaceAlert)
+        .filter((g) => g.enableWeeklyRaceAlert && g.weeklyRaceAlertChannelId)
         .map((g) => {
           return {
             channelId: g.weeklyRaceAlertChannelId,
@@ -37,14 +40,16 @@ module.exports = {
 
       alerts.forEach((a) => {
         let channel = client.channels.cache.get(a.channelId);
+        if (!channel) return;
+
         console.log(
           `Sending alert to to ${channel.guild.name} (#${channel.name})`
         );
-        // @TODO: Move this message to config
+
+        let notify = a.roleId ? `<@&${a.roleId}> ` : "";
+
         channel
-          .send(
-            `<@&${a.roleId}> The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>`
-          )
+          .send(notify + WEEKLY_ALERT_MESSAGE)
           .then(() => {
             console.log(`-> Sent!`);
 
