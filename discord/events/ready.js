@@ -1,4 +1,7 @@
 const schedule = require("node-schedule");
+const ALTTP_GUILD_ID = "138378732376162304";
+const REZE_ID = "86234074175258624";
+const LJ_SMILE = "<:ljSmile:1069331097193812071>";
 
 module.exports = {
   name: "ready",
@@ -6,10 +9,6 @@ module.exports = {
   execute(client) {
     console.log(`Ready! Logged in as ${client.user.tag}`);
 
-    // alttp #bot-alerts = 333676639550570496
-    // CoU #general = 1013180793234927688
-    const weeklyRaceAlertChannel =
-      client.channels.cache.get("333676639550570496");
     let timeToSchedule = {
       dayOfWeek: 0,
       hour: 11,
@@ -17,28 +16,45 @@ module.exports = {
       tz: "America/Los_Angeles",
     };
 
-    // alttp nmg-race = 222135243866374144
-    // CoU nmg-race = 1069299066921562275
-    const weeklyRaceAlertRole = "222135243866374144";
-    const rezeId = "86234074175258624";
-    const ljSmile = weeklyRaceAlertChannel.guild.emojis.cache.find(
-      (emoji) => emoji.name === "ljSmile"
-    );
+    // !!!!!!!!!!!!!!!!! DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!
+    // timeToSchedule.dayOfWeek = 2;
+    // timeToSchedule.hour = 18;
+    // timeToSchedule.minute = 00;
+    /////////////////////////////////////////////////////
+
     const job = schedule.scheduleJob(timeToSchedule, () => {
-      console.log(
-        `Sending weekly alert to ${weeklyRaceAlertChannel.guild.name} (#${weeklyRaceAlertChannel.name})`
-      );
-      // let randomEmoji = guild.emojis.random();
-      // @TODO: Move this message to config
-      weeklyRaceAlertChannel
-        .send(
-          `<@&${weeklyRaceAlertRole}> The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>`
-        )
-        .then(() => {
-          console.log(`Weekly alert sent!`);
-          weeklyRaceAlertChannel.send(`<@${rezeId}> happy weekly ${ljSmile}`);
-        })
-        .catch(console.error);
+      console.log(`Sending weekly alerts!`);
+
+      // Look up which guilds/channels/roles should be alerted
+      let alerts = client.config.guilds
+        .filter((g) => g.enableWeeklyRaceAlert)
+        .map((g) => {
+          return {
+            channelId: g.weeklyRaceAlertChannelId,
+            roleId: g.weeklyRaceAlertRoleId,
+          };
+        });
+
+      alerts.forEach((a) => {
+        let channel = client.channels.cache.get(a.channelId);
+        console.log(
+          `Sending alert to to ${channel.guild.name} (#${channel.name})`
+        );
+        // @TODO: Move this message to config
+        channel
+          .send(
+            `<@&${a.roleId}> The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>`
+          )
+          .then(() => {
+            console.log(`-> Sent!`);
+
+            // special message for reze in the alttp discord :)
+            if (channel.guild.id == ALTTP_GUILD_ID) {
+              channel.send(`<@${REZE_ID}> happy weekly ${LJ_SMILE}`);
+            }
+          })
+          .catch(console.error);
+      });
     });
     console.log(
       `Weekly alert is scheduled, next invocation: ${job.nextInvocation()}`
