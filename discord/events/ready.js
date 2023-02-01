@@ -12,6 +12,7 @@ module.exports = {
   execute(client) {
     console.log(`Ready! Logged in as ${client.user.tag}`);
 
+    // 1. Set up weekly alerts
     let timeToSchedule = {
       dayOfWeek: 0,
       hour: 11,
@@ -25,7 +26,7 @@ module.exports = {
     // timeToSchedule.minute = 19;
     /////////////////////////////////////////////////////
 
-    const job = schedule.scheduleJob(timeToSchedule, () => {
+    const weeklyAlertJob = schedule.scheduleJob(timeToSchedule, () => {
       console.log(`Sending weekly alerts!`);
 
       // Look up which guilds/channels/roles should be alerted
@@ -62,7 +63,18 @@ module.exports = {
       });
     });
     console.log(
-      `Weekly alert is scheduled, next invocation: ${job.nextInvocation()}`
+      `Weekly alert scheduled, next invocation: ${weeklyAlertJob.nextInvocation()}`
     );
+    ///////////////////////////////////////////////////////////////////////////
+
+    // 2. Rotate activity
+    client.setRandomActivity();
+    const activityRotateJob = schedule.scheduleJob({ minute: 0 }, () => {
+      client.setRandomActivity();
+    });
+    console.log(
+      `Activity rotation scheduled, next invocation: ${activityRotateJob.nextInvocation()}`
+    );
+    ///////////////////////////////////////////////////////////////////////////
   },
 };

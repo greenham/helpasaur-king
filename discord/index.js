@@ -1,6 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const axios = require("axios");
 const { API_URL } = process.env;
 
@@ -34,6 +34,18 @@ axios
   .then((result) => {
     // Store the config
     client.config = Object.assign({}, result.data.config);
+
+    client.setRandomActivity = () => {
+      let activity =
+        client.config.activities[
+          Math.floor(Math.random() * client.config.activities.length)
+        ];
+      console.log(`Setting Discord activity to: ${activity}`);
+      client.user.setActivity(activity, {
+        type: ActivityType.Streaming,
+        url: `https://twitch.tv/helpasaurking`,
+      });
+    };
 
     // Log the bot in to Discord
     client.login(client.config.token);
