@@ -107,6 +107,8 @@ services:
       - 80:80
     environment:
       - WEB_PUBLIC_EXTERNAL_PORT
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - web-public
     networks:
