@@ -89,10 +89,20 @@ services:
     restart: always
     ports:
       - 80:80
+      - 443:443
     environment:
       - WEB_PUBLIC_EXTERNAL_PORT
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     depends_on:
       - web-public
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
 
 volumes:
   mongodb_data_container:
