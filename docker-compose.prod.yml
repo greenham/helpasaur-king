@@ -2,3 +2,7 @@ services:
   mongo:
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.prod.js:/docker-entrypoint-initdb.d/db-init.prod.js:ro
+
+  nginx:
+    volumes:
+      - /etc/letsencrypt/live:/etc/nginx/certs

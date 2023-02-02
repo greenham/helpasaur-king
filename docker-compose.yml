@@ -109,19 +109,12 @@ services:
     environment:
       - WEB_PUBLIC_EXTERNAL_PORT
     volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - ./data/ssl:/etc/nginx/ssl
     depends_on:
       - web-public
     networks:
       - int
       - ext
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
 
 volumes:
   mongodb_data_container:
