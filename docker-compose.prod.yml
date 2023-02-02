@@ -4,6 +4,9 @@ services:
       - ./docker-entrypoint-initdb.d/db-init.prod.js:/docker-entrypoint-initdb.d/db-init.prod.js:ro
 
   nginx:
+    ports:
+      - 80:80
+      - 443:443
     volumes:
       - /etc/letsencrypt/live:/etc/nginx/certs
       - ./data/ssl:/etc/nginx/ssl
