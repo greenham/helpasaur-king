@@ -1,6 +1,6 @@
 # Commands
 
-Global command list is available at http://helpasaur.com/commands
+Global command list is available at https://helpasaur.com/commands
 
 # Features
 
@@ -15,5 +15,5 @@ Global command list is available at http://helpasaur.com/commands
 
 ## Web App
 
-- Command List: http://helpasaur.com/commands
-- ALttP Speedrun Stream Directory: http://helpasaur.com/streams
+- Command List: https://helpasaur.com/commands
+- ALttP Speedrun Stream Directory: https://helpasaur.com/streams
