@@ -13,6 +13,8 @@ services:
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.js:/docker-entrypoint-initdb.d/db-init.js:ro
       - mongodb_data_container:/data/db
+    networks:
+      - int
 
   mongo-express:
     image: mongo-express
@@ -27,6 +29,9 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
     depends_on:
       - mongo
+    networks:
+      - int
+      - ext
 
   api-server:
     build:
@@ -42,6 +47,9 @@ services:
       PORT: ${API_SERVER_EXTERNAL_PORT}
     depends_on:
       - mongo
+    networks:
+      - int
+      - ext
 
   discord-bot:
     build:
@@ -54,6 +62,9 @@ services:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
     depends_on:
       - api-server
+    networks:
+      - int
+      - ext
 
   twitch-bot:
     build:
@@ -66,6 +77,9 @@ services:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
     depends_on:
       - api-server
+    networks:
+      - int
+      - ext
 
   web-public:
     build:
@@ -81,6 +95,8 @@ services:
       PORT: ${WEB_PUBLIC_EXTERNAL_PORT}
     depends_on:
       - api-server
+    networks:
+      - int
 
   nginx:
     build:
@@ -97,6 +113,9 @@ services:
       - ./data/certbot/www:/var/www/certbot
     depends_on:
       - web-public
+    networks:
+      - int
+      - ext
 
   certbot:
     image: certbot/certbot
@@ -106,3 +125,10 @@ services:
 
 volumes:
   mongodb_data_container:
+
+networks:
+  ext:
+    driver: bridge
+  int:
+    driver: bridge
+    internal: true
