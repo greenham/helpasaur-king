@@ -1,9 +1,6 @@
 node_modules
 logs/*
 config.json
-config.production.json
-conf/twitch_bot_channels
-alttpbot-mongodump*
 *.todo
 docker-entrypoint-initdb.d
 .env*
