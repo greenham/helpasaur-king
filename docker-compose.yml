@@ -108,8 +108,6 @@ services:
       - 443:443
     environment:
       - WEB_PUBLIC_EXTERNAL_PORT
-    volumes:
-      - ./data/ssl:/etc/nginx/ssl
     depends_on:
       - web-public
     networks:
