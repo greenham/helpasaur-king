@@ -5,9 +5,11 @@ const expressSanitizer = require("express-sanitizer");
 const { create } = require("express-handlebars");
 const axios = require("axios");
 
-const { PORT, NODE_ENV, API_URL } = process.env;
+const { PORT, NODE_ENV, API_URL, API_KEY } = process.env;
 const port = PORT || 3000;
 const env = NODE_ENV || "development";
+
+axios.defaults.headers.common["Authorization"] = API_KEY;
 
 // Create the app
 const app = express();
@@ -31,6 +33,7 @@ axios
   })
   .catch((err) => {
     console.error(`Error fetching config: ${err.message}`);
+    console.log(err.toJSON());
     // @TODO: build in retry
   });
 

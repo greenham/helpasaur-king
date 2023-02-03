@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const linkifyStr = require("linkify-string");
-const { API_URL } = process.env;
+const { API_URL, API_KEY } = process.env;
+axios.defaults.headers.common["Authorization"] = API_KEY;
 
 // Homepage
 router.get("/", (req, res) => {

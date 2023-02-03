@@ -2,7 +2,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const axios = require("axios");
-const { API_URL } = process.env;
+const { API_URL, API_KEY } = process.env;
+axios.defaults.headers.common["Authorization"] = API_KEY;
 
 const client = new Client({
   intents: [

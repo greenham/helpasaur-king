@@ -1,6 +1,7 @@
 const { EmbedBuilder, Collection } = require("discord.js");
 const axios = require("axios");
-const { API_URL } = process.env;
+const { API_URL, API_KEY } = process.env;
+axios.defaults.headers.common["Authorization"] = API_KEY;
 const defaultConfig = {
   cmdPrefix: "!",
   textCmdCooldown: 10,

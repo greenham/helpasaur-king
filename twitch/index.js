@@ -1,6 +1,7 @@
 const tmi = require("tmi.js");
 const axios = require("axios");
-const { API_URL } = process.env;
+const { API_URL, API_KEY } = process.env;
+axios.defaults.headers.common["Authorization"] = API_KEY;
 let cooldowns = new Map();
 let cachedCommands = new Map();
 

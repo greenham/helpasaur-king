@@ -18,7 +18,7 @@ database.once("connected", async () => {
 const app = express();
 
 // Set up logging
-app.use(logger("tiny"));
+app.use(logger("short"));
 
 app.use(express.json());
 app.use(routes);
