@@ -99,9 +99,7 @@ services:
       - int
 
   nginx:
-    build:
-      context: ./nginx
-      target: ${TARGET}
+    image: nginx:1.21.6
     restart: always
     ports:
       - 80:80
