@@ -46,6 +46,7 @@ services:
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_EXTERNAL_PORT}/${MONGO_DATABASE_NAME}?authSource=admin
       PORT: ${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
+      TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
     depends_on:
       - mongo
     networks:

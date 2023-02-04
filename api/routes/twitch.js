@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const crypto = require("crypto");
-
-const SECRET_KEY =
-  "5f1a6e7cd2e7137ccf9e15b2f43fe63949eb84b1db83c1d5a867dc93429de4e4";
+const { TWITCH_EVENTSUB_SECRET_KEY } = process.env;
 
 // Notification request headers
 const TWITCH_MESSAGE_ID = "Twitch-Eventsub-Message-Id";
@@ -37,12 +35,13 @@ router.post("/eventsub", (req, res) => {
 
   if (req.get(MESSAGE_TYPE) === MESSAGE_TYPE_VERIFICATION) {
     console.log(
-      `Received challenge request, responding with: ${notification.challenge}`
+      `Received Twitch webhook challenge request, responding with: ${notification.challenge}`
     );
-    res.type("txt").send(notification.challenge); // Returning a 200 status with the received challenge to complete webhook creation flow
+    // Returning a 200 status with the received challenge to complete webhook creation flow
+    res.status(200).type("txt").send(notification.challenge);
   } else if (req.get(MESSAGE_TYPE) === MESSAGE_TYPE_NOTIFICATION) {
-    console.log(`!!!Received notification!!!`);
-    console.log(notification.event); // Implement your own use case with the event data at this block
+    console.log(`[${notification.subscription.type}]`);
+    console.log(notification.event);
     handleNotification(notification);
     res.send(""); // Default .send is a 200 status
   } else if (req.get(MESSAGE_TYPE) === MESSAGE_TYPE_REVOCATION) {
@@ -66,7 +65,7 @@ router.post("/eventsub", (req, res) => {
 function verifySignature(messageSignature, messageID, messageTimestamp, body) {
   let message = messageID + messageTimestamp + body;
   let signature = crypto
-    .createHmac("sha256", SECRET_KEY)
+    .createHmac("sha256", TWITCH_EVENTSUB_SECRET_KEY)
     .update(message)
     .digest("hex");
   let expectedSignatureHeader = "sha256=" + signature;
@@ -92,5 +91,11 @@ function handleNotification(notification) {
     console.log(`${user.name} went live at ${event.started_at}`);
   }
 }
+
+// console.log(
+//   Array.from(crypto.randomBytes(32), function (byte) {
+//     return ("0" + (byte & 0xff).toString(16)).slice(-2);
+//   }).join("")
+// );
 
 module.exports = router;
