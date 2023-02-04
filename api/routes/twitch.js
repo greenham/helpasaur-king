@@ -6,7 +6,7 @@ const TwitchApi = require("node-twitch").default;
 
 const Config = require("../models/config");
 
-const { TWITCH_EVENTSUB_SECRET_KEY } = process.env;
+const { TWITCH_EVENTSUB_SECRET_KEY, TWITCH_EVENTSUB_WEBHOOK_URL } = process.env;
 
 // Notification request headers
 const TWITCH_MESSAGE_ID = "Twitch-Eventsub-Message-Id";
@@ -112,7 +112,7 @@ function createSubscription(userId, api) {
     },
     transport: {
       method: "webhook",
-      callback: "https://api.helpasaurking.com/twitch/eventsub",
+      callback: `${TWITCH_EVENTSUB_WEBHOOK_URL}/twitch/eventsub`,
       secret: TWITCH_EVENTSUB_SECRET_KEY,
     },
   });
@@ -171,22 +171,22 @@ Config.findOne({ id: "streamAlerts" }).then((config) => {
 
       // clearSubscriptions("", twitchEventSubApiClient);
 
-      // streamAlertsConfig.channels.forEach((user) => {
-      //   createSubscription(user.id, twitchEventSubApiClient)
-      //     .then((res) => {
-      //       let newSub = res.data.data.shift();
-      //       console.log(
-      //         `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${user.login})`
-      //       );
-      //     })
-      //     .catch((err) => {
-      //       console.error(
-      //         `Error creating subscription for ${user.login}: ${err.message}`
-      //       );
-      //       console.error(`${err.status} - ${err.code}`);
-      //       console.error(JSON.stringify(err.config.data));
-      //     });
-      // });
+      streamAlertsConfig.channels.slice(0, 10).forEach((user) => {
+        createSubscription(user.id, twitchEventSubApiClient)
+          .then((res) => {
+            let newSub = res.data.data.shift();
+            console.log(
+              `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${user.login})`
+            );
+          })
+          .catch((err) => {
+            console.error(
+              `Error creating subscription for ${user.login}: ${err.message}`
+            );
+            console.error(`${err.status} - ${err.code}`);
+            console.error(JSON.stringify(err.config.data));
+          });
+      });
     })
     .catch((err) => {
       console.error(err);
