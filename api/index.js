@@ -20,7 +20,6 @@ const app = express();
 // Set up logging
 app.use(logger("short"));
 
-app.use(express.json());
 app.use(routes);
 
 app.listen(PORT, () => {
