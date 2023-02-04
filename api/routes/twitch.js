@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const crypto = require("crypto");
+const axios = require("axios");
+const TwitchApi = require("node-twitch").default;
+
+const Config = require("../models/config");
+
 const { TWITCH_EVENTSUB_SECRET_KEY } = process.env;
 
 // Notification request headers
@@ -91,6 +96,102 @@ function handleNotification(notification) {
     console.log(`${user.name} went live at ${event.started_at}`);
   }
 }
+
+function getSubscriptions(after = "", api) {
+  return api.get(
+    `https://api.twitch.tv/helix/eventsub/subscriptions?after=${after}`
+  );
+}
+
+function createSubscription(userId, api) {
+  return api.post("https://api.twitch.tv/helix/eventsub/subscriptions", {
+    type: STREAM_ONLINE_EVENT,
+    version: "1",
+    condition: {
+      broadcaster_user_id: userId,
+    },
+    transport: {
+      method: "webhook",
+      callback: "https://api.helpasaurking.com/twitch/eventsub",
+      secret: TWITCH_EVENTSUB_SECRET_KEY,
+    },
+  });
+}
+
+function deleteSubscription(id, api) {
+  return api.delete(
+    `https://api.twitch.tv/helix/eventsub/subscriptions?id=${id}`
+  );
+}
+
+function clearSubscriptions(after = "", api) {
+  getSubscriptions(after, api)
+    .then((res) => {
+      let subscriptionIds = res.data.data.map((d) => d.id);
+      subscriptionIds.forEach((sid) => {
+        deleteSubscription(sid, api)
+          .then((res) => {
+            console.log(`Deleted subscription ${sid}`);
+          })
+          .catch((err) => {
+            console.error(err.message);
+          });
+      });
+
+      if (res.data.pagination && res.data.pagination.cursor) {
+        clearSubscriptions(res.data.pagination.cursor, api);
+      }
+    })
+    .catch((err) => {
+      console.error(err.message);
+    });
+}
+
+Config.findOne({ id: "streamAlerts" }).then((config) => {
+  const streamAlertsConfig = config.config;
+
+  const twitchApiClient = new TwitchApi({
+    client_id: streamAlertsConfig.clientId,
+    client_secret: streamAlertsConfig.clientSecret,
+  });
+
+  twitchApiClient
+    ._getAppAccessToken()
+    .then((token) => {
+      console.log(
+        `Twitch app access token for client ${streamAlertsConfig.clientId}: ${token}`
+      );
+      let twitchEventSubApiClient = axios.create({
+        headers: {
+          "Client-ID": streamAlertsConfig.clientId,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // clearSubscriptions("", twitchEventSubApiClient);
+
+      // streamAlertsConfig.channels.forEach((user) => {
+      //   createSubscription(user.id, twitchEventSubApiClient)
+      //     .then((res) => {
+      //       let newSub = res.data.data.shift();
+      //       console.log(
+      //         `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${user.login})`
+      //       );
+      //     })
+      //     .catch((err) => {
+      //       console.error(
+      //         `Error creating subscription for ${user.login}: ${err.message}`
+      //       );
+      //       console.error(`${err.status} - ${err.code}`);
+      //       console.error(JSON.stringify(err.config.data));
+      //     });
+      // });
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+});
 
 // console.log(
 //   Array.from(crypto.randomBytes(32), function (byte) {
