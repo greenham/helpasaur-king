@@ -119,6 +119,29 @@ services:
       - int
       - ext
 
+  runnerwatcher:
+    build:
+      context: ./runnerwatcher
+      target: ${TARGET}
+    volumes:
+      - ./runnerwatcher:/src
+    restart: on-failure
+    ports:
+      - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002
+      - ${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}:3003
+    environment:
+      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      API_KEY: ${API_SECRET_KEY}
+      TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
+      TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL}
+      TWITCH_WEBHOOK_LISTENER_PORT: ${TWITCH_WEBHOOK_LISTENER_PORT}
+      STREAM_ALERTS_WEBSOCKET_SERVER_PORT: ${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
+    depends_on:
+      - api-server
+    networks:
+      - int
+      - ext
+
 volumes:
   mongodb_data_container:
 
