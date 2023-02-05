@@ -1,13 +1,17 @@
 const axios = require("axios");
+const EventEmitter = require("events");
 const TwitchApi = require("node-twitch").default;
 const { TWITCH_EVENTSUB_SECRET_KEY, TWITCH_EVENTSUB_WEBHOOK_URL } = process.env;
 const { STREAM_ONLINE_EVENT } = require("../constants");
 
-class TwitchEventSubApi {
+class TwitchEventSubApi extends EventEmitter {
   constructor(options) {
+    super();
+
     this.clientId = options.clientId;
     this.clientSecret = options.clientSecret;
     this.token = null;
+
     this.api = axios.create({
       baseURL: "https://api.twitch.tv/helix",
       headers: {
@@ -15,41 +19,29 @@ class TwitchEventSubApi {
         "Client-ID": this.clientId,
       },
     });
+
+    this._getToken();
   }
 
   _getToken() {
-    return new Promise((resolve, reject) => {
-      const tokenGrabber = new TwitchApi({
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-      });
-
-      tokenGrabber
-        ._getAppAccessToken()
-        .then((token) => {
-          console.log(
-            `Twitch app access token for client ${this.clientId}: ${token}`
-          );
-          this.token = token;
-          this.api.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${this.token}`;
-          resolve(this.token);
-        })
-        .catch(reject);
+    const tokenGrabber = new TwitchApi({
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
     });
-  }
 
-  _init() {
-    return new Promise((resolve, reject) => {
-      if (this.token) resolve(this.token);
-
-      this._getToken()
-        .then((token) => {
-          resolve(token);
-        })
-        .catch(reject);
-    });
+    tokenGrabber
+      ._getAppAccessToken()
+      .then((token) => {
+        console.log(
+          `Twitch app access token for client ${this.clientId}: ${token}`
+        );
+        this.token = token;
+        this.api.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${this.token}`;
+        this.emit("ready");
+      })
+      .catch(console.error);
   }
 
   getSubscriptions(after = "") {
@@ -65,7 +57,7 @@ class TwitchEventSubApi {
       },
       transport: {
         method: "webhook",
-        callback: `${TWITCH_EVENTSUB_WEBHOOK_URL}/twitch/eventsub`,
+        callback: TWITCH_EVENTSUB_WEBHOOK_URL,
         secret: TWITCH_EVENTSUB_SECRET_KEY,
       },
     });
@@ -76,26 +68,28 @@ class TwitchEventSubApi {
   }
 
   clearSubscriptions(after = "") {
-    this.getSubscriptions(after)
-      .then((res) => {
-        let subscriptionIds = res.data.data.map((d) => d.id);
-        subscriptionIds.forEach((sid) => {
-          this.deleteSubscription(sid)
-            .then((res) => {
-              console.log(`Deleted subscription ${sid}`);
-            })
-            .catch((err) => {
-              console.error(err.message);
-            });
-        });
+    return new Promise((resolve, reject) => {
+      this.getSubscriptions(after)
+        .then((res) => {
+          let subscriptionIds = res.data.data.map((d) => d.id);
+          subscriptionIds.forEach((sid) => {
+            this.deleteSubscription(sid)
+              .then((res) => {
+                console.log(`Deleted subscription ${sid}`);
+              })
+              .catch((err) => {
+                console.error(err.message);
+              });
+          });
 
-        if (res.data.pagination && res.data.pagination.cursor) {
-          this.clearSubscriptions(res.data.pagination.cursor);
-        }
-      })
-      .catch((err) => {
-        console.error(err.message);
-      });
+          if (res.data.pagination && res.data.pagination.cursor) {
+            this.clearSubscriptions(res.data.pagination.cursor);
+          } else {
+            resolve();
+          }
+        })
+        .catch(reject);
+    });
   }
 }
 
