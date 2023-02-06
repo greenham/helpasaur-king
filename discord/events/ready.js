@@ -1,4 +1,8 @@
 const schedule = require("node-schedule");
+const { io } = require("socket.io-client");
+const { STREAM_ALERTS_WEBSOCKET_SERVER } = process.env;
+const STREAM_ONLINE_EVENT = "stream.online";
+
 // @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304";
 const REZE_ID = "86234074175258624";
@@ -77,5 +81,24 @@ module.exports = {
       `Activity rotation scheduled, next invocation: ${activityRotateJob.nextInvocation()}`
     );
     ///////////////////////////////////////////////////////////////////////////
+
+    // 3. Listen for stream alerts
+    const streamAlerts = io(STREAM_ALERTS_WEBSOCKET_SERVER, {
+      transports: ["websocket"],
+    });
+    console.log(`Trying to connect to ${STREAM_ALERTS_WEBSOCKET_SERVER}...`);
+    streamAlerts.on("connect_error", (err) => {
+      console.log(`Connection error!`);
+      console.log(err);
+    });
+    streamAlerts.on("connect", () => {
+      console.log(
+        `Connected to stream alerts websocket server ${STREAM_ALERTS_WEBSOCKET_SERVER}, socket ID: ${streamAlerts.id}`
+      );
+    });
+    streamAlerts.on(STREAM_ONLINE_EVENT, (stream) => {
+      console.log(`Received stream online event!`);
+      console.log(stream);
+    });
   },
 };

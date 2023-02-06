@@ -64,6 +64,7 @@ services:
     environment:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
       API_KEY: ${API_SECRET_KEY}
+      STREAM_ALERTS_WEBSOCKET_SERVER: http://runnerwatcher:${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
     depends_on:
       - api-server
     networks:
