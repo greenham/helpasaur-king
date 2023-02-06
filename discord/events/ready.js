@@ -93,8 +93,9 @@ module.exports = {
     });
     streamAlerts.on("connect", () => {
       console.log(
-        `Connected to stream alerts websocket server ${STREAM_ALERTS_WEBSOCKET_SERVER}, socket ID: ${streamAlerts.id}`
+        `Connected to stream alerts server: ${STREAM_ALERTS_WEBSOCKET_SERVER}`
       );
+      console.log(`Socket ID: ${streamAlerts.id}`);
     });
     streamAlerts.on(STREAM_ONLINE_EVENT, (stream) => {
       console.log(`Received stream online event!`);

@@ -77,9 +77,9 @@ listener.listen(TWITCH_WEBHOOK_LISTENER_PORT);
 const io = new Server();
 
 io.on("connection", (socket) => {
-  console.log(`New connection: ${socket.id}`);
+  console.log(`New WSS connection: ${socket.id}`);
   socket.on("disconnect", () => {
-    console.log(`Disconnected: ${socket.id}`);
+    console.log(`WSS Client Disconnected: ${socket.id}`);
   });
 });
 
@@ -124,7 +124,7 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
     // @TODO: Implement caching
     let userResult = await twitchApi.getUsers(user.id);
     let userData;
-    if (!userResult || !userResult.data) {
+    if (!userResult || !userResult.data || !userResult.data[0]) {
       console.log(`Unable to get data for user ${user.name} (${user.id})`);
     } else {
       userData = userResult.data[0];
