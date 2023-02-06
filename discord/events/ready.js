@@ -2,7 +2,7 @@ const schedule = require("node-schedule");
 // @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304";
 const REZE_ID = "86234074175258624";
-const LJ_SMILE = "<:ljSmile:1069331097193812071>";
+const LJ_SMILE_ID = "1069331097193812071";
 const WEEKLY_ALERT_MESSAGE =
   "The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>";
 
@@ -56,7 +56,8 @@ module.exports = {
 
             // special message for reze in the alttp discord :)
             if (channel.guild.id == ALTTP_GUILD_ID) {
-              channel.send(`<@${REZE_ID}> happy weekly ${LJ_SMILE}`);
+              let ljSmile = channel.guild.emojis.cache.get(LJ_SMILE_ID);
+              channel.send(`<@${REZE_ID}> happy weekly ${ljSmile}`);
             }
           })
           .catch(console.error);
