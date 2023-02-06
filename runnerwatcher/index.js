@@ -1,6 +1,8 @@
 const axios = require("axios");
 const { Server } = require("socket.io");
 const Listener = require("./listener");
+const TwitchApi = require("node-twitch").default;
+const TwitchEventSubApi = require("./lib/twitch-eventsub-api");
 
 const {
   API_URL,
@@ -17,18 +19,25 @@ const helpaApi = axios.create({
     Authorization: API_KEY,
   },
 });
-const twitchEventSubApi = require("./lib/twitch-eventsub-api");
+
+let streamAlertsConfig;
+let twitchApi;
 
 helpaApi
   .get("/configs/streamAlerts")
   .then((res) => {
-    const streamAlertsConfig = res.data.config;
-    const eventSubs = new twitchEventSubApi({
+    streamAlertsConfig = res.data.config;
+    const eventSubs = new TwitchEventSubApi({
       clientId: streamAlertsConfig.clientId,
       clientSecret: streamAlertsConfig.clientSecret,
     });
 
     eventSubs.on("ready", () => {
+      twitchApi = new TwitchApi({
+        client_id: streamAlertsConfig.clientId,
+        client_secret: streamAlertsConfig.clientSecret,
+      });
+
       eventSubs
         .clearSubscriptions()
         .then(() => {
@@ -74,19 +83,49 @@ io.on("connection", (socket) => {
 
 io.listen(STREAM_ALERTS_WEBSOCKET_SERVER_PORT);
 
-listener.on(STREAM_ONLINE_EVENT, (event) => {
+listener.on(STREAM_ONLINE_EVENT, async (event) => {
   let user = {
     id: event.broadcaster_user_id,
     login: event.broadcaster_user_login,
     name: event.broadcaster_user_name,
   };
 
-  console.log(`${user.name} went live at ${event.started_at}`);
+  // Pull stream info from Twitch API
+  try {
+    let streamData = await twitchApi.getStreams({
+      channel: event.broadcaster_user_login,
+    });
+    if (!streamData || !streamData.data) {
+      throw new Error(
+        `No results from API for stream: ${event.broadcaster_user_login}`
+      );
+    }
 
-  // @TODO: Pull stream info from Twitch API
-  // @TODO: Ensure stream is alttp and passes filters
-  // @TODO: Pull user info from Twitch API
-  // @TODO: Broadcast event message via websocket server
+    let stream = streamData.data.shift();
+    console.log(
+      `${user.name} went live at ${event.started_at}, playing game ID ${stream.game_id}`
+    );
+    console.log(`Title: ${stream.title}`);
+
+    // Ensure stream is alttp and passes filters
+    const speedrunTester = new RegExp(streamAlertsConfig.statusFilters, "i");
+    if (
+      stream.game_id != streamAlertsConfig.gameId ||
+      !speedrunTester.test(stream.title)
+    ) {
+      return;
+    }
+
+    // @TODO: Pull user info from Twitch API? (use caching)
+
+    console.log(`Filters passed! Broadcasting event via WSS...`);
+    console.log(stream);
+
+    // Broadcast event message via websocket server
+    io.emit(STREAM_ONLINE_EVENT, stream);
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 // Array.from(crypto.randomBytes(32), function (byte) {

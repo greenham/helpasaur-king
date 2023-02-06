@@ -44,6 +44,7 @@ class Listener extends EventEmitter {
           console.log(
             `Received Twitch webhook challenge request, responding with: ${notification.challenge}`
           );
+
           // Returning a 200 status with the received challenge to complete webhook creation flow
           res.status(200).type("txt").send(notification.challenge);
           break;
@@ -51,7 +52,9 @@ class Listener extends EventEmitter {
         case MESSAGE_TYPE_NOTIFICATION:
           console.log(`[${notification.subscription.type}]`);
           console.log(notification.event);
+
           this.handleNotification(notification);
+
           res.send(""); // Default .send is a 200 status
           break;
 
