@@ -95,7 +95,7 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
   // Pull stream info from Twitch API
   try {
     let streamResult = await twitchApi.getStreams({ channel: user.id });
-    if (!streamResult || !streamResult.data) {
+    if (!streamResult || !streamResult.data || !streamResult.data[0]) {
       throw new Error(`No streams found for ${user.login} (${user.id})`);
     }
 
@@ -104,14 +104,19 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
       `${user.name} went live at ${event.started_at}, playing game ID ${stream.game_id}`
     );
     console.log(`Title: ${stream.title}`);
+    console.log(stream);
 
     // Ensure stream is alttp and passes filters
     const speedrunTester = new RegExp(streamAlertsConfig.statusFilters, "i");
-    if (
-      stream.game_id != streamAlertsConfig.gameId ||
-      !speedrunTester.test(stream.title)
-    ) {
-      console.log("Game is not alttp or does not pass filters, skipping...");
+    if (stream.game_id != streamAlertsConfig.gameId) {
+      console.log(
+        `Game ID ${stream.game_id} is not alttp (${streamAlertsConfig.gameId}), skipping...`
+      );
+      return;
+    }
+
+    if (!speedrunTester.test(stream.title)) {
+      console.log(`Stream title does not pass filters, skipping...`);
       return;
     }
 
