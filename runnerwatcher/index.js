@@ -27,43 +27,45 @@ helpaApi
   .get("/configs/streamAlerts")
   .then((res) => {
     streamAlertsConfig = res.data.config;
-    const eventSubs = new TwitchEventSubApi({
-      clientId: streamAlertsConfig.clientId,
-      clientSecret: streamAlertsConfig.clientSecret,
+
+    twitchApi = new TwitchApi({
+      client_id: streamAlertsConfig.clientId,
+      client_secret: streamAlertsConfig.clientSecret,
     });
 
-    eventSubs.on("ready", () => {
-      twitchApi = new TwitchApi({
-        client_id: streamAlertsConfig.clientId,
-        client_secret: streamAlertsConfig.clientSecret,
-      });
+    // const eventSubs = new TwitchEventSubApi({
+    //   clientId: streamAlertsConfig.clientId,
+    //   clientSecret: streamAlertsConfig.clientSecret,
+    // });
 
-      eventSubs
-        .clearSubscriptions()
-        .then(() => {
-          console.log(
-            `Existing subscriptions cleared. Creating new subscriptions for ${streamAlertsConfig.channels.length} configured channels...`
-          );
-          streamAlertsConfig.channels.forEach((user) => {
-            eventSubs
-              .createSubscription(user.id)
-              .then((res) => {
-                let newSub = res.data.data.shift();
-                console.log(
-                  `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${user.login})`
-                );
-              })
-              .catch((err) => {
-                console.error(
-                  `Error creating subscription for ${user.login}: ${err.message}`
-                );
-                console.error(`${err.status} - ${err.code}`);
-                console.error(JSON.stringify(err.config.data));
-              });
-          });
-        })
-        .catch(console.error);
-    });
+    // eventSubs.on("ready", () => {
+
+    //   eventSubs
+    //     .clearSubscriptions()
+    //     .then(() => {
+    //       console.log(
+    //         `Existing subscriptions cleared. Creating new subscriptions for ${streamAlertsConfig.channels.length} configured channels...`
+    //       );
+    //       streamAlertsConfig.channels.forEach((user) => {
+    //         eventSubs
+    //           .createSubscription(user.id)
+    //           .then((res) => {
+    //             let newSub = res.data.data.shift();
+    //             console.log(
+    //               `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${user.login})`
+    //             );
+    //           })
+    //           .catch((err) => {
+    //             console.error(
+    //               `Error creating subscription for ${user.login}: ${err.message}`
+    //             );
+    //             console.error(`${err.status} - ${err.code}`);
+    //             console.error(JSON.stringify(err.config.data));
+    //           });
+    //       });
+    //     })
+    //     .catch(console.error);
+    // });
   })
   .catch((err) => {
     console.error(err);
@@ -92,16 +94,12 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
 
   // Pull stream info from Twitch API
   try {
-    let streamData = await twitchApi.getStreams({
-      channel: event.broadcaster_user_login,
-    });
-    if (!streamData || !streamData.data) {
-      throw new Error(
-        `No results from API for stream: ${event.broadcaster_user_login}`
-      );
+    let streamResult = await twitchApi.getStreams({ channel: user.id });
+    if (!streamResult || !streamResult.data) {
+      throw new Error(`No streams found for ${user.login} (${user.id})`);
     }
 
-    let stream = streamData.data.shift();
+    let stream = streamResult.data[0];
     console.log(
       `${user.name} went live at ${event.started_at}, playing game ID ${stream.game_id}`
     );
@@ -113,10 +111,21 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
       stream.game_id != streamAlertsConfig.gameId ||
       !speedrunTester.test(stream.title)
     ) {
+      console.log("Game is not alttp or does not pass filters, skipping...");
       return;
     }
 
-    // @TODO: Pull user info from Twitch API? (use caching)
+    // Pull user info from Twitch API
+    // @TODO: Implement caching
+    let userResult = await twitchApi.getUsers(user.id);
+    let userData;
+    if (!userResult || !userResult.data) {
+      console.log(`Unable to get data for user ${user.name} (${user.id})`);
+    } else {
+      userData = userResult.data[0];
+    }
+
+    stream.user = userData;
 
     console.log(`Filters passed! Broadcasting event via WSS...`);
     console.log(stream);
