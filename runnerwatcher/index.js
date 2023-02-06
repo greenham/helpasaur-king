@@ -107,7 +107,6 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
     console.log(stream);
 
     // Ensure stream is alttp and passes filters
-    const speedrunTester = new RegExp(streamAlertsConfig.statusFilters, "i");
     if (stream.game_id != streamAlertsConfig.gameId) {
       console.log(
         `Game ID ${stream.game_id} is not alttp (${streamAlertsConfig.gameId}), skipping...`
@@ -115,7 +114,8 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
       return;
     }
 
-    if (!speedrunTester.test(stream.title)) {
+    const speedrunTester = new RegExp(streamAlertsConfig.statusFilters, "i");
+    if (speedrunTester.test(stream.title)) {
       console.log(`Stream title does not pass filters, skipping...`);
       return;
     }
