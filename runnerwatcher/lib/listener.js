@@ -14,7 +14,7 @@ const {
   MESSAGE_TYPE_REVOCATION,
   STREAM_ONLINE_EVENT,
   STREAM_ONLINE_TYPE_LIVE,
-} = require("./constants");
+} = require("../constants");
 
 class Listener extends EventEmitter {
   constructor() {

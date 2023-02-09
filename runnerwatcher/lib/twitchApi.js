@@ -4,15 +4,18 @@ const TwitchApi = require("node-twitch").default;
 const { TWITCH_EVENTSUB_SECRET_KEY, TWITCH_EVENTSUB_WEBHOOK_URL } = process.env;
 const { STREAM_ONLINE_EVENT } = require("../constants");
 
-class TwitchEventSubApi extends EventEmitter {
+class TwitchApiWithEventSub extends TwitchApi {
   constructor(options) {
-    super();
+    super({
+      client_id: options.clientId,
+      client_secret: options.clientSecret,
+    });
 
     this.clientId = options.clientId;
     this.clientSecret = options.clientSecret;
     this.token = null;
 
-    this.api = axios.create({
+    this.eventSubApi = axios.create({
       baseURL: "https://api.twitch.tv/helix",
       headers: {
         "Content-Type": "application/json",
@@ -20,36 +23,36 @@ class TwitchEventSubApi extends EventEmitter {
       },
     });
 
-    this._getToken();
+    this.emitter = new EventEmitter();
+    this.emit = this.emitter.emit;
+    this.on = this.emitter.on;
+
+    this._getTokenForEventSub();
   }
 
-  _getToken() {
-    const tokenGrabber = new TwitchApi({
-      client_id: this.clientId,
-      client_secret: this.clientSecret,
-    });
-
-    tokenGrabber
-      ._getAppAccessToken()
+  _getTokenForEventSub() {
+    this._getAppAccessToken()
       .then((token) => {
         console.log(
           `Twitch app access token for client ${this.clientId}: ${token}`
         );
+
         this.token = token;
-        this.api.defaults.headers.common[
+        this.eventSubApi.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${this.token}`;
+
         this.emit("ready");
       })
       .catch(console.error);
   }
 
   getSubscriptions(after = "") {
-    return this.api.get(`/eventsub/subscriptions?after=${after}`);
+    return this.eventSubApi.get(`/eventsub/subscriptions?after=${after}`);
   }
 
   createSubscription(userId) {
-    return this.api.post("/eventsub/subscriptions", {
+    return this.eventSubApi.post("/eventsub/subscriptions", {
       type: STREAM_ONLINE_EVENT,
       version: "1",
       condition: {
@@ -64,7 +67,7 @@ class TwitchEventSubApi extends EventEmitter {
   }
 
   deleteSubscription(id) {
-    return this.api.delete(`/eventsub/subscriptions?id=${id}`);
+    return this.eventSubApi.delete(`/eventsub/subscriptions?id=${id}`);
   }
 
   clearSubscriptions(after = "") {
@@ -93,4 +96,4 @@ class TwitchEventSubApi extends EventEmitter {
   }
 }
 
-module.exports = TwitchEventSubApi;
+module.exports = TwitchApiWithEventSub;
