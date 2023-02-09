@@ -39,7 +39,6 @@ helpaApi
     // });
 
     // eventSubs.on("ready", () => {
-
     //   eventSubs
     //     .clearSubscriptions()
     //     .then(() => {
@@ -93,6 +92,7 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
   };
 
   // Pull stream info from Twitch API
+  // @TODO: Build in retry (or a delay?) here as sometimes this event gets fired ahead of the stream actually being available via the API
   try {
     let streamResult = await twitchApi.getStreams({ channel: user.id });
     if (!streamResult || !streamResult.data || !streamResult.data[0]) {
@@ -106,19 +106,24 @@ listener.on(STREAM_ONLINE_EVENT, async (event) => {
     console.log(`Title: ${stream.title}`);
     console.log(stream);
 
-    // Ensure stream is alttp and passes filters
-    if (stream.game_id != streamAlertsConfig.gameId) {
-      console.log(
-        `Game ID ${stream.game_id} is not alttp (${streamAlertsConfig.gameId}), skipping...`
-      );
-      return;
-    }
+    // @TODO: Subscribe to channel updates here so we get game/title changes and can emit those too
 
-    const speedrunTester = new RegExp(streamAlertsConfig.statusFilters, "i");
-    if (speedrunTester.test(stream.title)) {
-      console.log(`Stream title does not pass filters, skipping...`);
-      return;
-    }
+    // Ensure stream is alttp and passes filters
+    // @TODO: Support an array of game id's here
+    // if (stream.game_id != streamAlertsConfig.gameId) {
+    //   console.log(
+    //     `Game ID ${stream.game_id} is not alttp (${streamAlertsConfig.gameId}), skipping...`
+    //   );
+    //   return;
+    // }
+
+    // const speedrunTester = new RegExp(streamAlertsConfig.statusFilters, "i");
+    // if (speedrunTester.test(stream.title)) {
+    //   console.log(`Stream title does not pass filters, skipping...`);
+    //   return;
+    // }
+
+    // @TODO: Check tags for additional filtering
 
     // Pull user info from Twitch API
     // @TODO: Implement caching

@@ -1,3 +1,4 @@
+const { EmbedBuilder } = require("discord.js");
 const schedule = require("node-schedule");
 const { io } = require("socket.io-client");
 const { STREAM_ALERTS_WEBSOCKET_SERVER } = process.env;
@@ -83,9 +84,7 @@ module.exports = {
     ///////////////////////////////////////////////////////////////////////////
 
     // 3. Listen for stream alerts
-    const streamAlerts = io(STREAM_ALERTS_WEBSOCKET_SERVER, {
-      transports: ["websocket"],
-    });
+    const streamAlerts = io(STREAM_ALERTS_WEBSOCKET_SERVER);
     console.log(`Trying to connect to ${STREAM_ALERTS_WEBSOCKET_SERVER}...`);
     streamAlerts.on("connect_error", (err) => {
       console.log(`Connection error!`);
@@ -100,6 +99,56 @@ module.exports = {
     streamAlerts.on(STREAM_ONLINE_EVENT, (stream) => {
       console.log(`Received stream online event!`);
       console.log(stream);
+
+      // Get a list of guilds that have stream alerts enabled
+      let alerts = client.config.guilds
+        .filter((g) => g.enableStreamAlerts && g.streamAlertsChannelId)
+        .map((g) => {
+          return { channelId: g.streamAlertsChannelId };
+        });
+
+      // Post a message to the configured channels with the stream event
+      alerts.forEach((a) => {
+        let channel = client.channels.cache.get(a.channelId);
+        if (!channel) return;
+
+        console.log(
+          `Sending stream alert to to ${channel.guild.name} (#${channel.name})`
+        );
+
+        let streamAlertEmbed = new EmbedBuilder()
+          .setColor(0x6441a5)
+          .setTitle(`Now live on Twitch!`)
+          .setURL(`https://twitch.tv/${stream.user.login}`)
+          .setAuthor({
+            name: stream.user.display_name,
+            iconURL: "https://helpasaur.com/img/TwitchGlitchPurple.png",
+            url: `https://twitch.tv/${stream.user.login}`,
+          })
+          .setDescription(stream.title)
+          .setThumbnail(stream.user.profile_image_url)
+          // .addFields(
+          //   { name: "\u200b", value: "\u200b" },
+          //   { name: "Tags", value: stream.tags.join(", ") }
+          // )
+          .setImage(
+            stream.thumbnail_url
+              .replace("{width}", 1280)
+              .replace("{height}", 720)
+          )
+          .setTimestamp()
+          .setFooter({
+            text: "runnerwatcher v2.0",
+            iconURL: "https://helpasaur.com/img/logo.png",
+          });
+
+        channel
+          .send({ embeds: [streamAlertEmbed] })
+          .then(() => {
+            console.log(`-> Sent!`);
+          })
+          .catch(console.error);
+      });
     });
   },
 };
