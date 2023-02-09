@@ -3,6 +3,7 @@ const schedule = require("node-schedule");
 const { io } = require("socket.io-client");
 const { STREAM_ALERTS_WEBSOCKET_SERVER } = process.env;
 const STREAM_ONLINE_EVENT = "stream.online";
+const packageJson = require("../package.json");
 
 // @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304";
@@ -122,15 +123,11 @@ module.exports = {
           .setURL(`https://twitch.tv/${stream.user.login}`)
           .setAuthor({
             name: stream.user.display_name,
-            iconURL: "https://helpasaur.com/img/TwitchGlitchPurple.png",
+            iconURL: stream.user.profile_image_url,
             url: `https://twitch.tv/${stream.user.login}`,
           })
           .setDescription(stream.title)
           .setThumbnail(stream.user.profile_image_url)
-          // .addFields(
-          //   { name: "\u200b", value: "\u200b" },
-          //   { name: "Tags", value: stream.tags.join(", ") }
-          // )
           .setImage(
             stream.thumbnail_url
               .replace("{width}", 1280)
@@ -138,8 +135,8 @@ module.exports = {
           )
           .setTimestamp()
           .setFooter({
-            text: "runnerwatcher v2.0",
-            iconURL: "https://helpasaur.com/img/logo.png",
+            text: `runnerwatcher v${packageJson.version}`,
+            iconURL: "https://helpasaur.com/img/TwitchGlitchPurple.png",
           });
 
         channel
