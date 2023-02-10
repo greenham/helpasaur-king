@@ -4,8 +4,8 @@ const TwitchApi = require("../../lib/twitch-api");
 const Config = require("../../models/config");
 const getTwitchApiClient = (config) => {
   return new TwitchApi({
-    clientId: config.clientId,
-    clientSecret: config.clientSecret,
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
   });
 };
 const STREAM_ONLINE_EVENT = "stream.online";
@@ -30,38 +30,35 @@ router.post("/channels", async (req, res) => {
 
     // If not, query Twitch API for the user info by their login name
     const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config);
-    twitchApiClient.on("ready", async () => {
-      const userResult = await twitchApiClient.getUsers(req.body.channel);
-      if (!userResult || !userResult.data || !userResult.data[0]) {
-        throw new Error(
-          `Unable to get user data for channel ${req.body.channel}`
-        );
-      }
-
-      const userData = userResult.data[0];
-      console.log(`Got user data from Twitch:`);
-      console.log(userData);
-
-      // Add to list of channels in config
-      console.log(`Adding to list...`);
-      streamAlertsConfig.config.channels.push(userData);
-      streamAlertsConfig.markModified("config");
-      await streamAlertsConfig.save();
-
-      // Subscribe to event when stream goes live
-      console.log(
-        `Creating webhook subscription for ${STREAM_ONLINE_EVENT} event`
+    const userResult = await twitchApiClient.getUsers(req.body.channel);
+    if (!userResult || !userResult.data || !userResult.data[0]) {
+      throw new Error(
+        `Unable to get user data for channel ${req.body.channel}`
       );
-      const newSub = twitchApiClient.createSubscription(
-        userData.id,
-        STREAM_ONLINE_EVENT
-      );
-      console.log(
-        `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${user.login})`
-      );
+    }
 
-      res.status(200).json({ success: true });
-    });
+    const userData = userResult.data[0];
+    console.log(`Got user data from Twitch:`);
+    console.log(userData);
+
+    // Subscribe to event when stream goes live
+    console.log(`Creating event subscription for ${STREAM_ONLINE_EVENT} event`);
+    const newSubResult = await twitchApiClient.createSubscription(
+      userData.id,
+      STREAM_ONLINE_EVENT
+    );
+    const newSub = newSubResult.data[0];
+    console.log(
+      `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${req.body.channel})`
+    );
+
+    // Add to list of channels in config
+    console.log(`Adding to list...`);
+    streamAlertsConfig.config.channels.push(userData);
+    streamAlertsConfig.markModified("config");
+    await streamAlertsConfig.save();
+
+    res.status(200).json({ success: true });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -75,29 +72,37 @@ router.delete("/channels/:id", async (req, res) => {
       `Received request to remove ${req.params.id} from stream alerts`
     );
 
-    // Ensure this in the channel list already
-    if (
-      streamAlertsConfig.config.channels.find((c) => c.id == req.params.id) ===
-      undefined
-    ) {
+    // Ensure this channel is in the list already
+    const channelIndex = streamAlertsConfig.config.channels.findIndex(
+      (c) => c.id == req.params.id
+    );
+    if (channelIndex === undefined) {
       console.log(`${req.params.id} is not in the stream alerts list!`);
       return res.status(200).json({ noop: true });
     }
 
     // Remove from list of channels in config
     console.log(`Removing from list...`);
-    // streamAlertsConfig.config.channels.push(userData);
-    // streamAlertsConfig.markModified("config");
-    // await streamAlertsConfig.save();
+    streamAlertsConfig.config.channels.splice(channelIndex, 1);
+    streamAlertsConfig.markModified("config");
+    await streamAlertsConfig.save();
 
     // Delete webhook subscription
     const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config);
-    twitchApiClient.on("ready", async () => {
-      console.log(
-        `Removing webhook subscription for ${STREAM_ONLINE_EVENT} event`
-      );
-      twitchApiClient.deleteSubscription({ user_id: req.params.id });
+    console.log(
+      `Removing event subscriptions for ${STREAM_ONLINE_EVENT} event`
+    );
+
+    // Do a lookup to get event subscriptions for this user, then delete them one-by-one
+    const subscriptions = await twitchApiClient.getSubscriptions({
+      user_id: req.params.id,
     });
+    if (subscriptions && subscriptions.data && subscriptions.data.length > 0) {
+      subscriptions.data.forEach(async (subscription) => {
+        await twitchApiClient.deleteSubscription(subscription.id);
+        console.log(`Deleted subscription ${subscription.id}`);
+      });
+    }
 
     res.status(200).json({ success: true });
   } catch (err) {
@@ -105,23 +110,16 @@ router.delete("/channels/:id", async (req, res) => {
   }
 });
 
-// GET /subscriptions -> get list of webhook subscriptions (supports 'after' param)
+// GET /subscriptions -> get list of webhook subscriptions
 router.get("/subscriptions", async (req, res) => {
   try {
     const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
     const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config);
-    twitchApiClient.on("ready", async () => {
-      const results = await twitchApiClient.getSubscriptions(
-        req.params.after || ""
-      );
-      res.status(200).json(results.data);
-    });
+    const results = await twitchApiClient.getSubscriptions(req.params);
+    res.status(200).json(results.data);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
-
-// DELETE /subscriptions -> delete subscription by ID (id or user_id)
-// POST /subscriptions -> create new webhook subscription for specified channel ID (ensure it exists in channel list?)
 
 module.exports = router;
