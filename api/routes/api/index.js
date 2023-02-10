@@ -13,6 +13,7 @@ router.use((req, res, next) => {
 router.use("/commands", require("./commands"));
 router.use("/configs", require("./configs"));
 router.use("/streams", require("./streams"));
+router.use("/streamAlerts", require("./stream-alerts"));
 router.use("/twitch", require("./twitch"));
 
 module.exports = router;

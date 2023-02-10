@@ -65,8 +65,14 @@ class TwitchApiWithEventSub extends TwitchApi {
     });
   }
 
-  deleteSubscription(id) {
-    return this.eventSubApi.delete(`/eventsub/subscriptions?id=${id}`);
+  deleteSubscription(params) {
+    let queryParts = [];
+    for (const [key, value] of Object.entries(params)) {
+      queryParts.push(`${key}=${value}`);
+    }
+    return this.eventSubApi.delete(
+      `/eventsub/subscriptions?${queryParts.join("&")}`
+    );
   }
 
   clearSubscriptions(after = "") {

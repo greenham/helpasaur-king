@@ -1,5 +1,5 @@
 const EventEmitter = require("events");
-const TwitchEventListener = require("./TwitchEventListener");
+const TwitchEventListener = require("./twitch-event-listener");
 const TwitchApi = require("node-twitch").default;
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env;
