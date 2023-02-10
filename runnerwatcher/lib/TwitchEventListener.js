@@ -16,7 +16,7 @@ const {
   STREAM_ONLINE_TYPE_LIVE,
 } = require("../constants");
 
-class Listener extends EventEmitter {
+class TwitchEventListener extends EventEmitter {
   constructor() {
     super();
     this.app = express();
@@ -114,4 +114,4 @@ class Listener extends EventEmitter {
   }
 }
 
-module.exports = Listener;
+module.exports = TwitchEventListener;

@@ -1,4 +1,5 @@
-const TwitchApi = require("./twitchApi");
+const TwitchApi = require("./TwitchApi");
+const { STREAM_ONLINE_EVENT } = require("../constants");
 const logPrefix = "[EventSub]";
 
 class SubscriptionManager {
@@ -32,7 +33,7 @@ class SubscriptionManager {
   subscribeToUsers(channels) {
     channels.forEach((user) => {
       this.api
-        .createSubscription(user.id)
+        .createSubscription(user.id, STREAM_ONLINE_EVENT)
         .then((res) => {
           let newSub = res.data.data.shift();
           console.log(

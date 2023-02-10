@@ -2,7 +2,6 @@ const axios = require("axios");
 const EventEmitter = require("events");
 const TwitchApi = require("node-twitch").default;
 const { TWITCH_EVENTSUB_SECRET_KEY, TWITCH_EVENTSUB_WEBHOOK_URL } = process.env;
-const { STREAM_ONLINE_EVENT } = require("../constants");
 
 class TwitchApiWithEventSub extends TwitchApi {
   constructor(options) {
@@ -51,10 +50,10 @@ class TwitchApiWithEventSub extends TwitchApi {
     return this.eventSubApi.get(`/eventsub/subscriptions?after=${after}`);
   }
 
-  createSubscription(userId) {
+  createSubscription(userId, type, version = "1") {
     return this.eventSubApi.post("/eventsub/subscriptions", {
-      type: STREAM_ONLINE_EVENT,
-      version: "1",
+      type,
+      version,
       condition: {
         broadcaster_user_id: userId,
       },
