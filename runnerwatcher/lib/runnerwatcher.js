@@ -1,14 +1,14 @@
-const { Server } = require("socket.io");
+const EventEmitter = require("events");
 const Listener = require("./listener");
 const TwitchApi = require("./twitchApi");
 
-const { STREAM_ALERTS_WEBSOCKET_SERVER_PORT, TWITCH_WEBHOOK_LISTENER_PORT } =
-  process.env;
-
+const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env;
 const { STREAM_ONLINE_EVENT } = require("../constants");
 
-class RunnerWatcher {
+class RunnerWatcher extends EventEmitter {
   constructor(config) {
+    super();
+
     this.config = config;
 
     this.twitchApi = new TwitchApi({
@@ -22,17 +22,6 @@ class RunnerWatcher {
   }
 
   init() {
-    this.io = new Server();
-
-    this.io.on("connection", (socket) => {
-      console.log(`New WSS connection: ${socket.id}`);
-      socket.on("disconnect", () => {
-        console.log(`WSS Client Disconnected: ${socket.id}`);
-      });
-    });
-
-    this.io.listen(STREAM_ALERTS_WEBSOCKET_SERVER_PORT);
-
     this.listener = new Listener();
     this.listener.listen(TWITCH_WEBHOOK_LISTENER_PORT);
     this.listener.on(STREAM_ONLINE_EVENT, async (event) => {
@@ -93,7 +82,7 @@ class RunnerWatcher {
         );
 
         // Broadcast event message via websocket server
-        this.io.emit(STREAM_ONLINE_EVENT, stream);
+        this.emit(STREAM_ONLINE_EVENT, stream);
       } catch (err) {
         console.error(err);
       }
