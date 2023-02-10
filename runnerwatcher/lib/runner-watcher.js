@@ -3,7 +3,7 @@ const TwitchEventListener = require("./twitch-event-listener");
 const TwitchApi = require("node-twitch").default;
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env;
-const { STREAM_ONLINE_EVENT } = require("../constants");
+const { STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT } = require("../constants");
 
 class RunnerWatcher extends EventEmitter {
   constructor(config) {
@@ -29,15 +29,15 @@ class RunnerWatcher extends EventEmitter {
 
   init() {
     this.listener.listen(TWITCH_WEBHOOK_LISTENER_PORT);
-    this.listener.on(STREAM_ONLINE_EVENT, async (event) => {
-      console.log(`Received ${STREAM_ONLINE_EVENT} event:`);
-      console.log(event);
 
+    this.listener.on(STREAM_ONLINE_EVENT, async (event) => {
       let user = {
         id: event.broadcaster_user_id,
         login: event.broadcaster_user_login,
         name: event.broadcaster_user_name,
       };
+
+      console.log(`Received ${STREAM_ONLINE_EVENT} event for ${user.login}`);
 
       // Pull stream info from Twitch API
       // @TODO: Build in retry (or a delay?) here as sometimes this event gets fired ahead of the stream actually being available via the API
@@ -51,14 +51,10 @@ class RunnerWatcher extends EventEmitter {
         }
 
         let stream = streamResult.data[0];
-        console.log(`Found stream data:`);
-        console.log(stream);
-
-        // @TODO: Subscribe to channel updates here so we get game/title changes and can emit those too
 
         // Ensure stream is alttp
         if (!this.config.alttpGameIds.includes(stream.game_id)) {
-          console.log(`Game is not alttp, skipping...`);
+          console.log(`Not streaming configured game, skipping...`);
           return;
         }
 
@@ -71,23 +67,55 @@ class RunnerWatcher extends EventEmitter {
 
         // Pull user info
         let userResult = await this.twitchApi.getUsers(user.id);
+        if (!userResult || !userResult.data || !userResult.data[0]) {
+          console.log(`Unable to get data for user ${user.name} (${user.id})`);
+        } else {
+          stream.user = userResult.data[0];
+        }
+
+        // Let the people know!
+        stream.eventType = STREAM_ONLINE_EVENT;
+        this.emit("streamEvent", stream);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    this.listener.on(CHANNEL_UPDATE_EVENT, async (event) => {
+      let user = {
+        id: event.broadcaster_user_id,
+        login: event.broadcaster_user_login,
+        name: event.broadcaster_user_name,
+      };
+
+      console.log(`Received ${CHANNEL_UPDATE_EVENT} event for ${user.login}:`);
+
+      // Ensure stream is alttp
+      if (!this.config.alttpGameIds.includes(event.category_id)) {
+        console.log(`Not streaming configured game, skipping...`);
+        return;
+      }
+
+      // And passes filters
+      const speedrunTester = new RegExp(this.config.statusFilters, "i");
+      if (speedrunTester.test(event.title)) {
+        console.log(`Stream title does not pass filters, skipping...`);
+        return;
+      }
+
+      try {
+        // Pull user info
+        let userResult = await this.twitchApi.getUsers(user.id);
         let userData;
         if (!userResult || !userResult.data || !userResult.data[0]) {
           console.log(`Unable to get data for user ${user.name} (${user.id})`);
         } else {
-          userData = userResult.data[0];
-          console.log(`Found user data:`);
-          console.log(userData);
+          event.user = userResult.data[0];
         }
 
-        stream.user = userData;
-
-        console.log(
-          `Filters passed! Broadcasting ${STREAM_ONLINE_EVENT} event to clients...`
-        );
-
-        // Broadcast event message via websocket server
-        this.emit(STREAM_ONLINE_EVENT, stream);
+        // Let the people know!
+        event.eventType = CHANNEL_UPDATE_EVENT;
+        this.emit("streamEvent", event);
       } catch (err) {
         console.error(err);
       }

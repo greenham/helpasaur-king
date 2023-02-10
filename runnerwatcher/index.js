@@ -3,7 +3,6 @@ const RunnerWatcher = require("./lib/runner-watcher");
 const { Server } = require("socket.io");
 
 const { API_URL, API_KEY, STREAM_ALERTS_WEBSOCKET_SERVER_PORT } = process.env;
-const { STREAM_ONLINE_EVENT } = require("./constants");
 
 const helpaApi = axios.create({
   baseURL: API_URL,
@@ -27,8 +26,8 @@ async function init() {
 
     wss.listen(STREAM_ALERTS_WEBSOCKET_SERVER_PORT);
 
-    runnerwatcher.on(STREAM_ONLINE_EVENT, (data) => {
-      wss.emit(STREAM_ONLINE_EVENT, data);
+    runnerwatcher.on("streamEvent", (data) => {
+      wss.emit(data.eventType, data);
     });
   } catch (err) {
     console.error(err);

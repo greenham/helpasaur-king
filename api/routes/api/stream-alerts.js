@@ -9,6 +9,7 @@ const getTwitchApiClient = (config) => {
   });
 };
 const STREAM_ONLINE_EVENT = "stream.online";
+const CHANNEL_UPDATE_EVENT = "channel.update";
 
 // Endpoint: /streamAlerts
 
@@ -38,16 +39,27 @@ router.post("/channels", async (req, res) => {
     }
 
     const userData = userResult.data[0];
-    console.log(`Got user data from Twitch:`);
-    console.log(userData);
 
     // Subscribe to event when stream goes live
     console.log(`Creating event subscription for ${STREAM_ONLINE_EVENT} event`);
-    const newSubResult = await twitchApiClient.createSubscription(
+    let newSubResult = await twitchApiClient.createSubscription(
       userData.id,
       STREAM_ONLINE_EVENT
     );
-    const newSub = newSubResult.data[0];
+    let newSub = newSubResult.data[0];
+    console.log(
+      `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${req.body.channel})`
+    );
+
+    // Subscribe to event for channel updates (game, title, etc.)
+    console.log(
+      `Creating event subscription for ${CHANNEL_UPDATE_EVENT} event`
+    );
+    newSubResult = await twitchApiClient.createSubscription(
+      userData.id,
+      CHANNEL_UPDATE_EVENT
+    );
+    newSub = newSubResult.data[0];
     console.log(
       `Subscription ${newSub.id} ${newSub.status} at ${newSub.created_at} (${req.body.channel})`
     );

@@ -12,8 +12,6 @@ const {
   MESSAGE_TYPE_VERIFICATION,
   MESSAGE_TYPE_NOTIFICATION,
   MESSAGE_TYPE_REVOCATION,
-  STREAM_ONLINE_EVENT,
-  STREAM_ONLINE_TYPE_LIVE,
 } = require("../constants");
 
 class TwitchEventListener extends EventEmitter {
@@ -50,30 +48,16 @@ class TwitchEventListener extends EventEmitter {
           break;
 
         case MESSAGE_TYPE_NOTIFICATION:
-          console.log(`[${notification.subscription.type}]`);
-          console.log(notification.event);
-
+          console.log(`Received event notification, processing...`);
           this.handleNotification(notification);
-
           res.send(""); // Default .send is a 200 status
           break;
 
         case MESSAGE_TYPE_REVOCATION:
+          // Emit an event here for the subscription manager to handle
+          console.log(`Received revocation message: `, notification);
+          this.emit(MESSAGE_TYPE_REVOCATION, notification);
           res.sendStatus(204);
-
-          console.log(
-            `${notification.subscription.type} notifications revoked!`
-          );
-          console.log(`reason: ${notification.subscription.status}`);
-          console.log(
-            `condition: ${JSON.stringify(
-              notification.subscription.condition,
-              null,
-              4
-            )}`
-          );
-
-          // @TODO: Emit an event here for the subscription manager to handle
           break;
 
         default:
@@ -85,7 +69,7 @@ class TwitchEventListener extends EventEmitter {
 
   listen(port) {
     this.app.listen(port, () => {
-      console.log(`Twitch Webhook Event Listener running on port ${port}`);
+      console.log(`Twitch Event Listener running on port ${port}`);
     });
   }
 
@@ -105,12 +89,7 @@ class TwitchEventListener extends EventEmitter {
 
   handleNotification(notification) {
     const { subscription, event } = notification;
-    if (
-      subscription.type === STREAM_ONLINE_EVENT &&
-      event.type === STREAM_ONLINE_TYPE_LIVE
-    ) {
-      this.emit(STREAM_ONLINE_EVENT, event);
-    }
+    this.emit(subscription.type, event);
   }
 }
 

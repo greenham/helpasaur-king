@@ -10,7 +10,8 @@ module.exports = Object.freeze({
   MESSAGE_TYPE_NOTIFICATION: "notification",
   MESSAGE_TYPE_REVOCATION: "revocation",
 
-  // Stream Online Event
+  // EventSub constants
   STREAM_ONLINE_EVENT: "stream.online",
+  CHANNEL_UPDATE_EVENT: "channel.update",
   STREAM_ONLINE_TYPE_LIVE: "live",
 });
