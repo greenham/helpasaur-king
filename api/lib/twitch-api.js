@@ -7,12 +7,8 @@ class TwitchApiWithEventSub extends TwitchApi {
   }
 
   getSubscriptions(params) {
-    let queryParts = [];
-    for (const [key, value] of Object.entries(params)) {
-      queryParts.push(`${key}=${value}`);
-    }
-
-    return this._get(`/eventsub/subscriptions?${queryParts.join("&")}`);
+    const queryString = new URLSearchParams(params).toString();
+    return this._get(`/eventsub/subscriptions?${queryString}`);
   }
 
   createSubscription(userId, type, version = "1") {
