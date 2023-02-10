@@ -115,8 +115,8 @@ router.get("/subscriptions", async (req, res) => {
   try {
     const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
     const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config);
-    const results = await twitchApiClient.getSubscriptions(req.params);
-    res.status(200).json(results.data);
+    const results = await twitchApiClient.getSubscriptions(req.query);
+    res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
