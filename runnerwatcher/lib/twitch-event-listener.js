@@ -88,8 +88,7 @@ class TwitchEventListener extends EventEmitter {
   }
 
   handleNotification(notification) {
-    const { subscription, event } = notification;
-    this.emit(subscription.type, event);
+    this.emit("notification", notification);
   }
 }
 

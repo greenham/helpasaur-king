@@ -3,6 +3,7 @@ const schedule = require("node-schedule");
 const { io } = require("socket.io-client");
 const { STREAM_ALERTS_WEBSOCKET_SERVER } = process.env;
 const STREAM_ONLINE_EVENT = "stream.online";
+const CHANNEL_UPDATE_EVENT = "channel.update";
 const packageJson = require("../package.json");
 
 // @TODO: Move all of this to db.configs.discord
@@ -97,9 +98,14 @@ module.exports = {
       );
       console.log(`Socket ID: ${streamAlerts.id}`);
     });
-    streamAlerts.on(STREAM_ONLINE_EVENT, (stream) => {
-      console.log(`Received stream online event!`);
-      console.log(stream);
+    streamAlerts.on("streamAlert", (stream) => {
+      if (
+        ![STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT].includes(stream.eventType)
+      ) {
+        return;
+      }
+
+      console.log(`Received stream alert: ${stream.eventType}!`);
 
       // Get a list of guilds that have stream alerts enabled
       let alerts = client.config.guilds

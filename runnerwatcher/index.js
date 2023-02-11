@@ -27,7 +27,7 @@ async function init() {
     wss.listen(STREAM_ALERTS_WEBSOCKET_SERVER_PORT);
 
     runnerwatcher.on("streamEvent", (data) => {
-      wss.emit(data.eventType, data);
+      wss.emit("streamAlert", data);
     });
   } catch (err) {
     console.error(err);
