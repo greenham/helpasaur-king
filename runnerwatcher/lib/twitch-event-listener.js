@@ -48,7 +48,6 @@ class TwitchEventListener extends EventEmitter {
           break;
 
         case MESSAGE_TYPE_NOTIFICATION:
-          console.log(`Received event notification, processing...`);
           this.handleNotification(notification);
           res.send(""); // Default .send is a 200 status
           break;
