@@ -37,16 +37,16 @@ router.get("/streams", async (req, res) => {
 
   const streamAlertsConfig = req.app.locals.configs.get("streamAlerts");
   const { blacklistedUsers, channels, statusFilters } = streamAlertsConfig;
+  const blacklistedUserIds = blacklistedUsers.map((u) => u.id);
   const speedrunTester = new RegExp(statusFilters, "i");
-  const streamUserIds = channels.map((c) => c.id);
+  const priorityUserIds = channels.map((c) => c.id);
 
   if (livestreams.length > 0) {
     // Do some additional ordering/filtering:
 
     // 1. remove streams from users on the blacklist
-    // @TODO: Make this work with user IDs
     livestreams = livestreams.filter(
-      (stream) => !blacklistedUsers.includes(stream.user_name.toLowerCase())
+      (stream) => !blacklistedUserIds.includes(stream.user_id)
     );
 
     // 2. attempt to filter out most non-speedrun streams
@@ -56,7 +56,7 @@ router.get("/streams", async (req, res) => {
 
     // 3. prioritize streams that are in the alert list
     let topStreams = livestreams.filter((stream) =>
-      streamUserIds.includes(stream.user_id)
+      priorityUserIds.includes(stream.user_id)
     );
     topStreams = topStreams.map((s) => {
       s.isOnAlertsList = true;
