@@ -18,7 +18,7 @@ router.get("/live", async (req, res) => {
   });
 
   let filter = {
-    game_id: streamAlertsConfig.gameId,
+    game_id: streamAlertsConfig.alttpGameIds,
     type: "live",
     first: 100,
   };

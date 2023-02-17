@@ -1,8 +1,15 @@
+const { EmbedBuilder } = require("discord.js");
 const schedule = require("node-schedule");
+const { io } = require("socket.io-client");
+const { STREAM_ALERTS_WEBSOCKET_SERVER } = process.env;
+const STREAM_ONLINE_EVENT = "stream.online";
+const CHANNEL_UPDATE_EVENT = "channel.update";
+const packageJson = require("../package.json");
+
 // @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304";
 const REZE_ID = "86234074175258624";
-const LJ_SMILE = "<:ljSmile:1069331097193812071>";
+const LJ_SMILE_ID = "1069331097193812071";
 const WEEKLY_ALERT_MESSAGE =
   "The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>";
 
@@ -56,7 +63,8 @@ module.exports = {
 
             // special message for reze in the alttp discord :)
             if (channel.guild.id == ALTTP_GUILD_ID) {
-              channel.send(`<@${REZE_ID}> happy weekly ${LJ_SMILE}`);
+              let ljSmile = channel.guild.emojis.cache.get(LJ_SMILE_ID);
+              channel.send(`<@${REZE_ID}> happy weekly ${ljSmile}`);
             }
           })
           .catch(console.error);
@@ -76,5 +84,81 @@ module.exports = {
       `Activity rotation scheduled, next invocation: ${activityRotateJob.nextInvocation()}`
     );
     ///////////////////////////////////////////////////////////////////////////
+
+    // 3. Listen for stream alerts
+    const streamAlerts = io(STREAM_ALERTS_WEBSOCKET_SERVER);
+    console.log(`Trying to connect to ${STREAM_ALERTS_WEBSOCKET_SERVER}...`);
+    streamAlerts.on("connect_error", (err) => {
+      console.log(`Connection error!`);
+      console.log(err);
+    });
+    streamAlerts.on("connect", () => {
+      console.log(
+        `Connected to stream alerts server: ${STREAM_ALERTS_WEBSOCKET_SERVER}`
+      );
+      console.log(`Socket ID: ${streamAlerts.id}`);
+    });
+    streamAlerts.on("streamAlert", (stream) => {
+      if (
+        ![STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT].includes(stream.eventType)
+      ) {
+        return;
+      }
+
+      console.log(`Received stream alert: ${stream.eventType}!`);
+
+      // Get a list of guilds that have stream alerts enabled
+      let alerts = client.config.guilds
+        .filter((g) => g.enableStreamAlerts && g.streamAlertsChannelId)
+        .map((g) => {
+          return { channelId: g.streamAlertsChannelId };
+        });
+
+      // Post a message to the configured channels with the stream event
+      alerts.forEach((a) => {
+        let channel = client.channels.cache.get(a.channelId);
+        if (!channel) return;
+
+        console.log(
+          `Sending stream alert to to ${channel.guild.name} (#${channel.name})`
+        );
+
+        let streamAlertEmbed = new EmbedBuilder()
+          .setColor(0x6441a5)
+          .setTitle(`Now live on Twitch!`)
+          .setURL(`https://twitch.tv/${stream.user.login}`)
+          .setAuthor({
+            name: stream.user.display_name,
+            iconURL: stream.user.profile_image_url,
+            url: `https://twitch.tv/${stream.user.login}`,
+          })
+          .setDescription(stream.title)
+          .setThumbnail(stream.user.profile_image_url)
+          .setTimestamp()
+          .setFooter({
+            text: `runnerwatcher v${packageJson.version}`,
+            iconURL: "https://helpasaur.com/img/TwitchGlitchPurple.png",
+          });
+
+        if (stream.eventType === STREAM_ONLINE_EVENT) {
+          streamAlertEmbed.setImage(
+            stream.thumbnail_url
+              .replace("{width}", 1280)
+              .replace("{height}", 720)
+          );
+        }
+
+        if (stream.eventType === CHANNEL_UPDATE_EVENT) {
+          streamAlertEmbed.setTitle(`Changed title:`);
+        }
+
+        channel
+          .send({ embeds: [streamAlertEmbed] })
+          .then(() => {
+            console.log(`-> Sent!`);
+          })
+          .catch(console.error);
+      });
+    });
   },
 };

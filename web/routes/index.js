@@ -30,21 +30,42 @@ router.get("/commands", async (req, res) => {
 
 // Livestreams
 router.get("/streams", async (req, res) => {
-  // @TODO: Better error handling
-  const response = await axios.get(`${API_URL}/streams/live`);
-
-  let livestreams = response.data || [];
-
-  const streamAlertsConfig = req.app.locals.configs.get("streamAlerts");
-  const { blacklistedUsers, channels, statusFilters } = streamAlertsConfig;
-  const speedrunTester = new RegExp(statusFilters, "i");
+  let livestreams = [];
+  try {
+    const getLivestreams = await axios.get(`${API_URL}/streams/live`);
+    livestreams = getLivestreams.data;
+  } catch (err) {
+    console.error(err);
+    return res.render("error", {
+      message: `Unable to fetch livestreams from API`,
+      error: err,
+    });
+  }
 
   if (livestreams.length > 0) {
-    // Do some additional ordering/filtering:
+    // Do some additional ordering/filtering based on stream alerts config
+    let streamAlertsConfig = {};
+    try {
+      const getStreamAlertsConfig = await axios.get(
+        `${API_URL}/configs/streamAlerts`
+      );
+      streamAlertsConfig = getStreamAlertsConfig.data.config;
+    } catch (err) {
+      console.error(err);
+      return res.render("error", {
+        message: `Unable to fetch config from API`,
+        error: err,
+      });
+    }
+
+    const { blacklistedUsers, channels, statusFilters } = streamAlertsConfig;
+    const blacklistedUserIds = blacklistedUsers.map((u) => u.id);
+    const speedrunTester = new RegExp(statusFilters, "i");
+    const priorityUserIds = channels.map((c) => c.id);
 
     // 1. remove streams from users on the blacklist
     livestreams = livestreams.filter(
-      (stream) => !blacklistedUsers.includes(stream.user_name.toLowerCase())
+      (stream) => !blacklistedUserIds.includes(stream.user_id)
     );
 
     // 2. attempt to filter out most non-speedrun streams
@@ -54,7 +75,7 @@ router.get("/streams", async (req, res) => {
 
     // 3. prioritize streams that are in the alert list
     let topStreams = livestreams.filter((stream) =>
-      channels.includes(stream.user_name.toLowerCase())
+      priorityUserIds.includes(stream.user_id)
     );
     topStreams = topStreams.map((s) => {
       s.isOnAlertsList = true;
