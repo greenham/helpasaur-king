@@ -134,16 +134,23 @@ module.exports = {
           })
           .setDescription(stream.title)
           .setThumbnail(stream.user.profile_image_url)
-          .setImage(
-            stream.thumbnail_url
-              .replace("{width}", 1280)
-              .replace("{height}", 720)
-          )
           .setTimestamp()
           .setFooter({
             text: `runnerwatcher v${packageJson.version}`,
             iconURL: "https://helpasaur.com/img/TwitchGlitchPurple.png",
           });
+
+        if (stream.eventType === STREAM_ONLINE_EVENT) {
+          streamAlertEmbed.setImage(
+            stream.thumbnail_url
+              .replace("{width}", 1280)
+              .replace("{height}", 720)
+          );
+        }
+
+        if (stream.eventType === CHANNEL_UPDATE_EVENT) {
+          streamAlertEmbed.setTitle(`Changed title:`);
+        }
 
         channel
           .send({ embeds: [streamAlertEmbed] })
