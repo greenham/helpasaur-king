@@ -12,5 +12,7 @@ services:
       - /etc/letsencrypt/live/helpasaur.com/privkey.pem:/etc/nginx/certs/helpasaur.com/privkey.pem
       - /etc/letsencrypt/live/api.helpasaur.com/fullchain.pem:/etc/nginx/certs/api.helpasaur.com/fullchain.pem
       - /etc/letsencrypt/live/api.helpasaur.com/privkey.pem:/etc/nginx/certs/api.helpasaur.com/privkey.pem
+      - /etc/letsencrypt/live/rw.helpasaur.com/fullchain.pem:/etc/nginx/certs/rw.helpasaur.com/fullchain.pem
+      - /etc/letsencrypt/live/rw.helpasaur.com/privkey.pem:/etc/nginx/certs/rw.helpasaur.com/privkey.pem
       - ./nginx/ssl:/etc/nginx/ssl
       - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf
