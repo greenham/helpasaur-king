@@ -109,18 +109,26 @@ class RunnerWatcher extends EventEmitter {
       if (eventType === CHANNEL_UPDATE_EVENT) {
         // Find a stream with this ID in the cache
         let cachedStream = streams.find((s) => s.id === stream.id);
-        if (
-          cachedStream &&
+
+        // Treat this as a stream.online event:
+        // - If this wasn't cached before (meaning game was not alttp or title didn't pass)
+        // - If they switched from another game -> alttp
+        if (!cachedStream) {
+          console.log(
+            `Stream not found in cache after ${CHANNEL_UPDATE_EVENT}, treating as ${STREAM_ONLINE_EVENT}!`
+          );
+          eventType = STREAM_ONLINE_EVENT;
+        } else if (cachedStream.game_id != event.category_id) {
+          console.log(
+            `Switched game to alttp, treating as ${STREAM_ONLINE_EVENT}!`
+          );
+          eventType = STREAM_ONLINE_EVENT;
+        } else if (
           cachedStream.title == event.title &&
           cachedStream.game_id == event.category_id
         ) {
           console.log(`Title or game has not changed, skipping...`);
           return;
-        }
-
-        // If they switched from another game -> alttp, treat this as a stream.online event
-        if (cachedStream && cachedStream.game_id != event.category_id) {
-          eventType = STREAM_ONLINE_EVENT;
         }
       }
 
