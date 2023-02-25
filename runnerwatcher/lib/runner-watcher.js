@@ -55,7 +55,7 @@ class RunnerWatcher extends EventEmitter {
 
   async processEvent(notification) {
     const { subscription, event } = notification;
-    const eventType = subscription.type;
+    let eventType = subscription.type;
     const user = {
       id: event.broadcaster_user_id,
       login: event.broadcaster_user_login,
