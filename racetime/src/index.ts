@@ -1,13 +1,19 @@
+import axios, { AxiosError } from "axios";
+import WebSocket from "ws";
+import { v4 as uuidv4 } from "uuid";
+import schedule from "node-schedule";
+
 require("dotenv").config();
 
-const schedule = require("node-schedule");
-const axios = require("axios");
 const {
   RACETIME_GAME_CATEGORY_SLUG,
   RACETIME_BOT_CLIENT_ID,
   RACETIME_BOT_CLIENT_SECRET,
 } = process.env;
-const packageJson = require("../package.json");
+
+const nmgGoal = "Any% NMG";
+const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
+const weeklyRaceInfoBot = "";
 
 type RaceData = {
   goal: string; // A string indicating a goal name.
@@ -29,6 +35,40 @@ type RaceData = {
   allow_midrace_chat?: boolean; // Boolean, allows users to chat while the race is ongoing (doesn't affect race monitors or moderators).
   allow_non_entrant_chat?: boolean; // Boolean, allow users who are not entered in the race to chat (doesn't affect race monitors or moderators).
   chat_message_delay: number; // Integer (0-90), number of seconds to hold a message for before displaying it (doesn't affect race monitors or moderators). Required.
+};
+
+type RaceTimeMessage = {
+  action: "message";
+  data: {
+    message: string;
+    pinned: boolean;
+    actions: object | null;
+    direct_to: string | null;
+    guid: string;
+  };
+};
+
+const weeklyRaceData: RaceData = {
+  goal: nmgGoal,
+  info_user: weeklyRaceInfoUser,
+  info_bot: weeklyRaceInfoBot,
+  start_delay: 15,
+  time_limit: 24,
+  streaming_required: false,
+  auto_start: true,
+  allow_comments: true,
+  allow_prerace_chat: true,
+  allow_midrace_chat: true,
+  allow_non_entrant_chat: true,
+  chat_message_delay: 0,
+};
+
+// Happy Weekly (room opens 30 minutes before race starts)
+const timeToSchedule = {
+  dayOfWeek: 0,
+  hour: 11,
+  minute: 30,
+  tz: "America/Los_Angeles",
 };
 
 class RaceBot {
@@ -55,79 +95,127 @@ class RaceBot {
   }
 
   async startRace(raceData: RaceData) {
+    // Responses:
+    //   201 Created: If form is valid and race room is succesfully opened, a 201 is returned. The Location header will provide the URL of the opened race room.
+    //   422 Unprocessable Entity: If form is invalid, a 422 is returned. The content body (JSON) will contain an array of errors indicating what the problem(s) were.
+
     try {
       const response = await axios({
         method: "POST",
         data: raceData,
         url: `https://racetime.gg/o/${RACETIME_GAME_CATEGORY_SLUG}/startrace`,
-        headers: { Authorization: `Bearer ${this.#access}` },
+        headers: {
+          Authorization: `Bearer ${this.#access}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
       });
-
-      // Responses:
-      //   201 Created: If form is valid and race room is succesfully opened, a 201 is returned. The Location header will provide the URL of the opened race room.
-      //   422 Unprocessable Entity: If form is invalid, a 422 is returned. The content body (JSON) will contain an array of errors indicating what the problem(s) were.
 
       if (response.status === 201) {
         // Handle a successful creation (201 Created) response
         const locationHeader = response.headers.location;
         console.log("Race room created. Location:", locationHeader);
         return locationHeader;
-      } else if (response.status === 422) {
-        // Handle an unprocessable entity (422 Unprocessable Entity) response
-        const errors = response.data;
-        console.log("Validation errors:", errors);
-        return false;
       } else {
         // Handle other response statuses or errors here
         console.log("Received an unexpected response:", response.status);
         return false;
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          if (error.response.status === 422) {
+            // Handle an unprocessable entity (422 Unprocessable Entity) response
+            const errors = error.response.data;
+            console.log("Validation errors:", errors);
+          } else {
+            console.log(
+              "Received an unexpected response:",
+              error.response.status
+            );
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of http.ClientRequest
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      } else {
+        console.log("Caught exception outside of Axios:", error);
+      }
+
       return false;
     }
   }
+
+  connectToRaceRoom(raceRoom: string) {
+    return new Promise((resolve, reject) => {
+      // get websocket bot url via API
+      console.log("Fetching race details...");
+      axios
+        .get(`https://racetime.gg${raceRoom}/data`)
+        .then((response) => {
+          console.log("Race details:", response.data);
+          const raceData = response.data;
+
+          if (!raceData.websocket_bot_url) {
+            reject("No websocket bot URL in response data");
+          }
+
+          // connect to websocket
+          console.log("Connecting to websocket:", raceData.websocket_bot_url);
+          const ws = new WebSocket(
+            `https://racetime.gg${raceData.websocket_bot_url}?token=${
+              this.#access
+            }`
+          );
+          ws.on("error", console.error);
+
+          ws.on("open", function open() {
+            console.log("Opened websocket connection to race room:", raceRoom);
+            resolve(ws);
+          });
+        })
+        .catch(reject);
+    });
+  }
 }
-
-// Happy Weekly (room opens 30 minutes before race starts)
-let timeToSchedule = {
-  dayOfWeek: 0,
-  hour: 11,
-  minute: 30,
-  tz: "America/Los_Angeles",
-};
-// !!!!!!!!!!!!!!!!! DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!
-// timeToSchedule.dayOfWeek = 2;
-// timeToSchedule.hour = 18;
-// timeToSchedule.minute = 19;
-/////////////////////////////////////////////////////
-
-const weeklyRaceData: RaceData = {
-  goal: "Any% NMG",
-  info_user: "Weekly Community Race - Starts at 3PM Eastern",
-  info_bot: `Created by HelpasaurKing RaceBot v${packageJson.version}`,
-  start_delay: 15,
-  time_limit: 24,
-  streaming_required: false,
-  auto_start: true,
-  allow_comments: true,
-  allow_prerace_chat: true,
-  allow_midrace_chat: true,
-  allow_non_entrant_chat: true,
-  chat_message_delay: 0,
-};
 
 const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, async () => {
   console.log(`Creating weekly race room...`);
   const racebot = await RaceBot.initialize();
-  const raceResult = racebot.startRace(weeklyRaceData);
+  const raceResult = await racebot.startRace(weeklyRaceData);
   if (!raceResult) {
-    console.log(`Unable to create weekly race room!`);
+    console.error(`Unable to create weekly race room!`);
     return;
   }
 
-  // @TODO Get this event to discord somehow? Or should it just be listening for the room creation itself?
-  console.log(`Weekly race room created: ${raceResult}`);
+  // raceResult will have /<category>/<room-slug>
+
+  racebot
+    .connectToRaceRoom(raceResult)
+    .then((raceRoomWebsocket: any) => {
+      raceRoomWebsocket.on("message", function message(data: any) {
+        console.log("received: %s", JSON.parse(data));
+      });
+
+      const happyWeeklyMessage: RaceTimeMessage = {
+        action: "message",
+        data: {
+          message: "Happy Weekly!",
+          pinned: false,
+          actions: null,
+          direct_to: null,
+          guid: uuidv4(),
+        },
+      };
+      raceRoomWebsocket.send(JSON.stringify(happyWeeklyMessage));
+    })
+    .catch((error) => {
+      console.log("Unable to connect to race room:", error);
+    });
 });
 console.log(
   `Weekly race room creation scheduled, next invocation: ${weeklyRaceJob.nextInvocation()}`

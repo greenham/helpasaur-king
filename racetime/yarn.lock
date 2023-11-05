@@ -64,12 +64,31 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
-"@types/node@^20.8.10":
+"@types/node-schedule@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/node-schedule/-/node-schedule-2.1.2.tgz#405f54672d3811dd9099ecf07ee8621bc14852fc"
+  integrity sha512-pNf6vCw14EYbqo0Y1eLGhkyv9RhgvphrxpPk4bd1CqwsWbHCrLSVYpO+9NmKOCUSYwxG6eRaWDR3Y6C+4gtzow==
+  dependencies:
+    "@types/node" "*"
+
+"@types/node@*", "@types/node@^20.8.10":
   version "20.8.10"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.10.tgz#a5448b895c753ae929c26ce85cab557c6d4a365e"
   integrity sha512-TlgT8JntpcbmKUFzjhsyhGfP2fsiz1Mv56im6enJ905xG1DAYesxJaeSbGqQmAw8OWPdhyJGhGSQGKRNJ45u9w==
   dependencies:
     undici-types "~5.26.4"
+
+"@types/uuid@^9.0.6":
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.6.tgz#c91ae743d8344a54b2b0c691195f5ff5265f6dfb"
+  integrity sha512-BT2Krtx4xaO6iwzwMFUYvWBWkV2pr37zD68Vmp1CDV196MzczBRxuEpD6Pr395HAgebC/co7hOphs53r8V7jew==
+
+"@types/ws@^8.5.8":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.8.tgz#13efec7bd439d0bdf2af93030804a94f163b1430"
+  integrity sha512-flUksGIQCnJd6sZ1l5dqCEG/ksaoAg/eUwiLAGTJQcfgvZJKF++Ta4bJA6A5aPSJmsr+xlseHn4KLgVlNnvPTg==
+  dependencies:
+    "@types/node" "*"
 
 abbrev@1:
   version "1.1.1"
@@ -548,6 +567,7 @@ sorted-array-functions@^1.3.0:
   integrity sha512-2sqgzeFlid6N4Z2fUQ1cvFmTOLRi/sEDzSQ0OKYchqgoPmQBVyM3959qYx3fpS6Esef80KjmpgPeEr028dP3OA==
 
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
+  name string-width-cjs
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -566,6 +586,7 @@ string-width@^5.0.1, string-width@^5.1.2:
     strip-ansi "^7.0.1"
 
 "strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  name strip-ansi-cjs
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -634,6 +655,11 @@ undici-types@~5.26.4:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
+uuid@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
+
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/v8-compile-cache-lib/-/v8-compile-cache-lib-3.0.1.tgz#6336e8d71965cb3d35a1bbb7868445a7c05264bf"
@@ -663,6 +689,11 @@ wrap-ansi@^8.1.0:
     ansi-styles "^6.1.0"
     string-width "^5.0.1"
     strip-ansi "^7.0.1"
+
+ws@^8.14.2:
+  version "8.14.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.2.tgz#6c249a806eb2db7a20d26d51e7709eab7b2e6c7f"
+  integrity sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==
 
 yallist@^4.0.0:
   version "4.0.0"
