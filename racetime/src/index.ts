@@ -71,16 +71,16 @@ class RaceBot {
         // Handle a successful creation (201 Created) response
         const locationHeader = response.headers.location;
         console.log("Race room created. Location:", locationHeader);
-        // You can perform further actions as needed for a successful response.
+        return locationHeader;
       } else if (response.status === 422) {
         // Handle an unprocessable entity (422 Unprocessable Entity) response
         const errors = response.data;
         console.log("Validation errors:", errors);
-        // You can display or handle the validation errors in your application as needed.
+        return false;
       } else {
         // Handle other response statuses or errors here
         console.log("Received an unexpected response:", response.status);
-        // You can implement additional handling for other response statuses.
+        return false;
       }
     } catch (err) {
       console.error(err);
