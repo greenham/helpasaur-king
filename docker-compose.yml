@@ -143,6 +143,16 @@ services:
       - int
       - ext
 
+  racetime:
+    build:
+      context: ./racetime
+      target: ${TARGET}
+    volumes:
+      - ./racetime:/app
+    restart: on-failure
+    networks:
+      - int
+
 volumes:
   mongodb_data_container:
 
