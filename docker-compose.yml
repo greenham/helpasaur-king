@@ -152,6 +152,7 @@ services:
     restart: on-failure
     networks:
       - int
+      - ext
 
 volumes:
   mongodb_data_container:
