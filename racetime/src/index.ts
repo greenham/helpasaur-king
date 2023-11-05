@@ -50,7 +50,7 @@ class RaceBot {
         grant_type: "client_credentials",
       },
     });
-    console.log(`Received access token.`);
+    console.log(`Received access token: ${response.data.access_token}`);
     return new RaceBot(response.data.access_token);
   }
 
