@@ -72,10 +72,10 @@ const timeToSchedule = {
 };
 
 class RaceBot {
-  #access: string;
+  accessToken: string;
 
   private constructor(accessToken: string) {
-    this.#access = accessToken;
+    this.accessToken = accessToken;
   }
 
   static async initialize() {
@@ -105,7 +105,7 @@ class RaceBot {
         data: raceData,
         url: `https://racetime.gg/o/${RACETIME_GAME_CATEGORY_SLUG}/startrace`,
         headers: {
-          Authorization: `Bearer ${this.#access}`,
+          Authorization: `Bearer ${this.accessToken}`,
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
@@ -167,9 +167,7 @@ class RaceBot {
           // connect to websocket
           console.log("Connecting to websocket:", raceData.websocket_bot_url);
           const ws = new WebSocket(
-            `https://racetime.gg${raceData.websocket_bot_url}?token=${
-              this.#access
-            }`
+            `https://racetime.gg${raceData.websocket_bot_url}?token=${this.accessToken}`
           );
           ws.on("error", console.error);
 

@@ -31,21 +31,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _RaceBot_access;
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importStar(require("axios"));
 const ws_1 = __importDefault(require("ws"));
@@ -79,8 +67,7 @@ const timeToSchedule = {
 };
 class RaceBot {
     constructor(accessToken) {
-        _RaceBot_access.set(this, void 0);
-        __classPrivateFieldSet(this, _RaceBot_access, accessToken, "f");
+        this.accessToken = accessToken;
     }
     static initialize() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -110,7 +97,7 @@ class RaceBot {
                     data: raceData,
                     url: `https://racetime.gg/o/${RACETIME_GAME_CATEGORY_SLUG}/startrace`,
                     headers: {
-                        Authorization: `Bearer ${__classPrivateFieldGet(this, _RaceBot_access, "f")}`,
+                        Authorization: `Bearer ${this.accessToken}`,
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
                 });
@@ -170,7 +157,7 @@ class RaceBot {
                 }
                 // connect to websocket
                 console.log("Connecting to websocket:", raceData.websocket_bot_url);
-                const ws = new ws_1.default(`https://racetime.gg${raceData.websocket_bot_url}?token=${__classPrivateFieldGet(this, _RaceBot_access, "f")}`);
+                const ws = new ws_1.default(`https://racetime.gg${raceData.websocket_bot_url}?token=${this.accessToken}`);
                 ws.on("error", console.error);
                 ws.on("open", function open() {
                     console.log("Opened websocket connection to race room:", raceRoom);
@@ -181,7 +168,7 @@ class RaceBot {
         });
     }
 }
-_RaceBot_access = new WeakMap();
+RaceBot.initialize();
 const weeklyRaceJob = node_schedule_1.default.scheduleJob(timeToSchedule, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Creating weekly race room...`);
     const racebot = yield RaceBot.initialize();

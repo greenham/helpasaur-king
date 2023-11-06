@@ -144,9 +144,7 @@ services:
       - ext
 
   racetime:
-    build:
-      context: ./racetime
-      target: ${TARGET}
+    image: thenotoriouspig/racetime:1.0
     volumes:
       - ./racetime:/app
     restart: on-failure

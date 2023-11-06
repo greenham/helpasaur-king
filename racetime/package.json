@@ -1,7 +1,7 @@
 {
   "name": "helpasaur-king-racetime",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "build/index.js",
   "license": "MIT",
   "scripts": {
     "start:dev": "npx nodemon",
