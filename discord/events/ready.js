@@ -189,14 +189,11 @@ module.exports = {
           .setImage(
             "https://racetime.gg/media/The_Legend_of_Zelda__A_Link_to_the_Past-285x380_kyx6ga0.jpg"
           )
-          .setThumbnail(
-            "https://racetime.gg/static/26d8847b41e6de2310a8b72dd15a3f10/racetime/image/logo.svg"
-          )
+          .setThumbnail("https://helpasaur.com/img/logo.png")
           .setTimestamp()
           .setFooter({
             text: `racebot v${packageJson.version}`,
-            iconURL:
-              "https://racetime.gg/static/26d8847b41e6de2310a8b72dd15a3f10/racetime/image/logo.svg",
+            iconURL: "https://helpasaur.com/img/logo.png",
           });
 
         channel
