@@ -32,5 +32,5 @@ services:
   runnerwatcher:
     image: helpasaur-king-runnerwatcher:prod
 
-  racetime:
-    image: helpasaur-king-racetime:prod
+  racebot:
+    image: helpasaur-king-racebot:prod
