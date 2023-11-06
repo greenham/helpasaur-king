@@ -34,9 +34,7 @@ services:
       - ext
 
   api-server:
-    build:
-      context: ./api
-      target: ${TARGET}
+    image: helpasaur-king-api:dev
     volumes:
       - ./api:/src
     restart: on-failure
@@ -55,9 +53,7 @@ services:
       - ext
 
   discord-bot:
-    build:
-      context: ./discord
-      target: ${TARGET}
+    image: helpasaur-king-discord:dev
     volumes:
       - ./discord:/src
     restart: on-failure
@@ -72,9 +68,7 @@ services:
       - ext
 
   twitch-bot:
-    build:
-      context: ./twitch
-      target: ${TARGET}
+    image: helpasaur-king-twitch:dev
     volumes:
       - ./twitch:/src
     restart: on-failure
@@ -88,9 +82,7 @@ services:
       - ext
 
   web-public:
-    build:
-      context: ./web
-      target: ${TARGET}
+    image: helpasaur-king-web:dev
     volumes:
       - ./web:/src
     restart: on-failure
@@ -121,9 +113,7 @@ services:
       - ext
 
   runnerwatcher:
-    build:
-      context: ./runnerwatcher
-      target: ${TARGET}
+    image: helpasaur-king-runnerwatcher:dev
     volumes:
       - ./runnerwatcher:/src
     restart: on-failure
@@ -144,10 +134,12 @@ services:
       - ext
 
   racetime:
-    image: thenotoriouspig/racetime:1.0
+    image: helpasaur-king-racetime:dev
     volumes:
       - ./racetime:/app
     restart: on-failure
+    environment:
+      STREAM_ALERTS_WEBSOCKET_SERVER: http://runnerwatcher:${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
     networks:
       - int
       - ext
