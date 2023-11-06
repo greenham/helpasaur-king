@@ -182,19 +182,25 @@ module.exports = {
         );
 
         let weeklyRaceAlertEmbed = new EmbedBuilder()
-          .setColor(0x6441a5)
+          .setColor(0x379c6f)
           .setTitle(`Weekly race room has been created!`)
           .setURL(raceRoomUrl)
-          .setDescription("Any% NMG")
-          .addFields({ name: "Race room", value: raceRoomUrl })
+          .setAuthor({
+            name: "hap e weekly",
+            iconURL: "https://helpasaur.com/img/ljsmile.png",
+            url: raceRoomUrl,
+          })
+          .addFields(
+            { name: "Race room", value: raceRoomUrl },
+            { name: "Goal", value: "Any% NMG" }
+          )
           .setImage(
             "https://racetime.gg/media/The_Legend_of_Zelda__A_Link_to_the_Past-285x380_kyx6ga0.jpg"
           )
-          .setThumbnail("https://helpasaur.com/img/logo.png")
           .setTimestamp()
           .setFooter({
             text: `racebot v${packageJson.version}`,
-            iconURL: "https://helpasaur.com/img/logo.png",
+            iconURL: "https://helpasaur.com/img/ljsmile.png",
           });
 
         channel
