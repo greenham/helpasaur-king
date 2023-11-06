@@ -186,6 +186,7 @@ module.exports = {
           .setTitle(`Weekly race room has been created!`)
           .setURL(raceRoomUrl)
           .setDescription("Any% NMG")
+          .addFields({ name: "Race room", value: raceRoomUrl })
           .setImage(
             "https://racetime.gg/media/The_Legend_of_Zelda__A_Link_to_the_Past-285x380_kyx6ga0.jpg"
           )
