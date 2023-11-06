@@ -2,14 +2,31 @@ import axios, { AxiosError } from "axios";
 import WebSocket from "ws";
 import { v4 as uuidv4 } from "uuid";
 import schedule from "node-schedule";
+import { io } from "socket.io-client";
 
 require("dotenv").config();
 
 const {
+  RACETIME_BASE_URL,
   RACETIME_GAME_CATEGORY_SLUG,
   RACETIME_BOT_CLIENT_ID,
   RACETIME_BOT_CLIENT_SECRET,
+  STREAM_ALERTS_WEBSOCKET_SERVER,
 } = process.env;
+
+const streamAlertsWebsocketServer = String(STREAM_ALERTS_WEBSOCKET_SERVER);
+const streamAlerts = io(streamAlertsWebsocketServer);
+console.log(`Trying to connect to ${streamAlertsWebsocketServer}...`);
+streamAlerts.on("connect_error", (err) => {
+  console.log(`Connection error!`);
+  console.log(err);
+});
+streamAlerts.on("connect", () => {
+  console.log(
+    `Connected to stream alerts server: ${streamAlertsWebsocketServer}`
+  );
+  console.log(`Socket ID: ${streamAlerts.id}`);
+});
 
 const nmgGoal = "Any% NMG";
 const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
@@ -82,7 +99,7 @@ class RaceBot {
     console.log(`Requesting access token...`);
     const response = await axios({
       method: "POST",
-      url: "https://racetime.gg/o/token",
+      url: `${RACETIME_BASE_URL}/o/token`,
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       data: {
         client_id: RACETIME_BOT_CLIENT_ID,
@@ -103,7 +120,7 @@ class RaceBot {
       const response = await axios({
         method: "POST",
         data: raceData,
-        url: `https://racetime.gg/o/${RACETIME_GAME_CATEGORY_SLUG}/startrace`,
+        url: `${RACETIME_BASE_URL}/o/${RACETIME_GAME_CATEGORY_SLUG}/startrace`,
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
           "Content-Type": "application/x-www-form-urlencoded",
@@ -155,7 +172,7 @@ class RaceBot {
       // get websocket bot url via API
       console.log("Fetching race details...");
       axios
-        .get(`https://racetime.gg${raceRoom}/data`)
+        .get(`${RACETIME_BASE_URL}${raceRoom}/data`)
         .then((response) => {
           console.log("Race details:", response.data);
           const raceData = response.data;
@@ -167,7 +184,7 @@ class RaceBot {
           // connect to websocket
           console.log("Connecting to websocket:", raceData.websocket_bot_url);
           const ws = new WebSocket(
-            `https://racetime.gg${raceData.websocket_bot_url}?token=${this.accessToken}`
+            `${RACETIME_BASE_URL}${raceData.websocket_bot_url}?token=${this.accessToken}`
           );
           ws.on("error", console.error);
 
@@ -191,12 +208,16 @@ const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, async () => {
   }
 
   // raceResult will have /<category>/<room-slug>
+  streamAlerts.emit(
+    "weeklyRaceRoomCreated",
+    `${RACETIME_BASE_URL}${raceResult}`
+  );
 
   racebot
     .connectToRaceRoom(raceResult)
     .then((raceRoomWebsocket: any) => {
       raceRoomWebsocket.on("message", function message(data: any) {
-        console.log("received: %s", JSON.parse(data));
+        console.log("received message:", data);
       });
 
       const happyWeeklyMessage: RaceTimeMessage = {

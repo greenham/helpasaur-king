@@ -39,8 +39,20 @@ const axios_1 = __importStar(require("axios"));
 const ws_1 = __importDefault(require("ws"));
 const uuid_1 = require("uuid");
 const node_schedule_1 = __importDefault(require("node-schedule"));
+const socket_io_client_1 = require("socket.io-client");
 require("dotenv").config();
-const { RACETIME_GAME_CATEGORY_SLUG, RACETIME_BOT_CLIENT_ID, RACETIME_BOT_CLIENT_SECRET, } = process.env;
+const { RACETIME_BASE_URL, RACETIME_GAME_CATEGORY_SLUG, RACETIME_BOT_CLIENT_ID, RACETIME_BOT_CLIENT_SECRET, STREAM_ALERTS_WEBSOCKET_SERVER, } = process.env;
+const streamAlertsWebsocketServer = String(STREAM_ALERTS_WEBSOCKET_SERVER);
+const streamAlerts = (0, socket_io_client_1.io)(streamAlertsWebsocketServer);
+console.log(`Trying to connect to ${streamAlertsWebsocketServer}...`);
+streamAlerts.on("connect_error", (err) => {
+    console.log(`Connection error!`);
+    console.log(err);
+});
+streamAlerts.on("connect", () => {
+    console.log(`Connected to stream alerts server: ${streamAlertsWebsocketServer}`);
+    console.log(`Socket ID: ${streamAlerts.id}`);
+});
 const nmgGoal = "Any% NMG";
 const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
 const weeklyRaceInfoBot = "";
@@ -74,7 +86,7 @@ class RaceBot {
             console.log(`Requesting access token...`);
             const response = yield (0, axios_1.default)({
                 method: "POST",
-                url: "https://racetime.gg/o/token",
+                url: `${RACETIME_BASE_URL}/o/token`,
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 data: {
                     client_id: RACETIME_BOT_CLIENT_ID,
@@ -95,7 +107,7 @@ class RaceBot {
                 const response = yield (0, axios_1.default)({
                     method: "POST",
                     data: raceData,
-                    url: `https://racetime.gg/o/${RACETIME_GAME_CATEGORY_SLUG}/startrace`,
+                    url: `${RACETIME_BASE_URL}/o/${RACETIME_GAME_CATEGORY_SLUG}/startrace`,
                     headers: {
                         Authorization: `Bearer ${this.accessToken}`,
                         "Content-Type": "application/x-www-form-urlencoded",
@@ -148,7 +160,7 @@ class RaceBot {
             // get websocket bot url via API
             console.log("Fetching race details...");
             axios_1.default
-                .get(`https://racetime.gg${raceRoom}/data`)
+                .get(`${RACETIME_BASE_URL}${raceRoom}/data`)
                 .then((response) => {
                 console.log("Race details:", response.data);
                 const raceData = response.data;
@@ -157,7 +169,7 @@ class RaceBot {
                 }
                 // connect to websocket
                 console.log("Connecting to websocket:", raceData.websocket_bot_url);
-                const ws = new ws_1.default(`https://racetime.gg${raceData.websocket_bot_url}?token=${this.accessToken}`);
+                const ws = new ws_1.default(`${RACETIME_BASE_URL}${raceData.websocket_bot_url}?token=${this.accessToken}`);
                 ws.on("error", console.error);
                 ws.on("open", function open() {
                     console.log("Opened websocket connection to race room:", raceRoom);
@@ -168,7 +180,6 @@ class RaceBot {
         });
     }
 }
-RaceBot.initialize();
 const weeklyRaceJob = node_schedule_1.default.scheduleJob(timeToSchedule, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Creating weekly race room...`);
     const racebot = yield RaceBot.initialize();
@@ -178,11 +189,12 @@ const weeklyRaceJob = node_schedule_1.default.scheduleJob(timeToSchedule, () => 
         return;
     }
     // raceResult will have /<category>/<room-slug>
+    streamAlerts.emit("weeklyRaceRoomCreated", `${RACETIME_BASE_URL}${raceResult}`);
     racebot
         .connectToRaceRoom(raceResult)
         .then((raceRoomWebsocket) => {
         raceRoomWebsocket.on("message", function message(data) {
-            console.log("received: %s", JSON.parse(data));
+            console.log("received message:", data);
         });
         const happyWeeklyMessage = {
             action: "message",

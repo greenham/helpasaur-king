@@ -29,6 +29,10 @@ async function init() {
     runnerwatcher.on("streamEvent", (data) => {
       wss.emit("streamAlert", data);
     });
+
+    wss.on("weeklyRaceRoomCreated", (data) => {
+      wss.emit("weeklyRaceRoomCreated", data);
+    });
   } catch (err) {
     console.error(err);
   }
