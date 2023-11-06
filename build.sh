@@ -7,7 +7,7 @@ if [ $# -ne 1 ] || [[ "$1" != "dev" && "$1" != "prod" ]]; then
 fi
 
 # Define the list of services to build
-services=("api" "discord" "racetime" "runnerwatcher" "twitch" "web")
+services=("api" "discord" "racebot" "runnerwatcher" "twitch" "web")
 
 # Set the base tag for all builds
 base_tag="helpasaur-king"

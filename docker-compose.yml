@@ -133,13 +133,17 @@ services:
       - int
       - ext
 
-  racetime:
-    image: helpasaur-king-racetime:dev
+  racebot:
+    image: helpasaur-king-racebot:dev
     volumes:
-      - ./racetime:/app
+      - ./racebot:/app
     restart: on-failure
     environment:
       STREAM_ALERTS_WEBSOCKET_SERVER: http://runnerwatcher:${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
+      RACETIME_BASE_URL: ${RACETIME_BASE_URL}
+      RACETIME_GAME_CATEGORY_SLUG: ${RACETIME_GAME_CATEGORY_SLUG}
+      RACETIME_BOT_CLIENT_ID: ${RACETIME_BOT_CLIENT_ID}
+      RACETIME_BOT_CLIENT_SECRET: ${RACETIME_BOT_CLIENT_SECRET}
     networks:
       - int
       - ext
