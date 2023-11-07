@@ -22,6 +22,10 @@ async function init() {
       socket.on("disconnect", () => {
         console.log(`Client disconnected: ${socket.id}`);
       });
+      socket.on("weeklyRaceRoomCreated", (data) => {
+        console.log("Received weeklyRaceRoomCreated message:", data);
+        wss.emit("weeklyRaceRoomCreated", data);
+      });
     });
 
     wss.listen(STREAM_ALERTS_WEBSOCKET_SERVER_PORT);

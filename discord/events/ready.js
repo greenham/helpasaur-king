@@ -162,5 +162,54 @@ module.exports = {
           .catch(console.error);
       });
     });
+    streamAlerts.on("weeklyRaceRoomCreated", (raceRoomUrl) => {
+      console.log(`Weekly race room has been created! ${raceRoomUrl}!`);
+
+      // Get a list of guilds that have stream alerts enabled
+      let alerts = client.config.guilds
+        .filter((g) => g.enableStreamAlerts && g.streamAlertsChannelId)
+        .map((g) => {
+          return { channelId: g.streamAlertsChannelId };
+        });
+
+      // Post a message to the configured channels with the stream event
+      alerts.forEach((a) => {
+        let channel = client.channels.cache.get(a.channelId);
+        if (!channel) return;
+
+        console.log(
+          `Sending stream alert to to ${channel.guild.name} (#${channel.name})`
+        );
+
+        let weeklyRaceAlertEmbed = new EmbedBuilder()
+          .setColor(0x379c6f)
+          .setTitle(`Weekly race room has been created!`)
+          .setURL(raceRoomUrl)
+          .setAuthor({
+            name: "hap e weekly",
+            iconURL: "https://helpasaur.com/img/ljsmile.png",
+            url: raceRoomUrl,
+          })
+          .addFields(
+            { name: "Race room", value: raceRoomUrl },
+            { name: "Goal", value: "Any% NMG" }
+          )
+          .setImage(
+            "https://racetime.gg/media/The_Legend_of_Zelda__A_Link_to_the_Past-285x380_kyx6ga0.jpg"
+          )
+          .setTimestamp()
+          .setFooter({
+            text: `racebot v${packageJson.version}`,
+            iconURL: "https://helpasaur.com/img/ljsmile.png",
+          });
+
+        channel
+          .send({ embeds: [weeklyRaceAlertEmbed] })
+          .then(() => {
+            console.log(`-> Sent!`);
+          })
+          .catch(console.error);
+      });
+    });
   },
 };

@@ -34,9 +34,7 @@ services:
       - ext
 
   api-server:
-    build:
-      context: ./api
-      target: ${TARGET}
+    image: helpasaur-king-api:dev
     volumes:
       - ./api:/src
     restart: on-failure
@@ -55,9 +53,7 @@ services:
       - ext
 
   discord-bot:
-    build:
-      context: ./discord
-      target: ${TARGET}
+    image: helpasaur-king-discord:dev
     volumes:
       - ./discord:/src
     restart: on-failure
@@ -72,9 +68,7 @@ services:
       - ext
 
   twitch-bot:
-    build:
-      context: ./twitch
-      target: ${TARGET}
+    image: helpasaur-king-twitch:dev
     volumes:
       - ./twitch:/src
     restart: on-failure
@@ -88,9 +82,7 @@ services:
       - ext
 
   web-public:
-    build:
-      context: ./web
-      target: ${TARGET}
+    image: helpasaur-king-web:dev
     volumes:
       - ./web:/src
     restart: on-failure
@@ -109,7 +101,7 @@ services:
     image: nginx:1.21.6
     restart: always
     ports:
-      - 80:80
+      - 8888:80
     environment:
       - WEB_PUBLIC_EXTERNAL_PORT
     volumes:
@@ -121,9 +113,7 @@ services:
       - ext
 
   runnerwatcher:
-    build:
-      context: ./runnerwatcher
-      target: ${TARGET}
+    image: helpasaur-king-runnerwatcher:dev
     volumes:
       - ./runnerwatcher:/src
     restart: on-failure
@@ -139,6 +129,21 @@ services:
       STREAM_ALERTS_WEBSOCKET_SERVER_PORT: ${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
     depends_on:
       - api-server
+    networks:
+      - int
+      - ext
+
+  racebot:
+    image: helpasaur-king-racebot:dev
+    volumes:
+      - ./racebot:/app
+    restart: on-failure
+    environment:
+      STREAM_ALERTS_WEBSOCKET_SERVER: http://runnerwatcher:${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
+      RACETIME_BASE_URL: ${RACETIME_BASE_URL}
+      RACETIME_GAME_CATEGORY_SLUG: ${RACETIME_GAME_CATEGORY_SLUG}
+      RACETIME_BOT_CLIENT_ID: ${RACETIME_BOT_CLIENT_ID}
+      RACETIME_BOT_CLIENT_SECRET: ${RACETIME_BOT_CLIENT_SECRET}
     networks:
       - int
       - ext

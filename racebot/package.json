@@ -1,0 +1,29 @@
+{
+  "name": "helpasaur-king-racetime",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "license": "MIT",
+  "scripts": {
+    "start:dev": "npx nodemon",
+    "build": "rimraf ./build && tsc",
+    "start": "npm run build && node build/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "node-schedule": "^2.1.1",
+    "socket.io-client": "^4.7.2",
+    "uuid": "^9.0.1",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "@types/node-schedule": "^2.1.2",
+    "@types/uuid": "^9.0.6",
+    "@types/ws": "^8.5.8",
+    "nodemon": "^3.0.1",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
