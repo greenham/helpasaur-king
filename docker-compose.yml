@@ -136,7 +136,7 @@ services:
   racebot:
     image: helpasaur-king-racebot:dev
     volumes:
-      - ./racebot:/app
+      - ./racebot:/src
     restart: on-failure
     environment:
       STREAM_ALERTS_WEBSOCKET_SERVER: http://runnerwatcher:${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}

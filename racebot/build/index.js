@@ -194,7 +194,7 @@ const weeklyRaceJob = node_schedule_1.default.scheduleJob(timeToSchedule, () => 
         .connectToRaceRoom(raceResult)
         .then((raceRoomWebsocket) => {
         raceRoomWebsocket.on("message", function message(data) {
-            console.log("received message:", data);
+            console.log("received message:", JSON.stringify(JSON.parse(data)));
         });
         const happyWeeklyMessage = {
             action: "message",
