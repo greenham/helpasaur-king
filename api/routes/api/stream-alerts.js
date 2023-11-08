@@ -180,19 +180,6 @@ router.post("/channels/blacklist", async (req, res) => {
   );
 
   const results = req.body.channels.map(async (channel) => {
-    // Ensure this user isn't in the blacklist already
-    if (
-      streamAlertsConfig.config.blacklistedUsers.find(
-        (c) => c.login == channel.toLowerCase()
-      ) !== undefined
-    ) {
-      return {
-        status: "error",
-        channel,
-        message: `${channel} is already in the blacklist!`,
-      };
-    }
-
     // Query Twitch API for the user info by their login name
     const userResult = await twitchApiClient.getUsers(channel);
     if (!userResult || !userResult.data || !userResult.data[0]) {
@@ -203,6 +190,15 @@ router.post("/channels/blacklist", async (req, res) => {
       };
     }
     const userData = userResult.data[0];
+
+    // Ensure this user isn't in the blacklist already
+    if (streamAlertsConfig.config.blacklistedUsers.includes(userData.id)) {
+      return {
+        status: "error",
+        channel,
+        message: `${channel} is already in the blacklist!`,
+      };
+    }
 
     streamAlertsConfig.config.blacklistedUsers.push(userData.id);
     streamAlertsConfig.markModified("config");
