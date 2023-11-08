@@ -10,5 +10,8 @@
   "dependencies": {
     "axios": "^0.27.2",
     "tmi.js": "^1.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

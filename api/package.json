@@ -12,5 +12,8 @@
     "mongoose": "^6.11.3",
     "morgan": "^1.10.0",
     "node-twitch": "^0.4.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
