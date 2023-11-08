@@ -11,7 +11,7 @@ environment="$1"
 
 # Build images for the target environment
 echo "Building images for $environment"
-eval "./build $environment"
+eval "./build.sh $environment"
 
 # Define the base Docker Compose command
 docker_compose_command="docker compose"

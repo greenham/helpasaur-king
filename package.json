@@ -1,0 +1,15 @@
+{
+  "name": "helpasaur-king",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:greenham/helpasaur-king.git",
+  "scripts": {
+    "build:dev": "./build.sh dev",
+    "build": "./build.sh prod",
+    "start:dev": "./helpa.sh dev && docker compose logs -f",
+    "start": "./helpa.sh prod",
+    "logs": "docker compose logs -f"
+  },
+  "author": "greenham",
+  "license": "MIT"
+}
