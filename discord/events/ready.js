@@ -108,7 +108,7 @@ module.exports = {
         return;
       }
 
-      console.log(`Received stream alert: ${stream.eventType}!`);
+      console.log("Received stream alert:", stream.eventType);
 
       // Get a list of guilds that have stream alerts enabled
       let alerts = client.config.guilds
@@ -167,8 +167,8 @@ module.exports = {
     });
 
     // 4. Listen for weekly race room creation
-    wsRelay.on("weeklyRaceRoomCreated", (raceRoomUrl) => {
-      console.log(`Received weekly race room event: ${raceRoomUrl}`);
+    wsRelay.on("weeklyRaceRoomCreated", (raceData) => {
+      console.log("Received weekly race room event:", raceData);
 
       // Get a list of guilds that have race room alerts enabled
       let alerts = client.config.guilds
@@ -194,10 +194,13 @@ module.exports = {
         );
 
         let notify = a.roleId ? `<@&${a.roleId}> ` : "";
+        let startsIn = `<t:${raceData.startTimestamp}:R>`;
+        let raceRoomUrl = raceData.raceRoomUrl;
 
         let weeklyRaceAlertEmbed = new EmbedBuilder()
           .setColor(0x379c6f)
           .setTitle(`Weekly race room has been created!`)
+          .setDescription(`Starts in ${startsIn}`)
           .setURL(raceRoomUrl)
           .setAuthor({
             name: "hap e weekly",

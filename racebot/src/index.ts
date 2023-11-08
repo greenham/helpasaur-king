@@ -75,7 +75,9 @@ const weeklyRaceData: RaceData = {
   chat_message_delay: 0,
 };
 
-// Happy Weekly (room opens 30 minutes before race starts)
+// Happy Weekly
+// (room opens 30 minutes before race starts)
+const weeklyRaceStartOffsetSeconds = 30 * 60;
 const timeToSchedule = {
   dayOfWeek: 0,
   hour: 11,
@@ -203,7 +205,13 @@ const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, async () => {
   }
 
   // raceResult will have /<category>/<room-slug>
-  wsRelay.emit("weeklyRaceRoomCreated", `${RACETIME_BASE_URL}${raceResult}`);
+  const raceData = {
+    raceRoomUrl: `${RACETIME_BASE_URL}${raceResult}`,
+    startTimestamp: Math.floor(
+      (Date.now() + weeklyRaceStartOffsetSeconds) / 1000
+    ),
+  };
+  wsRelay.emit("weeklyRaceRoomCreated", raceData);
 
   racebot
     .connectToRaceRoom(raceResult)
