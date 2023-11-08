@@ -242,6 +242,7 @@ function init(config) {
     cooldowns.set(cooldownKey, Date.now());
 
     // @TODO: Call the API to increment use count for this command
+    console.log(`[${channel}] ${tags["display-name"]}: ${command.command}`);
   });
 }
 
