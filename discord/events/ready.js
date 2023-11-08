@@ -168,7 +168,7 @@ module.exports = {
 
     // 4. Listen for weekly race room creation
     wsRelay.on("weeklyRaceRoomCreated", (raceRoomUrl) => {
-      console.log(`Weekly race room has been created! ${raceRoomUrl}!`);
+      console.log(`Received weekly race room event: ${raceRoomUrl}`);
 
       // Get a list of guilds that have race room alerts enabled
       let alerts = client.config.guilds
