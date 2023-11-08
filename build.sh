@@ -15,6 +15,9 @@ base_tag="helpasaur-king"
 # Extract the target environment from the command line argument
 target_environment="$1"
 
+# Build images for the target environment
+echo "Building images for $environment"
+
 # Loop through the services and run the Docker build command with the specified target environment
 for service in "${services[@]}"; do
     # Define the full tag for this service
