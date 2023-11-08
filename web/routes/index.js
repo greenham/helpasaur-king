@@ -59,13 +59,12 @@ router.get("/streams", async (req, res) => {
     }
 
     const { blacklistedUsers, channels, statusFilters } = streamAlertsConfig;
-    const blacklistedUserIds = blacklistedUsers.map((u) => u.id);
     const speedrunTester = new RegExp(statusFilters, "i");
     const priorityUserIds = channels.map((c) => c.id);
 
     // 1. remove streams from users on the blacklist
     livestreams = livestreams.filter(
-      (stream) => !blacklistedUserIds.includes(stream.user_id)
+      (stream) => !blacklistedUsers.includes(stream.user_id)
     );
 
     // 2. attempt to filter out most non-speedrun streams

@@ -204,7 +204,7 @@ router.post("/channels/blacklist", async (req, res) => {
     }
     const userData = userResult.data[0];
 
-    streamAlertsConfig.config.blacklistedUsers.push(userData);
+    streamAlertsConfig.config.blacklistedUsers.push(userData.id);
     streamAlertsConfig.markModified("config");
     await streamAlertsConfig.save();
     console.log(`Added ${channel} to blacklisted users`);
