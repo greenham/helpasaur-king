@@ -116,6 +116,8 @@ module.exports = {
           return { channelId: g.streamAlertsChannelId };
         });
 
+      console.log(`Found ${alerts.length} guilds to alert`);
+
       // Post a message to the configured channels with the stream event
       alerts.forEach((a) => {
         let channel = client.channels.cache.get(a.channelId);
@@ -165,21 +167,30 @@ module.exports = {
     streamAlerts.on("weeklyRaceRoomCreated", (raceRoomUrl) => {
       console.log(`Weekly race room has been created! ${raceRoomUrl}!`);
 
-      // Get a list of guilds that have stream alerts enabled
+      // Get a list of guilds that have race room alerts enabled
       let alerts = client.config.guilds
-        .filter((g) => g.enableStreamAlerts && g.streamAlertsChannelId)
+        .filter(
+          (g) => g.enableWeeklyRaceRoomAlert && g.weeklyRaceRoomAlertChannelId
+        )
         .map((g) => {
-          return { channelId: g.streamAlertsChannelId };
+          return {
+            channelId: g.weeklyRaceRoomAlertChannelId,
+            roleId: g.weeklyRaceAlertRoleId,
+          };
         });
 
-      // Post a message to the configured channels with the stream event
+      console.log(`Found ${alerts.length} guilds to alert`);
+
+      // Post a message to the configured channels with the race details
       alerts.forEach((a) => {
         let channel = client.channels.cache.get(a.channelId);
         if (!channel) return;
 
         console.log(
-          `Sending stream alert to to ${channel.guild.name} (#${channel.name})`
+          `Sending weekly race room alert to ${channel.guild.name} (#${channel.name})`
         );
+
+        let notify = a.roleId ? `<@&${a.roleId}> ` : "";
 
         let weeklyRaceAlertEmbed = new EmbedBuilder()
           .setColor(0x379c6f)
@@ -204,7 +215,7 @@ module.exports = {
           });
 
         channel
-          .send({ embeds: [weeklyRaceAlertEmbed] })
+          .send({ content: notify, embeds: [weeklyRaceAlertEmbed] })
           .then(() => {
             console.log(`-> Sent!`);
           })
