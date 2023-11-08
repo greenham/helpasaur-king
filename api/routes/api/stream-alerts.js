@@ -155,4 +155,66 @@ router.delete("/subscriptions/all", async (req, res) => {
     });
 });
 
+// @TODO DRY this out into something that can do basic list management / user querying
+router.post("/channels/blacklist", async (req, res) => {
+  if (!req.body.hasOwnProperty("channels")) {
+    return res
+      .status(400)
+      .json({ message: "Missing payload property 'channels' (Array<String>)" });
+  }
+
+  if (!Array.isArray(req.body.channels)) {
+    return res
+      .status(400)
+      .json({ message: "'channels' must be an Array of usernames" });
+  }
+
+  if (req.body.channels.length === 0) {
+    return res.status(400).json({ message: "No channels provided in Array" });
+  }
+
+  const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
+  const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config);
+  console.log(
+    `Blacklisting ${req.body.channels.length} channels from stream directory...`
+  );
+
+  const results = req.body.channels.map(async (channel) => {
+    // Ensure this user isn't in the blacklist already
+    if (
+      streamAlertsConfig.config.blacklistedUsers.find(
+        (c) => c.login == channel.toLowerCase()
+      ) !== undefined
+    ) {
+      return {
+        status: "error",
+        channel,
+        message: `${channel} is already in the blacklist!`,
+      };
+    }
+
+    // Query Twitch API for the user info by their login name
+    const userResult = await twitchApiClient.getUsers(channel);
+    if (!userResult || !userResult.data || !userResult.data[0]) {
+      return {
+        status: "error",
+        channel,
+        message: `Unable to get user data for channel ${channel}`,
+      };
+    }
+    const userData = userResult.data[0];
+
+    streamAlertsConfig.config.blacklistedUsers.push(userData);
+    streamAlertsConfig.markModified("config");
+    await streamAlertsConfig.save();
+    console.log(`Added ${channel} to blacklisted users`);
+
+    return { success: true, channel };
+  });
+
+  Promise.allSettled(results).then(async (channelResults) => {
+    res.status(200).json({ success: true, data: channelResults });
+  });
+});
+
 module.exports = router;
