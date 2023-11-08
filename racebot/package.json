@@ -4,13 +4,12 @@
   "main": "build/index.js",
   "license": "MIT",
   "scripts": {
-    "start:dev": "npx nodemon",
+    "start:dev": "nodemon .",
     "build": "rimraf ./build && tsc",
     "start": "npm run build && node build/index.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
-    "dotenv": "^16.3.1",
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.7.2",
     "uuid": "^9.0.1",

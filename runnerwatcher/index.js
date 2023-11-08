@@ -1,8 +1,8 @@
 const axios = require("axios");
+const { io } = require("socket.io-client");
 const RunnerWatcher = require("./lib/runner-watcher");
-const { Server } = require("socket.io");
 
-const { API_URL, API_KEY, STREAM_ALERTS_WEBSOCKET_SERVER_PORT } = process.env;
+const { API_URL, API_KEY, WEBSOCKET_RELAY_SERVER } = process.env;
 
 const helpaApi = axios.create({
   baseURL: API_URL,
@@ -15,23 +15,21 @@ async function init() {
   try {
     const streamAlertsConfig = await helpaApi.get("/configs/streamAlerts");
     const runnerwatcher = new RunnerWatcher(streamAlertsConfig.data.config);
-    const wss = new Server();
+    const wsRelay = io(WEBSOCKET_RELAY_SERVER);
 
-    wss.on("connection", (socket) => {
-      console.log(`Client connected to stream alerts server: ${socket.id}`);
-      socket.on("disconnect", () => {
-        console.log(`Client disconnected: ${socket.id}`);
-      });
-      socket.on("weeklyRaceRoomCreated", (data) => {
-        console.log("Received weeklyRaceRoomCreated message:", data);
-        wss.emit("weeklyRaceRoomCreated", data);
-      });
+    console.log(
+      `Connecting to websocket relay server: ${WEBSOCKET_RELAY_SERVER}...`
+    );
+    wsRelay.on("connect_error", (err) => {
+      console.log(`Connection error!`);
+      console.log(err);
+    });
+    wsRelay.on("connect", () => {
+      console.log(`Connected! Socket ID: ${wsRelay.id}`);
     });
 
-    wss.listen(STREAM_ALERTS_WEBSOCKET_SERVER_PORT);
-
     runnerwatcher.on("streamEvent", (data) => {
-      wss.emit("streamAlert", data);
+      wsRelay.emit("streamAlert", data);
     });
   } catch (err) {
     console.error(err);

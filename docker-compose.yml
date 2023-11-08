@@ -60,7 +60,7 @@ services:
     environment:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
       API_KEY: ${API_SECRET_KEY}
-      STREAM_ALERTS_WEBSOCKET_SERVER: http://runnerwatcher:${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
     networks:
@@ -119,14 +119,13 @@ services:
     restart: on-failure
     ports:
       - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002
-      - ${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}:3003
     environment:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
       API_KEY: ${API_SECRET_KEY}
       TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
       TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL}
       TWITCH_WEBHOOK_LISTENER_PORT: ${TWITCH_WEBHOOK_LISTENER_PORT}
-      STREAM_ALERTS_WEBSOCKET_SERVER_PORT: ${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
     networks:
@@ -139,11 +138,24 @@ services:
       - ./racebot:/src
     restart: on-failure
     environment:
-      STREAM_ALERTS_WEBSOCKET_SERVER: http://runnerwatcher:${STREAM_ALERTS_WEBSOCKET_SERVER_PORT}
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
       RACETIME_BASE_URL: ${RACETIME_BASE_URL}
       RACETIME_GAME_CATEGORY_SLUG: ${RACETIME_GAME_CATEGORY_SLUG}
       RACETIME_BOT_CLIENT_ID: ${RACETIME_BOT_CLIENT_ID}
       RACETIME_BOT_CLIENT_SECRET: ${RACETIME_BOT_CLIENT_SECRET}
+    networks:
+      - int
+      - ext
+
+  ws-relay:
+    image: helpasaur-king-ws-relay:dev
+    volumes:
+      - ./ws-relay:/src
+    restart: on-failure
+    ports:
+      - ${WEBSOCKET_RELAY_SERVER_PORT}:${WEBSOCKET_RELAY_SERVER_PORT}
+    environment:
+      WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
     networks:
       - int
       - ext

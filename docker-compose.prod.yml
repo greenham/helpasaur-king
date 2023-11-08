@@ -34,3 +34,8 @@ services:
 
   racebot:
     image: helpasaur-king-racebot:prod
+
+  ws-relay:
+    image: helpasaur-king-ws-relay:prod
+    networks:
+      - int

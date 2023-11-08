@@ -4,28 +4,23 @@ import { v4 as uuidv4 } from "uuid";
 import schedule from "node-schedule";
 import { io } from "socket.io-client";
 
-require("dotenv").config();
-
 const {
   RACETIME_BASE_URL,
   RACETIME_GAME_CATEGORY_SLUG,
   RACETIME_BOT_CLIENT_ID,
   RACETIME_BOT_CLIENT_SECRET,
-  STREAM_ALERTS_WEBSOCKET_SERVER,
+  WEBSOCKET_RELAY_SERVER,
 } = process.env;
 
-const streamAlertsWebsocketServer = String(STREAM_ALERTS_WEBSOCKET_SERVER);
-const streamAlerts = io(streamAlertsWebsocketServer);
-console.log(`Trying to connect to ${streamAlertsWebsocketServer}...`);
-streamAlerts.on("connect_error", (err) => {
+const wsRelayServer = String(WEBSOCKET_RELAY_SERVER);
+const wsRelay = io(wsRelayServer);
+console.log(`Connecting to websocket relay server: ${wsRelayServer}...`);
+wsRelay.on("connect_error", (err) => {
   console.log(`Connection error!`);
   console.log(err);
 });
-streamAlerts.on("connect", () => {
-  console.log(
-    `Connected to stream alerts server: ${streamAlertsWebsocketServer}`
-  );
-  console.log(`Socket ID: ${streamAlerts.id}`);
+wsRelay.on("connect", () => {
+  console.log(`Connected! Socket ID: ${wsRelay.id}`);
 });
 
 const nmgGoal = "Any% NMG";
@@ -208,10 +203,7 @@ const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, async () => {
   }
 
   // raceResult will have /<category>/<room-slug>
-  streamAlerts.emit(
-    "weeklyRaceRoomCreated",
-    `${RACETIME_BASE_URL}${raceResult}`
-  );
+  wsRelay.emit("weeklyRaceRoomCreated", `${RACETIME_BASE_URL}${raceResult}`);
 
   racebot
     .connectToRaceRoom(raceResult)

@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const schedule = require("node-schedule");
 const { io } = require("socket.io-client");
-const { STREAM_ALERTS_WEBSOCKET_SERVER } = process.env;
+const { WEBSOCKET_RELAY_SERVER } = process.env;
 const STREAM_ONLINE_EVENT = "stream.online";
 const CHANNEL_UPDATE_EVENT = "channel.update";
 const packageJson = require("../package.json");
@@ -18,6 +18,19 @@ module.exports = {
   once: true,
   execute(client) {
     console.log(`Ready! Logged in as ${client.user.tag}`);
+
+    // Connect to websocket relay to listen for events like stream alerts and race rooms
+    const wsRelay = io(WEBSOCKET_RELAY_SERVER);
+    console.log(
+      `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
+    );
+    wsRelay.on("connect_error", (err) => {
+      console.log(`Connection error!`);
+      console.log(err);
+    });
+    wsRelay.on("connect", () => {
+      console.log(`Connected! Socket ID: ${wsRelay.id}`);
+    });
 
     // 1. Set up weekly alerts
     let timeToSchedule = {
@@ -88,19 +101,7 @@ module.exports = {
     ///////////////////////////////////////////////////////////////////////////
 
     // 3. Listen for stream alerts
-    const streamAlerts = io(STREAM_ALERTS_WEBSOCKET_SERVER);
-    console.log(`Trying to connect to ${STREAM_ALERTS_WEBSOCKET_SERVER}...`);
-    streamAlerts.on("connect_error", (err) => {
-      console.log(`Connection error!`);
-      console.log(err);
-    });
-    streamAlerts.on("connect", () => {
-      console.log(
-        `Connected to stream alerts server: ${STREAM_ALERTS_WEBSOCKET_SERVER}`
-      );
-      console.log(`Socket ID: ${streamAlerts.id}`);
-    });
-    streamAlerts.on("streamAlert", (stream) => {
+    wsRelay.on("streamAlert", (stream) => {
       if (
         ![STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT].includes(stream.eventType)
       ) {
@@ -164,7 +165,9 @@ module.exports = {
           .catch(console.error);
       });
     });
-    streamAlerts.on("weeklyRaceRoomCreated", (raceRoomUrl) => {
+
+    // 4. Listen for weekly race room creation
+    wsRelay.on("weeklyRaceRoomCreated", (raceRoomUrl) => {
       console.log(`Weekly race room has been created! ${raceRoomUrl}!`);
 
       // Get a list of guilds that have race room alerts enabled
