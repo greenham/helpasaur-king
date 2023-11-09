@@ -34,7 +34,10 @@ services:
       - ext
 
   api-server:
-    image: helpasaur-king-api:dev
+    image: helpasaur-king-api:${TARGET}
+    build:
+      context: ./api
+      target: ${TARGET}
     volumes:
       - ./api:/src
     restart: on-failure
@@ -53,7 +56,10 @@ services:
       - ext
 
   discord-bot:
-    image: helpasaur-king-discord:dev
+    image: helpasaur-king-discord:${TARGET}
+    build:
+      context: ./discord
+      target: ${TARGET}
     volumes:
       - ./discord:/src
     restart: on-failure
@@ -68,7 +74,10 @@ services:
       - ext
 
   twitch-bot:
-    image: helpasaur-king-twitch:dev
+    image: helpasaur-king-twitch:${TARGET}
+    build:
+      context: ./twitch
+      target: ${TARGET}
     volumes:
       - ./twitch:/src
     restart: on-failure
@@ -82,7 +91,10 @@ services:
       - ext
 
   web-public:
-    image: helpasaur-king-web:dev
+    image: helpasaur-king-web:${TARGET}
+    build:
+      context: ./web
+      target: ${TARGET}
     volumes:
       - ./web:/src
     restart: on-failure
@@ -113,7 +125,10 @@ services:
       - ext
 
   runnerwatcher:
-    image: helpasaur-king-runnerwatcher:dev
+    image: helpasaur-king-runnerwatcher:${TARGET}
+    build:
+      context: ./runnerwatcher
+      target: ${TARGET}
     volumes:
       - ./runnerwatcher:/src
     restart: on-failure
@@ -133,7 +148,10 @@ services:
       - ext
 
   racebot:
-    image: helpasaur-king-racebot:dev
+    image: helpasaur-king-racebot:${TARGET}
+    build:
+      context: ./racebot
+      target: ${TARGET}
     volumes:
       - ./racebot:/src
     restart: on-failure
@@ -148,7 +166,10 @@ services:
       - ext
 
   ws-relay:
-    image: helpasaur-king-ws-relay:dev
+    image: helpasaur-king-ws-relay:${TARGET}
+    build:
+      context: ./ws-relay
+      target: ${TARGET}
     volumes:
       - ./ws-relay:/src
     restart: on-failure

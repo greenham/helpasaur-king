@@ -17,25 +17,6 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl
       - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf
 
-  api-server:
-    image: helpasaur-king-api:prod
-
-  discord-bot:
-    image: helpasaur-king-discord:prod
-
-  twitch-bot:
-    image: helpasaur-king-twitch:prod
-
-  web-public:
-    image: helpasaur-king-web:prod
-
-  runnerwatcher:
-    image: helpasaur-king-runnerwatcher:prod
-
-  racebot:
-    image: helpasaur-king-racebot:prod
-
   ws-relay:
-    image: helpasaur-king-ws-relay:prod
     networks:
       - int
