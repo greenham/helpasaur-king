@@ -100,7 +100,10 @@ class RunnerWatcher extends EventEmitter {
 
       // And passes filters
       const speedrunTester = new RegExp(this.config.statusFilters, "i");
-      if (speedrunTester.test(stream.title)) {
+      if (
+        speedrunTester.test(stream.title) ||
+        speedrunTester.test(stream.title.replace(/\s/g, ""))
+      ) {
         console.log(`Stream title does not pass filters, skipping...`);
         return;
       }
