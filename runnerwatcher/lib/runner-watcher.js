@@ -108,11 +108,12 @@ class RunnerWatcher extends EventEmitter {
         return;
       }
 
+      // See if this stream is in the cache
+      let cachedStream = streams.find((s) => s.id === stream.id);
+      console.log(cachedStream ? `Found live stream in cache!` : ``);
+
       // If this is a channel update, ensure the title or game changed
       if (eventType === CHANNEL_UPDATE_EVENT) {
-        // Find a stream with this ID in the cache
-        let cachedStream = streams.find((s) => s.id === stream.id);
-
         // Treat this as a stream.online event:
         // - If this wasn't cached before (meaning game was not alttp or title didn't pass)
         // - If they switched from another game -> alttp
@@ -133,6 +134,16 @@ class RunnerWatcher extends EventEmitter {
           console.log(`Title or game has not changed, skipping...`);
           return;
         }
+      } else if (eventType === STREAM_ONLINE_EVENT && cachedStream) {
+        // This handles a weird scenario where:
+        // - CHANNEL_UPDATE_EVENT gets fired
+        // - we wait DELAY_FOR_API_SECONDS
+        // - stream data is fetched via API
+        // - stream comes back as live
+        // - stream is not found in cache, gets treated as STREAM_ONLINE_EVENT
+        // - the real STREAM_ONLINE_EVENT gets fired
+        console.log(`Stream is already in the cache, skipping...`);
+        return;
       }
 
       // Pull user info
