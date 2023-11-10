@@ -35,8 +35,7 @@ wsRelay.on("connect", () => {
 });
 
 const nmgGoal = "Any% NMG";
-//const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
-const weeklyRaceInfoUser = "!TEST RACE!";
+const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
 const weeklyRaceInfoBot = "";
 
 const weeklyRaceData: RaceData = {
@@ -56,7 +55,8 @@ const weeklyRaceData: RaceData = {
 
 // Happy Weekly
 // (room opens 30 minutes before race starts)
-const weeklyRaceStartOffsetSeconds = 30 * 60;
+const weeklyRaceStartOffsetMinutes = 30;
+const weeklyRaceStartOffsetSeconds = weeklyRaceStartOffsetMinutes * 60;
 const timeToSchedule = {
   dayOfWeek: 0,
   hour: 11,
@@ -98,7 +98,7 @@ const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
 const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, async () => {
   console.log(`Creating weekly race room...`);
   createRaceRoom(RACETIME_GAME_CATEGORY_SLUG_Z3, weeklyRaceData)
-    .then((weeklyRaceRoomSlug: any) => {
+    .then((weeklyRaceRoomSlug: string) => {
       const raceData = {
         raceRoomUrl: `${RACETIME_BASE_URL}${weeklyRaceRoomSlug}`,
         startTimestamp: Math.floor(
@@ -113,7 +113,7 @@ const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, async () => {
       const happyWeeklyMessage: RaceTimeMessage = {
         action: "message",
         data: {
-          message: "Happy Weekly!",
+          message: `Happy Weekly! The race will start in ~${weeklyRaceStartOffsetMinutes} minutes. Good luck and have fun!`,
           pinned: false,
           actions: null,
           direct_to: null,
