@@ -1,8 +1,9 @@
 import axios, { AxiosError } from "axios";
 import WebSocket from "ws";
+import { NewRaceData } from "./types";
 const { RACETIME_BASE_URL, RACETIME_WSS_URL } = process.env;
 
-class RaceBot {
+class RacetimeBot {
   accessToken: string;
 
   private constructor(accessToken: string) {
@@ -12,7 +13,7 @@ class RaceBot {
   static async initialize(
     clientId: string,
     clientSecret: string
-  ): Promise<RaceBot> {
+  ): Promise<RacetimeBot> {
     console.log(`Requesting access token...`);
     const response = await axios({
       method: "POST",
@@ -25,10 +26,10 @@ class RaceBot {
       },
     });
     console.log(`Received access token: ${response.data.access_token}`);
-    return new RaceBot(response.data.access_token);
+    return new RacetimeBot(response.data.access_token);
   }
 
-  startRace(gameCategorySlug: string, raceData: RaceData): Promise<string> {
+  startRace(gameCategorySlug: string, raceData: NewRaceData): Promise<string> {
     return new Promise((resolve, reject) => {
       const startRaceRequest = {
         method: "POST",
@@ -128,37 +129,4 @@ class RaceBot {
   }
 }
 
-export type RaceData = {
-  goal: string; // A string indicating a goal name.
-  custom_goal?: string; // A string indicating a custom goal name.
-  team_race?: boolean; // Boolean, initiates a team race instead of a regular one.
-  invitational?: boolean; // Boolean, sets the race room to be invite-only if enabled.
-  unlisted?: boolean; // Boolean, sets the race room to be unlisted if enabled. Only allowed if the category supports unlisted rooms.
-  info_user?: string; // String, giving useful information for race entrants. Can be edited by race monitors.
-  info_bot?: string; // String, giving useful information for race entrants. Can only be edited by bots.
-  require_even_teams?: boolean; // Boolean, requires all teams to have the same number of entrants before the race can start. Only applicable if team_race is true.
-  start_delay: number; // Integer (10-60), number of seconds the countdown should run for. Required.
-  time_limit: number; // Integer (1-72), maximum number of hours the race is allowed to run for. Required.
-  time_limit_auto_complete?: boolean; // Boolean, changes race behavior if everyone forfeits (race is considered completed/recordable instead of canceled).
-  streaming_required?: boolean; // Boolean, indicates if race entrants must have a live stream to race. If not supplied, the category's default streaming rules are applied. If the category does not allow streaming rules to be overridden, this field is ignored.
-  auto_start?: boolean; // Boolean, if true then the race will start as soon as everyone is ready. If false, it must be force-started.
-  allow_comments?: boolean; // Boolean, allows entrants to add a comment to their result when finished.
-  hide_comments?: boolean; // Boolean, causes comments to be hidden until the race is finished. Only applicable if allow_comments is true.
-  allow_prerace_chat?: boolean; // Boolean, allows users to chat before the race begins (doesn't affect race monitors or moderators).
-  allow_midrace_chat?: boolean; // Boolean, allows users to chat while the race is ongoing (doesn't affect race monitors or moderators).
-  allow_non_entrant_chat?: boolean; // Boolean, allow users who are not entered in the race to chat (doesn't affect race monitors or moderators).
-  chat_message_delay: number; // Integer (0-90), number of seconds to hold a message for before displaying it (doesn't affect race monitors or moderators). Required.
-};
-
-export type RaceTimeMessage = {
-  action: "message";
-  data: {
-    message: string;
-    pinned: boolean;
-    actions: object | null;
-    direct_to: string | null;
-    guid: string;
-  };
-};
-
-export default RaceBot;
+export default RacetimeBot;
