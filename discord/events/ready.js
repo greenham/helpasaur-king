@@ -178,7 +178,7 @@ module.exports = {
         .map((g) => {
           return {
             channelId: g.weeklyRaceRoomAlertChannelId,
-            roleId: g.weeklyRaceAlertRoleId,
+            roleId: g.weeklyRaceAlertRoleId || false,
           };
         });
 
