@@ -7,8 +7,23 @@ const {
   Partials,
 } = require("discord.js");
 const axios = require("axios");
+const axiosRetry = require("axios-retry");
 const { API_URL, API_KEY } = process.env;
-axios.defaults.headers.common["Authorization"] = API_KEY;
+const helpaApi = axios.create({
+  baseURL: API_URL,
+  headers: { authorization: API_KEY },
+});
+
+axiosRetry(helpaApi, {
+  retries: 1000,
+  retryDelay: () => 10000,
+  onRetry: (retryCount, error, requestConfig) => {
+    console.log(`API Request Error:`, error.toString());
+    console.log(
+      `Retrying call to ${requestConfig.url} (attempt #${retryCount})`
+    );
+  },
+});
 
 const client = new Client({
   intents: [
@@ -37,10 +52,12 @@ for (const file of eventFiles) {
 }
 
 // Fetch config via API
-axios
+console.log(`Fetching config from API: ${API_URL}...`);
+helpaApi
   .get(`${API_URL}/configs/discord`)
   .then((result) => {
     // Store the config
+    console.log(`✅ Config Retrieved!`);
     client.config = Object.assign({}, result.data.config);
 
     client.setRandomActivity = () => {
@@ -56,12 +73,11 @@ axios
     };
 
     // Log the bot in to Discord
+    console.log(`Logging bot into Discord...`);
     client.login(client.config.token);
   })
   .catch((err) => {
-    console.error(`Error fetching config: ${err.message}`);
-
-    // @TODO: build in retry
+    console.error(`🔴 Error fetching config: ${err.message}`);
   });
 
 process.on("unhandledRejection", (error) => {

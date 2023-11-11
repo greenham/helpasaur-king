@@ -10,6 +10,7 @@
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
     "axios": "^0.27.2",
+    "axios-retry": "^3.8.1",
     "discord.js": "^14.3.0",
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.5.4"

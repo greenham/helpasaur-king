@@ -17,7 +17,7 @@ module.exports = {
   name: "ready",
   once: true,
   execute(client) {
-    console.log(`Ready! Logged in as ${client.user.tag}`);
+    console.log(`✅ Success! Logged in as ${client.user.tag}`);
 
     // Connect to websocket relay to listen for events like stream alerts and race rooms
     const wsRelay = io(WEBSOCKET_RELAY_SERVER);
@@ -29,7 +29,7 @@ module.exports = {
       console.log(err);
     });
     wsRelay.on("connect", () => {
-      console.log(`Connected! Socket ID: ${wsRelay.id}`);
+      console.log(`✅ Connected! Socket ID: ${wsRelay.id}`);
     });
 
     // 1. Set up weekly alerts
@@ -84,9 +84,13 @@ module.exports = {
           })
           .catch(console.error);
       });
+
+      console.log(
+        `Next weekly alert scheduled for: ${weeklyAlertJob.nextInvocation()}`
+      );
     });
     console.log(
-      `Weekly alert scheduled, next invocation: ${weeklyAlertJob.nextInvocation()}`
+      `Weekly alert scheduled for: ${weeklyAlertJob.nextInvocation()}`
     );
     ///////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +100,7 @@ module.exports = {
       client.setRandomActivity();
     });
     console.log(
-      `Activity rotation scheduled, next invocation: ${activityRotateJob.nextInvocation()}`
+      `Activity rotation scheduled for: ${activityRotateJob.nextInvocation()}`
     );
     ///////////////////////////////////////////////////////////////////////////
 
