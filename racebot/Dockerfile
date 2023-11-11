@@ -18,5 +18,6 @@ CMD ["yarn", "start:dev"]
 
 FROM base as prod
 ENV NODE_ENV=production
-COPY . .
+COPY --from=base /src/build ./build
+RUN yarn install --only=production
 CMD ["yarn", "start"]
