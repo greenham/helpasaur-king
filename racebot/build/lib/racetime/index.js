@@ -38,7 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importStar(require("axios"));
 const ws_1 = __importDefault(require("ws"));
 const { RACETIME_BASE_URL, RACETIME_WSS_URL } = process.env;
-class RaceBot {
+class RacetimeBot {
     constructor(accessToken) {
         this.accessToken = accessToken;
     }
@@ -56,7 +56,7 @@ class RaceBot {
                 },
             });
             console.log(`Received access token: ${response.data.access_token}`);
-            return new RaceBot(response.data.access_token);
+            return new RacetimeBot(response.data.access_token);
         });
     }
     startRace(gameCategorySlug, raceData) {
@@ -149,4 +149,4 @@ class RaceBot {
         });
     }
 }
-exports.default = RaceBot;
+exports.default = RacetimeBot;

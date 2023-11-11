@@ -1,12 +1,26 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -15,17 +29,46 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = require("uuid");
 const node_schedule_1 = __importDefault(require("node-schedule"));
 const socket_io_client_1 = require("socket.io-client");
-const RaceBot_1 = __importDefault(require("./lib/RaceBot"));
-const { RACETIME_BASE_URL, WEBSOCKET_RELAY_SERVER, RACETIME_BOT_CLIENT_ID, RACETIME_BOT_CLIENT_SECRET, RACETIME_GAME_CATEGORY_SLUG_Z3, } = process.env;
-if (!RACETIME_BASE_URL ||
-    !WEBSOCKET_RELAY_SERVER ||
-    !RACETIME_BOT_CLIENT_ID ||
-    !RACETIME_BOT_CLIENT_SECRET ||
-    !RACETIME_GAME_CATEGORY_SLUG_Z3) {
-    console.error("At least one required environment variable is not set!");
-    process.exit(1);
-}
-const wsRelayServer = String(WEBSOCKET_RELAY_SERVER);
+const racetime_1 = __importDefault(require("./lib/racetime"));
+const Racetime = __importStar(require("./lib/racetime/types"));
+const requiredEnvVariables = [
+    "WEBSOCKET_RELAY_SERVER",
+    "RACETIME_BASE_URL",
+    "RACETIME_WSS_URL",
+    "RACETIME_BOT_CLIENT_ID",
+    "RACETIME_BOT_CLIENT_SECRET",
+    "RACETIME_GAME_CATEGORY_SLUG_Z3",
+];
+const config = {};
+// Extract values from process.env and check for existence
+requiredEnvVariables.forEach((variable) => {
+    if (!process.env[variable]) {
+        console.error(`Required environment variable ${variable} is not set!`);
+        process.exit(1);
+    }
+    config[variable] = process.env[variable];
+});
+const nmgGoal = "Any% NMG";
+//const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
+const weeklyRaceInfoUser = "!!! TEST RACE !!!";
+const weeklyRaceInfoBot = "";
+// Configure race room to open 30 minutes before the start time
+const weeklyRaceStartOffsetMinutes = 30;
+const weeklyRaceStartOffsetSeconds = weeklyRaceStartOffsetMinutes * 60;
+// Weekly starts at Noon Pacific on Sundays
+const timeToSchedule = {
+    dayOfWeek: 0,
+    hour: 11,
+    minute: 30,
+    tz: "America/Los_Angeles",
+};
+// !!!!! DEBUG ONLY !!!!! //
+// timeToSchedule.dayOfWeek = 5;
+// timeToSchedule.hour = 13;
+// timeToSchedule.minute = 15;
+////////////////////////////
+// Connect to websocket relay so we can forward events to other services and listen for commands
+const wsRelayServer = String(config.WEBSOCKET_RELAY_SERVER);
 const wsRelay = (0, socket_io_client_1.io)(wsRelayServer);
 console.log(`Connecting to websocket relay server: ${wsRelayServer}...`);
 wsRelay.on("connect_error", (err) => {
@@ -35,10 +78,6 @@ wsRelay.on("connect_error", (err) => {
 wsRelay.on("connect", () => {
     console.log(`Connected! Socket ID: ${wsRelay.id}`);
 });
-const nmgGoal = "Any% NMG";
-//const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
-const weeklyRaceInfoUser = "!TEST RACE!";
-const weeklyRaceInfoBot = "";
 const weeklyRaceData = {
     goal: nmgGoal,
     info_user: weeklyRaceInfoUser,
@@ -53,22 +92,11 @@ const weeklyRaceData = {
     allow_non_entrant_chat: true,
     chat_message_delay: 0,
 };
-// Happy Weekly
-// (room opens 30 minutes before race starts)
-const weeklyRaceStartOffsetSeconds = 30 * 60;
-const timeToSchedule = {
-    dayOfWeek: 0,
-    hour: 11,
-    minute: 30,
-    tz: "America/Los_Angeles",
-};
 const createRaceRoom = (game, raceData) => {
     return new Promise((resolve, reject) => {
-        RaceBot_1.default.initialize(RACETIME_BOT_CLIENT_ID, RACETIME_BOT_CLIENT_SECRET)
+        racetime_1.default.initialize(config.RACETIME_BOT_CLIENT_ID, config.RACETIME_BOT_CLIENT_SECRET)
             .then((racebot) => racebot.startRace(game, raceData))
-            .then((raceResult) => {
-            resolve(String(raceResult));
-        })
+            .then(resolve)
             .catch((error) => {
             console.error(`Unable to create race room!`);
             reject(error);
@@ -77,36 +105,35 @@ const createRaceRoom = (game, raceData) => {
 };
 const listenToRaceRoom = (raceRoomSlug) => {
     return new Promise((resolve, reject) => {
-        RaceBot_1.default.initialize(RACETIME_BOT_CLIENT_ID, RACETIME_BOT_CLIENT_SECRET)
+        racetime_1.default.initialize(config.RACETIME_BOT_CLIENT_ID, config.RACETIME_BOT_CLIENT_SECRET)
             .then((racebot) => racebot.connectToRaceRoom(raceRoomSlug))
-            .then((wsRaceRoom) => {
-            wsRaceRoom.on("message", (data) => {
-                console.log(`[${raceRoomSlug}] ->`, JSON.stringify(JSON.parse(data)));
-            });
-            resolve(wsRaceRoom);
-        })
+            .then(resolve)
             .catch((error) => {
             console.log("Unable to connect to race room:");
             reject(error);
         });
     });
 };
-const weeklyRaceJob = node_schedule_1.default.scheduleJob(timeToSchedule, () => __awaiter(void 0, void 0, void 0, function* () {
+const weeklyRaceJob = node_schedule_1.default.scheduleJob(timeToSchedule, () => {
+    let weeklyRaceRoomSlug = "";
     console.log(`Creating weekly race room...`);
-    createRaceRoom(RACETIME_GAME_CATEGORY_SLUG_Z3, weeklyRaceData)
-        .then((weeklyRaceRoomSlug) => {
+    createRaceRoom(config.RACETIME_GAME_CATEGORY_SLUG_Z3, weeklyRaceData)
+        .then((slug) => {
+        weeklyRaceRoomSlug = slug;
+        // Assemble event data to push to the relay (for discord, etc.)
         const raceData = {
-            raceRoomUrl: `${RACETIME_BASE_URL}${weeklyRaceRoomSlug}`,
+            raceRoomUrl: `${config.RACETIME_BASE_URL}${slug}`,
             startTimestamp: Math.floor((Date.now() + weeklyRaceStartOffsetSeconds * 1000) / 1000),
         };
         wsRelay.emit("weeklyRaceRoomCreated", raceData);
-        return listenToRaceRoom(weeklyRaceRoomSlug);
+        // Connect to the race room so we can interact with it
+        return listenToRaceRoom(slug);
     })
         .then((wsRaceRoom) => {
         const happyWeeklyMessage = {
-            action: "message",
+            action: Racetime.MESSAGE_ACTION,
             data: {
-                message: "Happy Weekly!",
+                message: `Happy Weekly! The race will start in ~${weeklyRaceStartOffsetMinutes} minutes. Good luck and have fun!`,
                 pinned: false,
                 actions: null,
                 direct_to: null,
@@ -116,12 +143,26 @@ const weeklyRaceJob = node_schedule_1.default.scheduleJob(timeToSchedule, () => 
         wsRaceRoom.send(JSON.stringify(happyWeeklyMessage), (err) => {
             if (err)
                 return console.error(err);
-            console.log(`Sent happy weekly message to race room, closing connection...`);
-            wsRaceRoom.terminate();
+            console.log(`Sent happy weekly message to race room!`);
+        });
+        wsRaceRoom.on("message", (data) => {
+            const raceRoomMessage = JSON.parse(data);
+            console.log(`Received message from [${weeklyRaceRoomSlug}]`, raceRoomMessage);
+            switch (raceRoomMessage.type) {
+                case Racetime.RACE_DATA_TYPE:
+                    // Type assertion to specify that raceRoomMessage is of type RaceDataMessage
+                    const raceDataMessage = raceRoomMessage;
+                    // if the race has ended, disconnect from the websocket
+                    if (["finished", "cancelled"].includes(raceDataMessage.race.status.value)) {
+                        console.log(`Race has finished (or been cancelled)! Closing websocket connection...`);
+                        wsRaceRoom.terminate();
+                    }
+                    break;
+            }
         });
     })
         .catch(console.error);
-}));
+});
 weeklyRaceJob.on("scheduled", (date) => {
     console.log(`Weekly race room creation scheduled, next invocation: ${date}`);
 });

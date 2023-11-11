@@ -1,0 +1,33 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OVERRIDE_STREAM_ACTION = exports.REMOVE_MONITOR_ACTION = exports.ADD_MONITOR_ACTION = exports.REMOVE_ENTRANT_ACTION = exports.FORCE_UNREADY_ACTION = exports.ACCEPT_REQUEST_ACTION = exports.INVITE_ACTION = exports.CANCEL_ACTION = exports.BEGIN_ACTION = exports.MAKE_INVITATIONAL_ACTION = exports.MAKE_OPEN_ACTION = exports.SETINFO_ACTION = exports.PING_ACTION = exports.UNPIN_MESSAGE_ACTION = exports.PIN_MESSAGE_ACTION = exports.MESSAGE_ACTION = exports.GETHISTORY_ACTION = exports.GETRACE_ACTION = exports.CHAT_HISTORY_TYPE = exports.RACE_DATA_TYPE = exports.PONG_TYPE = exports.ERROR_TYPE = exports.CHAT_PURGE_TYPE = exports.CHAT_DELETE_TYPE = exports.CHAT_UNPIN_TYPE = exports.CHAT_PIN_TYPE = exports.CHAT_DM_TYPE = exports.CHAT_MESSAGE_TYPE = void 0;
+// Incoming message type constants
+exports.CHAT_MESSAGE_TYPE = "chat.message";
+exports.CHAT_DM_TYPE = "chat.dm";
+exports.CHAT_PIN_TYPE = "chat.pin";
+exports.CHAT_UNPIN_TYPE = "chat.unpin";
+exports.CHAT_DELETE_TYPE = "chat.delete";
+exports.CHAT_PURGE_TYPE = "chat.purge";
+exports.ERROR_TYPE = "error";
+exports.PONG_TYPE = "pong";
+exports.RACE_DATA_TYPE = "race.data";
+exports.CHAT_HISTORY_TYPE = "chat.history";
+// Outgoing action type constants
+exports.GETRACE_ACTION = "getrace";
+exports.GETHISTORY_ACTION = "gethistory";
+exports.MESSAGE_ACTION = "message";
+exports.PIN_MESSAGE_ACTION = "pin_message";
+exports.UNPIN_MESSAGE_ACTION = "unpin_message";
+exports.PING_ACTION = "ping";
+exports.SETINFO_ACTION = "setinfo";
+exports.MAKE_OPEN_ACTION = "make_open";
+exports.MAKE_INVITATIONAL_ACTION = "make_invitational";
+exports.BEGIN_ACTION = "begin";
+exports.CANCEL_ACTION = "cancel";
+exports.INVITE_ACTION = "invite";
+exports.ACCEPT_REQUEST_ACTION = "accept_request";
+exports.FORCE_UNREADY_ACTION = "force_unready";
+exports.REMOVE_ENTRANT_ACTION = "remove_entrant";
+exports.ADD_MONITOR_ACTION = "add_monitor";
+exports.REMOVE_MONITOR_ACTION = "remove_monitor";
+exports.OVERRIDE_STREAM_ACTION = "override_stream";
