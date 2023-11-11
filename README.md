@@ -7,8 +7,8 @@ Global command list is available at https://helpasaur.com/commands
 ## Discord Bot
 
 - Simple call-and-response [commands](https://helpasaur.com/commands)
+- Posts go-lives for A Link to the Past Twitch streams
 - Pings role for weekly race an hour before
-- Posts go-lives for ALttP Twitch streams
 - Posts weekly race room details after [Race Bot](#race-bot) creates it
 
 ## Twitch Bot
@@ -23,3 +23,13 @@ Global command list is available at https://helpasaur.com/commands
 ## Race Bot
 
 - Automatically creates racetime.gg room for weekly race
+
+# FAQ
+
+## How do I get the bot to join my Twitch channel?
+
+Head to [https://twitch.tv/helpasaurking](https://twitch.tv/helpasaurking) and send `!join` in the chat.
+
+## How do I get the bot to join my Discord server?
+
+Sorry, this is invite-only right now.
