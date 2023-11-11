@@ -8,16 +8,15 @@ WORKDIR /src
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=yarn.lock,target=yarn.lock \
-    --mount=type=cache,target=/root/.yarn
-    
+    --mount=type=cache,target=/root/.yarn \
+    yarn install --production=false --frozen-lockfile
+
 FROM base as dev
 ENV NODE_ENV=development
-RUN yarn install --production=false --frozen-lockfile
 COPY . .
 CMD ["yarn", "start:dev"]
 
 FROM base as prod
 ENV NODE_ENV=production
-RUN yarn install --production --frozen-lockfile
 COPY . .
 CMD ["yarn", "start"]
