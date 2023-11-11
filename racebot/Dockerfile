@@ -8,18 +8,16 @@ WORKDIR /src
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=yarn.lock,target=yarn.lock \
-    --mount=type=cache,target=/root/.yarn \
-    yarn install --production=false --frozen-lockfile
-# COPY package.json /
-# COPY yarn.lock /
-
+    --mount=type=cache,target=/root/.yarn
+    
 FROM base as dev
 ENV NODE_ENV=development
-#RUN yarn global add nodemon
+RUN yarn install --production=false --frozen-lockfile
 COPY . .
 CMD ["yarn", "start:dev"]
 
 FROM base as prod
 ENV NODE_ENV=production
+RUN yarn install --production --frozen-lockfile
 COPY . .
 CMD ["yarn", "start"]
