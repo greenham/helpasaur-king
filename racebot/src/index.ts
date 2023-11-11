@@ -26,8 +26,7 @@ requiredEnvVariables.forEach((variable) => {
 });
 
 const nmgGoal = "Any% NMG";
-//const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
-const weeklyRaceInfoUser = "!!! TEST RACE !!!";
+const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
 const weeklyRaceInfoBot = "";
 
 // Configure race room to open 30 minutes before the start time
@@ -48,7 +47,10 @@ const timeToSchedule = {
 
 // Connect to websocket relay so we can forward events to other services and listen for commands
 const wsRelayServer = String(config.WEBSOCKET_RELAY_SERVER);
-const wsRelay = io(wsRelayServer);
+const wsRelay = io(wsRelayServer, {
+  query: { clientId: "racebot v1.0.0" },
+});
+// { query: { clientId: `${packageJson.name} ${packageJson.version}` } }
 console.log(`Connecting to websocket relay server: ${wsRelayServer}...`);
 wsRelay.on("connect_error", (err) => {
   console.log(`Connection error!`);

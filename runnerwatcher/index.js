@@ -1,6 +1,7 @@
 const axios = require("axios");
 const { io } = require("socket.io-client");
 const RunnerWatcher = require("./lib/runner-watcher");
+const packageJson = require("./package.json");
 
 const { API_URL, API_KEY, WEBSOCKET_RELAY_SERVER } = process.env;
 
@@ -15,7 +16,9 @@ async function init() {
   try {
     const streamAlertsConfig = await helpaApi.get("/configs/streamAlerts");
     const runnerwatcher = new RunnerWatcher(streamAlertsConfig.data.config);
-    const wsRelay = io(WEBSOCKET_RELAY_SERVER);
+    const wsRelay = io(WEBSOCKET_RELAY_SERVER, {
+      query: { clientId: `${packageJson.name} v${packageJson.version}` },
+    });
 
     console.log(
       `Connecting to websocket relay server: ${WEBSOCKET_RELAY_SERVER}...`

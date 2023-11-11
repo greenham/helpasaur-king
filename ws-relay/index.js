@@ -5,15 +5,21 @@ const wss = new Server();
 const relayEvents = ["streamAlert", "weeklyRaceRoomCreated"];
 
 wss.on("connection", (socket) => {
-  console.log(`Client connected to websocket relay: ${socket.id}`);
+  const clientId = socket.handshake.query.clientId || "Unknown";
+  socket.data.clientId = clientId;
+  console.log(`Client connected: ${socket.id} (${clientId})`);
   socket.on("disconnect", () => {
-    console.log(`Client disconnected: ${socket.id}`);
+    console.log(`Client disconnected: ${socket.id} (${socket.data.clientId})`);
   });
 
   relayEvents.forEach((event) => {
     socket.on(event, (data) => {
       console.log(`Received ${event} event:`, data);
-      if (wss.emit(event, data)) console.log(`-> Relayed!`);
+      const relayData = {
+        payload: data,
+        source: socket.data.clientId,
+      };
+      if (wss.emit(event, relayData)) console.log(`✅ Relayed!`);
     });
   });
 });

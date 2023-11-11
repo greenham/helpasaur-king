@@ -20,7 +20,9 @@ module.exports = {
     console.log(`✅ Success! Logged in as ${client.user.tag}`);
 
     // Connect to websocket relay to listen for events like stream alerts and race rooms
-    const wsRelay = io(WEBSOCKET_RELAY_SERVER);
+    const wsRelay = io(WEBSOCKET_RELAY_SERVER, {
+      query: { clientId: `${packageJson.name} v${packageJson.version}` },
+    });
     console.log(
       `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
     );
@@ -105,7 +107,7 @@ module.exports = {
     ///////////////////////////////////////////////////////////////////////////
 
     // 3. Listen for stream alerts
-    wsRelay.on("streamAlert", (stream) => {
+    wsRelay.on("streamAlert", ({ payload: stream, source }) => {
       if (
         ![STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT].includes(stream.eventType)
       ) {
@@ -145,7 +147,7 @@ module.exports = {
           .setThumbnail(stream.user.profile_image_url)
           .setTimestamp()
           .setFooter({
-            text: `runnerwatcher v${packageJson.version}`,
+            text: source,
             iconURL: "https://helpasaur.com/img/TwitchGlitchPurple.png",
           });
 
@@ -171,7 +173,7 @@ module.exports = {
     });
 
     // 4. Listen for weekly race room creation
-    wsRelay.on("weeklyRaceRoomCreated", (raceData) => {
+    wsRelay.on("weeklyRaceRoomCreated", ({ payload: raceData, source }) => {
       console.log("Received weekly race room event:", raceData);
 
       // Get a list of guilds that have race room alerts enabled
@@ -220,7 +222,7 @@ module.exports = {
           )
           .setTimestamp()
           .setFooter({
-            text: `racebot v${packageJson.version}`,
+            text: source,
             iconURL: "https://helpasaur.com/img/ljsmile.png",
           });
 
