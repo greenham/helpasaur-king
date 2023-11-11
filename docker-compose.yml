@@ -152,6 +152,8 @@ services:
     build:
       context: ./racebot
       target: ${TARGET}
+    volumes:
+      - ./racebot:/src
     restart: on-failure
     environment:
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
