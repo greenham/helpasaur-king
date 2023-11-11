@@ -108,78 +108,87 @@ const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
   });
 };
 
-const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, () => {
-  let weeklyRaceRoomSlug = "";
+const scheduleWeeklyRace = () => {
+  const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, () => {
+    let weeklyRaceRoomSlug = "";
 
-  console.log(`Creating weekly race room...`);
-  createRaceRoom(config.RACETIME_GAME_CATEGORY_SLUG_Z3, weeklyRaceData)
-    .then((slug) => {
-      weeklyRaceRoomSlug = slug;
-      // Assemble event data to push to the relay (for discord, etc.)
-      const raceData = {
-        raceRoomUrl: `${config.RACETIME_BASE_URL}${slug}`,
-        startTimestamp: Math.floor(
-          (Date.now() + weeklyRaceStartOffsetSeconds * 1000) / 1000
-        ),
-      };
-      wsRelay.emit("weeklyRaceRoomCreated", raceData);
+    console.log(`Creating weekly race room...`);
+    createRaceRoom(config.RACETIME_GAME_CATEGORY_SLUG_Z3, weeklyRaceData)
+      .then((slug) => {
+        weeklyRaceRoomSlug = slug;
+        // Assemble event data to push to the relay (for discord, etc.)
+        const raceData = {
+          raceRoomUrl: `${config.RACETIME_BASE_URL}${slug}`,
+          startTimestamp: Math.floor(
+            (Date.now() + weeklyRaceStartOffsetSeconds * 1000) / 1000
+          ),
+        };
+        wsRelay.emit("weeklyRaceRoomCreated", raceData);
 
-      // Connect to the race room so we can interact with it
-      return listenToRaceRoom(slug);
-    })
-    .then((wsRaceRoom) => {
-      const happyWeeklyMessage: Racetime.OutgoingMessage = {
-        action: Racetime.MESSAGE_ACTION,
-        data: {
-          message: `Happy Weekly! The race will start in ~${weeklyRaceStartOffsetMinutes} minutes. Good luck and have fun!`,
-          pinned: false,
-          actions: null,
-          direct_to: null,
-          guid: uuidv4(),
-        },
-      };
-      wsRaceRoom.send(JSON.stringify(happyWeeklyMessage), (err) => {
-        if (err) return console.error(err);
-        console.log(`Sent happy weekly message to race room!`);
-      });
+        // Connect to the race room so we can interact with it
+        return listenToRaceRoom(slug);
+      })
+      .then((wsRaceRoom) => {
+        const happyWeeklyMessage: Racetime.OutgoingMessage = {
+          action: Racetime.MESSAGE_ACTION,
+          data: {
+            message: `Happy Weekly! The race will start in ~${weeklyRaceStartOffsetMinutes} minutes. Good luck and have fun!`,
+            pinned: false,
+            actions: null,
+            direct_to: null,
+            guid: uuidv4(),
+          },
+        };
+        wsRaceRoom.send(JSON.stringify(happyWeeklyMessage), (err) => {
+          if (err) return console.error(err);
+          console.log(`Sent happy weekly message to race room!`);
+        });
 
-      wsRaceRoom.on("message", (data: string) => {
-        const raceRoomMessage: Racetime.IncomingMessage = JSON.parse(data);
-        console.log(
-          `Received message from [${weeklyRaceRoomSlug}]`,
-          raceRoomMessage
-        );
+        wsRaceRoom.on("message", (data: string) => {
+          const raceRoomMessage: Racetime.IncomingMessage = JSON.parse(data);
+          console.log(
+            `Received message from [${weeklyRaceRoomSlug}]`,
+            raceRoomMessage
+          );
 
-        switch (raceRoomMessage.type) {
-          case Racetime.RACE_DATA_TYPE:
-            // Type assertion to specify that raceRoomMessage is of type RaceDataMessage
-            const raceDataMessage = raceRoomMessage as Racetime.RaceDataMessage;
+          switch (raceRoomMessage.type) {
+            case Racetime.RACE_DATA_TYPE:
+              // Type assertion to specify that raceRoomMessage is of type RaceDataMessage
+              const raceDataMessage =
+                raceRoomMessage as Racetime.RaceDataMessage;
 
-            // if the race has ended, disconnect from the websocket
-            if (
-              ["finished", "cancelled"].includes(
-                raceDataMessage.race.status.value
-              )
-            ) {
-              console.log(
-                `Race has finished (or been cancelled)! Closing websocket connection...`
-              );
-              wsRaceRoom.terminate();
-            }
+              // if the race has ended, disconnect from the websocket
+              if (
+                ["finished", "cancelled"].includes(
+                  raceDataMessage.race.status.value
+                )
+              ) {
+                console.log(
+                  `Race has finished (or been cancelled)! Closing websocket connection...`
+                );
+                wsRaceRoom.terminate();
+              }
 
-            break;
-        }
-      });
-    })
-    .catch(console.error);
-});
-weeklyRaceJob.on("scheduled", (date) => {
-  console.log(`Weekly race room creation scheduled, next invocation: ${date}`);
-});
+              break;
+          }
+        });
+      })
+      .catch(console.error);
+  });
+  weeklyRaceJob.on("scheduled", (date) => {
+    console.log(
+      `Weekly race room creation scheduled, next invocation: ${date}`
+    );
+  });
 
-console.log(
-  `Weekly race room creation scheduled, next invocation: ${weeklyRaceJob.nextInvocation()}`
-);
+  console.log(
+    `Weekly race room creation scheduled, next invocation: ${weeklyRaceJob.nextInvocation()}`
+  );
+};
+
+if (process.env.NODE_ENV === "production") {
+  scheduleWeeklyRace();
+}
 
 process.on("SIGINT", function () {
   schedule.gracefulShutdown().then(() => process.exit(0));
