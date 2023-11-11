@@ -91,11 +91,103 @@ export type OutgoingActionData =
   | SetInfoActionData
   | UserActionData;
 
-// Union type for all outgoing message types
-export type OutgoingMessage = {
-  action: OutgoingActionType;
-  data?: OutgoingActionData;
+export type GetRaceAction = {
+  action: typeof GETRACE_ACTION;
 };
+
+export type GetHistoryAction = {
+  action: typeof GETHISTORY_ACTION;
+};
+
+export type MessageAction = {
+  action: typeof MESSAGE_ACTION;
+  data: OutgoingMessageActionData;
+};
+
+export type PinMessageAction = {
+  action: typeof PIN_MESSAGE_ACTION;
+  data: PinMessageActionData;
+};
+
+export type UnpinMessageAction = {
+  action: typeof UNPIN_MESSAGE_ACTION;
+  data: PinMessageActionData;
+};
+
+export type PingAction = {
+  action: typeof PING_ACTION;
+};
+
+export type SetInfoAction = {
+  action: typeof SETINFO_ACTION;
+  data: SetInfoActionData;
+};
+
+export type MakeOpenAction = {
+  action: typeof MAKE_OPEN_ACTION;
+};
+
+export type MakeInvitationalAction = {
+  action: typeof MAKE_INVITATIONAL_ACTION;
+};
+
+export type BeginAction = {
+  action: typeof BEGIN_ACTION;
+};
+
+export type CancelAction = {
+  action: typeof CANCEL_ACTION;
+};
+
+export type InviteAction = {
+  action: typeof INVITE_ACTION;
+  data: UserActionData;
+};
+
+export type AcceptRequestAction = {
+  action: typeof ACCEPT_REQUEST_ACTION;
+  data: UserActionData;
+};
+
+export type ForceUnreadyAction = {
+  action: typeof FORCE_UNREADY_ACTION;
+  data: UserActionData;
+};
+
+export type RemoveEntrantAction = {
+  action: typeof REMOVE_ENTRANT_ACTION;
+  data: UserActionData;
+};
+
+export type AddMonitorAction = {
+  action: typeof ADD_MONITOR_ACTION;
+  data: UserActionData;
+};
+
+export type OverrideStreamAction = {
+  action: typeof OVERRIDE_STREAM_ACTION;
+  data: UserActionData;
+};
+
+// Union type for all outgoing actions
+export type RaceAction =
+  | GetRaceAction
+  | GetHistoryAction
+  | MessageAction
+  | PinMessageAction
+  | UnpinMessageAction
+  | PingAction
+  | SetInfoAction
+  | MakeOpenAction
+  | MakeInvitationalAction
+  | BeginAction
+  | CancelAction
+  | InviteAction
+  | AcceptRequestAction
+  | ForceUnreadyAction
+  | RemoveEntrantAction
+  | AddMonitorAction
+  | OverrideStreamAction;
 
 interface UserData {
   id: string;

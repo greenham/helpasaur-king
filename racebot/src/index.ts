@@ -129,7 +129,7 @@ const scheduleWeeklyRace = () => {
         return listenToRaceRoom(slug);
       })
       .then((wsRaceRoom) => {
-        const happyWeeklyMessage: Racetime.OutgoingMessage = {
+        const happyWeeklyMessage: Racetime.MessageAction = {
           action: Racetime.MESSAGE_ACTION,
           data: {
             message: `Happy Weekly! The race will start in ~${weeklyRaceStartOffsetMinutes} minutes. Good luck and have fun!`,
