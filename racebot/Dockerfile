@@ -1,6 +1,6 @@
 FROM node:16-alpine as base
 
-WORKDIR /src
+WORKDIR /app
 
 COPY package.json yarn.lock ./
 
@@ -17,6 +17,6 @@ CMD ["yarn", "start:dev"]
 
 FROM base as prod
 ENV NODE_ENV=production
-COPY --from=base /src/build ./build
+COPY --from=base /app/build ./build
 RUN yarn install --only=production
 CMD ["yarn", "start"]
