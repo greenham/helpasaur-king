@@ -40,9 +40,11 @@ const timeToSchedule = {
   minute: 30,
   tz: "America/Los_Angeles",
 };
-timeToSchedule.dayOfWeek = 5;
-timeToSchedule.hour = 13;
-timeToSchedule.minute = 15;
+// !!!!! DEBUG ONLY !!!!! //
+// timeToSchedule.dayOfWeek = 5;
+// timeToSchedule.hour = 13;
+// timeToSchedule.minute = 15;
+////////////////////////////
 
 // Connect to websocket relay so we can forward events to other services and listen for commands
 const wsRelayServer = String(config.WEBSOCKET_RELAY_SERVER);
