@@ -1,12 +1,12 @@
 {
   "name": "helpasaur-king-racebot",
   "version": "1.0.0",
-  "main": "build/index.js",
+  "main": "./build/index.js",
   "license": "MIT",
   "scripts": {
     "start:dev": "nodemon .",
     "build": "rimraf ./build && tsc",
-    "start": "node build/index.js"
+    "start": "node ./build/index.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
