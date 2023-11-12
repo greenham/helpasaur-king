@@ -1,0 +1,29 @@
+{
+  "name": "web-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "clean": "npx rimraf build",
+    "start": "parcel src/index.html -p 3000 -d build",
+    "build": "parcel build src/index.html -d build",
+    "serve": "serve -l 3000 -s ./build"
+  },
+  "dependencies": {
+    "@types/node": "^20.9.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.1",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "parcel-bundler": "^1.12.5",
+    "prettier": "^3.0.3",
+    "sass": "^1.69.5",
+    "typescript": "^5.2.2"
+  }
+}

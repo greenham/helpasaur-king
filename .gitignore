@@ -5,3 +5,6 @@ legacy/config.json
 docker-entrypoint-initdb.d
 .env*
 node_modules
+racebot/build/
+web-react/build/
+web-react/.cache/
