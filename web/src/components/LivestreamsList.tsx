@@ -62,9 +62,13 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
   const livestreamGroups = chunkLivestreams(livestreams, 3);
 
   return (
-    <Container>
+    <Container id="streams">
       <h1>
-        ALttP Streams <Badge bg="danger">{livestreams.length} Live Now</Badge>
+        ALttP Streams{" "}
+        <Badge bg="danger">
+          <i className="fa-solid fa-tower-broadcast"></i> {livestreams.length}{" "}
+          Live Now
+        </Badge>
       </h1>
       <hr />
       {livestreamGroups.map((g, groupIndex) => {
@@ -92,6 +96,8 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
                       variant="primary"
                       as="a"
                       href={getTwitchUrl(s.user_login)}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Watch Stream
                     </Button>

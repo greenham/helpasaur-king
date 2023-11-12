@@ -2,14 +2,13 @@
   "name": "web-react",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "scripts": {
     "clean": "npx rimraf build",
-    "start": "parcel src/index.html -p 3000 -d build",
-    "build": "parcel build src/index.html -d build",
+    "start": "parcel src/index.html -p 3000 --dist-dir build",
+    "build": "parcel build src/index.html --dist-dir build",
     "serve": "serve -l 3000 -s ./build"
   },
   "dependencies": {
@@ -20,11 +19,13 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@parcel/transformer-sass": "2.10.2",
     "@types/node": "^20.9.0",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
-    "parcel-bundler": "^1.12.5",
+    "parcel": "^2.0.0",
     "prettier": "^3.0.3",
+    "process": "^0.11.10",
     "sass": "^1.69.5",
     "typescript": "^5.2.2"
   }

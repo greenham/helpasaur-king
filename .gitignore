@@ -4,7 +4,6 @@ legacy/config.json
 *.todo
 docker-entrypoint-initdb.d
 .env*
-node_modules
 racebot/build/
-web-react/build/
-web-react/.cache/
+web/build/
+web/.parcel-cache/

@@ -39,7 +39,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
       });
   }, []);
   return (
-    <Container>
+    <Container id="commands">
       <h1>Commands</h1>
       <p>
         Each of these commands will work via the Discord or Twitch bots,
@@ -52,25 +52,27 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
             <th>Response</th>
           </tr>
         </thead>
-        {commands.map((c, index) => {
-          return (
-            <tr key={`command-${index}`}>
-              <td>
-                <p>
-                  <code>{c.command}</code>
-                </p>
-                <Stack direction="horizontal" gap={1}>
-                  {c.aliases.map((a) => (
-                    <Badge bg="secondary">{a}</Badge>
-                  ))}
-                </Stack>
-              </td>
-              <td>
-                <LinkifyText text={c.response} />
-              </td>
-            </tr>
-          );
-        })}
+        <tbody>
+          {commands.map((c, index) => {
+            return (
+              <tr key={`command-${index}`}>
+                <td>
+                  <p>
+                    <code>{c.command}</code>
+                  </p>
+                  <Stack direction="horizontal" gap={1}>
+                    {c.aliases.map((a) => (
+                      <Badge bg="secondary">{a}</Badge>
+                    ))}
+                  </Stack>
+                </td>
+                <td>
+                  <LinkifyText text={c.response} />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
       </Table>
     </Container>
   );
