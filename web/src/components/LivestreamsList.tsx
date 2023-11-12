@@ -1,9 +1,11 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
+import Stack from "react-bootstrap/Stack";
 import Card from "react-bootstrap/Card";
 import CardGroup from "react-bootstrap/CardGroup";
 import Badge from "react-bootstrap/Badge";
+import TimeAgo from "react-timeago";
 
 const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
@@ -33,7 +35,7 @@ const sizeStreamThumbnail = (url: string, width: number, height: number) => {
     .replace("{height}", String(height));
 };
 
-// Function to chunk the livestreams into groups of 3
+// Function to chunk the livestreams into groups
 const chunkLivestreams = (arr: TwitchStream[], size: number) => {
   return arr.reduce(
     (acc: TwitchStream[][], _, i: number) =>
@@ -73,7 +75,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
       <hr />
       {livestreamGroups.map((g, groupIndex) => {
         return (
-          <CardGroup key={groupIndex} className="gap-4 mb-4">
+          <CardGroup key={groupIndex} className="gap-4 mb-5">
             {g.map((s, streamIndex) => {
               return (
                 <Card key={streamIndex} className="rounded">
@@ -109,14 +111,19 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
                       </a>
                     </Card.Title>
                   </Card.Body>
-                  <Card.Footer className="text-muted">
-                    <small>
-                      <i className="fa-solid fa-stopwatch"></i> Started{" "}
-                      {s.started_at}
-                      <br />
-                      <i className="fa-solid fa-chalkboard-user"></i>{" "}
-                      {s.viewer_count} viewers
-                    </small>
+                  <Card.Footer className="text-muted fs-6">
+                    <Stack gap={1}>
+                      <small>
+                        <i className="fa-solid fa-stopwatch"></i> Started{" "}
+                        <em>
+                          <TimeAgo date={s.started_at} />
+                        </em>
+                      </small>
+                      <small>
+                        <i className="fa-solid fa-chalkboard-user"></i>{" "}
+                        {s.viewer_count} viewers
+                      </small>
+                    </Stack>
                   </Card.Footer>
                 </Card>
               );
