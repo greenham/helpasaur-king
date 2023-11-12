@@ -1,7 +1,6 @@
-// Include any default variable overrides here (though functions won't be available)
-// -
+// Your variable overrides can go here, e.g.:
+// $h1-font-size: 3rem;
 
-// Import all bootstrap styles
-@import "./bootstrap.min.css";
-
-// Then add additional custom code here
+@import "../node_modules/bootswatch/dist/darkly/variables";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootswatch/dist/darkly/bootswatch";
