@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import CardGroup from "react-bootstrap/CardGroup";
 import Badge from "react-bootstrap/Badge";
-import { BroadcastPin } from "react-bootstrap-icons";
 
 const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
@@ -65,11 +64,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
   return (
     <Container>
       <h1>
-        ALttP Streams{" "}
-        <Badge bg="danger">
-          <BroadcastPin />
-          {livestreams.length} Live Now
-        </Badge>
+        ALttP Streams <Badge bg="danger">{livestreams.length} Live Now</Badge>
       </h1>
       <hr />
       {livestreamGroups.map((g, groupIndex) => {
