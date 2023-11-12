@@ -2,7 +2,7 @@ import * as React from "react";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
+import { LinkContainer } from "react-router-bootstrap";
 
 function TopNav() {
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
@@ -10,7 +10,7 @@ function TopNav() {
     <>
       <Navbar expand="lg" bg="primary" data-bs-theme="dark" sticky="top">
         <Container>
-          <Navbar.Brand href="#home">
+          <Navbar.Brand href="/">
             <img
               alt=""
               src={logo}
@@ -23,8 +23,12 @@ function TopNav() {
           <Navbar.Toggle aria-controls="top-nav" />
           <Navbar.Collapse id="top-nav" role="">
             <Nav className="me-auto">
-              <Nav.Link href="#commands">Commands</Nav.Link>
-              <Nav.Link href="#streams">ALttP Streams</Nav.Link>
+              <LinkContainer to="commands">
+                <Nav.Link>Commands</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="streams">
+                <Nav.Link>ALttP Streams</Nav.Link>
+              </LinkContainer>
             </Nav>
           </Navbar.Collapse>
         </Container>
