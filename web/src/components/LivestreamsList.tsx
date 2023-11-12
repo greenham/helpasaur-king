@@ -59,7 +59,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
       });
   }, []);
 
-  const livestreamGroups = chunkLivestreams(livestreams, 3);
+  const livestreamGroups = chunkLivestreams(livestreams, 4);
 
   return (
     <Container id="streams" className="mt-5">
@@ -73,37 +73,50 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
       <hr />
       {livestreamGroups.map((g, groupIndex) => {
         return (
-          <CardGroup key={groupIndex}>
+          <CardGroup key={groupIndex} className="gap-4 mb-4">
             {g.map((s, streamIndex) => {
               return (
-                <Card style={{ width: "18rem" }} key={streamIndex}>
-                  <Card.Img
-                    variant="top"
-                    src={sizeStreamThumbnail(s.thumbnail_url, 320, 180)}
-                  />
+                <Card key={streamIndex} className="rounded">
+                  <Card.Header>
+                    <Button
+                      variant="secondary"
+                      href={getTwitchUrl(s.user_login)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="fa-brands fa-twitch"></i> {s.user_name}
+                    </Button>
+                  </Card.Header>
+                  <a
+                    href={getTwitchUrl(s.user_login)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Card.Img
+                      variant="top"
+                      src={sizeStreamThumbnail(s.thumbnail_url, 320, 180)}
+                    />
+                  </a>
                   <Card.Body>
                     <Card.Title>
                       <a
                         href={getTwitchUrl(s.user_login)}
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="text-decoration-none"
                       >
-                        {s.user_name}
+                        {s.title}
                       </a>
                     </Card.Title>
-                    <Card.Text>{s.title}</Card.Text>
-                    <Button
-                      variant="primary"
-                      as="a"
-                      href={getTwitchUrl(s.user_login)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Watch Stream
-                    </Button>
                   </Card.Body>
                   <Card.Footer className="text-muted">
-                    Started {s.started_at} | {s.viewer_count} viewers
+                    <small>
+                      <i className="fa-solid fa-stopwatch"></i> Started{" "}
+                      {s.started_at}
+                      <br />
+                      <i className="fa-solid fa-chalkboard-user"></i>{" "}
+                      {s.viewer_count} viewers
+                    </small>
                   </Card.Footer>
                 </Card>
               );
