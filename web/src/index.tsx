@@ -15,6 +15,10 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
+        index: true,
+        element: <CommandsList />,
+      },
+      {
         path: "streams",
         element: <LivestreamsList />,
       },

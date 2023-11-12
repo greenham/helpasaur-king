@@ -39,11 +39,12 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
       });
   }, []);
   return (
-    <Container id="commands">
+    <Container id="commands" className="mt-5">
       <h1>Commands</h1>
       <p>
         Each of these commands will work via the Discord or Twitch bots,
         preceded by their configured prefix, which is <code>!</code> by default.
+        e.g. <code>!nmg</code>
       </p>
       <Table striped bordered hover>
         <thead>

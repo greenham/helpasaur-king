@@ -8,18 +8,20 @@ export default function ErrorPage() {
   console.error(error);
 
   return (
-    <Container>
+    <>
       <TopNav />
-      <Alert variant="warning" data-bs-theme="light">
-        <Alert.Heading>
-          <i class="fa-solid fa-circle-exclamation"></i> Oops!
-        </Alert.Heading>
-        <p>Sorry, an unexpected error has occurred.</p>
-        <hr />
-        <p>
-          <i>{error.statusText || error.message}</i>
-        </p>
-      </Alert>
-    </Container>
+      <Container className="mt-5">
+        <Alert variant="info" data-bs-theme="dark">
+          <Alert.Heading>
+            <i class="fa-solid fa-circle-exclamation"></i> Oops!
+          </Alert.Heading>
+          <p>Sorry, an unexpected error has occurred.</p>
+          <hr />
+          <p>
+            <i>{error.statusText || error.message}</i>
+          </p>
+        </Alert>
+      </Container>
+    </>
   );
 }
