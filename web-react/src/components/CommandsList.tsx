@@ -1,4 +1,5 @@
 import * as React from "react";
+import Container from "react-bootstrap/Container";
 import Table from "react-bootstrap/Table";
 import LinkifyText from "./LinkifyText";
 import Badge from "react-bootstrap/Badge";
@@ -38,7 +39,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
       });
   }, []);
   return (
-    <>
+    <Container>
       <h1>Commands</h1>
       <p>
         Each of these commands will work via the Discord or Twitch bots,
@@ -53,7 +54,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
         </thead>
         {commands.map((c, index) => {
           return (
-            <tr key={index}>
+            <tr key={`command-${index}`}>
               <td>
                 <p>
                   <code>{c.command}</code>
@@ -71,7 +72,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
           );
         })}
       </Table>
-    </>
+    </Container>
   );
 };
 
