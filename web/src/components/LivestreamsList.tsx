@@ -42,6 +42,10 @@ const chunkLivestreams = (arr: TwitchStream[], size: number) => {
   );
 };
 
+const getTwitchUrl = (username: string) => {
+  return `https://twitch.tv/${username}`;
+};
+
 const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
   const [livestreams, setLivestreams] = React.useState<Array<TwitchStream>>([]);
 
@@ -60,8 +64,13 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
   return (
     <Container>
       <h1>
-        ALttP Streams <Badge bg="danger">{livestreams.length} Live Now</Badge>
+        ALttP Streams{" "}
+        <Badge bg="danger">
+          <i className="bi bi-broadcast-pin"></i>
+          {livestreams.length} Live Now
+        </Badge>
       </h1>
+      <hr />
       {livestreamGroups.map((g, groupIndex) => {
         return (
           <CardGroup key={groupIndex}>
@@ -73,18 +82,27 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
                     src={sizeStreamThumbnail(s.thumbnail_url, 320, 180)}
                   />
                   <Card.Body>
-                    <Card.Title>{s.user_name}</Card.Title>
-                    <Card.Text>
-                      Viewers: {s.viewer_count} | Started at: {s.started_at}
-                    </Card.Text>
+                    <Card.Title>
+                      <a
+                        href={getTwitchUrl(s.user_login)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {s.user_name}
+                      </a>
+                    </Card.Title>
+                    <Card.Text>{s.title}</Card.Text>
                     <Button
                       variant="primary"
                       as="a"
-                      href={`https://twitch.tv/${s.user_login}`}
+                      href={getTwitchUrl(s.user_login)}
                     >
                       Watch Stream
                     </Button>
                   </Card.Body>
+                  <Card.Footer className="text-muted">
+                    Started {s.started_at} | {s.viewer_count} viewers
+                  </Card.Footer>
                 </Card>
               );
             })}

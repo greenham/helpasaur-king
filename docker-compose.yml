@@ -90,34 +90,15 @@ services:
       - int
       - ext
 
-  # web-public:
-  #   image: helpa-web:${TARGET}
-  #   build:
-  #     context: ./web
-  #     target: ${TARGET}
-  #   volumes:
-  #     - ./web:/src
-  #   restart: on-failure
-  #   ports:
-  #     - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
-  #   environment:
-  #     API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
-  #     API_KEY: ${API_SECRET_KEY}
-  #     PORT: ${WEB_PUBLIC_EXTERNAL_PORT}
-  #   depends_on:
-  #     - api-server
-  #   networks:
-  #     - int
-
   web:
-    image: helpa-web-react:${TARGET}
+    image: helpa-web:${TARGET}
     build:
-      context: ./web-react
+      context: ./web
       target: ${TARGET}
     volumes:
-      - ./web-react/src:/app/src
+      - ./web/src:/app/src
     env_file:
-      - ./web-react/.env
+      - ./web/.env
     restart: on-failure
     ports:
       - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
