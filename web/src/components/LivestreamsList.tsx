@@ -3,36 +3,25 @@ import Container from "react-bootstrap/Container";
 import CardGroup from "react-bootstrap/CardGroup";
 import Badge from "react-bootstrap/Badge";
 import useConfig from "../hooks/useConfig";
-import { TwitchStream } from "../types/streams";
+import useLivestreams from "../hooks/useLivestreams";
 import StreamCard from "./StreamCard";
-import { filterStreams } from "../utils/utils";
-import { chunkLivestreams } from "../utils/utils";
-
-const API_URL = process.env.API_URL;
-const API_KEY = process.env.API_KEY;
+import { filterStreams, chunkLivestreams } from "../utils/utils";
 
 interface LivestreamsListProps {}
 
 const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
-  const [allStreams, setAllStreams] = React.useState<Array<TwitchStream>>([]);
   const {
-    config: streamAlertsConfig,
+    data: streamAlertsConfig,
     isLoading: configLoading,
     isError: configError,
   } = useConfig("streamAlerts");
+  const {
+    data: allStreams,
+    isLoading: streamsLoading,
+    isError: streamsError,
+  } = useLivestreams();
 
-  // Get livestreams from API
-  React.useEffect(() => {
-    fetch(`${API_URL}/streams/live`, {
-      headers: { Authorization: String(API_KEY) },
-    })
-      .then((rawResponse) => rawResponse.json())
-      .then((streams: Array<TwitchStream>) => {
-        setAllStreams(streams);
-      });
-  }, []);
-
-  const filteredStreams = filterStreams(allStreams, streamAlertsConfig?.config);
+  const filteredStreams = filterStreams(allStreams, streamAlertsConfig);
   const mergedStreams = filteredStreams.featured.concat(filteredStreams.other);
   const livestreamGroups = chunkLivestreams(mergedStreams, 4);
 

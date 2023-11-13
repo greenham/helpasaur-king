@@ -4,40 +4,33 @@ import Table from "react-bootstrap/Table";
 import LinkifyText from "./LinkifyText";
 import Badge from "react-bootstrap/Badge";
 import Stack from "react-bootstrap/Stack";
-
-const API_URL = process.env.API_URL;
-const API_KEY = process.env.API_KEY;
+import { Command } from "../types/commands";
+import useCommands from "../hooks/useCommands";
 
 interface CommandsListProps {}
-interface Command {
-  _id: string;
-  command: string;
-  aliases: Array<string>;
-  response: string;
-  category: string;
-  enabled: boolean;
-}
+
+const sortCommandsAlpha = (commands: Array<Command>) => {
+  commands.sort((a, b) => {
+    if (a.command < b.command) {
+      return -1;
+    }
+    if (a.command > b.command) {
+      return 1;
+    }
+    return 0;
+  });
+  return commands;
+};
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
-  const [commands, setCommands] = React.useState<Array<Command>>([]);
-  React.useEffect(() => {
-    fetch(`${API_URL}/commands`, {
-      headers: { Authorization: String(API_KEY) },
-    })
-      .then((rawResponse) => rawResponse.json())
-      .then((commands: Array<Command>) => {
-        commands.sort((a, b) => {
-          if (a.command < b.command) {
-            return -1;
-          }
-          if (a.command > b.command) {
-            return 1;
-          }
-          return 0;
-        });
-        setCommands(commands);
-      });
-  }, []);
+  const {
+    data: commands,
+    isLoading: commandsLoading,
+    isError: commandsError,
+  } = useCommands();
+
+  const sortedCommands = sortCommandsAlpha(commands);
+
   return (
     <Container id="commands" className="mt-5">
       <h1>Commands</h1>
@@ -54,7 +47,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
           </tr>
         </thead>
         <tbody>
-          {commands.map((c, index) => {
+          {sortedCommands.map((c, index) => {
             return (
               <tr key={`command-${index}`}>
                 <td>
