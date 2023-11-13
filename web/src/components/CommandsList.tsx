@@ -32,12 +32,13 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
         {sortedCommands.map((c, idx) => (
           <Accordion.Item eventKey={String(idx)} key={idx}>
             <Accordion.Header>
-              <code className="display-6">{c.command}</code>
+              <code className="fs-3">{c.command}</code>
             </Accordion.Header>
             <Accordion.Body>
               <p className="lead">
                 <LinkifyText text={c.response} />
               </p>
+              <CommandAliasesStack aliases={c.aliases} />
             </Accordion.Body>
           </Accordion.Item>
         ))}
@@ -56,17 +57,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
               <tr key={`command-${index}`}>
                 <td className="align-middle text-end">
                   <code className="fs-3">{c.command}</code>
-                  <Stack
-                    direction="horizontal"
-                    gap={1}
-                    className="justify-content-end"
-                  >
-                    {c.aliases.map((a, idx) => (
-                      <Badge bg="secondary" key={idx}>
-                        {a}
-                      </Badge>
-                    ))}
-                  </Stack>
+                  <CommandAliasesStack aliases={c.aliases} />
                 </td>
                 <td className="align-middle">
                   <p className="lead">
@@ -81,5 +72,18 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
     </Container>
   );
 };
+
+function CommandAliasesStack(props: { aliases: string[] }) {
+  const { aliases } = props;
+  return (
+    <Stack direction="horizontal" gap={1} className="justify-content-end">
+      {aliases.map((a, idx) => (
+        <Badge bg="secondary" key={idx}>
+          {a}
+        </Badge>
+      ))}
+    </Stack>
+  );
+}
 
 export default CommandsList;
