@@ -21,7 +21,7 @@ interface Command {
 const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
   const [commands, setCommands] = React.useState<Array<Command>>([]);
   React.useEffect(() => {
-    fetch(`${API_URL}/api/commands`, {
+    fetch(`${API_URL}/commands`, {
       headers: { Authorization: String(API_KEY) },
     })
       .then((rawResponse) => rawResponse.json())

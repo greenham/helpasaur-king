@@ -106,6 +106,7 @@ services:
       - api-server
     networks:
       - int
+      - ext
 
   nginx:
     image: nginx:1.21.6

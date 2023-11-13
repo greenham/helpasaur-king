@@ -1,74 +1,47 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
-import Button from "react-bootstrap/Button";
-import Stack from "react-bootstrap/Stack";
-import Card from "react-bootstrap/Card";
 import CardGroup from "react-bootstrap/CardGroup";
 import Badge from "react-bootstrap/Badge";
-import TimeAgo from "react-timeago";
+import useConfig from "../hooks/useConfig";
+import { TwitchStream } from "../types/streams";
+import StreamCard from "./StreamCard";
+import { filterStreams } from "../utils/utils";
+import { chunkLivestreams } from "../utils/utils";
 
 const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 
 interface LivestreamsListProps {}
-interface TwitchStream {
-  id: string;
-  user_id: string;
-  user_login: string;
-  user_name: string;
-  game_id: string;
-  game_name: string;
-  type: string;
-  title: string;
-  viewer_count: number;
-  started_at: string;
-  language: string;
-  thumbnail_url: string;
-  tag_ids: string[];
-  tags: string[];
-  is_mature: boolean;
-}
-
-const sizeStreamThumbnail = (url: string, width: number, height: number) => {
-  return url
-    .replace("{width}", String(width))
-    .replace("{height}", String(height));
-};
-
-// Function to chunk the livestreams into groups
-const chunkLivestreams = (arr: TwitchStream[], size: number) => {
-  return arr.reduce(
-    (acc: TwitchStream[][], _, i: number) =>
-      i % size ? acc : [...acc, arr.slice(i, i + size)],
-    []
-  );
-};
-
-const getTwitchUrl = (username: string) => {
-  return `https://twitch.tv/${username}`;
-};
 
 const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
-  const [livestreams, setLivestreams] = React.useState<Array<TwitchStream>>([]);
+  const [allStreams, setAllStreams] = React.useState<Array<TwitchStream>>([]);
+  const {
+    config: streamAlertsConfig,
+    isLoading: configLoading,
+    isError: configError,
+  } = useConfig("streamAlerts");
 
+  // Get livestreams from API
   React.useEffect(() => {
-    fetch(`${API_URL}/api/streams/live`, {
+    fetch(`${API_URL}/streams/live`, {
       headers: { Authorization: String(API_KEY) },
     })
       .then((rawResponse) => rawResponse.json())
       .then((streams: Array<TwitchStream>) => {
-        setLivestreams(streams);
+        setAllStreams(streams);
       });
   }, []);
 
-  const livestreamGroups = chunkLivestreams(livestreams, 4);
+  const filteredStreams = filterStreams(allStreams, streamAlertsConfig?.config);
+  const mergedStreams = filteredStreams.featured.concat(filteredStreams.other);
+  const livestreamGroups = chunkLivestreams(mergedStreams, 4);
 
   return (
     <Container id="streams" className="mt-5">
       <h1>
         ALttP Streams{" "}
         <Badge bg="danger">
-          <i className="fa-solid fa-tower-broadcast"></i> {livestreams.length}{" "}
+          <i className="fa-solid fa-tower-broadcast"></i> {mergedStreams.length}{" "}
           Live Now
         </Badge>
       </h1>
@@ -77,56 +50,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
         return (
           <CardGroup key={groupIndex} className="gap-4 mb-5">
             {g.map((s, streamIndex) => {
-              return (
-                <Card key={streamIndex} className="rounded">
-                  <Card.Header>
-                    <Button
-                      variant="secondary"
-                      href={getTwitchUrl(s.user_login)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <i className="fa-brands fa-twitch"></i> {s.user_name}
-                    </Button>
-                  </Card.Header>
-                  <a
-                    href={getTwitchUrl(s.user_login)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Card.Img
-                      variant="top"
-                      src={sizeStreamThumbnail(s.thumbnail_url, 320, 180)}
-                    />
-                  </a>
-                  <Card.Body>
-                    <Card.Title>
-                      <a
-                        href={getTwitchUrl(s.user_login)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-decoration-none"
-                      >
-                        {s.title}
-                      </a>
-                    </Card.Title>
-                  </Card.Body>
-                  <Card.Footer className="text-muted fs-6">
-                    <Stack gap={1}>
-                      <small>
-                        <i className="fa-solid fa-stopwatch"></i> Started{" "}
-                        <em>
-                          <TimeAgo date={s.started_at} />
-                        </em>
-                      </small>
-                      <small>
-                        <i className="fa-solid fa-chalkboard-user"></i>{" "}
-                        {s.viewer_count} viewers
-                      </small>
-                    </Stack>
-                  </Card.Footer>
-                </Card>
-              );
+              return <StreamCard stream={s} key={streamIndex} />;
             })}
           </CardGroup>
         );
