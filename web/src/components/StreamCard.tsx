@@ -17,7 +17,10 @@ function StreamCard(props: StreamCardProps) {
   const thumbnailWidth = props.thumbnailWidth || 320;
   const thumbnailHeight = props.thumbnailHeight || 180;
   return (
-    <Card className="rounded" bg={stream.isOnAlertsList ? "primary" : "dark"}>
+    <Card
+      className="rounded h-100"
+      bg={stream.isOnAlertsList ? "primary" : "dark"}
+    >
       <Card.Header>
         <Button
           variant="secondary"
