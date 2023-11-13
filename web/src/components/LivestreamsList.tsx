@@ -26,20 +26,27 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
   const mergedStreams = filteredStreams.featured.concat(filteredStreams.other);
 
   return (
-    <Container id="streams" className="mt-5">
+    <Container id="streams" className="my-5">
       <h1>
-        ALttP Streams{" "}
-        <Badge bg="danger">
-          <i className="fa-solid fa-tower-broadcast"></i> {mergedStreams.length}{" "}
-          Live Now
-        </Badge>
+        <i className="fa-brands fa-twitch"></i> ALttP Streams{" "}
+        <small>
+          <Badge bg="danger" className="ms-auto">
+            <i className="fa-solid fa-tower-broadcast"></i>{" "}
+            {mergedStreams.length} Live Now
+          </Badge>
+        </small>
       </h1>
       <hr />
       <Row xs={1} md={2} lg={3} xl={4} className="g-4">
         {mergedStreams.map((s, streamIndex) => {
           return (
             <Col key={streamIndex}>
-              <StreamCard stream={s} key={streamIndex} />
+              <StreamCard
+                stream={s}
+                key={streamIndex}
+                thumbnailWidth={640}
+                thumbnailHeight={360}
+              />
             </Col>
           );
         })}
