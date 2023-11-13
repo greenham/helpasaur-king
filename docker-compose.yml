@@ -117,6 +117,7 @@ services:
       - WEB_PUBLIC_EXTERNAL_PORT
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/static:/srv/static
     depends_on:
       - web
     networks:
