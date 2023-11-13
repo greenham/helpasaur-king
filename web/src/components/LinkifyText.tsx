@@ -1,5 +1,4 @@
 import * as React from "react";
-import Badge from "react-bootstrap/Badge";
 
 const LinkifyText = ({ text }: { text: string }) => {
   // Regular expression to identify URLs in text
@@ -11,10 +10,14 @@ const LinkifyText = ({ text }: { text: string }) => {
   // Map the parts to React elements, making URLs clickable
   const elements = parts.map((part, index) =>
     urlRegex.test(part) ? (
-      <a key={index} href={part} target="_blank" rel="noopener noreferrer">
-        <Badge pill bg="info">
-          {part}
-        </Badge>
+      <a
+        key={index}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="link-info"
+      >
+        {part}
       </a>
     ) : (
       <span key={index}>{part}</span>

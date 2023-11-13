@@ -1,26 +1,14 @@
 import * as React from "react";
+import Accordion from "react-bootstrap/Accordion";
+import Badge from "react-bootstrap/Badge";
 import Container from "react-bootstrap/Container";
+import Stack from "react-bootstrap/Stack";
 import Table from "react-bootstrap/Table";
 import LinkifyText from "./LinkifyText";
-import Badge from "react-bootstrap/Badge";
-import Stack from "react-bootstrap/Stack";
-import { Command } from "../types/commands";
 import useCommands from "../hooks/useCommands";
+import { sortCommandsAlpha } from "../utils/utils";
 
 interface CommandsListProps {}
-
-const sortCommandsAlpha = (commands: Array<Command>) => {
-  commands.sort((a, b) => {
-    if (a.command < b.command) {
-      return -1;
-    }
-    if (a.command > b.command) {
-      return 1;
-    }
-    return 0;
-  });
-  return commands;
-};
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
   const {
@@ -39,10 +27,26 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
         preceded by their configured prefix, which is <code>!</code> by default.
         e.g. <code>!nmg</code>
       </p>
-      <Table striped bordered hover>
+
+      <Accordion className="d-xl-none">
+        {sortedCommands.map((c, idx) => (
+          <Accordion.Item eventKey={String(idx)} key={idx}>
+            <Accordion.Header>
+              <code className="display-6">{c.command}</code>
+            </Accordion.Header>
+            <Accordion.Body>
+              <p className="lead">
+                <LinkifyText text={c.response} />
+              </p>
+            </Accordion.Body>
+          </Accordion.Item>
+        ))}
+      </Accordion>
+
+      <Table striped bordered hover responsive className="d-xl-block">
         <thead>
           <tr>
-            <th>Command</th>
+            <th className="text-end">Command</th>
             <th>Response</th>
           </tr>
         </thead>
@@ -50,18 +54,24 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
           {sortedCommands.map((c, index) => {
             return (
               <tr key={`command-${index}`}>
-                <td>
-                  <p>
-                    <code>{c.command}</code>
-                  </p>
-                  <Stack direction="horizontal" gap={1}>
-                    {c.aliases.map((a) => (
-                      <Badge bg="secondary">{a}</Badge>
+                <td className="align-middle text-end">
+                  <code className="display-6">{c.command}</code>
+                  <Stack
+                    direction="horizontal"
+                    gap={1}
+                    className="justify-content-end"
+                  >
+                    {c.aliases.map((a, idx) => (
+                      <Badge bg="secondary" key={idx}>
+                        {a}
+                      </Badge>
                     ))}
                   </Stack>
                 </td>
-                <td>
-                  <LinkifyText text={c.response} />
+                <td className="align-middle">
+                  <p className="lead">
+                    <LinkifyText text={c.response} />
+                  </p>
                 </td>
               </tr>
             );

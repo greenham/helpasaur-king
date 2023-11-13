@@ -1,3 +1,4 @@
+import { Command } from "../types/commands";
 import { TwitchStream, StreamAlertsConfig } from "../types/streams";
 
 export const sizeStreamThumbnail = (
@@ -63,4 +64,17 @@ export const chunkLivestreams = (arr: TwitchStream[], size: number) => {
       i % size ? acc : [...acc, arr.slice(i, i + size)],
     []
   );
+};
+
+export const sortCommandsAlpha = (commands: Array<Command>) => {
+  commands.sort((a, b) => {
+    if (a.command < b.command) {
+      return -1;
+    }
+    if (a.command > b.command) {
+      return 1;
+    }
+    return 0;
+  });
+  return commands;
 };
