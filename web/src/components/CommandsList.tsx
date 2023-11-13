@@ -3,6 +3,7 @@ import Accordion from "react-bootstrap/Accordion";
 import Badge from "react-bootstrap/Badge";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
+import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import LinkifyText from "./LinkifyText";
 import useCommands from "../hooks/useCommands";
@@ -28,26 +29,28 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
         e.g. <code>!nmg</code>
       </p>
 
-      <Accordion className="d-xl-none">
+      <Stack gap={2} className="d-xl-none">
         {sortedCommands.map((c, idx) => (
-          <Accordion.Item eventKey={String(idx)} key={idx}>
-            <Accordion.Header>
+          <Card>
+            <Card.Header>
               <code className="fs-3">{c.command}</code>
-            </Accordion.Header>
-            <Accordion.Body>
-              <p className="lead">
+            </Card.Header>
+            <Card.Body>
+              <Card.Title>
                 <LinkifyText text={c.response} />
-              </p>
-              <CommandAliasesStack aliases={c.aliases} />
-            </Accordion.Body>
-          </Accordion.Item>
+              </Card.Title>
+              <Card.Text>
+                <CommandAliasesStack aliases={c.aliases} />
+              </Card.Text>
+            </Card.Body>
+          </Card>
         ))}
-      </Accordion>
+      </Stack>
 
       <Table striped bordered hover responsive className="d-xl-block">
         <thead>
           <tr>
-            <th className="text-end">Command</th>
+            <th className="text-end mw-25">Command</th>
             <th>Response</th>
           </tr>
         </thead>
@@ -76,7 +79,11 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
 function CommandAliasesStack(props: { aliases: string[] }) {
   const { aliases } = props;
   return (
-    <Stack direction="horizontal" gap={1} className="justify-content-end">
+    <Stack
+      direction="horizontal"
+      gap={1}
+      className="justify-content-end flex-wrap"
+    >
       {aliases.map((a, idx) => (
         <Badge bg="secondary" key={idx}>
           {a}
