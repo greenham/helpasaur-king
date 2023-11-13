@@ -1,11 +1,12 @@
 import * as React from "react";
 import Container from "react-bootstrap/Container";
-import CardGroup from "react-bootstrap/CardGroup";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import Badge from "react-bootstrap/Badge";
 import useConfig from "../hooks/useConfig";
 import useLivestreams from "../hooks/useLivestreams";
 import StreamCard from "./StreamCard";
-import { filterStreams, chunkLivestreams } from "../utils/utils";
+import { filterStreams } from "../utils/utils";
 
 interface LivestreamsListProps {}
 
@@ -23,7 +24,6 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
 
   const filteredStreams = filterStreams(allStreams, streamAlertsConfig);
   const mergedStreams = filteredStreams.featured.concat(filteredStreams.other);
-  const livestreamGroups = chunkLivestreams(mergedStreams, 4);
 
   return (
     <Container id="streams" className="mt-5">
@@ -35,15 +35,15 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
         </Badge>
       </h1>
       <hr />
-      {livestreamGroups.map((g, groupIndex) => {
-        return (
-          <CardGroup key={groupIndex} className="gap-4 mb-5">
-            {g.map((s, streamIndex) => {
-              return <StreamCard stream={s} key={streamIndex} />;
-            })}
-          </CardGroup>
-        );
-      })}
+      <Row xs={1} md={2} lg={3} xl={4} className="g-4">
+        {mergedStreams.map((s, streamIndex) => {
+          return (
+            <Col key={streamIndex}>
+              <StreamCard stream={s} key={streamIndex} />
+            </Col>
+          );
+        })}
+      </Row>
     </Container>
   );
 };

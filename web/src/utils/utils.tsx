@@ -58,14 +58,6 @@ export const filterStreams = (
   }
 };
 
-export const chunkLivestreams = (arr: TwitchStream[], size: number) => {
-  return arr.reduce(
-    (acc: TwitchStream[][], _, i: number) =>
-      i % size ? acc : [...acc, arr.slice(i, i + size)],
-    []
-  );
-};
-
 export const sortCommandsAlpha = (commands: Array<Command>) => {
   commands.sort((a, b) => {
     if (a.command < b.command) {

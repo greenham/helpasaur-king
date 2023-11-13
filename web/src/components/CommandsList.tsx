@@ -55,7 +55,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
             return (
               <tr key={`command-${index}`}>
                 <td className="align-middle text-end">
-                  <code className="display-6">{c.command}</code>
+                  <code className="fs-3">{c.command}</code>
                   <Stack
                     direction="horizontal"
                     gap={1}

@@ -42,21 +42,19 @@ function StreamCard(props: StreamCardProps) {
           )}
         />
       </a>
-      <Card.Body>
+      <Card.Body className="flex-grow-1">
         <Card.Title>
           <a
             href={getTwitchUrl(stream.user_login)}
             target="_blank"
             rel="noopener noreferrer"
-            className={`text-decoration-none ${
-              stream.isOnAlertsList ? "link-light" : ""
-            }`}
+            className={`text-decoration-none`}
           >
             {stream.title}
           </a>
         </Card.Title>
       </Card.Body>
-      <Card.Footer className="text-muted fs-6">
+      <Card.Footer className="text-muted font-monospace">
         <Stack gap={1}>
           <small>
             <i className="fa-solid fa-stopwatch"></i> Started{" "}
@@ -65,8 +63,7 @@ function StreamCard(props: StreamCardProps) {
             </em>
           </small>
           <small>
-            <i className="fa-solid fa-chalkboard-user"></i>{" "}
-            {stream.viewer_count} viewers
+            <i className="fa-regular fa-eye"></i> {stream.viewer_count} viewers
           </small>
         </Stack>
       </Card.Footer>
