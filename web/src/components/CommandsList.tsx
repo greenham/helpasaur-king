@@ -31,7 +31,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
         e.g. <code>!nmg</code>
       </p>
 
-      <Stack gap={2} className="d-xl-none">
+      <Stack gap={5} className="d-xl-none">
         {sortedCommands.map((c, idx) => (
           <Card>
             <Card.Header>

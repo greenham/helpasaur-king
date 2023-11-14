@@ -23,12 +23,12 @@ function StreamCard(props: StreamCardProps) {
     >
       <Card.Header className="d-grid">
         <Button
-          variant="secondary"
+          variant={stream.isOnAlertsList ? "secondary" : "primary"}
           href={getTwitchUrl(stream.user_login)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {stream.user_name}
+          <i className="fa-regular fa-user"></i> {stream.user_name}
         </Button>
       </Card.Header>
       <a
@@ -57,7 +57,7 @@ function StreamCard(props: StreamCardProps) {
           </a>
         </Card.Title>
       </Card.Body>
-      <Card.Footer className="text-muted font-monospace">
+      <Card.Footer className="font-monospace">
         <Stack gap={1}>
           <small>
             <i className="fa-solid fa-stopwatch"></i> Started{" "}

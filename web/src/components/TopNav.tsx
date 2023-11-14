@@ -8,7 +8,7 @@ function TopNav() {
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
   return (
     <>
-      <Navbar expand="lg" bg="primary" data-bs-theme="dark" sticky="top">
+      <Navbar expand="lg" bg="primary" sticky="top">
         <Container>
           <Navbar.Brand href="/">
             <img

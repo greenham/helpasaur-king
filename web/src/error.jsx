@@ -11,7 +11,7 @@ export default function ErrorPage() {
     <>
       <TopNav />
       <Container className="mt-5">
-        <Alert variant="info" data-bs-theme="dark">
+        <Alert variant="info">
           <Alert.Heading>
             <i class="fa-solid fa-circle-exclamation"></i> Oops!
           </Alert.Heading>

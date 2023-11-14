@@ -10,13 +10,7 @@ const LinkifyText = ({ text }: { text: string }) => {
   // Map the parts to React elements, making URLs clickable
   const elements = parts.map((part, index) =>
     urlRegex.test(part) ? (
-      <a
-        key={index}
-        href={part}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="link-info"
-      >
+      <a key={index} href={part} target="_blank" rel="noopener noreferrer">
         {part}
       </a>
     ) : (
