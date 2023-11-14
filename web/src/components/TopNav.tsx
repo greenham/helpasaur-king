@@ -24,10 +24,14 @@ function TopNav() {
           <Navbar.Collapse id="top-nav" role="">
             <Nav className="me-auto">
               <LinkContainer to="commands">
-                <Nav.Link>Commands</Nav.Link>
+                <Nav.Link>
+                  <i className="fa-solid fa-terminal"></i> Commands
+                </Nav.Link>
               </LinkContainer>
               <LinkContainer to="streams">
-                <Nav.Link>ALttP Streams</Nav.Link>
+                <Nav.Link>
+                  <i className="fa-brands fa-twitch"></i> ALttP Streams
+                </Nav.Link>
               </LinkContainer>
             </Nav>
           </Navbar.Collapse>

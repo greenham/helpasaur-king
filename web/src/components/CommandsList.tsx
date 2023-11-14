@@ -22,7 +22,9 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
 
   return (
     <Container id="commands" className="mt-5">
-      <h1>Commands</h1>
+      <h1>
+        <i className="fa-solid fa-terminal"></i> Commands
+      </h1>
       <p>
         Each of these commands will work via the Discord or Twitch bots,
         preceded by their configured prefix, which is <code>!</code> by default.
