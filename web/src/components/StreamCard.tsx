@@ -21,12 +21,13 @@ function StreamCard(props: StreamCardProps) {
       className="rounded h-100"
       bg={stream.isOnAlertsList ? "primary" : "dark"}
     >
-      <Card.Header className="d-grid">
+      <Card.Header className="d-grid p-0">
         <Button
           variant={stream.isOnAlertsList ? "secondary" : "primary"}
           href={getTwitchUrl(stream.user_login)}
           target="_blank"
           rel="noopener noreferrer"
+          className="py-3"
         >
           <i className="fa-regular fa-user"></i> {stream.user_name}
         </Button>
