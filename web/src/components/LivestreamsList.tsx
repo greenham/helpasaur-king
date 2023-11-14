@@ -37,7 +37,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
         </small>
       </h1>
       <hr />
-      <Row xs={1} md={2} lg={3} xl={4} className="g-4">
+      <Row xs={1} md={2} lg={3} className="row-gap-5 col-gap-4">
         {mergedStreams.map((s, streamIndex) => {
           return (
             <Col key={streamIndex}>

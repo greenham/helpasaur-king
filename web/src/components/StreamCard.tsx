@@ -4,7 +4,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
 import TimeAgo from "react-timeago";
-import { sizeStreamThumbnail, getTwitchUrl } from "../utils/utils";
+import { sizeStreamThumbnail, getTwitchUrl, onClickUrl } from "../utils/utils";
 
 interface StreamCardProps {
   stream: TwitchStream;
@@ -47,14 +47,16 @@ function StreamCard(props: StreamCardProps) {
       </a>
       <Card.Body className="flex-grow-1">
         <Card.Title>
-          <a
-            href={getTwitchUrl(stream.user_login)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`text-decoration-none`}
-          >
-            {stream.title}
-          </a>
+          <p className="py-2 fw-bold">
+            <a
+              href={getTwitchUrl(stream.user_login)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-decoration-none link-light`}
+            >
+              {stream.title}
+            </a>
+          </p>
         </Card.Title>
       </Card.Body>
       <Card.Footer className="font-monospace">
