@@ -30,7 +30,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
       <h1>
         <i className="fa-brands fa-twitch"></i> ALttP Streams{" "}
         <small>
-          <Badge bg="danger" className="ms-auto">
+          <Badge bg="info">
             <i className="fa-solid fa-tower-broadcast"></i>{" "}
             {mergedStreams.length} Live Now
           </Badge>
