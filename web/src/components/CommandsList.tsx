@@ -1,5 +1,5 @@
 import * as React from "react";
-import Accordion from "react-bootstrap/Accordion";
+import { useEffect } from "react";
 import Badge from "react-bootstrap/Badge";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
@@ -12,6 +12,10 @@ import { sortCommandsAlpha } from "../utils/utils";
 interface CommandsListProps {}
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
+  useEffect(() => {
+    document.title = "Commands | Helpasaur King";
+  }, []);
+
   const {
     data: commands,
     isLoading: commandsLoading,

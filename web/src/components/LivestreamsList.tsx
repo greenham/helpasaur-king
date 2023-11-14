@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -11,6 +12,10 @@ import { filterStreams } from "../utils/utils";
 interface LivestreamsListProps {}
 
 const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
+  useEffect(() => {
+    document.title = "ALttP Streams | Helpasaur King";
+  }, []);
+
   const {
     data: streamAlertsConfig,
     isLoading: configLoading,
