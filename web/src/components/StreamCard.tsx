@@ -1,10 +1,11 @@
 import * as React from "react";
 import { TwitchStream } from "../types/streams";
 import Card from "react-bootstrap/Card";
+import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
 import TimeAgo from "react-timeago";
-import { sizeStreamThumbnail, getTwitchUrl, onClickUrl } from "../utils/utils";
+import { sizeStreamThumbnail, getTwitchUrl } from "../utils/utils";
 
 interface StreamCardProps {
   stream: TwitchStream;
@@ -60,8 +61,8 @@ function StreamCard(props: StreamCardProps) {
           </p>
         </Card.Title>
       </Card.Body>
-      <Card.Footer className="font-monospace">
-        <Stack gap={1}>
+      <Card.Footer>
+        <Stack gap={1} className="font-monospace">
           <small>
             <i className="fa-solid fa-stopwatch"></i> Started{" "}
             <em>
@@ -71,6 +72,11 @@ function StreamCard(props: StreamCardProps) {
           <small>
             <i className="fa-regular fa-eye"></i> {stream.viewer_count} viewers
           </small>
+          <Stack direction="horizontal" gap={1}>
+            {stream.tags.slice(0, 3).map((t) => (
+              <Badge>{t}</Badge>
+            ))}
+          </Stack>
         </Stack>
       </Card.Footer>
     </Card>
