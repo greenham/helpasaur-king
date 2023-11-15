@@ -8,9 +8,12 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Stack from "react-bootstrap/Stack";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import LinkifyText from "./LinkifyText";
 import useCommands from "../hooks/useCommands";
 import { sortCommandsAlpha } from "../utils/utils";
+import { Command } from "../types/commands";
 
 interface CommandsListProps {}
 
@@ -20,24 +23,32 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Array<Command>>([]);
+
   const {
     data: commands,
     isLoading: commandsLoading,
     isError: commandsError,
   } = useCommands();
 
-  const filteredCommands =
-    searchQuery.length > 0
-      ? commands.filter(
-          (c) =>
-            c.command.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            c.aliases.some((alias) =>
-              alias.toLowerCase().includes(searchQuery.toLowerCase())
-            ) ||
-            c.response.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : commands;
-  const sortedCommands = sortCommandsAlpha(filteredCommands);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const filteredCommands =
+        searchQuery.length > 0
+          ? commands.filter(
+              (c) =>
+                c.command.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.aliases.some((alias) =>
+                  alias.toLowerCase().includes(searchQuery.toLowerCase())
+                ) ||
+                c.response.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+          : commands;
+      setSearchResults(sortCommandsAlpha(filteredCommands));
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   return (
     <Container id="commands" className="mt-5">
@@ -50,38 +61,58 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
         e.g. <code>!nmg</code>
       </p>
 
-      <InputGroup className="mb-3 mw-50 sticky-top" style={{ top: "56px" }}>
-        <InputGroup.Text id="search-icon">
-          {searchQuery.length > 0 ? (
-            <i
-              className="fa-regular fa-circle-xmark p-2"
-              onClick={() => setSearchQuery("")}
-              style={{ cursor: "pointer" }}
-            ></i>
-          ) : (
-            <i className="fa-solid fa-magnifying-glass p-2"></i>
-          )}
-        </InputGroup.Text>
-        <Form.Control
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          size="lg"
-        />
-      </InputGroup>
+      <Row
+        className="sticky-top my-5 justify-content-center"
+        style={{ top: "56px" }}
+      >
+        <Col xl={8}>
+          <InputGroup>
+            <InputGroup.Text id="search-icon">
+              {searchQuery.length > 0 ? (
+                <i
+                  className="fa-regular fa-circle-xmark p-2"
+                  onClick={() => setSearchQuery("")}
+                  style={{ cursor: "pointer" }}
+                ></i>
+              ) : (
+                <i className="fa-solid fa-magnifying-glass p-2"></i>
+              )}
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Search names, aliases, or responses..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              size="lg"
+            />
+          </InputGroup>
+        </Col>
+      </Row>
 
-      {sortedCommands.length === 0 && (
+      {searchResults.length === 0 && (
         <Alert>
           No results found
-          {searchQuery.length > 0 ? ` for <strong>${searchQuery}</strong>` : ""}
+          {searchQuery.length > 0 ? (
+            <span>
+              &nbsp; for <strong>{searchQuery}</strong>
+            </span>
+          ) : (
+            ""
+          )}
           .
         </Alert>
       )}
 
+      {searchResults.length > 0 && (
+        <Alert variant="dark">
+          {searchResults.length} command
+          {searchResults.length !== 1 ? "s" : ""} found.
+        </Alert>
+      )}
+
       <Stack gap={5} className="d-xl-none">
-        {sortedCommands.map((c, idx) => (
-          <Card>
+        {searchResults.map((c, idx) => (
+          <Card key={idx}>
             <Card.Header>
               <code className="fs-3">{c.command}</code>
             </Card.Header>
@@ -97,7 +128,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
         ))}
       </Stack>
 
-      {sortedCommands.length > 0 && (
+      {searchResults.length > 0 && (
         <Table striped bordered hover className="d-none d-xl-block">
           <thead>
             <tr>
@@ -106,7 +137,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
             </tr>
           </thead>
           <tbody>
-            {sortedCommands.map((c, index) => {
+            {searchResults.map((c, index) => {
               return (
                 <tr key={`command-${index}`}>
                   <td className="align-middle text-end">
@@ -114,9 +145,9 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
                     <CommandAliasesStack aliases={c.aliases} />
                   </td>
                   <td className="align-middle">
-                    <p className="lead">
+                    <div className="lead">
                       <LinkifyText text={c.response} />
-                    </p>
+                    </div>
                   </td>
                 </tr>
               );
