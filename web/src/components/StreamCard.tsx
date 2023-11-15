@@ -73,8 +73,8 @@ function StreamCard(props: StreamCardProps) {
             <i className="fa-regular fa-eye"></i> {stream.viewer_count} viewers
           </small>
           <Stack direction="horizontal" gap={1}>
-            {stream.tags.slice(0, 3).map((t) => (
-              <Badge>{t}</Badge>
+            {stream.tags.slice(0, 3).map((t, i) => (
+              <Badge key={i}>{t}</Badge>
             ))}
           </Stack>
         </Stack>
