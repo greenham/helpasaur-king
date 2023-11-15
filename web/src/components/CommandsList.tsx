@@ -48,19 +48,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         className="sticky-top my-5 justify-content-center"
         style={{ top: "56px" }}
       >
-        <Col xl={8}>
-          <InputGroup>
-            <InputGroup.Text id="search-icon">
-              {searchQuery.length > 0 ? (
-                <i
-                  className="fa-regular fa-circle-xmark p-2"
-                  onClick={() => setSearchQuery("")}
-                  style={{ cursor: "pointer" }}
-                ></i>
-              ) : (
-                <i className="fa-solid fa-magnifying-glass p-2"></i>
-              )}
-            </InputGroup.Text>
+        <Col xl={6}>
+          <InputGroup className="border border-primary border-2 rounded">
             <Form.Control
               type="text"
               placeholder="Search names, aliases, or responses..."
@@ -73,6 +62,17 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               }}
               size="lg"
             />
+            <InputGroup.Text id="search-icon">
+              {searchQuery.length > 0 ? (
+                <i
+                  className="fa-regular fa-circle-xmark p-2"
+                  onClick={() => setSearchQuery("")}
+                  style={{ cursor: "pointer" }}
+                ></i>
+              ) : (
+                <i className="fa-solid fa-magnifying-glass p-2"></i>
+              )}
+            </InputGroup.Text>
           </InputGroup>
         </Col>
       </Row>
