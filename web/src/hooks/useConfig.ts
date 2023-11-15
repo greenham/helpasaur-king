@@ -2,9 +2,9 @@ import { StreamAlertsConfig } from "../types/streams";
 import { helpaApiFetcher } from "../utils/apiService";
 import useSWR from "swr";
 
-const useConfig = (id: string) => {
-  const { data, error, isLoading } = useSWR(`/configs/${id}`, helpaApiFetcher);
-  const config: StreamAlertsConfig = data?.config || {};
+const useConfig = () => {
+  const { data, error, isLoading } = useSWR(`/web/config`, helpaApiFetcher);
+  const config: StreamAlertsConfig = data || {};
   return {
     data: config,
     isLoading,

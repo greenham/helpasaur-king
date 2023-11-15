@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Command = require("../../models/command");
+const { requireAuthKey } = require("../../lib/utils");
 
 // Endpoint: /commands
 
@@ -38,7 +39,7 @@ router.post("/find", async (req, res) => {
 });
 
 // DELETE /:id -> "delete" command by ID
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAuthKey, async (req, res) => {
   try {
     const command = await Command.findById(req.params.id);
     res.status(200).json(command);

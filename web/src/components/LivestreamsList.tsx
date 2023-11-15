@@ -20,7 +20,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = () => {
     data: streamAlertsConfig,
     isLoading: configLoading,
     isError: configError,
-  } = useConfig("streamAlerts");
+  } = useConfig();
   const {
     data: allStreams,
     isLoading: streamsLoading,

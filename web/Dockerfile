@@ -11,9 +11,6 @@ COPY . .
 ARG API_URL
 ENV API_URL=$API_URL
 
-ARG API_KEY
-ENV API_KEY=$API_KEY
-
 # Build the app
 RUN yarn clean && yarn build
 

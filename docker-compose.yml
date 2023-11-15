@@ -97,7 +97,6 @@ services:
       target: ${TARGET}
       args:
         API_URL: http://hermes:${API_SERVER_EXTERNAL_PORT}/api
-        API_KEY: ${API_SECRET_KEY}
     volumes:
       - ./web/src:/app/src
     restart: on-failure
