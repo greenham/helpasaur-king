@@ -1,5 +1,6 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useDebounce } from "use-debounce";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import Container from "react-bootstrap/Container";
@@ -22,33 +23,39 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
     document.title = "Commands | Helpasaur King";
   }, []);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Array<Command>>([]);
-
+  // Fetch all commands
   const {
     data: commands,
     isLoading: commandsLoading,
     isError: commandsError,
   } = useCommands();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const filteredCommands =
-        searchQuery.length > 0
-          ? commands.filter(
-              (c) =>
-                c.command.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                c.aliases.some((alias) =>
-                  alias.toLowerCase().includes(searchQuery.toLowerCase())
-                ) ||
-                c.response.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-          : commands;
-      setSearchResults(sortCommandsAlpha(filteredCommands));
-    }, 500);
+  // Set up searching
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+  const [searchResults, setSearchResults] = useState<Array<Command>>([]);
+  const filterCommands = (commandsToFilter: Command[], query: string) => {
+    if (query.length === 0) return commandsToFilter;
 
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+    const filteredCommands = commands.filter(
+      (c) =>
+        c.command.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.aliases.some((alias) =>
+          alias.toLowerCase().includes(searchQuery.toLowerCase())
+        ) ||
+        c.response.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    return filteredCommands;
+  };
+
+  useMemo(() => {
+    return filterCommands(commands, debouncedSearchQuery);
+  }, [commands, debouncedSearchQuery]);
+
+  useEffect(() => {
+    const filteredCommands = filterCommands(commands, debouncedSearchQuery);
+    return setSearchResults(filteredCommands);
+  }, [debouncedSearchQuery]);
 
   return (
     <Container id="commands" className="mt-5">
@@ -83,6 +90,11 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
               placeholder="Search names, aliases, or responses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyUp={(e) => {
+                if (e.key === "Escape") {
+                  setSearchQuery("");
+                }
+              }}
               size="lg"
             />
           </InputGroup>
