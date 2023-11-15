@@ -35,7 +35,7 @@ function TopNav() {
                 </Nav.Link>
               </LinkContainer>
               <Nav.Link
-                href="https://twitch.tv/helpasaurking/about"
+                href="https://twitch.tv/helpasaurking"
                 target="_blank"
                 rel="noopener,noreferrer"
               >
