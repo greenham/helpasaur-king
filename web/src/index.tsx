@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import App from "./App";
 import ErrorPage from "./error";
-import CommandsList from "./components/CommandsList";
+import CommandsPage from "./pages/CommandsPage";
 import LivestreamsList from "./components/LivestreamsList";
 import "./styles.scss";
 
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <CommandsList />,
+        element: <CommandsPage />,
       },
       {
         path: "streams",
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
       },
       {
         path: "commands",
-        element: <CommandsList />,
+        element: <CommandsPage />,
       },
     ],
   },

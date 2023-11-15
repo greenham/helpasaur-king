@@ -1,9 +1,8 @@
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
-import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Stack from "react-bootstrap/Stack";
@@ -12,45 +11,31 @@ import Table from "react-bootstrap/Table";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import LinkifyText from "./LinkifyText";
-import useCommands from "../hooks/useCommands";
-import { sortCommandsAlpha } from "../utils/utils";
 import { Command } from "../types/commands";
 
-interface CommandsListProps {}
+interface CommandsListProps {
+  commands: Command[];
+}
 
-const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
-  useEffect(() => {
-    document.title = "Commands | Helpasaur King";
-  }, []);
-
-  // Fetch all commands
-  const {
-    data: commands,
-    isLoading: commandsLoading,
-    isError: commandsError,
-  } = useCommands();
+const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
+  const { commands } = props;
 
   // Set up searching
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-  const [searchResults, setSearchResults] = useState<Array<Command>>([]);
+  const [searchResults, setSearchResults] = useState<Array<Command>>(commands);
   const filterCommands = (commandsToFilter: Command[], query: string) => {
     if (query.length === 0) return commandsToFilter;
 
-    const filteredCommands = commands.filter(
+    return commandsToFilter.filter(
       (c) =>
-        c.command.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.command.toLowerCase().includes(query.toLowerCase()) ||
         c.aliases.some((alias) =>
-          alias.toLowerCase().includes(searchQuery.toLowerCase())
+          alias.toLowerCase().includes(query.toLowerCase())
         ) ||
-        c.response.toLowerCase().includes(searchQuery.toLowerCase())
+        c.response.toLowerCase().includes(query.toLowerCase())
     );
-    return filteredCommands;
   };
-
-  useMemo(() => {
-    return filterCommands(commands, debouncedSearchQuery);
-  }, [commands, debouncedSearchQuery]);
 
   useEffect(() => {
     const filteredCommands = filterCommands(commands, debouncedSearchQuery);
@@ -58,16 +43,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
   }, [debouncedSearchQuery]);
 
   return (
-    <Container id="commands" className="mt-5">
-      <h1>
-        <i className="fa-solid fa-terminal"></i> Commands
-      </h1>
-      <p className="lead">
-        Each of these commands will work via the Discord or Twitch bots,
-        preceded by their configured prefix, which is <code>!</code> by default.
-        e.g. <code>!nmg</code>
-      </p>
-
+    <>
       <Row
         className="sticky-top my-5 justify-content-center"
         style={{ top: "56px" }}
@@ -167,7 +143,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
           </tbody>
         </Table>
       )}
-    </Container>
+    </>
   );
 };
 
