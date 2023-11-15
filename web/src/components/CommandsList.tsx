@@ -73,7 +73,9 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = () => {
 
       {sortedCommands.length === 0 && (
         <Alert>
-          No results found for <strong>{searchQuery}</strong>.
+          No results found
+          {searchQuery.length > 0 ? ` for <strong>${searchQuery}</strong>` : ""}
+          .
         </Alert>
       )}
 
