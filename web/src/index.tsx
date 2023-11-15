@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import ErrorPage from "./error";
 import CommandsPage from "./pages/CommandsPage";
-import LivestreamsList from "./components/LivestreamsList";
+import LivestreamsPage from "./pages/LivestreamsPage";
 import "./styles.scss";
 
 const router = createBrowserRouter([
@@ -20,7 +20,7 @@ const router = createBrowserRouter([
       },
       {
         path: "streams",
-        element: <LivestreamsList />,
+        element: <LivestreamsPage />,
       },
       {
         path: "commands",
