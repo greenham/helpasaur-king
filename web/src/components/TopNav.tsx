@@ -3,65 +3,79 @@ import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Popover from "react-bootstrap/Popover";
 import { LinkContainer } from "react-router-bootstrap";
+
+const resources = [
+  {
+    href: "https://alttp-wiki.net/index.php/Main_Page",
+    target: "_blank",
+    rel: "noopener,noreferrer",
+    icon: "fa-solid fa-caret-right",
+    text: "Speedrun Wiki",
+  },
+  {
+    href: "https://spannerisms.github.io/lttphack/",
+    target: "_blank",
+    rel: "noopener,noreferrer",
+    icon: "fa-solid fa-caret-right",
+    text: "Practice Hack",
+  },
+  {
+    href: "https://strats.alttp.run/",
+    target: "_blank",
+    rel: "noopener,noreferrer",
+    icon: "fa-solid fa-caret-right",
+    text: "Strat Hub",
+  },
+  {
+    href: "http://www.speedrun.com/alttp",
+    target: "_blank",
+    rel: "noopener,noreferrer",
+    icon: "fa-solid fa-caret-right",
+    text: "Leaderboards",
+  },
+  {
+    divider: true, // Divider element
+  },
+  {
+    href: "https://discord.gg/8cskCK4",
+    target: "_blank",
+    rel: "noopener,noreferrer",
+    icon: "fa-brands fa-discord",
+    text: "Discord",
+  },
+];
+
+const popover = (
+  <Popover placement="bottom" id="helpa-popover">
+    <Popover.Header as="h3">Hello!</Popover.Header>
+    <Popover.Body className="bg-dark">
+      I'm <strong>Helpasaur King</strong> and I'm very high in potassium... like
+      a banana!
+    </Popover.Body>
+  </Popover>
+);
 
 function TopNav() {
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
-  const resources = [
-    {
-      href: "https://alttp-wiki.net/index.php/Main_Page",
-      target: "_blank",
-      rel: "noopener,noreferrer",
-      icon: "fa-solid fa-caret-right",
-      text: "Speedrun Wiki",
-    },
-    {
-      href: "https://spannerisms.github.io/lttphack/",
-      target: "_blank",
-      rel: "noopener,noreferrer",
-      icon: "fa-solid fa-caret-right",
-      text: "Practice Hack",
-    },
-    {
-      href: "https://strats.alttp.run/",
-      target: "_blank",
-      rel: "noopener,noreferrer",
-      icon: "fa-solid fa-caret-right",
-      text: "Strat Hub",
-    },
-    {
-      href: "http://www.speedrun.com/alttp",
-      target: "_blank",
-      rel: "noopener,noreferrer",
-      icon: "fa-solid fa-caret-right",
-      text: "Leaderboards",
-    },
-    {
-      divider: true, // Divider element
-    },
-    {
-      href: "https://discord.gg/8cskCK4",
-      target: "_blank",
-      rel: "noopener,noreferrer",
-      icon: "fa-brands fa-discord",
-      text: "Discord",
-    },
-  ];
 
   return (
     <>
       <Navbar expand="lg" bg="primary" sticky="top">
         <Container>
-          <Navbar.Brand href="/">
-            <img
-              alt=""
-              src={logo}
-              width="30"
-              height="30"
-              className="d-inline-block align-top"
-            />{" "}
-            Helpasaur King
-          </Navbar.Brand>
+          <OverlayTrigger placement="bottom" overlay={popover}>
+            <Navbar.Brand>
+              <img
+                alt=""
+                src={logo}
+                width="30"
+                height="30"
+                className="d-inline-block align-top"
+              />
+            </Navbar.Brand>
+          </OverlayTrigger>
           <Navbar.Toggle aria-controls="top-nav" />
           <Navbar.Collapse id="top-nav" role="">
             <Nav className="me-auto">
@@ -76,6 +90,8 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
+            </Nav>
+            <Nav className="justify-content-end">
               <NavDropdown
                 title={
                   <>
@@ -100,8 +116,6 @@ function TopNav() {
                   )
                 )}
               </NavDropdown>
-            </Nav>
-            <Nav className="justify-content-end">
               <Nav.Link
                 href="https://twitch.tv/helpasaurking"
                 target="_blank"
