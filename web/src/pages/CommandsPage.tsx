@@ -36,8 +36,6 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
         e.g. <code>!nmg</code>
       </p>
 
-      {commandsError && <Alert variant="danger">{commandsError}</Alert>}
-
       {commandsLoading && (
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
