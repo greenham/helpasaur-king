@@ -20,8 +20,3 @@ services:
   ws-relay:
     networks:
       - int
-
-  web:
-    build:
-      args:
-        API_URL: https://api.helpasaur.com/api

@@ -96,7 +96,7 @@ services:
       context: ./web
       target: ${TARGET}
       args:
-        API_URL: http://hermes:${API_SERVER_EXTERNAL_PORT}/api
+        API_URL: ${API_URL}
     volumes:
       - ./web/src:/app/src
     restart: on-failure
