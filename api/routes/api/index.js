@@ -1,19 +1,17 @@
 const express = require("express");
+const { requireAuthKey } = require("../../lib/utils");
 const router = express.Router();
-const { API_KEY } = process.env;
 
 router.use(express.json());
 
-router.use((req, res, next) => {
-  if (!req.get("Authorization") || req.get("Authorization") !== API_KEY)
-    return res.sendStatus(401);
-  next();
-});
-
+// Public Endpoints
 router.use("/commands", require("./commands"));
-router.use("/configs", require("./configs"));
 router.use("/streams", require("./streams"));
-router.use("/streamAlerts", require("./stream-alerts"));
-router.use("/twitch", require("./twitch"));
+router.use("/web", require("./web"));
+
+// "Secure" Endpoints
+router.use("/twitch", requireAuthKey, require("./twitch"));
+router.use("/configs", requireAuthKey, require("./configs"));
+router.use("/streamAlerts", requireAuthKey, require("./stream-alerts"));
 
 module.exports = router;

@@ -1,0 +1,16 @@
+// Include functions first (so you can manipulate colors, SVGs, calc, etc)
+@import "../node_modules/bootstrap/scss/functions";
+
+// Variable overrides
+// - Attempt a fix for dropdown not floating over sticky content
+$zindex-sticky: 1000;
+$zindex-dropdown: 1025;
+
+@import "../node_modules/bootswatch/dist/vapor/variables";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootswatch/dist/vapor/bootswatch";
+
+// Another desperate yet futile attempt
+// #resources-dropdown {
+//   z-index: 9999 !important;
+// }

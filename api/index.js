@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const routes = require("./routes");
@@ -16,6 +17,8 @@ database.once("connected", async () => {
 });
 
 const app = express();
+
+app.use(cors());
 
 // Set up logging
 app.use(logger("short"));

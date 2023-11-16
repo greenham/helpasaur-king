@@ -10,6 +10,6 @@
     "start": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "logs": "docker compose logs -f"
   },
-  "author": "greenham",
+  "author": "https://github.com/greenham",
   "license": "MIT"
 }
