@@ -1,6 +1,0 @@
-<div class="container">
-	<h1>{{#if pageHeader}}{{pageHeader}}{{else}}People{{/if}}</h1>
-	<pre>{{#each people}}{{math @index "+" 1}}. {{displayName}} ({{hrt bestGroupsTime}})
-	{{/each}}
-	</pre>
-</div>
