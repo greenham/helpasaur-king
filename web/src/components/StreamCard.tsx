@@ -61,7 +61,7 @@ function StreamCard(props: StreamCardProps) {
           </p>
         </Card.Title>
       </Card.Body>
-      <Card.Footer>
+      <Card.Footer className="bg-dark">
         <Stack gap={1} className="font-monospace">
           <small>
             <i className="fa-solid fa-stopwatch"></i> Started{" "}
