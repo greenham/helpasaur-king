@@ -64,13 +64,13 @@ function StreamCard(props: StreamCardProps) {
       <Card.Footer className="bg-dark">
         <Stack gap={1} className="font-monospace">
           <small>
+            <i className="fa-regular fa-eye"></i> {stream.viewer_count} viewers
+          </small>
+          <small>
             <i className="fa-solid fa-stopwatch"></i> Started{" "}
             <em>
               <TimeAgo date={stream.started_at} />
             </em>
-          </small>
-          <small>
-            <i className="fa-regular fa-eye"></i> {stream.viewer_count} viewers
           </small>
           <Stack direction="horizontal" gap={1}>
             {stream.tags.slice(0, 3).map((t, i) => (
