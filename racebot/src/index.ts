@@ -28,6 +28,7 @@ requiredEnvVariables.forEach((variable) => {
 const nmgGoal = "Any% NMG";
 const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
 const weeklyRaceInfoBot = "";
+const disconnectFromRaceRoomAfterHours = 4;
 
 // Configure race room to open 30 minutes before the start time
 const weeklyRaceStartOffsetMinutes = 30;
@@ -181,6 +182,13 @@ const scheduleWeeklyRace = () => {
               break;
           }
         });
+
+        setTimeout(() => {
+          console.log(
+            `It's been ${disconnectFromRaceRoomAfterHours} hours, closing websocket connection...`
+          );
+          wsRaceRoom.terminate();
+        }, 1000 * 60 * 60 * disconnectFromRaceRoomAfterHours);
       })
       .catch(console.error);
   });
