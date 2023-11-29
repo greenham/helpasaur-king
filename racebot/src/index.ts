@@ -146,12 +146,21 @@ const scheduleWeeklyRace = () => {
 
         wsRaceRoom.on("message", (data: string) => {
           const raceRoomMessage: Racetime.IncomingMessage = JSON.parse(data);
-          console.log(
-            `Received message from [${weeklyRaceRoomSlug}]`,
-            raceRoomMessage
-          );
 
           switch (raceRoomMessage.type) {
+            case Racetime.CHAT_MESSAGE_TYPE:
+              // Type assertion to specify that raceRoomMessage is of type ChatMessageMessage
+              const raceChatMessage =
+                raceRoomMessage as Racetime.ChatMessageMessage;
+              const { message: chatMessage } = raceChatMessage;
+
+              console.log(
+                `${weeklyRaceRoomSlug} | <${chatMessage.user}>: ${chatMessage.message}`
+              );
+
+              // @TODO: Respond to the usual prefixed commands
+              break;
+
             case Racetime.RACE_DATA_TYPE:
               // Type assertion to specify that raceRoomMessage is of type RaceDataMessage
               const raceDataMessage =
