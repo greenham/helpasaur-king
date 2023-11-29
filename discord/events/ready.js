@@ -10,8 +10,9 @@ const packageJson = require("../package.json");
 const ALTTP_GUILD_ID = "138378732376162304";
 const REZE_ID = "86234074175258624";
 const LJ_SMILE_NAME = "ljSmile";
+const WEEKLY_ALERT_OFFSET_MINUTES = 60;
 const WEEKLY_ALERT_MESSAGE =
-  "The weekly Any% NMG Race is starting in 1 Hour on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>";
+  "The weekly Any% NMG Race is starting #startsIn# on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>";
 
 module.exports = {
   name: "ready",
@@ -70,9 +71,13 @@ module.exports = {
         );
 
         let notify = a.roleId ? `<@&${a.roleId}> ` : "";
+        let startsIn = `<t:${Math.floor(
+          (Date.now() + WEEKLY_ALERT_OFFSET_MINUTES * 60 * 1000) / 1000
+        )}:R>`;
+        let alertMessage = WEEKLY_ALERT_MESSAGE.replace("#startsIn#", startsIn);
 
         channel
-          .send(notify + WEEKLY_ALERT_MESSAGE)
+          .send(notify + alertMessage)
           .then(() => {
             console.log(`-> Sent!`);
 
@@ -206,7 +211,7 @@ module.exports = {
         let weeklyRaceAlertEmbed = new EmbedBuilder()
           .setColor(0x379c6f)
           .setTitle(`Weekly race room has been created!`)
-          .setDescription(`Starts in ${startsIn}`)
+          .setDescription(`Starts ${startsIn}`)
           .setURL(raceRoomUrl)
           .setAuthor({
             name: "hap e weekly",
