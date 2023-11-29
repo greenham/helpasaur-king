@@ -107,6 +107,7 @@ module.exports = {
       .setTitle(commandNoPrefix)
       .setDescription(command.response);
 
+    let aliasUsed = "";
     if (command.aliases && command.aliases.length > 0) {
       aliasList = [...command.aliases];
 
@@ -115,6 +116,7 @@ module.exports = {
         // Alias was used, remove it from the list, and add the original command
         aliasList = aliasList.filter((a) => a != commandNoPrefix);
         aliasList.push(command.command);
+        aliasUsed = commandNoPrefix;
       }
       response.setFooter({ text: `Aliases: ${aliasList.join(", ")}` });
     }
@@ -125,6 +127,16 @@ module.exports = {
     // Place command on cooldown
     cooldowns.set(cooldownKey, Date.now());
 
-    // @TODO: Make an API call to increment the counter for useage
+    // Make an API call to log useage
+    await axios.post(`${API_URL}/commands/logs`, {
+      command: command.command,
+      alias: aliasUsed,
+      source: "discord",
+      username: author.username,
+      metadata: {
+        author,
+        guildId,
+      },
+    });
   },
 };
