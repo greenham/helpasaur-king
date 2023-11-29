@@ -98,7 +98,7 @@ module.exports = {
     }
 
     console.log(
-      `Received command ${commandNoPrefix} from ${author.username}#${author.discriminator} in guild ${guildId}`
+      `Received command <${commandNoPrefix}> from <${author.username}> in guild <${guildConfig.internalName}>`
     );
 
     // Build the command response
@@ -134,8 +134,8 @@ module.exports = {
       source: "discord",
       username: author.username,
       metadata: {
+        guild: guildConfig.internalName,
         author,
-        guildId,
       },
     });
   },
