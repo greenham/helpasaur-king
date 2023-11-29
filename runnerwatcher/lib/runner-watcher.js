@@ -9,8 +9,9 @@ const {
   STREAM_ONLINE_TYPE_LIVE,
 } = require("../constants");
 const DELAY_FOR_API_SECONDS = 10;
+const ALERT_DELAY_SECONDS = 10 * 60;
 
-// Maintain a cache of streams we've alerted
+// Maintain a cache of streams we've recently alerted
 let streams = [];
 
 class RunnerWatcher extends EventEmitter {
@@ -108,9 +109,24 @@ class RunnerWatcher extends EventEmitter {
         return;
       }
 
-      // See if this stream is in the cache
-      let cachedStream = streams.find((s) => s.id === stream.id);
-      console.log(cachedStream ? `Found live stream in cache!` : ``);
+      // See if this user has a stream in the cache already
+      let cachedStream = streams.find((s) => s.user.id == stream.user.id);
+      console.log(
+        cachedStream ? `Found stream in cache for ${user.login}!` : ``
+      );
+
+      // Make sure it's been long enough since the last alert
+      if (cachedStream) {
+        const secondsSinceLastAlert = Math.floor(
+          (Date.now() - cachedStream.lastAlertedAt) / 1000
+        );
+        if (secondsSinceLastAlert < ALERT_DELAY_SECONDS) {
+          console.log(
+            `Only ${secondsSinceLastAlert} seconds since last alert, skipping...`
+          );
+          return;
+        }
+      }
 
       // If this is a channel update, ensure the title or game changed
       if (eventType === CHANNEL_UPDATE_EVENT) {
@@ -162,6 +178,7 @@ class RunnerWatcher extends EventEmitter {
       streams = streams.filter((s) => s.user.id == stream.user.id);
 
       // Cache it
+      stream.lastAlertedAt = Date.now();
       streams.push(stream);
     } catch (err) {
       console.error(err);
