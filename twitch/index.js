@@ -241,8 +241,30 @@ function init(config) {
     // Place command on cooldown
     cooldowns.set(cooldownKey, Date.now());
 
-    // @TODO: Call the API to increment use count for this command
-    console.log(`[${channel}] ${tags["display-name"]}: ${command.command}`);
+    console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
+
+    // Determine if the original command or an alias was used
+    let aliasUsed = "";
+    if (
+      command.aliases &&
+      command.aliases.length > 0 &&
+      command.aliases.includes(commandNoPrefix)
+    ) {
+      // Alias was used, remove it from the list, and add the original command
+      aliasUsed = commandNoPrefix;
+    }
+
+    // Make an API call to log useage
+    await axios.post(`${API_URL}/commands/logs`, {
+      command: command.command,
+      alias: aliasUsed,
+      source: "twitch",
+      username: tags.username,
+      metadata: {
+        channel,
+        tags,
+      },
+    });
   });
 }
 
