@@ -7,6 +7,14 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 import { LinkContainer } from "react-router-bootstrap";
 
+const clientId = "w81l1hairuptw4izjeg5m5ol4g2lel";
+const redirectUri = encodeURIComponent(
+  "https://api-dev.helpasaur.com/auth/twitch"
+);
+const claims = JSON.stringify({
+  id_token: { preferred_username: null, picture: null, email_verified: null },
+});
+
 const resources = [
   {
     href: "https://alttp-wiki.net/index.php/Main_Page",
@@ -90,6 +98,12 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
+              <Nav.Link
+                href={`https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid&claims=${claims}`}
+                rel="noopener,noreferrer"
+              >
+                <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
+              </Nav.Link>
             </Nav>
             <Nav className="justify-content-end">
               <NavDropdown
