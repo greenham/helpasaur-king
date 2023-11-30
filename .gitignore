@@ -1,6 +1,5 @@
 node_modules
 logs/*
-legacy/config.json
 *.todo
 docker-entrypoint-initdb.d
 .env*
