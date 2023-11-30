@@ -110,7 +110,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // See if this user has a stream in the cache already
-      let cachedStream = streams.find((s) => s.user.id == stream.user.id);
+      let cachedStream = streams.find((s) => s.user_id == stream.user_id);
       console.log(
         cachedStream ? `Found stream in cache for ${user.login}!` : ``
       );
@@ -175,7 +175,7 @@ class RunnerWatcher extends EventEmitter {
       this.emit("streamEvent", stream);
 
       // Remove any cached stream data for this user
-      streams = streams.filter((s) => s.user.id == stream.user.id);
+      streams = streams.filter((s) => s.user_id == stream.user_id);
 
       // Cache it
       stream.lastAlertedAt = Date.now();
