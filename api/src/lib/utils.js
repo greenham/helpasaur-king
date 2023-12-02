@@ -2,8 +2,8 @@ const { expressjwt: jwt } = require("express-jwt");
 const {
   API_KEY,
   JWT_SECRET_KEY,
-  TWITCH_JWT_HEADER_COOKIE_NAME,
-  TWITCH_JWT_FOOTER_COOKIE_NAME,
+  JWT_HEADER_COOKIE_NAME,
+  JWT_FOOTER_COOKIE_NAME,
 } = process.env;
 
 const requireAuthKey = (req, res, next) => {
@@ -22,8 +22,8 @@ const requireJwtToken = jwt({
       return authorizationHeader.split(" ")[1];
     } else {
       // try to re-form id token from cookies
-      const header = req.cookies[TWITCH_JWT_HEADER_COOKIE_NAME];
-      const footer = req.cookies[TWITCH_JWT_FOOTER_COOKIE_NAME];
+      const header = req.cookies[JWT_HEADER_COOKIE_NAME];
+      const footer = req.cookies[JWT_FOOTER_COOKIE_NAME];
       return [header, footer].join(".");
     }
   },

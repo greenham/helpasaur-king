@@ -9,8 +9,8 @@ const User = require("../models/user");
 const {
   CLIENT_POST_AUTH_REDIRECT_URL,
   JWT_SECRET_KEY,
-  TWITCH_JWT_HEADER_COOKIE_NAME,
-  TWITCH_JWT_FOOTER_COOKIE_NAME,
+  JWT_HEADER_COOKIE_NAME,
+  JWT_FOOTER_COOKIE_NAME,
   TWITCH_APP_OAUTH_REDIRECT_URL,
 } = process.env;
 const loginExpirationLength = "7d";
@@ -61,7 +61,7 @@ router.get(`/twitch`, async (req, res) => {
   twitchAuthData.expires_at = Date.now() + twitchAuthData.expires_in * 1000;
   delete twitchAuthData.expires_in;
 
-  console.log(`Received access token for user: ${userAccessToken})`);
+  console.log(`Received access token for user: ${userAccessToken}`);
 
   // Get user data from Twitch with the user's access token
   const twitchApiUser = new TwitchApi({
@@ -116,11 +116,11 @@ router.get(`/twitch`, async (req, res) => {
   const signature = idParts[2];
   const maxAge = ms(loginExpirationLength);
 
-  res.cookie(TWITCH_JWT_HEADER_COOKIE_NAME, headerAndPayload, {
+  res.cookie(JWT_HEADER_COOKIE_NAME, headerAndPayload, {
     httpOnly: false,
     maxAge,
   });
-  res.cookie(TWITCH_JWT_FOOTER_COOKIE_NAME, signature, {
+  res.cookie(JWT_FOOTER_COOKIE_NAME, signature, {
     maxAge,
   });
 
@@ -130,8 +130,8 @@ router.get(`/twitch`, async (req, res) => {
 
 router.get(`/logout`, async (req, res) => {
   // Clear cookies
-  res.cookie(TWITCH_JWT_HEADER_COOKIE_NAME, "");
-  res.cookie(TWITCH_JWT_FOOTER_COOKIE_NAME, "");
+  res.cookie(JWT_HEADER_COOKIE_NAME, "");
+  res.cookie(JWT_FOOTER_COOKIE_NAME, "");
 
   // Redirect to client
   res.redirect(CLIENT_POST_AUTH_REDIRECT_URL);
