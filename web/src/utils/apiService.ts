@@ -37,3 +37,9 @@ export const helpaApiWithCredentialsFetcher = (url: string) => {
     data.json()
   );
 };
+
+export const helpaApiWithCredentialsFetcher = (url: string) => {
+  return fetch(`${API_URL}${url}`, { credentials: "include" }).then((data) =>
+    data.json()
+  );
+};
