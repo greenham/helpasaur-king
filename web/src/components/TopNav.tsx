@@ -73,7 +73,7 @@ const popover = (
 
 function TopNav() {
   const userContext = React.useContext(UserContext) as UserContextType;
-  const { data: user } = userContext;
+  const { data: user, isLoading: userLoading } = userContext;
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
 
   return (
@@ -105,6 +105,14 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
+              {user && user.permissions.includes("admin") && (
+                <LinkContainer to="admin">
+                  <Nav.Link>
+                    <i className="fa-solid fa-user-tie"></i>&nbsp;&nbsp;Admin
+                    Panel
+                  </Nav.Link>
+                </LinkContainer>
+              )}
             </Nav>
             <Nav>
               <Nav.Link
@@ -147,7 +155,7 @@ function TopNav() {
               </NavDropdown>
             </Nav>
             <Nav className="justify-content-end">
-              {user ? (
+              {user && !userLoading ? (
                 <Navbar.Text>
                   <NavDropdown
                     title={
@@ -162,6 +170,7 @@ function TopNav() {
                     }
                     id="user-dropdown"
                   >
+                    <NavDropdown.Divider />
                     <NavDropdown.Item
                       href={API_LOGOUT_URL}
                       rel="noopener,noreferrer"
