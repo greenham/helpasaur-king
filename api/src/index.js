@@ -3,7 +3,7 @@ const cors = require("cors");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const routes = require("./routes");
-const { MONGODB_URL, PORT } = process.env;
+const { MONGODB_URL, PORT, API_CORS_ORIGINS_WHITELIST } = process.env;
 
 mongoose.connect(MONGODB_URL);
 const database = mongoose.connection;
@@ -18,7 +18,8 @@ database.once("connected", async () => {
 
 const app = express();
 
-app.use(cors());
+const originWhitelist = API_CORS_ORIGINS_WHITELIST.split(",");
+app.use(cors({ origin: originWhitelist, credentials: true }));
 
 // Set up logging
 app.use(logger("short"));

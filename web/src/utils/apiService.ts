@@ -23,3 +23,9 @@ export const getConfig = async () => {
   }
   return response.json();
 };
+
+export const helpaApiWithCredentialsFetcher = (url: string) => {
+  return fetch(`${API_URL}${url}`, { credentials: "include" }).then((data) =>
+    data.json()
+  );
+};

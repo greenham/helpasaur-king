@@ -5,18 +5,24 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient();
+import useUser from "./hooks/useUser";
+const UserContext = React.createContext({});
 
-class App extends React.Component {
-  render() {
-    return (
+interface AppProps {}
+const App: React.FunctionComponent<AppProps> = () => {
+  // Check for logged-in user
+  const { data: user, isLoading: userLoading, isError: userError } = useUser();
+
+  return (
+    <UserContext.Provider value={{ user, userLoading, userError }}>
       <QueryClientProvider client={queryClient}>
         <ScrollRestoration />
         <TopNav />
         <Outlet />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-    );
-  }
-}
+    </UserContext.Provider>
+  );
+};
 
 export default App;

@@ -11,9 +11,8 @@ const clientId = "w81l1hairuptw4izjeg5m5ol4g2lel";
 const redirectUri = encodeURIComponent(
   "https://api-dev.helpasaur.com/auth/twitch"
 );
-const claims = JSON.stringify({
-  id_token: { preferred_username: null, picture: null, email_verified: null },
-});
+const scope = "";
+const twitchLoginUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
 
 const resources = [
   {
@@ -98,10 +97,7 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
-              <Nav.Link
-                href={`https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid&claims=${claims}`}
-                rel="noopener,noreferrer"
-              >
+              <Nav.Link href={twitchLoginUrl} rel="noopener,noreferrer">
                 <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
               </Nav.Link>
             </Nav>
