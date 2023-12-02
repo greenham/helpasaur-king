@@ -6,21 +6,19 @@ import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
-import { Dropdown } from "react-bootstrap";
 import { Image } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { UserContext } from "../contexts/user";
 import { UserContextType } from "../types/users";
-
-const clientId = "w81l1hairuptw4izjeg5m5ol4g2lel";
-const redirectUri = encodeURIComponent(
-  "https://api-dev.helpasaur.com/auth/twitch"
+const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID;
+const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
+  String(process.env.TWITCH_APP_OAUTH_REDIRECT_URL)
 );
-const logoutUrl = "https://api-dev.helpasaur.com/auth/logout";
-const scope = "";
-const twitchLoginUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+const API_LOGOUT_URL = process.env.API_LOGOUT_URL;
 
-const resources = [
+const TWITCH_LOGIN_URL = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`;
+
+const RESOURCES = [
   {
     href: "https://alttp-wiki.net/index.php/Main_Page",
     target: "_blank",
@@ -128,7 +126,7 @@ function TopNav() {
                 }
                 id="resources-dropdown"
               >
-                {resources.map((resource, index) =>
+                {RESOURCES.map((resource, index) =>
                   resource.divider ? (
                     <NavDropdown.Divider key={index} />
                   ) : (
@@ -162,7 +160,7 @@ function TopNav() {
                     id="user-dropdown"
                   >
                     <NavDropdown.Item
-                      href={logoutUrl}
+                      href={API_LOGOUT_URL}
                       rel="noopener,noreferrer"
                     >
                       <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log Out
@@ -170,7 +168,7 @@ function TopNav() {
                   </NavDropdown>
                 </Navbar.Text>
               ) : (
-                <Nav.Link href={twitchLoginUrl} rel="noopener,noreferrer">
+                <Nav.Link href={TWITCH_LOGIN_URL} rel="noopener,noreferrer">
                   <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
                 </Nav.Link>
               )}
