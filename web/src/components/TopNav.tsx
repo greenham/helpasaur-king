@@ -7,6 +7,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 import { Button } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { Image } from "react-bootstrap";
 import { Dropdown } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
