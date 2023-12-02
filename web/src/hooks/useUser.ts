@@ -1,18 +1,13 @@
-import { helpaApiWithCredentialsFetcher } from "../utils/apiService";
+import { helpaApiFetcher } from "../utils/apiService";
 import useSWR from "swr";
-//import { Command } from "../types/commands";
+import { UserContextType } from "../types/users";
 
 const useUser = () => {
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading }: UserContextType = useSWR(
     `/me`,
-    helpaApiWithCredentialsFetcher
+    helpaApiFetcher
   );
-  const user: any = data || [];
-  return {
-    data: user,
-    isLoading,
-    isError: error,
-  };
+  return { data, error, isLoading };
 };
 
 export default useUser;
