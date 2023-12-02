@@ -130,12 +130,9 @@ router.get(`/twitch`, async (req, res) => {
 
 router.get(`/logout`, async (req, res) => {
   // Clear cookies
-  res.cookie(TWITCH_JWT_HEADER_COOKIE_NAME, null, {
-    expires: Date.now() - ms("1y"),
-  });
-  res.cookie(TWITCH_JWT_FOOTER_COOKIE_NAME, null, {
-    expires: Date.now() - ms("1y"),
-  });
+  res.cookie(TWITCH_JWT_HEADER_COOKIE_NAME, "");
+  res.cookie(TWITCH_JWT_FOOTER_COOKIE_NAME, "");
+
   // Redirect to client
   res.redirect(CLIENT_POST_AUTH_REDIRECT_URL);
 });
