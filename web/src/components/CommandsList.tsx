@@ -110,7 +110,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               <Card.Title>
                 <LinkifyText text={c.response} />
               </Card.Title>
-              <Card.Text>
+              <Card.Text as="div">
                 <CommandAliasesStack aliases={c.aliases} />
               </Card.Text>
             </Card.Body>
