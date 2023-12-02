@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
@@ -11,14 +10,13 @@ import { Image } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { UserContext } from "../contexts/user";
 import { UserContextType } from "../types/users";
+
 const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID;
 const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
   String(process.env.TWITCH_APP_OAUTH_REDIRECT_URL)
 );
 const API_LOGOUT_URL = process.env.API_LOGOUT_URL;
-
 const TWITCH_LOGIN_URL = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`;
-
 const RESOURCES = [
   {
     href: "https://alttp-wiki.net/index.php/Main_Page",
@@ -56,7 +54,7 @@ const RESOURCES = [
     target: "_blank",
     rel: "noopener,noreferrer",
     icon: "fa-brands fa-discord",
-    text: "Discord",
+    text: "ALttP Discord",
   },
 ];
 
@@ -72,8 +70,7 @@ const popover = (
 
 function TopNav() {
   const userContext = React.useContext(UserContext) as UserContextType;
-  const { data: user, isLoading: userLoading, error: userError } = userContext;
-  const navigate = useNavigate();
+  const { data: user } = userContext;
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
 
   return (
@@ -85,8 +82,8 @@ function TopNav() {
               <img
                 alt=""
                 src={logo}
-                width="30"
-                height="30"
+                width="32"
+                height="32"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
