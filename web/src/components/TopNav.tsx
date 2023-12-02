@@ -1,16 +1,22 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
+import { Dropdown } from "react-bootstrap";
+import { Image } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import { UserContext } from "../contexts/user";
+import { UserContextType } from "../types/users";
 
 const clientId = "w81l1hairuptw4izjeg5m5ol4g2lel";
 const redirectUri = encodeURIComponent(
   "https://api-dev.helpasaur.com/auth/twitch"
 );
+const logoutUrl = "https://api-dev.helpasaur.com/auth/logout";
 const scope = "";
 const twitchLoginUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
 
@@ -66,6 +72,9 @@ const popover = (
 );
 
 function TopNav() {
+  const userContext = React.useContext(UserContext) as UserContextType;
+  const { data: user, isLoading: userLoading, error: userError } = userContext;
+  const navigate = useNavigate();
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
 
   return (
@@ -97,11 +106,20 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
-              <Nav.Link href={twitchLoginUrl} rel="noopener,noreferrer">
-                <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
+              <Nav.Link
+                href="https://twitch.tv/helpasaurking"
+                target="_blank"
+                rel="noopener,noreferrer"
+              >
+                <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
               </Nav.Link>
-            </Nav>
-            <Nav className="justify-content-end">
+              <Nav.Link
+                href="https://github.com/greenham/helpasaur-king"
+                target="_blank"
+                rel="noopener,noreferrer"
+              >
+                <i className="fa-brands fa-github"></i>&nbsp;&nbsp;GitHub
+              </Nav.Link>
               <NavDropdown
                 title={
                   <>
@@ -126,20 +144,36 @@ function TopNav() {
                   )
                 )}
               </NavDropdown>
-              <Nav.Link
-                href="https://twitch.tv/helpasaurking"
-                target="_blank"
-                rel="noopener,noreferrer"
-              >
-                <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
-              </Nav.Link>
-              <Nav.Link
-                href="https://github.com/greenham/helpasaur-king"
-                target="_blank"
-                rel="noopener,noreferrer"
-              >
-                <i className="fa-brands fa-github"></i>&nbsp;&nbsp;GitHub
-              </Nav.Link>
+            </Nav>
+            <Nav className="justify-content-end">
+              {user ? (
+                <Navbar.Text>
+                  <NavDropdown
+                    title={
+                      <Image
+                        src={user.twitchUserData.profile_image_url}
+                        roundedCircle
+                        className="bg-light ml-3"
+                        alt={"Logged in as " + user.twitchUserData.display_name}
+                        width={36}
+                        height={36}
+                      />
+                    }
+                    id="user-dropdown"
+                  >
+                    <NavDropdown.Item
+                      href={logoutUrl}
+                      rel="noopener,noreferrer"
+                    >
+                      <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log Out
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                </Navbar.Text>
+              ) : (
+                <Nav.Link href={twitchLoginUrl} rel="noopener,noreferrer">
+                  <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
+                </Nav.Link>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>

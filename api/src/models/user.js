@@ -36,23 +36,18 @@ const userSchema = new mongoose.Schema({
     auth: {
       access_token: {
         type: String,
-        required: true,
       },
-      expires_in: {
+      expires_at: {
         type: Number,
-        required: true,
       },
       refresh_token: {
         type: String,
-        required: true,
       },
       scope: {
         type: [String],
-        required: true,
       },
       token_type: {
         type: String,
-        required: true,
       },
     },
   },

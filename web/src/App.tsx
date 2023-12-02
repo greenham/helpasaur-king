@@ -6,15 +6,12 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient();
 import useUser from "./hooks/useUser";
-const UserContext = React.createContext({});
+import { UserContext } from "./contexts/user";
 
 interface AppProps {}
 const App: React.FunctionComponent<AppProps> = () => {
-  // Check for logged-in user
-  const { data: user, isLoading: userLoading, isError: userError } = useUser();
-
   return (
-    <UserContext.Provider value={{ user, userLoading, userError }}>
+    <UserContext.Provider value={}>
       <QueryClientProvider client={queryClient}>
         <ScrollRestoration />
         <TopNav />
