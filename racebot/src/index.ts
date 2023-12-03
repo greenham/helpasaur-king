@@ -156,7 +156,7 @@ const scheduleWeeklyRace = () => {
               const { message: chatMessage } = raceChatMessage;
 
               console.log(
-                `${weeklyRaceRoomSlug} | <${chatMessage.user}>: ${chatMessage.message}`
+                `${weeklyRaceRoomSlug} | <${chatMessage.user?.name}>: ${chatMessage.message}`
               );
 
               // @TODO: Respond to the usual prefixed commands
