@@ -79,7 +79,7 @@ services:
       context: ./twitch
       target: ${TARGET}
     volumes:
-      - ./twitch:/src
+      - ./twitch/src:/app/src
     restart: on-failure
     environment:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
