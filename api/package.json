@@ -1,11 +1,11 @@
 {
   "name": "helpa-api",
   "version": "1.1.0",
-  "main": "index.js",
+  "main": "./src/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node .",
-    "start:dev": "nodemon ."
+    "start": "node ./src/index",
+    "start:dev": "nodemon ./src"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -15,6 +15,6 @@
     "node-twitch": "^0.4.7"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.2"
   }
 }

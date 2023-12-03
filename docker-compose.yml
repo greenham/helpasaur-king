@@ -39,7 +39,7 @@ services:
       context: ./api
       target: ${TARGET}
     volumes:
-      - ./api:/src
+      - ./api/src:/app/src
     restart: on-failure
     ports:
       - ${API_SERVER_EXTERNAL_PORT}:3001
