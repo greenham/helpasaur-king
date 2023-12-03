@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  api-server:
+    volumes:
+      - ./api/src:/app/src
+
+  discord-bot:
+    volumes:
+      - ./discord/src:/app/src
+
+  twitch-bot:
+    volumes:
+      - ./twitch/src:/app/src
+
+  web:
+    volumes:
+      - ./web/src:/app/src
+
+  runnerwatcher:
+    volumes:
+      - ./runnerwatcher/src:/app/src
+
+  racebot:
+    volumes:
+      - ./racebot/src:/app/src
+
+  ws-relay:
+    volumes:
+      - ./ws-relay/src:/app/src
