@@ -130,7 +130,7 @@ services:
       context: ./runnerwatcher
       target: ${TARGET}
     volumes:
-      - ./runnerwatcher:/src
+      - ./runnerwatcher/src:/app/src
     restart: on-failure
     ports:
       - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002

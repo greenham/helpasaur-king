@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { io } = require("socket.io-client");
 const RunnerWatcher = require("./lib/runner-watcher");
-const packageJson = require("./package.json");
+const packageJson = require("../package.json");
 
 const { API_URL, API_KEY, WEBSOCKET_RELAY_SERVER } = process.env;
 
