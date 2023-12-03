@@ -39,7 +39,6 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
       </h1>
 
       <h2>Stream alerts management</h2>
-      <h2>Commands management</h2>
       <h2>Twitch bot user management</h2>
       <h2>User management</h2>
       <h2>Command logs</h2>

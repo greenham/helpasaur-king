@@ -17,10 +17,11 @@ import { Command } from "../types/commands";
 
 interface CommandsListProps {
   commands: Command[];
+  userCanEdit: boolean;
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
-  const { commands } = props;
+  const { commands, userCanEdit } = props;
 
   // Set up searching
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,6 +44,19 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     const filteredCommands = filterCommands(commands, debouncedSearchQuery);
     return setSearchResults(filteredCommands);
   }, [debouncedSearchQuery]);
+
+  const [editCommandModalActive, setEditCommandModalActive] = useState(false);
+  const hideEditCommandModal = () => setEditCommandModalActive(false);
+  const showEditCommandModal = () => setEditCommandModalActive(true);
+
+  const [commandToEdit, setCommandToEdit] = useState<Command>({
+    _id: "",
+    command: "",
+    response: "",
+    aliases: [],
+    enabled: true,
+    category: "",
+  });
 
   return (
     <>
@@ -126,6 +140,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
             <tr>
               <th className="text-end w-25">Command</th>
               <th className="w-75">Response</th>
+              {userCanEdit && <th></th>}
             </tr>
           </thead>
           <tbody>
@@ -141,12 +156,66 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                       <LinkifyText text={c.response} />
                     </div>
                   </td>
+                  {userCanEdit && (
+                    <td>
+                      <Button
+                        variant="dark"
+                        onClick={() => {
+                          setCommandToEdit(c);
+                          showEditCommandModal();
+                        }}
+                      >
+                        <i className="fa-regular fa-pen-to-square"></i>
+                      </Button>
+                      <Button variant="dark">
+                        <i className="fa-regular fa-trash-can"></i>
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
           </tbody>
         </Table>
       )}
+
+      {/* <span className="text-secondary"></span> */}
+      <Modal show={editCommandModalActive} onHide={hideEditCommandModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {`Editing: ${commandToEdit.command}` || "New Command"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <FloatingLabel
+            controlId="commandName"
+            label="Command name"
+            className="mb-3"
+          >
+            <Form.Control
+              type="text"
+              placeholder="obaeb"
+              value={commandToEdit.command}
+            />
+          </FloatingLabel>
+          <FloatingLabel controlId="commandResponse" label="Response">
+            <Form.Control
+              as="textarea"
+              placeholder="Stop! Don't shoot fire stick in space canoe! Cause explosive decompression! You can crush me but you can't crush my spirit! Why, those are the Grunka-Lunkas! They work here in the Slurm factory. If rubbin' frozen dirt in your crotch is wrong, hey I don't wanna be right."
+              style={{ height: "200px" }}
+              value={commandToEdit.response}
+            />
+          </FloatingLabel>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={hideEditCommandModal}>
+            Close
+          </Button>
+          <Button variant="dark" onClick={hideEditCommandModal}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

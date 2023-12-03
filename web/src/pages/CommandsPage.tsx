@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Container, Spinner } from "react-bootstrap";
 import { getCommands } from "../utils/apiService";
+import { UserContext } from "../contexts/user";
+import { UserContextType } from "../types/users";
 import CommandsList from "../components/CommandsList";
 import { sortCommandsAlpha } from "../utils/utils";
 
@@ -12,6 +14,9 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
   useEffect(() => {
     document.title = "Commands | Helpasaur King";
   }, []);
+
+  const userContext = React.useContext(UserContext) as UserContextType;
+  const { data: user } = userContext;
 
   const query = useQuery({ queryKey: ["commands"], queryFn: getCommands });
   const {
@@ -42,7 +47,10 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       )}
 
       {!commandsError && !commandsLoading && (
-        <CommandsList commands={sortCommandsAlpha(commands)} />
+        <CommandsList
+          commands={sortCommandsAlpha(commands)}
+          userCanEdit={user ? user.permissions.includes("admin") : false}
+        />
       )}
     </Container>
   );
