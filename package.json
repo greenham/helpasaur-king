@@ -5,9 +5,11 @@
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "build": "docker compose build",
+    "start": "docker compose up -d",
+    "stop": "docker compose down",
     "start:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
     "start:dev:logs": "yarn start:dev && yarn logs",
-    "start": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
+    "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "logs": "docker compose logs -f --tail 1000"
   },
   "author": "https://github.com/greenham",
