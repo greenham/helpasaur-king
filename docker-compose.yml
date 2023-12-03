@@ -61,7 +61,7 @@ services:
       context: ./discord
       target: ${TARGET}
     volumes:
-      - ./discord:/src
+      - ./discord/src:/app/src
     restart: on-failure
     environment:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
