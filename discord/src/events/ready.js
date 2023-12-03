@@ -4,7 +4,7 @@ const { io } = require("socket.io-client");
 const { WEBSOCKET_RELAY_SERVER } = process.env;
 const STREAM_ONLINE_EVENT = "stream.online";
 const CHANNEL_UPDATE_EVENT = "channel.update";
-const packageJson = require("../package.json");
+const packageJson = require("../../package.json");
 
 // @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304";
