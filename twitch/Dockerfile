@@ -12,4 +12,5 @@ CMD ["yarn", "start:dev"]
 FROM base as prod
 ENV NODE_ENV=production
 RUN yarn install --production
+COPY src /app/src
 CMD ["yarn", "start"]

@@ -5,7 +5,7 @@
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "build": "docker compose build",
-    "start:dev": "docker compose up -d",
+    "start:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
     "start:dev:logs": "yarn start:dev && yarn logs",
     "start": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "logs": "docker compose logs -f --tail 1000"

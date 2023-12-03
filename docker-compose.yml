@@ -38,8 +38,6 @@ services:
     build:
       context: ./api
       target: ${TARGET}
-    volumes:
-      - ./api/src:/app/src
     restart: on-failure
     ports:
       - ${API_SERVER_EXTERNAL_PORT}:3001
@@ -60,8 +58,6 @@ services:
     build:
       context: ./discord
       target: ${TARGET}
-    volumes:
-      - ./discord/src:/app/src
     restart: on-failure
     environment:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
@@ -78,8 +74,6 @@ services:
     build:
       context: ./twitch
       target: ${TARGET}
-    volumes:
-      - ./twitch/src:/app/src
     restart: on-failure
     environment:
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
@@ -97,8 +91,9 @@ services:
       target: ${TARGET}
       args:
         API_URL: ${API_URL}
-    volumes:
-      - ./web/src:/app/src
+        API_LOGOUT_URL: ${API_LOGOUT_URL}
+        TWITCH_APP_CLIENT_ID: ${TWITCH_APP_CLIENT_ID}
+        TWITCH_APP_OAUTH_REDIRECT_URL: ${TWITCH_APP_OAUTH_REDIRECT_URL}
     restart: on-failure
     ports:
       - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
@@ -129,8 +124,6 @@ services:
     build:
       context: ./runnerwatcher
       target: ${TARGET}
-    volumes:
-      - ./runnerwatcher/src:/app/src
     restart: on-failure
     ports:
       - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002
@@ -152,8 +145,6 @@ services:
     build:
       context: ./racebot
       target: ${TARGET}
-    volumes:
-      - ./racebot/src:/app/src
     restart: on-failure
     environment:
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
@@ -172,8 +163,6 @@ services:
     build:
       context: ./ws-relay
       target: ${TARGET}
-    volumes:
-      - ./ws-relay/src:/app/src
     restart: on-failure
     ports:
       - ${WEBSOCKET_RELAY_SERVER_PORT}:${WEBSOCKET_RELAY_SERVER_PORT}
