@@ -1,21 +1,23 @@
 {
   "name": "helpa-discord",
   "version": "2.0.0",
-  "main": "index.js",
+  "main": "./src/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node .",
+    "start": "node ./src/index.js",
     "start:dev": "nodemon ."
   },
   "dependencies": {
-    "@discordjs/rest": "^1.1.0",
     "axios": "^1.6.0",
     "axios-retry": "^3.8.1",
-    "discord.js": "^14.3.0",
+    "discord.js": "^14.14.1",
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.5.4"
   },
+  "resolutions": {
+    "@vladfrangu/async_event_emitter": "2.2.2"
+  },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.2"
   }
 }
