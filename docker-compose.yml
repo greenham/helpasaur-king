@@ -173,7 +173,7 @@ services:
       context: ./ws-relay
       target: ${TARGET}
     volumes:
-      - ./ws-relay:/src
+      - ./ws-relay/src:/app/src
     restart: on-failure
     ports:
       - ${WEBSOCKET_RELAY_SERVER_PORT}:${WEBSOCKET_RELAY_SERVER_PORT}
