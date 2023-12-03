@@ -170,7 +170,6 @@ services:
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
     networks:
       - int
-      - ext
 
 volumes:
   mongodb_data_container:
