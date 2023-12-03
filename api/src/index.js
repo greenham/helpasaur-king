@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 const routes = require("./routes");
 const { MONGODB_URL, PORT, API_CORS_ORIGINS_WHITELIST } = process.env;
 
@@ -24,6 +25,7 @@ app.use(cors({ origin: originWhitelist, credentials: true }));
 // Set up logging
 app.use(logger("short"));
 
+app.use(cookieParser());
 app.use(routes);
 
 app.listen(PORT, () => {

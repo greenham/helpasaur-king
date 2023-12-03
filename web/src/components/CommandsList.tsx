@@ -49,14 +49,36 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const hideEditCommandModal = () => setEditCommandModalActive(false);
   const showEditCommandModal = () => setEditCommandModalActive(true);
 
-  const [commandToEdit, setCommandToEdit] = useState<Command>({
-    _id: "",
-    command: "",
-    response: "",
-    aliases: [],
-    enabled: true,
-    category: "",
-  });
+  const getFreshCommand = (): Command => {
+    return {
+      _id: "",
+      command: "",
+      response: "",
+      aliases: [],
+      enabled: true,
+      category: "",
+    };
+  };
+  const [commandToEdit, setCommandToEdit] = useState<Command>(
+    getFreshCommand()
+  );
+  const [commandToEditPristine, setCommandToEditPristine] = useState<Command>(
+    getFreshCommand()
+  );
+
+  const saveCommandToEdit = () => {
+    if (commandToEdit._id !== "") {
+      // editing command
+      if (commandToEdit === commandToEditPristine) {
+        // nothing to do here
+        return;
+      }
+
+      // call API service to update command
+    } else {
+      // call API service to create new command
+    }
+  };
 
   return (
     <>
@@ -162,6 +184,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                         variant="dark"
                         onClick={() => {
                           setCommandToEdit(c);
+                          setCommandToEditPristine(c);
                           showEditCommandModal();
                         }}
                       >
@@ -179,7 +202,6 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Table>
       )}
 
-      {/* <span className="text-secondary"></span> */}
       <Modal show={editCommandModalActive} onHide={hideEditCommandModal}>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -211,7 +233,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           <Button variant="primary" onClick={hideEditCommandModal}>
             Close
           </Button>
-          <Button variant="dark" onClick={hideEditCommandModal}>
+          <Button variant="dark" onClick={saveCommandToEdit}>
             Save Changes
           </Button>
         </Modal.Footer>
