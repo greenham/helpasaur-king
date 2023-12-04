@@ -187,6 +187,8 @@ function init(config) {
       cachedCommand = false;
     }
 
+    console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
+
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
@@ -241,7 +243,7 @@ function init(config) {
     // Place command on cooldown
     cooldowns.set(cooldownKey, Date.now());
 
-    console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
+    // console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
 
     // Determine if the original command or an alias was used
     let aliasUsed = "";
