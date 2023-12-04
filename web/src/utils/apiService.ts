@@ -23,7 +23,3 @@ export const getConfig = async () => {
   }
   return response.json();
 };
-
-export const getCommands = () => {
-  return fetch(`${API_URL}/commands`).then((data) => data.json());
-};
