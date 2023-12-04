@@ -25,7 +25,7 @@ export const getConfig = async () => {
 };
 
 export const getCurrentUser = async () => {
-  const response = await fetch(`${API_URL}/me`);
+  const response = await fetch(`${API_URL}/me`, { credentials: "include" });
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
