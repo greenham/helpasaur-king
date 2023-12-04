@@ -7,7 +7,7 @@ export const getCommands = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return await response.json();
+  return response.json();
 };
 
 export const getLivestreams = async () => {
@@ -15,7 +15,7 @@ export const getLivestreams = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return await response.json();
+  return response.json();
 };
 
 export const getConfig = async () => {
@@ -23,7 +23,7 @@ export const getConfig = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return await response.json();
+  return response.json();
 };
 
 export const getCurrentUser = async () => {
@@ -31,7 +31,7 @@ export const getCurrentUser = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return await response.json();
+  return response.json();
 };
 
 export const createCommand = async (command: Command) => {
@@ -41,7 +41,7 @@ export const createCommand = async (command: Command) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
   });
-  return await response.json();
+  return response.json();
 };
 
 export const updateCommand = async (command: Command) => {
@@ -51,5 +51,5 @@ export const updateCommand = async (command: Command) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
   });
-  return await response.json();
+  return response.json();
 };

@@ -18,12 +18,15 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
   const userContext = React.useContext(UserContext) as UserContextType;
   const { data: user } = userContext;
 
-  const query = useQuery({ queryKey: ["commands"], queryFn: getCommands });
+  const commandsQuery = useQuery({
+    queryKey: ["commands"],
+    queryFn: getCommands,
+  });
   const {
     data: commands,
     isError: commandsError,
     isLoading: commandsLoading,
-  } = query;
+  } = commandsQuery;
 
   if (commandsError) {
     return <Alert variant="danger">{commandsError}</Alert>;

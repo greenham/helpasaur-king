@@ -17,6 +17,7 @@ import LinkifyText from "./LinkifyText";
 import { Command } from "../types/commands";
 import { createCommand, updateCommand } from "../utils/apiService";
 import CommandFormModal from "./CommandFormModal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CommandsListProps {
   commands: Command[];
@@ -61,19 +62,28 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     category: "",
   });
 
+  const queryClient = useQueryClient();
+
+  // Mutations
+  const updateCommandMutation = useMutation({
+    mutationFn: updateCommand,
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["commands"] });
+    },
+  });
+
   const saveCommand = async (command: Command) => {
     if (command._id !== "") {
-      setSearchResults(
-        commands.map((c) => (c._id === command._id ? { ...c, ...command } : c))
-      );
-      // call API service to update command
-      await updateCommand(command);
+      updateCommandMutation.mutate(command);
     } else {
       // call API service to create new command
-      await createCommand(command);
+      // await createCommand(command);
     }
     hideEditCommandModal();
   };
+
+  ////////////////////
 
   return (
     <>
