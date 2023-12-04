@@ -23,3 +23,11 @@ export const getConfig = async () => {
   }
   return response.json();
 };
+
+export const getCurrentUser = async () => {
+  const response = await fetch(`${API_URL}/me`);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
