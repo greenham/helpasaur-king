@@ -46,7 +46,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   };
 
   useEffect(() => {
-    setSearchResults(commands);
+    setSearchResults(filterCommands(commands, debouncedSearchQuery));
   }, [commands]);
 
   useEffect(() => {
