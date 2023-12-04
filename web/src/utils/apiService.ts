@@ -1,13 +1,25 @@
 const API_URL = process.env.API_URL;
 
-export const getCommands = () => {
-  return fetch(`${API_URL}/commands`).then((data) => data.json());
+export const getCommands = async () => {
+  const response = await fetch(`${API_URL}/commands`);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
 };
 
-export const getLivestreams = () => {
-  return fetch(`${API_URL}/streams/live`).then((data) => data.json());
+export const getLivestreams = async () => {
+  const response = await fetch(`${API_URL}/streams/live`);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
 };
 
-export const getConfig = () => {
-  return fetch(`${API_URL}/web/config`).then((data) => data.json());
+export const getConfig = async () => {
+  const response = await fetch(`${API_URL}/web/config`);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
 };
