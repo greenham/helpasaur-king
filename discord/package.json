@@ -14,9 +14,6 @@
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.5.4"
   },
-  "resolutions": {
-    "@vladfrangu/async_event_emitter": "2.2.2"
-  },
   "devDependencies": {
     "nodemon": "^3.0.2"
   }
