@@ -4,6 +4,7 @@ import { useDebounce } from "use-debounce";
 import {
   Alert,
   Badge,
+  Button,
   Card,
   Col,
   Form,
@@ -16,7 +17,6 @@ import LinkifyText from "./LinkifyText";
 import { Command } from "../types/commands";
 import { createCommand, updateCommand } from "../utils/apiService";
 import CommandFormModal from "./CommandFormModal";
-import { useSWRConfig } from "swr";
 
 interface CommandsListProps {
   commands: Command[];
@@ -25,7 +25,6 @@ interface CommandsListProps {
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const { commands, userCanEdit } = props;
-  const { mutate } = useSWRConfig();
 
   // Set up searching
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,7 +71,6 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     } else {
       // call API service to create new command
       await createCommand(command);
-      mutate("/commands");
     }
     hideEditCommandModal();
   };

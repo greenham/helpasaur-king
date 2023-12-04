@@ -7,7 +7,7 @@ export const getCommands = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return response.json();
+  return await response.json();
 };
 
 export const getLivestreams = async () => {
@@ -15,7 +15,7 @@ export const getLivestreams = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return response.json();
+  return await response.json();
 };
 
 export const getConfig = async () => {
@@ -23,7 +23,7 @@ export const getConfig = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return response.json();
+  return await response.json();
 };
 
 export const getCurrentUser = async () => {
@@ -31,29 +31,25 @@ export const getCurrentUser = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return response.json();
+  return await response.json();
 };
 
-export const helpaApiWithCredentialsFetcher = (url: string) => {
-  return fetch(`${API_URL}${url}`, { credentials: "include" }).then((data) =>
-    data.json()
-  );
-};
-
-export const createCommand = (command: Command) => {
-  return fetch(`${API_URL}/commands`, {
+export const createCommand = async (command: Command) => {
+  const response = await fetch(`${API_URL}/commands`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
-  }).then((data) => data.json());
+  });
+  return await response.json();
 };
 
-export const updateCommand = (command: Command) => {
-  return fetch(`${API_URL}/commands/${command._id}`, {
+export const updateCommand = async (command: Command) => {
+  const response = await fetch(`${API_URL}/commands/${command._id}`, {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
-  }).then((data) => data.json());
+  });
+  return await response.json();
 };
