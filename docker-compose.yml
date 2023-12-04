@@ -34,7 +34,7 @@ services:
       - ext
 
   api-server:
-    image: helpa-api:${TARGET}
+    image: thenotoriouspig/helpa-api:${TARGET}
     build:
       context: ./api
       target: ${TARGET}
@@ -54,7 +54,7 @@ services:
       - ext
 
   discord-bot:
-    image: helpa-discord:${TARGET}
+    image: thenotoriouspig/helpa-discord:${TARGET}
     build:
       context: ./discord
       target: ${TARGET}
@@ -70,7 +70,7 @@ services:
       - ext
 
   twitch-bot:
-    image: helpa-twitch:${TARGET}
+    image: thenotoriouspig/helpa-twitch:${TARGET}
     build:
       context: ./twitch
       target: ${TARGET}
@@ -85,7 +85,7 @@ services:
       - ext
 
   web:
-    image: helpa-web:${TARGET}
+    image: thenotoriouspig/helpa-web:${TARGET}
     build:
       context: ./web
       target: ${TARGET}
@@ -120,7 +120,7 @@ services:
       - ext
 
   runnerwatcher:
-    image: helpa-runnerwatcher:${TARGET}
+    image: thenotoriouspig/helpa-runnerwatcher:${TARGET}
     build:
       context: ./runnerwatcher
       target: ${TARGET}
@@ -141,7 +141,7 @@ services:
       - ext
 
   racebot:
-    image: helpa-racebot:${TARGET}
+    image: thenotoriouspig/helpa-racebot:${TARGET}
     build:
       context: ./racebot
       target: ${TARGET}
@@ -159,7 +159,7 @@ services:
       - ext
 
   ws-relay:
-    image: helpa-ws-relay:${TARGET}
+    image: thenotoriouspig/helpa-ws-relay:${TARGET}
     build:
       context: ./ws-relay
       target: ${TARGET}
