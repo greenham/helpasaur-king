@@ -19,7 +19,7 @@ export const filterStreams = (
   streams: TwitchStream[],
   config: StreamAlertsConfig
 ) => {
-  if (streams.length > 0) {
+  if (streams && streams.length > 0) {
     const { blacklistedUsers, channels, statusFilters } = config;
     const speedrunTester = new RegExp(statusFilters, "i");
     const alertUserIds = channels.map((c) => c.id);
