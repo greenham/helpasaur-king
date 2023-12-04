@@ -1,10 +1,10 @@
 import * as React from "react";
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Alert, Container, Spinner } from "react-bootstrap";
 import { getCommands } from "../utils/apiService";
 import CommandsList from "../components/CommandsList";
 import { sortCommandsAlpha } from "../utils/utils";
-import { useQuery } from "@tanstack/react-query";
 
 interface CommandsPageProps {}
 
