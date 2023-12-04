@@ -15,13 +15,14 @@ import {
 } from "react-bootstrap";
 import LinkifyText from "./LinkifyText";
 import { Command } from "../types/commands";
-import { createCommand, updateCommand } from "../utils/apiService";
 import CommandFormModal from "./CommandFormModal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+// import { createCommand, updateCommand } from "../utils/apiService";
+// import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CommandsListProps {
   commands: Command[];
   userCanEdit: boolean;
+  updateCommand: (c: Command) => void;
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
@@ -30,7 +31,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   // Set up searching
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-  const [searchResults, setSearchResults] = useState<Array<Command>>(commands);
+  const [searchResults, setSearchResults] = useState<Array<Command>>([]);
   const filterCommands = (commandsToFilter: Command[], query: string) => {
     if (query.length === 0) return commandsToFilter;
 
@@ -43,6 +44,10 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         c.response.toLowerCase().includes(query.toLowerCase())
     );
   };
+
+  useEffect(() => {
+    setSearchResults(commands);
+  }, [commands]);
 
   useEffect(() => {
     const filteredCommands = filterCommands(commands, debouncedSearchQuery);
@@ -62,20 +67,20 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     category: "",
   });
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
-  // Mutations
-  const updateCommandMutation = useMutation({
-    mutationFn: updateCommand,
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["commands"] });
-    },
-  });
+  // // Mutations
+  // const updateCommandMutation = useMutation({
+  //   mutationFn: updateCommand,
+  //   onSuccess: () => {
+  //     // Invalidate and refetch
+  //     queryClient.invalidateQueries({ queryKey: ["commands"] });
+  //   },
+  // });
 
   const saveCommand = async (command: Command) => {
     if (command._id !== "") {
-      updateCommandMutation.mutate(command);
+      props.updateCommand(command);
     } else {
       // call API service to create new command
       // await createCommand(command);
