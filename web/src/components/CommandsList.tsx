@@ -16,13 +16,12 @@ import {
 import LinkifyText from "./LinkifyText";
 import { Command } from "../types/commands";
 import CommandFormModal from "./CommandFormModal";
-// import { createCommand, updateCommand } from "../utils/apiService";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CommandsListProps {
   commands: Command[];
   userCanEdit: boolean;
   updateCommand: (c: Command) => void;
+  createCommand: (c: Command) => void;
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
@@ -67,28 +66,14 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     category: "",
   });
 
-  // const queryClient = useQueryClient();
-
-  // // Mutations
-  // const updateCommandMutation = useMutation({
-  //   mutationFn: updateCommand,
-  //   onSuccess: () => {
-  //     // Invalidate and refetch
-  //     queryClient.invalidateQueries({ queryKey: ["commands"] });
-  //   },
-  // });
-
   const saveCommand = async (command: Command) => {
     if (command._id !== "") {
       props.updateCommand(command);
     } else {
-      // call API service to create new command
-      // await createCommand(command);
+      props.createCommand(command);
     }
     hideEditCommandModal();
   };
-
-  ////////////////////
 
   return (
     <>

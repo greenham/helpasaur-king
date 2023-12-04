@@ -35,6 +35,9 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
   const handleUpdateCommand = (command: Command) => {
     updateCommandMutation.mutate(command);
   };
+  const handleCreateCommand = (command: Command) => {
+    createCommandMutation.mutate(command);
+  };
 
   // Mutations
   const updateCommandMutation = useMutation({
@@ -52,6 +55,40 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       queryClient.setQueryData(["commands"], (old: Command[]) =>
         old.map((c) => (c._id !== updatedCommand._id ? c : updatedCommand))
       );
+
+      // Return a context object with the snapshotted value
+      return { previousCommands: previousCommands };
+    },
+    // If the mutation fails,
+    // use the context returned from onMutate to roll back
+    onError: (err, newTodo, context) => {
+      queryClient.setQueryData(
+        ["commands"],
+        context ? context.previousCommands : []
+      );
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["commands"] });
+    },
+  });
+
+  const createCommandMutation = useMutation({
+    mutationFn: createCommand,
+    // When mutate is called:
+    onMutate: async (newCommand) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ["commands"] });
+
+      // Snapshot the previous value
+      const previousCommands = queryClient.getQueryData(["commands"]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["commands"], (old: Command[]) => [
+        ...old,
+        newCommand,
+      ]);
 
       // Return a context object with the snapshotted value
       return { previousCommands: previousCommands };
@@ -96,6 +133,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
           commands={sortCommandsAlpha(commands)}
           userCanEdit={user ? user.permissions.includes("admin") : false}
           updateCommand={handleUpdateCommand}
+          createCommand={handleCreateCommand}
         />
       )}
     </Container>
