@@ -1,4 +1,5 @@
 const { expressjwt: jwt } = require("express-jwt");
+const User = require("../models/user");
 const {
   API_KEY,
   JWT_SECRET_KEY,
@@ -29,7 +30,22 @@ const requireJwtToken = jwt({
   },
 });
 
+const userHasPermission = async (req, res, next) => {
+  if (!req.auth || !req.auth.sub) return res.sendStatus(401);
+
+  try {
+    const user = await User.findById(req.auth.sub);
+    if (!user || !user.permissions?.includes("admin"))
+      return res.sendStatus(401);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+
+  next();
+};
+
 module.exports = {
   requireAuthKey,
   requireJwtToken,
+  userHasPermission,
 };

@@ -50,7 +50,7 @@ export const createCommand = (command: Command) => {
 };
 
 export const updateCommand = (command: Command) => {
-  return fetch(`${API_URL}/commands`, {
+  return fetch(`${API_URL}/commands/${command._id}`, {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

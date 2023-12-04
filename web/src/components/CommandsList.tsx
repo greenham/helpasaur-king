@@ -14,6 +14,9 @@ import {
 } from "react-bootstrap";
 import LinkifyText from "./LinkifyText";
 import { Command } from "../types/commands";
+import { createCommand, updateCommand } from "../utils/apiService";
+import CommandFormModal from "./CommandFormModal";
+import { useSWRConfig } from "swr";
 
 interface CommandsListProps {
   commands: Command[];
@@ -22,6 +25,7 @@ interface CommandsListProps {
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const { commands, userCanEdit } = props;
+  const { mutate } = useSWRConfig();
 
   // Set up searching
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,42 +53,35 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const hideEditCommandModal = () => setEditCommandModalActive(false);
   const showEditCommandModal = () => setEditCommandModalActive(true);
 
-  const getFreshCommand = (): Command => {
-    return {
-      _id: "",
-      command: "",
-      response: "",
-      aliases: [],
-      enabled: true,
-      category: "",
-    };
-  };
-  const [commandToEdit, setCommandToEdit] = useState<Command>(
-    getFreshCommand()
-  );
-  const [commandToEditPristine, setCommandToEditPristine] = useState<Command>(
-    getFreshCommand()
-  );
+  const [commandToEdit, setCommandToEdit] = useState<Command>({
+    _id: "",
+    command: "",
+    response: "",
+    aliases: [],
+    enabled: true,
+    category: "",
+  });
 
-  const saveCommandToEdit = () => {
-    if (commandToEdit._id !== "") {
-      // editing command
-      if (commandToEdit === commandToEditPristine) {
-        // nothing to do here
-        return;
-      }
-
+  const saveCommand = async (command: Command) => {
+    if (command._id !== "") {
+      setSearchResults(
+        commands.map((c) => (c._id === command._id ? { ...c, ...command } : c))
+      );
       // call API service to update command
+      await updateCommand(command);
     } else {
       // call API service to create new command
+      await createCommand(command);
+      mutate("/commands");
     }
+    hideEditCommandModal();
   };
 
   return (
     <>
       <Row
         className="sticky-top my-5 justify-content-center"
-        style={{ top: "56px" }}
+        style={{ top: "80px" }}
       >
         <Col xl={6}>
           <InputGroup className="border border-primary border-2 rounded">
@@ -184,7 +181,6 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                         variant="dark"
                         onClick={() => {
                           setCommandToEdit(c);
-                          setCommandToEditPristine(c);
                           showEditCommandModal();
                         }}
                       >
@@ -202,42 +198,14 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Table>
       )}
 
-      <Modal show={editCommandModalActive} onHide={hideEditCommandModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {`Editing: ${commandToEdit.command}` || "New Command"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <FloatingLabel
-            controlId="commandName"
-            label="Command name"
-            className="mb-3"
-          >
-            <Form.Control
-              type="text"
-              placeholder="obaeb"
-              value={commandToEdit.command}
-            />
-          </FloatingLabel>
-          <FloatingLabel controlId="commandResponse" label="Response">
-            <Form.Control
-              as="textarea"
-              placeholder="Stop! Don't shoot fire stick in space canoe! Cause explosive decompression! You can crush me but you can't crush my spirit! Why, those are the Grunka-Lunkas! They work here in the Slurm factory. If rubbin' frozen dirt in your crotch is wrong, hey I don't wanna be right."
-              style={{ height: "200px" }}
-              value={commandToEdit.response}
-            />
-          </FloatingLabel>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={hideEditCommandModal}>
-            Close
-          </Button>
-          <Button variant="dark" onClick={saveCommandToEdit}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {editCommandModalActive && (
+        <CommandFormModal
+          command={commandToEdit}
+          show={editCommandModalActive}
+          onHide={hideEditCommandModal}
+          onSubmit={saveCommand}
+        />
+      )}
     </>
   );
 };

@@ -2,7 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Command = require("../../models/command");
 const CommandLog = require("../../models/commandLog");
-const { requireAuthKey, requireJwtToken } = require("../../lib/utils");
+const {
+  requireAuthKey,
+  requireJwtToken,
+  userHasPermission,
+} = require("../../lib/utils");
 
 // Endpoint: /commands
 
@@ -40,11 +44,7 @@ router.post("/find", async (req, res) => {
 });
 
 // POST / -> create new command
-router.post("/", requireJwtToken, async (req, res) => {
-  if (!req.auth.permissions.includes("admin")) {
-    res.status(401).json({ message: "Not authorized" });
-  }
-
+router.post("/", requireJwtToken, userHasPermission, async (req, res) => {
   try {
     const command = await Command.create(req.body);
     res.status(201).json(command);
@@ -54,21 +54,26 @@ router.post("/", requireJwtToken, async (req, res) => {
 });
 
 // PATCH /:id -> update command
-router.patch("/:id", requireJwtToken, async (req, res) => {
-  if (!req.auth.permissions.includes("admin")) {
-    res.status(401).json({ message: "Not authorized" });
-  }
-
+router.patch("/:id", requireJwtToken, userHasPermission, async (req, res) => {
   try {
     const command = await Command.findById(req.params.id);
-    res.status(201).json(command);
+    if (!command) {
+      return res.sendStatus(404);
+    }
+
+    for (key in req.body) {
+      command[key] = req.body[key];
+    }
+    await command.save();
+
+    res.status(200).json(command);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
 // DELETE /:id -> "delete" command by ID
-router.delete("/:id", requireJwtToken, async (req, res) => {
+router.delete("/:id", requireJwtToken, userHasPermission, async (req, res) => {
   try {
     const command = await Command.findById(req.params.id);
     res.status(200).json(command);
