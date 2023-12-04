@@ -49,10 +49,9 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       const previousCommands = queryClient.getQueryData(["commands"]);
 
       // Optimistically update to the new value
-      queryClient.setQueryData(["commands"], (old: Command[]) => [
-        ...old,
-        updatedCommand,
-      ]);
+      queryClient.setQueryData(["commands"], (old: Command[]) =>
+        old.map((c) => (c._id !== updatedCommand._id ? c : updatedCommand))
+      );
 
       // Return a context object with the snapshotted value
       return { previousCommands: previousCommands };
