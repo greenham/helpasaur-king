@@ -56,15 +56,15 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const [editCommandModalActive, setEditCommandModalActive] = useState(false);
   const hideEditCommandModal = () => setEditCommandModalActive(false);
   const showEditCommandModal = () => setEditCommandModalActive(true);
-
-  const [commandToEdit, setCommandToEdit] = useState<Command>({
+  const freshCommand = {
     _id: "",
     command: "",
     response: "",
     aliases: [],
     enabled: true,
     category: "",
-  });
+  };
+  const [commandToEdit, setCommandToEdit] = useState<Command>(freshCommand);
 
   const saveCommand = async (command: Command) => {
     if (command._id !== "") {
@@ -73,6 +73,11 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
       props.createCommand(command);
     }
     hideEditCommandModal();
+  };
+
+  const handleNewCommandClick = () => {
+    setCommandToEdit(freshCommand);
+    showEditCommandModal();
   };
 
   return (
@@ -131,6 +136,12 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           {searchResults.length} command
           {searchResults.length !== 1 ? "s" : ""} found.
         </Alert>
+      )}
+
+      {userCanEdit && (
+        <Button onClick={handleNewCommandClick} variant="dark">
+          Add a new command
+        </Button>
       )}
 
       <Stack gap={5} className="d-xl-none">

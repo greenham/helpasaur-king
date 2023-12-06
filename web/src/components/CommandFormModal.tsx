@@ -33,7 +33,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>
-          {`Editing: ${command.command}` || "New Command"}
+          {command._id ? `Editing: ${command.command}` : "New Command"}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>

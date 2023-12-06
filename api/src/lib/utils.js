@@ -30,6 +30,7 @@ const requireJwtToken = jwt({
   },
 });
 
+// @TODO: Allow passing of permissions instead of hardcoding
 const userHasPermission = async (req, res, next) => {
   if (!req.auth || !req.auth.sub) return res.sendStatus(401);
 

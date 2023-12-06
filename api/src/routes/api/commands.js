@@ -46,6 +46,7 @@ router.post("/find", async (req, res) => {
 // POST / -> create new command
 router.post("/", requireJwtToken, userHasPermission, async (req, res) => {
   try {
+    delete req.body._id;
     const command = await Command.create(req.body);
     res.status(201).json(command);
   } catch (err) {

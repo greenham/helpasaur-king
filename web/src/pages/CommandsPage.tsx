@@ -40,6 +40,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
   };
 
   // Mutations
+  // @TODO: DRY this out
   const updateCommandMutation = useMutation({
     mutationFn: updateCommand,
     // When mutate is called:
@@ -95,7 +96,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, newTodo, context) => {
+    onError: (err, newCommand, context) => {
       queryClient.setQueryData(
         ["commands"],
         context ? context.previousCommands : []
