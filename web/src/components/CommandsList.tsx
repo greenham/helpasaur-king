@@ -1,15 +1,17 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
-import Alert from "react-bootstrap/Alert";
-import Badge from "react-bootstrap/Badge";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import Stack from "react-bootstrap/Stack";
-import Card from "react-bootstrap/Card";
-import Table from "react-bootstrap/Table";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import {
+  Alert,
+  Badge,
+  Card,
+  Col,
+  Form,
+  InputGroup,
+  Row,
+  Stack,
+  Table,
+} from "react-bootstrap";
 import LinkifyText from "./LinkifyText";
 import { Command } from "../types/commands";
 

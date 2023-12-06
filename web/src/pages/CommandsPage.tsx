@@ -1,9 +1,8 @@
 import * as React from "react";
 import { useEffect } from "react";
-import Alert from "react-bootstrap/Alert";
-import Container from "react-bootstrap/Container";
-import Spinner from "react-bootstrap/Spinner";
-import useCommands from "../hooks/useCommands";
+import { useQuery } from "@tanstack/react-query";
+import { Alert, Container, Spinner } from "react-bootstrap";
+import { getCommands } from "../utils/apiService";
 import CommandsList from "../components/CommandsList";
 import { sortCommandsAlpha } from "../utils/utils";
 
@@ -14,12 +13,12 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
     document.title = "Commands | Helpasaur King";
   }, []);
 
-  // Fetch all commands
+  const query = useQuery({ queryKey: ["commands"], queryFn: getCommands });
   const {
     data: commands,
-    isLoading: commandsLoading,
     isError: commandsError,
-  } = useCommands();
+    isLoading: commandsLoading,
+  } = query;
 
   if (commandsError) {
     return <Alert variant="danger">{commandsError}</Alert>;
