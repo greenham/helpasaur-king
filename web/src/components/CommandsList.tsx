@@ -132,6 +132,16 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Col>
       </Row>
 
+      {userCanEdit && (
+        <Button
+          onClick={handleNewCommandClick}
+          variant="primary"
+          className="mb-3"
+        >
+          <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
+        </Button>
+      )}
+
       {searchResults.length === 0 && (
         <Alert>
           No results found
@@ -151,16 +161,6 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           {searchResults.length} command
           {searchResults.length !== 1 ? "s" : ""} found.
         </Alert>
-      )}
-
-      {userCanEdit && (
-        <Button
-          onClick={handleNewCommandClick}
-          variant="primary"
-          className="mb-3"
-        >
-          <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
-        </Button>
       )}
 
       <Stack gap={5} className="d-xl-none">
