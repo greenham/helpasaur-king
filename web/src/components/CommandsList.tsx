@@ -159,7 +159,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           variant="primary"
           className="mb-3"
         >
-          Add a new command
+          <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
         </Button>
       )}
 
@@ -277,7 +277,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               Cancel
             </Button>
             <Button variant="danger" onClick={handleDeleteConfirm}>
-              Confirm Delete
+              <i className="fa-solid fa-delete-left px-1"></i> Confirm Delete
             </Button>
           </Modal.Footer>
         </Modal>

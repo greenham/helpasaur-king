@@ -66,7 +66,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
           Close
         </Button>
         <Button variant="dark" onClick={handleSubmit}>
-          Save Changes
+          <i className="fa-regular fa-floppy-disk px-1"></i> Save Changes
         </Button>
       </Modal.Footer>
     </Modal>
