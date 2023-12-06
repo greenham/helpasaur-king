@@ -75,7 +75,11 @@ function TopNav() {
 
   return (
     <>
-      <Navbar expand="lg" bg="primary" sticky="top">
+      <Navbar
+        expand="lg"
+        bg={process.env.NODE_ENV === "production" ? "primary" : "info"}
+        sticky="top"
+      >
         <Container>
           <OverlayTrigger placement="bottom" overlay={popover}>
             <Navbar.Brand>
