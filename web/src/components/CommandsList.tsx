@@ -9,6 +9,7 @@ import {
   Col,
   Form,
   InputGroup,
+  Modal,
   Row,
   Stack,
   Table,
@@ -22,6 +23,7 @@ interface CommandsListProps {
   userCanEdit: boolean;
   updateCommand: (c: Command) => void;
   createCommand: (c: Command) => void;
+  deleteCommand: (c: Command) => void;
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
@@ -53,9 +55,6 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     return setSearchResults(filteredCommands);
   }, [debouncedSearchQuery]);
 
-  const [editCommandModalActive, setEditCommandModalActive] = useState(false);
-  const hideEditCommandModal = () => setEditCommandModalActive(false);
-  const showEditCommandModal = () => setEditCommandModalActive(true);
   const freshCommand = {
     _id: "",
     command: "",
@@ -64,7 +63,16 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     enabled: true,
     category: "",
   };
+  const [editCommandModalActive, setEditCommandModalActive] = useState(false);
+  const hideEditCommandModal = () => setEditCommandModalActive(false);
+  const showEditCommandModal = () => setEditCommandModalActive(true);
   const [commandToEdit, setCommandToEdit] = useState<Command>(freshCommand);
+
+  const [deleteCommandModalActive, setDeleteCommandModalActive] =
+    useState(false);
+  const hideDeleteCommandModal = () => setDeleteCommandModalActive(false);
+  const showDeleteCommandModal = () => setDeleteCommandModalActive(true);
+  const [commandToDelete, setCommandToDelete] = useState<Command>(freshCommand);
 
   const saveCommand = async (command: Command) => {
     if (command._id !== "") {
@@ -73,6 +81,13 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
       props.createCommand(command);
     }
     hideEditCommandModal();
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (commandToDelete._id !== "") {
+      props.deleteCommand(commandToDelete);
+    }
+    hideDeleteCommandModal();
   };
 
   const handleNewCommandClick = () => {
@@ -139,7 +154,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
       )}
 
       {userCanEdit && (
-        <Button onClick={handleNewCommandClick} variant="dark">
+        <Button onClick={handleNewCommandClick} variant="primary">
           Add a new command
         </Button>
       )}
@@ -195,7 +210,13 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                       >
                         <i className="fa-regular fa-pen-to-square"></i>
                       </Button>
-                      <Button variant="dark">
+                      <Button
+                        variant="dark"
+                        onClick={() => {
+                          setCommandToDelete(c);
+                          showDeleteCommandModal();
+                        }}
+                      >
                         <i className="fa-regular fa-trash-can"></i>
                       </Button>
                     </td>
@@ -214,6 +235,27 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           onHide={hideEditCommandModal}
           onSubmit={saveCommand}
         />
+      )}
+      {deleteCommandModalActive && (
+        <Modal show={deleteCommandModalActive} onHide={hideDeleteCommandModal}>
+          <Modal.Header closeButton>
+            <Modal.Title></Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Alert variant="danger">
+              Are you sure you want to delete{" "}
+              <strong>{commandToDelete.command}</strong>?
+            </Alert>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={hideDeleteCommandModal}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleDeleteConfirm}>
+              Confirm Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
       )}
     </>
   );

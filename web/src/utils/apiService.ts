@@ -53,3 +53,13 @@ export const updateCommand = async (command: Command) => {
   });
   return response.json();
 };
+
+export const deleteCommand = async (command: Command) => {
+  const response = await fetch(`${API_URL}/commands/${command._id}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(command),
+  });
+  return response.json();
+};

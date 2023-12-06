@@ -76,7 +76,7 @@ router.patch("/:id", requireJwtToken, userHasPermission, async (req, res) => {
 // DELETE /:id -> "delete" command by ID
 router.delete("/:id", requireJwtToken, userHasPermission, async (req, res) => {
   try {
-    const command = await Command.findById(req.params.id);
+    const command = await Command.deleteOne({ _id: req.params.id });
     res.status(200).json(command);
   } catch (err) {
     res.status(500).json({ message: err.message });

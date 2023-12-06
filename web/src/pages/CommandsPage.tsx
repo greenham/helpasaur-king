@@ -1,14 +1,18 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert, Container, Spinner } from "react-bootstrap";
-import { getCommands } from "../utils/apiService";
 import { UserContext } from "../contexts/user";
 import { UserContextType } from "../types/users";
 import CommandsList from "../components/CommandsList";
 import { sortCommandsAlpha } from "../utils/utils";
-import { createCommand, updateCommand } from "../utils/apiService";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getCommands,
+  createCommand,
+  updateCommand,
+  deleteCommand,
+} from "../utils/apiService";
 import { Command } from "../types/commands";
 
 interface CommandsPageProps {}
@@ -37,6 +41,9 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
   };
   const handleCreateCommand = (command: Command) => {
     createCommandMutation.mutate(command);
+  };
+  const handleDeleteCommand = (command: Command) => {
+    deleteCommandMutation.mutate(command);
   };
 
   // Mutations
@@ -108,6 +115,39 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
     },
   });
 
+  const deleteCommandMutation = useMutation({
+    mutationFn: deleteCommand,
+    // When mutate is called:
+    onMutate: async (deletedCommand) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ["commands"] });
+
+      // Snapshot the previous value
+      const previousCommands = queryClient.getQueryData(["commands"]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["commands"], (old: Command[]) =>
+        old.filter((c) => c._id !== deletedCommand._id)
+      );
+
+      // Return a context object with the snapshotted value
+      return { previousCommands: previousCommands };
+    },
+    // If the mutation fails,
+    // use the context returned from onMutate to roll back
+    onError: (err, deletedCommand, context) => {
+      queryClient.setQueryData(
+        ["commands"],
+        context ? context.previousCommands : []
+      );
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["commands"] });
+    },
+  });
+
   if (commandsError) {
     return <Alert variant="danger">{commandsError}</Alert>;
   }
@@ -135,6 +175,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
           userCanEdit={user ? user.permissions.includes("admin") : false}
           updateCommand={handleUpdateCommand}
           createCommand={handleCreateCommand}
+          deleteCommand={handleDeleteCommand}
         />
       )}
     </Container>
