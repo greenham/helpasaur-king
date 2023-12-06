@@ -1,7 +1,6 @@
 {
   "name": "helpasaur-king",
   "version": "1.0.0",
-  "main": "index.js",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "build": "docker compose build",
@@ -11,7 +10,8 @@
     "start:dev:logs": "yarn start:dev && yarn logs",
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "logs": "docker compose logs -f --tail 1000",
-    "push:images": "docker compose push --ignore-push-failures"
+    "push:images": "docker compose push --ignore-push-failures",
+    "boom:dev": "yarn build && yarn start:dev --force-recreate && yarn logs"
   },
   "author": "https://github.com/greenham",
   "license": "MIT"
