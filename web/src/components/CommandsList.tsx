@@ -169,25 +169,29 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
             <Card.Header>
               <Stack direction="horizontal">
                 <code className="fs-3">{c.command}</code>
-                <Button
-                  onClick={() => {
-                    setCommandToEdit(c);
-                    showEditCommandModal();
-                  }}
-                  className="ms-auto"
-                  variant="dark"
-                >
-                  <i className="fa-regular fa-pen-to-square"></i>
-                </Button>
-                <Button
-                  variant="dark"
-                  onClick={() => {
-                    setCommandToDelete(c);
-                    showDeleteCommandModal();
-                  }}
-                >
-                  <i className="fa-regular fa-trash-can"></i>
-                </Button>
+                {userCanEdit && (
+                  <>
+                    <Button
+                      onClick={() => {
+                        setCommandToEdit(c);
+                        showEditCommandModal();
+                      }}
+                      className="ms-auto"
+                      variant="dark"
+                    >
+                      <i className="fa-regular fa-pen-to-square"></i>
+                    </Button>
+                    <Button
+                      variant="dark"
+                      onClick={() => {
+                        setCommandToDelete(c);
+                        showDeleteCommandModal();
+                      }}
+                    >
+                      <i className="fa-regular fa-trash-can"></i>
+                    </Button>
+                  </>
+                )}
               </Stack>
             </Card.Header>
             <Card.Body>
