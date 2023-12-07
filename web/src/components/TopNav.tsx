@@ -106,15 +106,13 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
+              <LinkContainer to="twitch">
+                <Nav.Link>
+                  <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
+                </Nav.Link>
+              </LinkContainer>
             </Nav>
             <Nav>
-              <Nav.Link
-                href="https://twitch.tv/helpasaurking"
-                target="_blank"
-                rel="noopener,noreferrer"
-              >
-                <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
-              </Nav.Link>
               <Nav.Link
                 href="https://github.com/greenham/helpasaur-king"
                 target="_blank"
