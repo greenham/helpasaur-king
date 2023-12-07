@@ -28,24 +28,24 @@ const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
   const streamsQuery = useQuery({
     queryKey: ["livestreams"],
     queryFn: getLivestreams,
+    refetchInterval: 1000 * 60,
   });
   const {
     data: allStreams,
     isError: streamsError,
     isLoading: streamsLoading,
+    isFetching: streamsFetching,
   } = streamsQuery;
 
-  const [filteredStreams, setFilteredStreams] = useState<FilteredStreams>({
-    featured: [],
-    other: [],
-  });
   const [mergedStreams, setMergedStreams] = useState<Array<TwitchStream>>([]);
 
   useEffect(() => {
-    const filteredStreams = filterStreams(allStreams, webConfig);
-    setFilteredStreams(filteredStreams);
+    const filteredStreams: FilteredStreams = filterStreams(
+      allStreams,
+      webConfig
+    );
     setMergedStreams(filteredStreams.featured.concat(filteredStreams.other));
-  }, [streamsLoading]);
+  }, [allStreams]);
 
   if (configError || streamsError) {
     return (
@@ -62,7 +62,7 @@ const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
         <small>
           <Badge bg="info">
             <i className="fa-solid fa-tower-broadcast"></i>{" "}
-            {streamsLoading ? (
+            {streamsLoading || streamsFetching ? (
               <Spinner animation="border" size="sm" />
             ) : (
               mergedStreams.length
@@ -80,7 +80,7 @@ const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
       )}
 
       {!configLoading && !configError && !streamsLoading && !streamsError && (
-        <LivestreamsList streams={mergedStreams} config={webConfig} />
+        <LivestreamsList streams={mergedStreams} />
       )}
     </Container>
   );
