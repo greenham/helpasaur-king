@@ -26,6 +26,14 @@ app.use(logger("short"));
 
 app.use(routes);
 
+app.use(function (err, req, res, next) {
+  if (err.name === "UnauthorizedError") {
+    res.status(401).json({ error: err.name + ": " + err.message });
+  } else {
+    next(err);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Helpasaur API Server Started at ${PORT}`);
 });
