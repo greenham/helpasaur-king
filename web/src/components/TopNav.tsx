@@ -65,7 +65,7 @@ function TopNav() {
     <>
       <Navbar
         expand="lg"
-        bg={process.env.NODE_ENV === "production" ? "primary" : "info"}
+        bg={process.env.NODE_ENV === "production" ? "dark" : "primary"}
         sticky="top"
       >
         <Container>
