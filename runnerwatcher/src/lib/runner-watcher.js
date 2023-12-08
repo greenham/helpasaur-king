@@ -9,7 +9,7 @@ const {
   STREAM_ONLINE_TYPE_LIVE,
 } = require("../constants");
 const DELAY_FOR_API_SECONDS = 10;
-const ALERT_DELAY_SECONDS = 10 * 60;
+const ALERT_DELAY_SECONDS = 15 * 60;
 
 // Maintain a cache of streams we've recently alerted
 let cachedStreams = [];
