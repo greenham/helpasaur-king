@@ -12,7 +12,7 @@ const DELAY_FOR_API_SECONDS = 10;
 const ALERT_DELAY_SECONDS = 10 * 60;
 
 // Maintain a cache of streams we've recently alerted
-let streams = [];
+let cachedStreams = [];
 
 class RunnerWatcher extends EventEmitter {
   constructor(config) {
@@ -110,9 +110,11 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // See if this user has a stream in the cache already
-      let cachedStream = streams.find((s) => s.user_id == stream.user_id);
+      let cachedStream = cachedStreams.find((s) => s.user_id == stream.user_id);
       console.log(
-        cachedStream ? `Found stream in cache for ${user.login}!` : ``
+        cachedStream
+          ? `Found stream in cache for ${user.login}`
+          : `No stream found in cache for ${user.login}`
       );
 
       // Make sure it's been long enough since the last alert
@@ -175,11 +177,11 @@ class RunnerWatcher extends EventEmitter {
       this.emit("streamEvent", stream);
 
       // Remove any cached stream data for this user
-      streams = streams.filter((s) => s.user_id == stream.user_id);
+      cachedStreams = cachedStreams.filter((s) => s.user_id !== stream.user_id);
 
       // Cache it
       stream.lastAlertedAt = Date.now();
-      streams.push(stream);
+      cachedStreams.push(stream);
     } catch (err) {
       console.error(err);
     }
