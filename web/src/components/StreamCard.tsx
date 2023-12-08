@@ -30,7 +30,9 @@ function StreamCard(props: StreamCardProps) {
           rel="noopener noreferrer"
           className="py-3"
         >
-          <i className="fa-regular fa-user"></i> {stream.user_name}
+          <h5>
+            <i className="fa-regular fa-user"></i> {stream.user_name}
+          </h5>
         </Button>
       </Card.Header>
       <a
