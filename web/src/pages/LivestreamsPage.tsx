@@ -14,10 +14,6 @@ interface FilteredStreams {
 }
 
 const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
-  useEffect(() => {
-    document.title = "ALttP Streams | Helpasaur King";
-  }, []);
-
   const configQuery = useQuery({ queryKey: ["config"], queryFn: getConfig });
   const {
     data: webConfig,
@@ -46,6 +42,10 @@ const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
     );
     setMergedStreams(filteredStreams.featured.concat(filteredStreams.other));
   }, [allStreams]);
+
+  useEffect(() => {
+    document.title = `(${mergedStreams.length}) ALttP Streams | Helpasaur King`;
+  }, [mergedStreams]);
 
   if (configError || streamsError) {
     return (
