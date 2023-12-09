@@ -147,29 +147,27 @@ function TopNav() {
             </Nav>
             <Nav className="justify-content-end">
               {user ? (
-                <Navbar.Text>
-                  <NavDropdown
-                    title={
-                      <Image
-                        src={user.twitchUserData.profile_image_url}
-                        roundedCircle
-                        className="bg-dark ml-3"
-                        alt={"Logged in as " + user.twitchUserData.display_name}
-                        width={32}
-                        height={32}
-                      />
-                    }
-                    id="user-dropdown"
+                <NavDropdown
+                  title={
+                    <Image
+                      src={user.twitchUserData.profile_image_url}
+                      roundedCircle
+                      className="bg-dark ml-3"
+                      alt={"Logged in as " + user.twitchUserData.display_name}
+                      width={32}
+                      height={32}
+                    />
+                  }
+                  id="user-dropdown"
+                >
+                  <NavDropdown.Item
+                    href={API_LOGOUT_URL}
+                    rel="noopener,noreferrer"
                   >
-                    <NavDropdown.Item
-                      href={API_LOGOUT_URL}
-                      rel="noopener,noreferrer"
-                    >
-                      <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                      &nbsp;&nbsp;Log Out
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                </Navbar.Text>
+                    <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                    &nbsp;&nbsp;Log Out
+                  </NavDropdown.Item>
+                </NavDropdown>
               ) : (
                 <Nav.Link href={TWITCH_LOGIN_URL} rel="noopener,noreferrer">
                   <Button variant="primary">
