@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Container } from "react-bootstrap";
+import { Alert, Button, Container } from "react-bootstrap";
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserContext } from "../contexts/user";
@@ -10,6 +10,7 @@ import {
   leaveTwitchChannel,
 } from "../utils/apiService";
 import { useToast } from "../hooks/useToast";
+import { getTwitchLoginUrl } from "../utils/utils";
 
 interface TwitchBotPageProps {}
 
@@ -55,7 +56,22 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
         <i className="fa-solid fa-robot"></i> Twitch Bot{" "}
       </h1>
       <hr />
-      {!user && <span>You're not logged in!</span>}
+      {!user && (
+        <Alert>
+          <a href={getTwitchLoginUrl()} rel="noopener,noreferrer">
+            Log in with your Twitch account
+          </a>{" "}
+          to manage the bot right here, or{" "}
+          <a
+            href="https://twitch.tv/helpasaurking"
+            target="_blank"
+            rel="noopener,noreferrer"
+          >
+            go to the bot's Twitch chat
+          </a>{" "}
+          and send <code>!join</code> or <code>!leave</code>.
+        </Alert>
+      )}
       {user && (
         <TwitchUserBotManagement
           user={user}

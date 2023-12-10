@@ -10,13 +10,8 @@ import { Image } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { UserContext } from "../contexts/user";
 import { UserContextType } from "../types/users";
+import { getTwitchLoginUrl } from "../utils/utils";
 
-const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID;
-const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
-  String(process.env.TWITCH_APP_OAUTH_REDIRECT_URL)
-);
-const API_LOGOUT_URL = process.env.API_LOGOUT_URL;
-const TWITCH_LOGIN_URL = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`;
 const RESOURCES = [
   {
     href: "https://alttp-wiki.net/index.php/Main_Page",
@@ -157,7 +152,7 @@ function TopNav() {
                   id="user-dropdown"
                 >
                   <NavDropdown.Item
-                    href={API_LOGOUT_URL}
+                    href={process.env.API_LOGOUT_URL}
                     rel="noopener,noreferrer"
                   >
                     <i className="fa-solid fa-arrow-right-from-bracket"></i>
@@ -165,7 +160,7 @@ function TopNav() {
                   </NavDropdown.Item>
                 </NavDropdown>
               ) : (
-                <Nav.Link href={TWITCH_LOGIN_URL} rel="noopener,noreferrer">
+                <Nav.Link href={getTwitchLoginUrl()} rel="noopener,noreferrer">
                   <Button variant="primary">
                     <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
                   </Button>
