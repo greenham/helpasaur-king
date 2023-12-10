@@ -1,5 +1,4 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const { requireAuthKey, requireJwtToken } = require("../../lib/utils");
 const router = express.Router();
 const User = require("../../models/user");
@@ -18,7 +17,6 @@ router.use("/configs", requireAuthKey, require("./configs"));
 router.use("/streamAlerts", requireAuthKey, require("./stream-alerts"));
 
 // User Endpoints
-router.use(cookieParser());
 router.get("/me", requireJwtToken, async (req, res) => {
   try {
     const user = await User.findById(req.auth.sub);

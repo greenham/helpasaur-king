@@ -3,6 +3,7 @@ const cors = require("cors");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const { io } = require("socket.io-client");
+const cookieParser = require("cookie-parser");
 const routes = require("./routes");
 const {
   MONGODB_URL,
@@ -40,14 +41,20 @@ wsRelay.on("connect", () => {
 
 const app = express();
 
+// Only allow requests from whitelisted origins
 const originWhitelist = API_CORS_ORIGINS_WHITELIST.split(",");
 app.use(cors({ origin: originWhitelist, credentials: true }));
 
 // Set up logging
 app.use(logger("short"));
 
+// Allow the app to use the websocket relay
 app.wsRelay = wsRelay;
 
+// Use cookie-parser
+app.use(cookieParser());
+
+// Set up routes
 app.use(routes);
 
 app.use(function (err, req, res, next) {

@@ -12,29 +12,17 @@ const DefaultToastContainer: React.FunctionComponent<
 > = (props) => {
   const { toasts } = props;
   return (
-    <div
-      aria-live="polite"
-      aria-atomic="true"
-      className="position-relative"
-      style={{
-        position: "fixed",
-        top: "80px",
-        right: "40px",
-        zIndex: 1,
-      }}
-    >
-      <ToastContainer position="top-end">
-        {toasts &&
-          toasts.map((toast) => (
-            <DefaultToast
-              key={toast.id}
-              id={toast.id}
-              variant={toast.variant}
-              message={toast.message}
-            />
-          ))}
-      </ToastContainer>
-    </div>
+    <ToastContainer position="bottom-start" className="position-fixed p-3">
+      {toasts &&
+        toasts.map((toast) => (
+          <DefaultToast
+            key={toast.id}
+            id={toast.id}
+            variant={toast.variant}
+            message={toast.message}
+          />
+        ))}
+    </ToastContainer>
   );
 };
 

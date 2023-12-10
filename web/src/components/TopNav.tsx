@@ -104,6 +104,14 @@ function TopNav() {
                   <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
                 </Nav.Link>
               </LinkContainer>
+              {user && user.permissions.includes("admin") && (
+                <LinkContainer to="admin">
+                  <Nav.Link>
+                    <i className="fa-solid fa-user-tie"></i>&nbsp;&nbsp;Admin
+                    Panel
+                  </Nav.Link>
+                </LinkContainer>
+              )}
             </Nav>
             <Nav>
               <Nav.Link
