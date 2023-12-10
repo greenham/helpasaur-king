@@ -295,10 +295,10 @@ function init(config) {
     }
 
     client.join(channel);
-    // client.say(
-    //   channel,
-    //   "Hello, I'm Helpasaur King and I'm very high in potassium... like a banana! Use !help to see what I can do."
-    // );
+    client.say(
+      channel,
+      "Hello, I'm Helpasaur King and I'm very high in potassium... like a banana! Use !help to see what I can do."
+    );
     channelList.push(channel);
     console.log(`Joined #${channel}`);
   });
@@ -310,10 +310,10 @@ function init(config) {
       return;
     }
 
-    // client.say(
-    //   channel,
-    //   "😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com or the bot's twitch chat using !join)"
-    // );
+    client.say(
+      channel,
+      "😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com or the bot's twitch chat using !join)"
+    );
     client.part(channel);
     channelList = channelList.filter((c) => c !== channel);
     console.log(`Left #${channel}`);
