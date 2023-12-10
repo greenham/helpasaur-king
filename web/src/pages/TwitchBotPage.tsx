@@ -72,12 +72,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
 > = (props) => {
   const { user, twitchBotConfig, handleJoinRequest, handleLeaveRequest } =
     props;
-  if (!twitchBotConfig.botHasJoined) {
+  if (!twitchBotConfig?.botHasJoined) {
     return (
       <>
         <h2>Would you like the bot to join your Twitch chat?</h2>
         <Button variant="primary" onClick={handleJoinRequest}>
-          Join my channel
+          <i className="fa-solid fa-arrow-right-to-bracket px-1"></i> Join my
+          channel
         </Button>
       </>
     );
@@ -90,7 +91,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
         HelpasaurKing.
       </h2>
       <Button variant="danger" onClick={handleLeaveRequest}>
-        Leave my channel
+        <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my channel
       </Button>
     </>
   );
