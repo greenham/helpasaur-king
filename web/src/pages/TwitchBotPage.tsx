@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { Button, Container } from "react-bootstrap";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserContext } from "../contexts/user";
 import { IUser, UserContextType } from "../types/users";
 import {
@@ -8,7 +9,6 @@ import {
   joinTwitchChannel,
   leaveTwitchChannel,
 } from "../utils/apiService";
-import { useQuery } from "@tanstack/react-query";
 
 interface TwitchBotPageProps {}
 
@@ -19,6 +19,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
 
   const userContext = React.useContext(UserContext) as UserContextType;
   const { data: user } = userContext;
+  const queryClient = useQueryClient();
 
   const {
     data: twitchBotConfig,
@@ -29,12 +30,16 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     queryFn: getTwitchBotConfig,
   });
 
-  const handleJoinRequest = () => {
-    joinTwitchChannel();
+  const handleJoinRequest = async () => {
+    // @TODO: Show toast notifications on success/failure
+    await joinTwitchChannel();
+    queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
   };
 
-  const handleLeaveRequest = () => {
-    leaveTwitchChannel();
+  const handleLeaveRequest = async () => {
+    // @TODO: Show toast notifications on success/failure
+    await leaveTwitchChannel();
+    queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
   };
 
   return (
@@ -47,7 +52,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
       {user && (
         <TwitchUserBotManagement
           user={user}
-          botHasJoined={twitchBotConfig.botHasJoined}
+          twitchBotConfig={twitchBotConfig}
           handleJoinRequest={handleJoinRequest}
           handleLeaveRequest={handleLeaveRequest}
         />
@@ -58,15 +63,16 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
 
 interface TwitchUserBotManagementProps {
   user: IUser;
-  botHasJoined: boolean;
+  twitchBotConfig: { botHasJoined: boolean };
   handleJoinRequest: () => void;
   handleLeaveRequest: () => void;
 }
 const TwitchUserBotManagement: React.FunctionComponent<
   TwitchUserBotManagementProps
 > = (props) => {
-  const { user, botHasJoined, handleJoinRequest, handleLeaveRequest } = props;
-  if (!botHasJoined) {
+  const { user, twitchBotConfig, handleJoinRequest, handleLeaveRequest } =
+    props;
+  if (!twitchBotConfig.botHasJoined) {
     return (
       <>
         <h2>Would you like the bot to join your Twitch chat?</h2>

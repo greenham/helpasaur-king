@@ -288,24 +288,25 @@ function init(config) {
 
   // listen for joinChannel and leaveChannel events from the websocket relay and handle them appropriately
   wsRelay.on("joinChannel", ({ payload: channel }) => {
-    console.log(`Received joinChannel event for ${channel}`);
+    console.log(`Received joinChannel event for: ${channel}`);
     if (channelList.includes(channel)) {
-      console.log(`Already in ${channel}`);
+      console.log(`Already in #${channel}`);
       return;
     }
 
+    client.join(channel);
     client.say(
       channel,
-      "Hello, I'm Helpasaur King and I'm very high in potassium... like a banana!"
+      "Hello, I'm Helpasaur King and I'm very high in potassium... like a banana! Use !help to see what I can do."
     );
-    client.join(channel);
     channelList.push(channel);
+    console.log(`Joined #${channel}`);
   });
 
   wsRelay.on("leaveChannel", ({ payload: channel }) => {
     console.log(`Received leaveChannel event for ${channel}`);
     if (!channelList.includes(channel)) {
-      console.log(`Not in ${channel}`);
+      console.log(`Not in #${channel}`);
       return;
     }
 
@@ -315,6 +316,7 @@ function init(config) {
     );
     client.part(channel);
     channelList = channelList.filter((c) => c !== channel);
+    console.log(`Left #${channel}`);
   });
 }
 
