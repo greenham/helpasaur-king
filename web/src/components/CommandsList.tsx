@@ -99,7 +99,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     <>
       <Row
         className="sticky-top my-5 justify-content-center"
-        style={{ top: "80px" }}
+        style={{ top: "60px" }}
       >
         <Col xl={6}>
           <InputGroup className="border border-primary border-2 rounded">

@@ -99,6 +99,11 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
+              <LinkContainer to="twitch">
+                <Nav.Link>
+                  <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
+                </Nav.Link>
+              </LinkContainer>
               {user && user.permissions.includes("admin") && (
                 <LinkContainer to="admin">
                   <Nav.Link>
@@ -107,11 +112,6 @@ function TopNav() {
                   </Nav.Link>
                 </LinkContainer>
               )}
-              <LinkContainer to="twitch">
-                <Nav.Link>
-                  <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
-                </Nav.Link>
-              </LinkContainer>
             </Nav>
             <Nav>
               <Nav.Link
