@@ -30,8 +30,8 @@ const toastVariants: ToastVariants = {
     title: "Info",
   },
   error: {
-    icon: <i className="fa-solid fa-exclamation px-1"></i>,
-    bgClass: "error",
+    icon: <i className="fa-solid fa-bug px-1"></i>,
+    bgClass: "danger",
     title: "Error!",
   },
 };
@@ -58,7 +58,7 @@ const DefaultToast: React.FunctionComponent<IToast> = (props) => {
         {toastVariant.icon}
         <strong className="me-auto">{toastVariant.title}</strong>
       </Toast.Header>
-      <Toast.Body>
+      <Toast.Body className="text-dark">
         <strong>{message}</strong>
       </Toast.Body>
     </Toast>

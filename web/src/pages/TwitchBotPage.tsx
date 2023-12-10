@@ -15,15 +15,16 @@ import { getTwitchLoginUrl } from "../utils/utils";
 interface TwitchBotPageProps {}
 
 const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
+  const toast = useToast();
+
   useEffect(() => {
     document.title = "Twitch Bot | Helpasaur King";
+    toast.error("Testing error");
   }, []);
 
   const queryClient = useQueryClient();
   const userContext = React.useContext(UserContext) as UserContextType;
   const { data: user } = userContext;
-
-  const toast = useToast();
 
   const { data: twitchBotConfig } = useQuery({
     queryKey: ["twitchBotConfig"],
@@ -36,7 +37,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
       toast.success("Successfully joined your channel!");
       queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
     } else {
-      toast.error("Unable to join your channel!");
+      toast.warning("Unable to join your channel!");
     }
   };
 
@@ -46,7 +47,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
       toast.success("Successfully left your channel!");
       queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
     } else {
-      toast.error("Unable to leave your channel!");
+      toast.warning("Unable to leave your channel!");
     }
   };
 
@@ -98,29 +99,34 @@ const TwitchUserBotManagement: React.FunctionComponent<
 
   if (!twitchBotConfig?.botHasJoined) {
     return (
-      <>
-        <h2>
-          Hello, {user.twitchUserData.display_name}!<br />
-          Would you like the bot to join your Twitch chat?
-        </h2>
-        <Button variant="primary" onClick={handleJoinRequest}>
+      <Alert variant="dark" className="p-5">
+        <h2>Would you like the bot to join your Twitch chat?</h2>
+        <p className="lead my-5">
+          Click the button below to have the bot join your Twitch chat. You can
+          request it to leave at any time from this page or from the bot's
+          Twitch chat.
+        </p>
+        <Button variant="primary" onClick={handleJoinRequest} size="lg">
           <i className="fa-solid fa-arrow-right-to-bracket px-1"></i> Join my
           channel
         </Button>
-      </>
+      </Alert>
     );
   }
 
   return (
-    <>
-      <h2>
-        Hello, {user.twitchUserData.display_name}!<br />
-        Thanks for using HelpasaurKing.
-      </h2>
-      <Button variant="danger" onClick={handleLeaveRequest}>
+    <Alert variant="dark" className="p-5">
+      <h2>Thanks for using HelpasaurKing!</h2>
+      <p className="lead my-5">
+        Eventually there will be more settings here like a custom command
+        prefix, enable/disable commands, maybe even some Twitch integrations
+        with channel points, polls, etc.
+      </p>
+      <hr />
+      <Button variant="danger" onClick={handleLeaveRequest} size="lg">
         <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my channel
       </Button>
-    </>
+    </Alert>
   );
 };
 
