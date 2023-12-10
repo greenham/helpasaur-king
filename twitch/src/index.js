@@ -1,6 +1,8 @@
 const tmi = require("tmi.js");
 const axios = require("axios");
-const { API_URL, API_KEY } = process.env;
+const { io } = require("socket.io-client");
+const { API_URL, API_KEY, WEBSOCKET_RELAY_SERVER } = process.env;
+const packageJson = require("../package.json");
 axios.defaults.headers.common["Authorization"] = API_KEY;
 let cooldowns = new Map();
 let cachedCommands = new Map();
@@ -15,6 +17,21 @@ axios
     console.error(`Error fetching config: ${err.message}`);
     // @TODO: build in retry
   });
+
+// Connect to websocket relay to communicate with other services
+const wsRelay = io(WEBSOCKET_RELAY_SERVER, {
+  query: { clientId: `${packageJson.name} v${packageJson.version}` },
+});
+console.log(
+  `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
+);
+wsRelay.on("connect_error", (err) => {
+  console.log(`Connection error!`);
+  console.log(err);
+});
+wsRelay.on("connect", () => {
+  console.log(`✅ Connected! Socket ID: ${wsRelay.id}`);
+});
 
 function init(config) {
   const {
@@ -267,6 +284,37 @@ function init(config) {
         tags,
       },
     });
+  });
+
+  // listen for joinChannel and leaveChannel events from the websocket relay and handle them appropriately
+  wsRelay.on("joinChannel", ({ payload: channel }) => {
+    console.log(`Received joinChannel event for ${channel}`);
+    if (channelList.includes(channel)) {
+      console.log(`Already in ${channel}`);
+      return;
+    }
+
+    client.say(
+      channel,
+      "Hello, I'm Helpasaur King and I'm very high in potassium... like a banana!"
+    );
+    client.join(channel);
+    channelList.push(channel);
+  });
+
+  wsRelay.on("leaveChannel", ({ payload: channel }) => {
+    console.log(`Received leaveChannel event for ${channel}`);
+    if (!channelList.includes(channel)) {
+      console.log(`Not in ${channel}`);
+      return;
+    }
+
+    client.say(
+      channel,
+      "goodbye forever (jk, have me re-join anytime through https://helpasaur.com or the bot's twitch chat using !join)"
+    );
+    client.part(channel);
+    channelList = channelList.filter((c) => c !== channel);
   });
 }
 
