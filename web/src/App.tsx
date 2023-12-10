@@ -6,7 +6,6 @@ import {
   QueryCache,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { UserProvider } from "./contexts/user";
 import { ToastProvider } from "./contexts/toasts";
 import { useToast } from "./hooks/useToast";
 import TopNav from "./components/TopNav";
@@ -27,14 +26,12 @@ const App: React.FunctionComponent<AppProps> = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <ScrollRestoration />
-        <ToastProvider>
-          <TopNav />
-          <Outlet />
-        </ToastProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </UserProvider>
+      <ScrollRestoration />
+      <ToastProvider>
+        <TopNav />
+        <Outlet />
+      </ToastProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };
