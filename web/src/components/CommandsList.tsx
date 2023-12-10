@@ -4,28 +4,35 @@ import { useDebounce } from "use-debounce";
 import {
   Alert,
   Badge,
+  Button,
   Card,
   Col,
   Form,
   InputGroup,
+  Modal,
   Row,
   Stack,
   Table,
 } from "react-bootstrap";
 import LinkifyText from "./LinkifyText";
 import { Command } from "../types/commands";
+import CommandFormModal from "./CommandFormModal";
 
 interface CommandsListProps {
   commands: Command[];
+  userCanEdit: boolean;
+  updateCommand: (c: Command) => void;
+  createCommand: (c: Command) => void;
+  deleteCommand: (c: Command) => void;
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
-  const { commands } = props;
+  const { commands, userCanEdit } = props;
 
   // Set up searching
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-  const [searchResults, setSearchResults] = useState<Array<Command>>(commands);
+  const [searchResults, setSearchResults] = useState<Array<Command>>([]);
   const filterCommands = (commandsToFilter: Command[], query: string) => {
     if (query.length === 0) return commandsToFilter;
 
@@ -40,15 +47,59 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   };
 
   useEffect(() => {
+    setSearchResults(filterCommands(commands, debouncedSearchQuery));
+  }, [commands]);
+
+  useEffect(() => {
     const filteredCommands = filterCommands(commands, debouncedSearchQuery);
     return setSearchResults(filteredCommands);
   }, [debouncedSearchQuery]);
+
+  const freshCommand = {
+    _id: "",
+    command: "",
+    response: "",
+    aliases: [],
+    enabled: true,
+    category: "",
+  };
+  const [editCommandModalActive, setEditCommandModalActive] = useState(false);
+  const hideEditCommandModal = () => setEditCommandModalActive(false);
+  const showEditCommandModal = () => setEditCommandModalActive(true);
+  const [commandToEdit, setCommandToEdit] = useState<Command>(freshCommand);
+
+  const [deleteCommandModalActive, setDeleteCommandModalActive] =
+    useState(false);
+  const hideDeleteCommandModal = () => setDeleteCommandModalActive(false);
+  const showDeleteCommandModal = () => setDeleteCommandModalActive(true);
+  const [commandToDelete, setCommandToDelete] = useState<Command>(freshCommand);
+
+  const saveCommand = async (command: Command) => {
+    if (command._id !== "") {
+      props.updateCommand(command);
+    } else {
+      props.createCommand(command);
+    }
+    hideEditCommandModal();
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (commandToDelete._id !== "") {
+      props.deleteCommand(commandToDelete);
+    }
+    hideDeleteCommandModal();
+  };
+
+  const handleNewCommandClick = () => {
+    setCommandToEdit(freshCommand);
+    showEditCommandModal();
+  };
 
   return (
     <>
       <Row
         className="sticky-top my-5 justify-content-center"
-        style={{ top: "56px" }}
+        style={{ top: "60px" }}
       >
         <Col xl={6}>
           <InputGroup className="border border-primary border-2 rounded">
@@ -81,6 +132,16 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Col>
       </Row>
 
+      {userCanEdit && (
+        <Button
+          onClick={handleNewCommandClick}
+          variant="primary"
+          className="mb-3"
+        >
+          <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
+        </Button>
+      )}
+
       {searchResults.length === 0 && (
         <Alert>
           No results found
@@ -106,7 +167,32 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         {searchResults.map((c, idx) => (
           <Card key={idx}>
             <Card.Header>
-              <code className="fs-3">{c.command}</code>
+              <Stack direction="horizontal">
+                <code className="fs-3">{c.command}</code>
+                {userCanEdit && (
+                  <>
+                    <Button
+                      onClick={() => {
+                        setCommandToEdit(c);
+                        showEditCommandModal();
+                      }}
+                      className="ms-auto"
+                      variant="dark"
+                    >
+                      <i className="fa-regular fa-pen-to-square"></i>
+                    </Button>
+                    <Button
+                      variant="dark"
+                      onClick={() => {
+                        setCommandToDelete(c);
+                        showDeleteCommandModal();
+                      }}
+                    >
+                      <i className="fa-regular fa-trash-can"></i>
+                    </Button>
+                  </>
+                )}
+              </Stack>
             </Card.Header>
             <Card.Body>
               <Card.Title>
@@ -126,6 +212,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
             <tr>
               <th className="text-end w-25">Command</th>
               <th className="w-75">Response</th>
+              {userCanEdit && <th></th>}
             </tr>
           </thead>
           <tbody>
@@ -141,11 +228,63 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                       <LinkifyText text={c.response} />
                     </div>
                   </td>
+                  {userCanEdit && (
+                    <td>
+                      <Button
+                        variant="dark"
+                        onClick={() => {
+                          setCommandToEdit(c);
+                          showEditCommandModal();
+                        }}
+                      >
+                        <i className="fa-regular fa-pen-to-square"></i>
+                      </Button>
+                      <Button
+                        variant="dark"
+                        onClick={() => {
+                          setCommandToDelete(c);
+                          showDeleteCommandModal();
+                        }}
+                      >
+                        <i className="fa-regular fa-trash-can"></i>
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
           </tbody>
         </Table>
+      )}
+
+      {editCommandModalActive && (
+        <CommandFormModal
+          command={commandToEdit}
+          show={editCommandModalActive}
+          onHide={hideEditCommandModal}
+          onSubmit={saveCommand}
+        />
+      )}
+      {deleteCommandModalActive && (
+        <Modal show={deleteCommandModalActive} onHide={hideDeleteCommandModal}>
+          <Modal.Header closeButton>
+            <Modal.Title></Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Alert variant="danger">
+              Are you sure you want to delete{" "}
+              <strong>{commandToDelete.command}</strong>?
+            </Alert>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={hideDeleteCommandModal}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleDeleteConfirm}>
+              <i className="fa-solid fa-delete-left px-1"></i> Confirm Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
       )}
     </>
   );

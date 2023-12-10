@@ -2,7 +2,12 @@ const { Server } = require("socket.io");
 const { WEBSOCKET_RELAY_SERVER_PORT } = process.env;
 
 const wss = new Server();
-const relayEvents = ["streamAlert", "weeklyRaceRoomCreated"];
+const relayEvents = [
+  "streamAlert",
+  "weeklyRaceRoomCreated",
+  "joinChannel",
+  "leaveChannel",
+];
 
 wss.on("connection", (socket) => {
   const clientId = socket.handshake.query.clientId || "Unknown";

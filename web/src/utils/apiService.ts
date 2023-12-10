@@ -1,3 +1,5 @@
+import { Command } from "../types/commands";
+
 const API_URL = process.env.API_URL;
 
 export const getCommands = async () => {
@@ -21,5 +23,75 @@ export const getConfig = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
+  return response.json();
+};
+
+export const getCurrentUser = async () => {
+  const response = await fetch(`${API_URL}/me`, { credentials: "include" });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+export const getTwitchBotConfig = async () => {
+  const response = await fetch(`${API_URL}/me/twitch`, {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+export const joinTwitchChannel = async () => {
+  const response = await fetch(`${API_URL}/me/twitch/join`, {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+export const leaveTwitchChannel = async () => {
+  const response = await fetch(`${API_URL}/me/twitch/leave`, {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+export const createCommand = async (command: Command) => {
+  const response = await fetch(`${API_URL}/commands`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(command),
+  });
+  return response.json();
+};
+
+export const updateCommand = async (command: Command) => {
+  const response = await fetch(`${API_URL}/commands/${command._id}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(command),
+  });
+  return response.json();
+};
+
+export const deleteCommand = async (command: Command) => {
+  const response = await fetch(`${API_URL}/commands/${command._id}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(command),
+  });
   return response.json();
 };
