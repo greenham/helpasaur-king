@@ -34,7 +34,6 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
   });
 
   const handleJoinRequest = async () => {
-    // @TODO: Show toast notifications on success/error
     const joinResult = await joinTwitchChannel();
     if (joinResult.result) {
       toast.success("Successfully joined your channel!");
@@ -45,7 +44,6 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
   };
 
   const handleLeaveRequest = async () => {
-    // @TODO: Show toast notifications on success/error
     const leaveResult = await leaveTwitchChannel();
     if (leaveResult.result) {
       toast.success("Successfully left your channel!");

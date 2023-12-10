@@ -27,7 +27,7 @@ export const ToastProvider: React.FunctionComponent<ToastProviderProps> = ({
 
   const addToast = (variant: string, message: string) => {
     const id = Math.floor(Math.random() * 10000000);
-    dispatch({ type: "ADD_TOAST", payload: { id, message, type: variant } });
+    dispatch({ type: "ADD_TOAST", payload: { id, message, variant } });
   };
 
   const remove = (id: number) => {
