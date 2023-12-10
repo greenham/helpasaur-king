@@ -1,8 +1,7 @@
 import * as React from "react";
 import { useEffect } from "react";
-import { UserContext } from "../contexts/user";
-import { UserContextType } from "../types/users";
 import { Alert, Container, Spinner } from "react-bootstrap";
+import { useUser } from "../hooks/useUser";
 
 interface AdminPageProps {}
 
@@ -11,8 +10,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
     document.title = "Admin Panel | Helpasaur King";
   }, []);
 
-  const userContext = React.useContext(UserContext) as UserContextType;
-  const { data: user, isLoading: userLoading } = userContext;
+  const { data: user, isLoading: userLoading } = useUser();
 
   if (userLoading)
     return (

@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert, Container, Spinner } from "react-bootstrap";
-import { UserContext } from "../contexts/user";
-import { UserContextType } from "../types/users";
 import CommandsList from "../components/CommandsList";
 import { sortCommandsAlpha } from "../utils/utils";
 import {
@@ -14,6 +12,7 @@ import {
   deleteCommand,
 } from "../utils/apiService";
 import { Command } from "../types/commands";
+import { useUser } from "../hooks/useUser";
 
 interface CommandsPageProps {}
 
@@ -22,8 +21,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
     document.title = "Commands | Helpasaur King";
   }, []);
 
-  const userContext = React.useContext(UserContext) as UserContextType;
-  const { data: user } = userContext;
+  const { data: user } = useUser();
 
   const commandsQuery = useQuery({
     queryKey: ["commands"],
