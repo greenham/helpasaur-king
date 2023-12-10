@@ -13,6 +13,7 @@ import {
 } from "../utils/apiService";
 import { Command } from "../types/commands";
 import { useUser } from "../hooks/useUser";
+import { useToast } from "../hooks/useToast";
 
 interface CommandsPageProps {}
 
@@ -22,6 +23,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
   }, []);
 
   const { data: user } = useUser();
+  const toast = useToast();
 
   const commandsQuery = useQuery({
     queryKey: ["commands"],
@@ -65,13 +67,17 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       // Return a context object with the snapshotted value
       return { previousCommands: previousCommands };
     },
+    onSuccess(data, variables, context) {
+      toast.success(`Command '${variables.command}' updated!`);
+    },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, newTodo, context) => {
+    onError: (err, updatedCommand, context) => {
       queryClient.setQueryData(
         ["commands"],
         context ? context.previousCommands : []
       );
+      toast.error(`Unable to update command: ${err.message}`);
     },
     // Always refetch after error or success:
     onSettled: () => {
@@ -99,6 +105,9 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       // Return a context object with the snapshotted value
       return { previousCommands: previousCommands };
     },
+    onSuccess(data, variables, context) {
+      toast.success(`Command '${variables.command}' created!`);
+    },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
     onError: (err, newCommand, context) => {
@@ -106,6 +115,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
         ["commands"],
         context ? context.previousCommands : []
       );
+      toast.error(`Unable to create command: ${err.message}`);
     },
     // Always refetch after error or success:
     onSettled: () => {
@@ -132,6 +142,9 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       // Return a context object with the snapshotted value
       return { previousCommands: previousCommands };
     },
+    onSuccess(data, variables, context) {
+      toast.success(`Command '${variables.command}' deleted!`);
+    },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
     onError: (err, deletedCommand, context) => {
@@ -139,6 +152,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
         ["commands"],
         context ? context.previousCommands : []
       );
+      toast.error(`Unable to delete command: ${err.message}`);
     },
     // Always refetch after error or success:
     onSettled: () => {
