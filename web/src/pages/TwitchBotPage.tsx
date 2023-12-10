@@ -1,6 +1,18 @@
 import * as React from "react";
-import { useEffect } from "react";
+// import { useEffect } from "react";
+// import { Button, Container } from "react-bootstrap";
+// import { useQuery, useQueryClient } from "@tanstack/react-query";
+// import { UserContext } from "../contexts/user";
+// import { IUser, UserContextType } from "../types/users";
+// import {
+//   getTwitchBotConfig,
+//   joinTwitchChannel,
+//   leaveTwitchChannel,
+// } from "../utils/apiService";
+// import { useToast } from "../hooks/useToast";
+
 import { Button, Container } from "react-bootstrap";
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserContext } from "../contexts/user";
 import { IUser, UserContextType } from "../types/users";
@@ -24,11 +36,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
 
   const toast = useToast();
 
-  const {
-    data: twitchBotConfig,
-    isLoading: twitchBotConfigLoading,
-    isError: twitchBotConfigError,
-  } = useQuery({
+  const { data: twitchBotConfig } = useQuery({
     queryKey: ["twitchBotConfig"],
     queryFn: getTwitchBotConfig,
   });
