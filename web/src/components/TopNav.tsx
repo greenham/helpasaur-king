@@ -1,22 +1,19 @@
 import * as React from "react";
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
-import { Button } from "react-bootstrap";
-import { Image } from "react-bootstrap";
+import {
+  Button,
+  Container,
+  Image,
+  Navbar,
+  Nav,
+  NavDropdown,
+  OverlayTrigger,
+  Popover,
+} from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { UserContext } from "../contexts/user";
-import { UserContextType } from "../types/users";
+import { getTwitchLoginUrl } from "../utils/utils";
+import { useLocation } from "react-router-dom";
+import { useUser } from "../hooks/useUser";
 
-const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID;
-const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
-  String(process.env.TWITCH_APP_OAUTH_REDIRECT_URL)
-);
-const API_LOGOUT_URL = process.env.API_LOGOUT_URL;
-const TWITCH_LOGIN_URL = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`;
 const RESOURCES = [
   {
     href: "https://alttp-wiki.net/index.php/Main_Page",
@@ -63,23 +60,19 @@ const popover = (
     <Popover.Header as="h3">Hello!</Popover.Header>
     <Popover.Body className="bg-dark">
       I'm <strong>Helpasaur King</strong> and I'm very high in potassium... like
-      a banana!
+      a banana! 🍌
     </Popover.Body>
   </Popover>
 );
 
 function TopNav() {
-  const userContext = React.useContext(UserContext) as UserContextType;
-  const { data: user, isLoading: userLoading } = userContext;
+  const { data: user } = useUser();
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
+  const location = useLocation();
 
   return (
     <>
-      <Navbar
-        expand="lg"
-        bg={process.env.NODE_ENV === "production" ? "dark" : "primary"}
-        sticky="top"
-      >
+      <Navbar expand="lg" bg="dark" sticky="top">
         <Container>
           <OverlayTrigger placement="bottom" overlay={popover}>
             <Navbar.Brand>
@@ -114,15 +107,13 @@ function TopNav() {
                   </Nav.Link>
                 </LinkContainer>
               )}
+              <LinkContainer to="twitch">
+                <Nav.Link>
+                  <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
+                </Nav.Link>
+              </LinkContainer>
             </Nav>
             <Nav>
-              <Nav.Link
-                href="https://twitch.tv/helpasaurking"
-                target="_blank"
-                rel="noopener,noreferrer"
-              >
-                <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
-              </Nav.Link>
               <Nav.Link
                 href="https://github.com/greenham/helpasaur-king"
                 target="_blank"
@@ -156,33 +147,34 @@ function TopNav() {
               </NavDropdown>
             </Nav>
             <Nav className="justify-content-end">
-              {user && !userLoading ? (
-                <Navbar.Text>
-                  <NavDropdown
-                    title={
-                      <Image
-                        src={user.twitchUserData.profile_image_url}
-                        roundedCircle
-                        className="bg-dark ml-3"
-                        alt={"Logged in as " + user.twitchUserData.display_name}
-                        width={32}
-                        height={32}
-                      />
+              {user ? (
+                <NavDropdown
+                  title={
+                    <Image
+                      src={user.twitchUserData.profile_image_url}
+                      roundedCircle
+                      className="bg-dark ml-3"
+                      alt={"Logged in as " + user.twitchUserData.display_name}
+                      width={32}
+                      height={32}
+                    />
+                  }
+                  id="user-dropdown"
+                >
+                  <NavDropdown.Item
+                    href={
+                      process.env.API_LOGOUT_URL +
+                      "?redirect=" +
+                      encodeURIComponent(location.pathname)
                     }
-                    id="user-dropdown"
+                    rel="noopener,noreferrer"
                   >
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item
-                      href={API_LOGOUT_URL}
-                      rel="noopener,noreferrer"
-                    >
-                      <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                      &nbsp;&nbsp;Log Out
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                </Navbar.Text>
+                    <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                    &nbsp;&nbsp;Log Out
+                  </NavDropdown.Item>
+                </NavDropdown>
               ) : (
-                <Nav.Link href={TWITCH_LOGIN_URL} rel="noopener,noreferrer">
+                <Nav.Link href={getTwitchLoginUrl()} rel="noopener,noreferrer">
                   <Button variant="primary">
                     <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
                   </Button>

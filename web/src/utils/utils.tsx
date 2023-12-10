@@ -15,6 +15,14 @@ export const getTwitchUrl = (username: string) => {
   return `https://twitch.tv/${username}`;
 };
 
+export const getTwitchLoginUrl = () => {
+  const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID;
+  const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
+    String(process.env.TWITCH_APP_OAUTH_REDIRECT_URL)
+  );
+  return `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`;
+};
+
 export const filterStreams = (
   streams: TwitchStream[],
   config: StreamAlertsConfig

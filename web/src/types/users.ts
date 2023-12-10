@@ -24,9 +24,3 @@ export interface IUser {
   permissions: string[];
   lastLogin: Date;
 }
-
-export type UserContextType = {
-  data?: IUser;
-  isLoading?: boolean;
-  error?: any;
-};

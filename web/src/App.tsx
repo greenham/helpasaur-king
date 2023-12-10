@@ -1,22 +1,37 @@
 import * as React from "react";
 import { Outlet, ScrollRestoration } from "react-router-dom";
-import TopNav from "./components/TopNav";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  QueryCache,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import UserProvider from "./components/UserProvider";
-
-const queryClient = new QueryClient();
+import { ToastProvider } from "./contexts/toasts";
+import { useToast } from "./hooks/useToast";
+import TopNav from "./components/TopNav";
 
 interface AppProps {}
 const App: React.FunctionComponent<AppProps> = () => {
+  const toast = useToast();
+
+  const queryClient = new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error, query) => {
+        if (query.state.data !== undefined) {
+          toast.error(`Something went wrong: ${error.message}`);
+        }
+      },
+    }),
+  });
+
   return (
     <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <ScrollRestoration />
+      <ScrollRestoration />
+      <ToastProvider>
         <TopNav />
         <Outlet />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </UserProvider>
+      </ToastProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };
