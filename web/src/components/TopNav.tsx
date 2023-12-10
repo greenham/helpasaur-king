@@ -1,12 +1,14 @@
 import * as React from "react";
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
-import { Button } from "react-bootstrap";
-import { Image } from "react-bootstrap";
+import {
+  Button,
+  Container,
+  Image,
+  Navbar,
+  Nav,
+  NavDropdown,
+  OverlayTrigger,
+  Popover,
+} from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { UserContext } from "../contexts/user";
 import { UserContextType } from "../types/users";
