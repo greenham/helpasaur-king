@@ -1,9 +1,10 @@
 import * as React from "react";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import DefaultToast from "./DefaultToast";
+import { IToast } from "../types/toasts";
 
 interface DefaultToastContainerProps {
-  toasts: any[];
+  toasts: IToast[];
 }
 
 const DefaultToastContainer: React.FunctionComponent<
@@ -18,9 +19,10 @@ const DefaultToastContainer: React.FunctionComponent<
       style={{ minHeight: "240px" }}
     >
       <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1 }}>
-        {toasts.map((toast, index) => (
+        {toasts.map((toast) => (
           <DefaultToast
-            key={index}
+            key={toast.id}
+            id={toast.id}
             variant={toast.variant}
             message={toast.message}
           />

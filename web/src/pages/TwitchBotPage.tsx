@@ -9,6 +9,7 @@ import {
   joinTwitchChannel,
   leaveTwitchChannel,
 } from "../utils/apiService";
+import { useToast } from "../hooks/useToast";
 
 interface TwitchBotPageProps {}
 
@@ -17,9 +18,11 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     document.title = "Twitch Bot | Helpasaur King";
   }, []);
 
+  const queryClient = useQueryClient();
   const userContext = React.useContext(UserContext) as UserContextType;
   const { data: user } = userContext;
-  const queryClient = useQueryClient();
+
+  const toast = useToast();
 
   const {
     data: twitchBotConfig,
@@ -34,10 +37,10 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     // @TODO: Show toast notifications on success/error
     const joinResult = await joinTwitchChannel();
     if (joinResult.result) {
-      // Create a DefaultToast and add it to the DefaultToastContainer
-      // const toast = <DefaultToast variant="success" message="The bot has joined your channel! You can optionally mod HelpasaurKing to avoid accidental timeouts or bans." />
+      toast.success("Successfully joined your channel!");
       queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
     } else {
+      toast.error("Unable to join your channel!");
     }
   };
 
@@ -45,7 +48,10 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     // @TODO: Show toast notifications on success/error
     const leaveResult = await leaveTwitchChannel();
     if (leaveResult.result) {
+      toast.success("Successfully left your channel!");
       queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+    } else {
+      toast.error("Unable to leave your channel!");
     }
   };
 

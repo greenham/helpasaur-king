@@ -1,10 +1,6 @@
 import * as React from "react";
 import Toast from "react-bootstrap/Toast";
-
-export interface DefaultToastProps {
-  variant?: string;
-  message?: string;
-}
+import { IToast } from "../types/toasts";
 
 export interface ToastVariant {
   icon: React.ReactNode;
@@ -34,11 +30,12 @@ const toastVariants: ToastVariants = {
   },
 };
 
-const DefaultToast: React.FunctionComponent<DefaultToastProps> = (props) => {
+const DefaultToast: React.FunctionComponent<IToast> = (props) => {
   const { variant, message } = props;
   const toastVariant = toastVariants[variant || "info"];
+  const [show, setShow] = React.useState(true);
   return (
-    <Toast>
+    <Toast onClose={() => setShow(false)} show={show} delay={3000} autohide>
       <Toast.Header>
         {toastVariant.icon}
         <strong className="me-auto">{toastVariant.bgClass}</strong>
