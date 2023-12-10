@@ -19,7 +19,6 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
 
   useEffect(() => {
     document.title = "Twitch Bot | Helpasaur King";
-    toast.error("Testing error");
   }, []);
 
   const queryClient = useQueryClient();
@@ -122,7 +121,6 @@ const TwitchUserBotManagement: React.FunctionComponent<
         prefix, enable/disable commands, maybe even some Twitch integrations
         with channel points, polls, etc.
       </p>
-      <hr />
       <Button variant="danger" onClick={handleLeaveRequest} size="lg">
         <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my channel
       </Button>
