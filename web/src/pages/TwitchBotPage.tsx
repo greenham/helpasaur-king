@@ -2,8 +2,7 @@ import * as React from "react";
 import { Alert, Button, Container, Modal } from "react-bootstrap";
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { UserContext } from "../contexts/user";
-import { IUser, UserContextType } from "../types/users";
+import { IUser } from "../types/users";
 import {
   getTwitchBotConfig,
   joinTwitchChannel,
@@ -11,6 +10,7 @@ import {
 } from "../utils/apiService";
 import { useToast } from "../hooks/useToast";
 import { getTwitchLoginUrl } from "../utils/utils";
+import { useUser } from "../hooks/useUser";
 
 interface TwitchBotPageProps {}
 
@@ -19,8 +19,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     document.title = "Twitch Bot | Helpasaur King";
   }, []);
 
-  const userContext = React.useContext(UserContext) as UserContextType;
-  const { data: user } = userContext;
+  const { data: user } = useUser();
 
   const { data: twitchBotConfig } = useQuery({
     queryKey: ["twitchBotConfig"],

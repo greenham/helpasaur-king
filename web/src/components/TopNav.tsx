@@ -10,10 +10,9 @@ import {
   Popover,
 } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { UserContext } from "../contexts/user";
-import { UserContextType } from "../types/users";
 import { getTwitchLoginUrl } from "../utils/utils";
 import { useLocation } from "react-router-dom";
+import { useUser } from "../hooks/useUser";
 
 const RESOURCES = [
   {
@@ -67,8 +66,7 @@ const popover = (
 );
 
 function TopNav() {
-  const userContext = React.useContext(UserContext) as UserContextType;
-  const { data: user } = userContext;
+  const { data: user } = useUser();
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
   const location = useLocation();
 
