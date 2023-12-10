@@ -31,15 +31,22 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
   });
 
   const handleJoinRequest = async () => {
-    // @TODO: Show toast notifications on success/failure
-    await joinTwitchChannel();
-    queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+    // @TODO: Show toast notifications on success/error
+    const joinResult = await joinTwitchChannel();
+    if (joinResult.result) {
+      // Create a DefaultToast and add it to the DefaultToastContainer
+      // const toast = <DefaultToast variant="success" message="The bot has joined your channel! You can optionally mod HelpasaurKing to avoid accidental timeouts or bans." />
+      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+    } else {
+    }
   };
 
   const handleLeaveRequest = async () => {
-    // @TODO: Show toast notifications on success/failure
-    await leaveTwitchChannel();
-    queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+    // @TODO: Show toast notifications on success/error
+    const leaveResult = await leaveTwitchChannel();
+    if (leaveResult.result) {
+      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+    }
   };
 
   return (
@@ -72,10 +79,14 @@ const TwitchUserBotManagement: React.FunctionComponent<
 > = (props) => {
   const { user, twitchBotConfig, handleJoinRequest, handleLeaveRequest } =
     props;
+
   if (!twitchBotConfig?.botHasJoined) {
     return (
       <>
-        <h2>Would you like the bot to join your Twitch chat?</h2>
+        <h2>
+          Hello, {user.twitchUserData.display_name}!<br />
+          Would you like the bot to join your Twitch chat?
+        </h2>
         <Button variant="primary" onClick={handleJoinRequest}>
           <i className="fa-solid fa-arrow-right-to-bracket px-1"></i> Join my
           channel
@@ -87,8 +98,8 @@ const TwitchUserBotManagement: React.FunctionComponent<
   return (
     <>
       <h2>
-        Hello, {user.twitchUserData.display_name}! Thanks for using
-        HelpasaurKing.
+        Hello, {user.twitchUserData.display_name}!<br />
+        Thanks for using HelpasaurKing.
       </h2>
       <Button variant="danger" onClick={handleLeaveRequest}>
         <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my channel

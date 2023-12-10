@@ -7,7 +7,8 @@ import {
   QueryCache,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import UserProvider from "./components/UserProvider";
+import { UserProvider } from "./contexts/user";
+import { ToastProvider } from "./contexts/toasts";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -25,8 +26,10 @@ const App: React.FunctionComponent<AppProps> = () => {
     <QueryClientProvider client={queryClient}>
       <UserProvider>
         <ScrollRestoration />
-        <TopNav />
-        <Outlet />
+        <ToastProvider>
+          <TopNav />
+          <Outlet />
+        </ToastProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </UserProvider>
     </QueryClientProvider>

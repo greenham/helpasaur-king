@@ -63,7 +63,7 @@ const popover = (
     <Popover.Header as="h3">Hello!</Popover.Header>
     <Popover.Body className="bg-dark">
       I'm <strong>Helpasaur King</strong> and I'm very high in potassium... like
-      a banana!
+      a banana! 🍌
     </Popover.Body>
   </Popover>
 );
