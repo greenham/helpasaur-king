@@ -10,8 +10,8 @@ import App from "./App";
 import ErrorPage from "./error";
 import CommandsPage from "./pages/CommandsPage";
 import LivestreamsPage from "./pages/LivestreamsPage";
-import "./styles.scss";
 import TwitchBotPage from "./pages/TwitchBotPage";
+import "./styles.scss";
 
 const router = createBrowserRouter([
   {
