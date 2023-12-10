@@ -23,16 +23,17 @@ const getStreamAlertsConfig = async () => {
 router.get(`/twitch`, async (req, res) => {
   const { config: streamAlertsConfig } = await getStreamAlertsConfig();
 
+  //const redirectPath = req.query.redirect || "/";
+  const redirectUrl = CLIENT_POST_AUTH_REDIRECT_URL; // + redirectPath;
+
   // Validate authorization code from Twitch
   const authCode = req.query.code || false;
   if (!authCode) {
-    return res.redirect(CLIENT_POST_AUTH_REDIRECT_URL + "?error=missing_code");
+    return res.redirect(redirectUrl + "?error=missing_code");
   }
 
   if (!/^[a-z0-9]{30}$/.test(authCode)) {
-    return res.redirect(
-      CLIENT_POST_AUTH_REDIRECT_URL + "?error=bad_code_format"
-    );
+    return res.redirect(redirectUrl + "?error=bad_code_format");
   }
 
   // Get access and ID tokens from Twitch
@@ -51,7 +52,7 @@ router.get(`/twitch`, async (req, res) => {
     !response.data ||
     !response.data.access_token
   ) {
-    return res.redirect(CLIENT_POST_AUTH_REDIRECT_URL + "?error=bad_response");
+    return res.redirect(redirectUrl + "?error=bad_response");
   }
 
   const twitchAuthData = response.data;
@@ -125,7 +126,7 @@ router.get(`/twitch`, async (req, res) => {
   });
 
   // Redirect to client
-  res.redirect(CLIENT_POST_AUTH_REDIRECT_URL);
+  res.redirect(redirectUrl);
 });
 
 router.get(`/logout`, async (req, res) => {
@@ -133,7 +134,7 @@ router.get(`/logout`, async (req, res) => {
   res.cookie(JWT_HEADER_COOKIE_NAME, "");
   res.cookie(JWT_FOOTER_COOKIE_NAME, "");
 
-  redirectPath = req.query.redirect || "/";
+  const redirectPath = req.query.redirect || "/";
 
   // Redirect to client
   res.redirect(CLIENT_POST_AUTH_REDIRECT_URL + redirectPath);
