@@ -41,10 +41,6 @@ router.get("/me/twitch", requireJwtToken, async (req, res) => {
   }
 });
 
-// There's a big aspect of this that I missed...
-// If the request to join is made from the frontend, how do we get the bot to join or leave?
-// We need to send an event via the ws-relay that the twitch bot will be listening for
-
 // @TODO DRY: Duplicating this functionality from /twitch for now until I can adapt the services to use a JWT as well
 // POST /join -> adds requested user to join list for twitch bot
 router.post("/me/twitch/join", requireJwtToken, async (req, res) => {
