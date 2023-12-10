@@ -1,6 +1,7 @@
 import * as React from "react";
-import Toast from "react-bootstrap/Toast";
+import { Toast } from "react-bootstrap";
 import { IToast } from "../types/toasts";
+import { useToast } from "../hooks/useToast";
 
 export interface ToastVariant {
   icon: React.ReactNode;
@@ -36,22 +37,30 @@ const toastVariants: ToastVariants = {
 };
 
 const DefaultToast: React.FunctionComponent<IToast> = (props) => {
-  const { variant, message } = props;
+  const { variant, message, id } = props;
   const toastVariant = toastVariants[variant];
   const [show, setShow] = React.useState(true);
+  const toast = useToast();
   return (
     <Toast
       bg={toastVariant.bgClass}
-      onClose={() => setShow(false)}
+      onClose={() => {
+        setShow(false);
+      }}
+      onExited={() => {
+        toast.remove(id);
+      }}
       show={show}
-      delay={3000}
+      delay={5000}
       autohide
     >
       <Toast.Header>
         {toastVariant.icon}
         <strong className="me-auto">{toastVariant.title}</strong>
       </Toast.Header>
-      <Toast.Body>{message}</Toast.Body>
+      <Toast.Body>
+        <strong>{message}</strong>
+      </Toast.Body>
     </Toast>
   );
 };

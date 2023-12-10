@@ -1,5 +1,5 @@
 import * as React from "react";
-import ToastContainer from "react-bootstrap/ToastContainer";
+import { ToastContainer } from "react-bootstrap";
 import DefaultToast from "./DefaultToast";
 import { IToast } from "../types/toasts";
 
@@ -15,14 +15,15 @@ const DefaultToastContainer: React.FunctionComponent<
     <div
       aria-live="polite"
       aria-atomic="true"
-      className="bg-dark position-relative"
+      className="position-relative"
       style={{
         position: "fixed",
         top: "80px",
-        right: "20px",
+        right: "40px",
+        zIndex: 1,
       }}
     >
-      <ToastContainer position="top-end" style={{ zIndex: 1 }}>
+      <ToastContainer position="top-end">
         {toasts &&
           toasts.map((toast) => (
             <DefaultToast

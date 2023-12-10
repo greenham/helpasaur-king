@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Outlet, ScrollRestoration } from "react-router-dom";
-import TopNav from "./components/TopNav";
 import {
   QueryClient,
   QueryClientProvider,
@@ -10,6 +9,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { UserProvider } from "./contexts/user";
 import { ToastProvider } from "./contexts/toasts";
 import { useToast } from "./hooks/useToast";
+import TopNav from "./components/TopNav";
 
 interface AppProps {}
 const App: React.FunctionComponent<AppProps> = () => {
