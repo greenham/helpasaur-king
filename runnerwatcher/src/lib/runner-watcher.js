@@ -110,17 +110,19 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // See if this user has a stream in the cache already
-      let cachedStream = cachedStreams.find((s) => s.user_id == stream.user_id);
+      let cachedStreamForUser = cachedStreams.find(
+        (s) => s.user_id == stream.user_id
+      );
       console.log(
-        cachedStream
+        cachedStreamForUser
           ? `Found stream in cache for ${user.login}`
           : `No stream found in cache for ${user.login}`
       );
 
-      // Make sure it's been long enough since the last alert
-      if (cachedStream) {
+      // Make sure it's been long enough since the last alert for this user
+      if (cachedStreamForUser) {
         const secondsSinceLastAlert = Math.floor(
-          (Date.now() - cachedStream.lastAlertedAt) / 1000
+          (Date.now() - cachedStreamForUser.lastAlertedAt) / 1000
         );
         if (secondsSinceLastAlert < ALERT_DELAY_SECONDS) {
           console.log(
@@ -134,25 +136,23 @@ class RunnerWatcher extends EventEmitter {
       if (eventType === CHANNEL_UPDATE_EVENT) {
         // Treat this as a stream.online event:
         // - If this wasn't cached before (meaning game was not alttp or title didn't pass)
-        // - If they switched from another game -> alttp
-        if (!cachedStream) {
+        if (!cachedStreamForUser) {
           console.log(
             `Stream not found in cache after ${CHANNEL_UPDATE_EVENT}, treating as ${STREAM_ONLINE_EVENT}!`
           );
           eventType = STREAM_ONLINE_EVENT;
-        } else if (cachedStream.game_id != event.category_id) {
-          console.log(
-            `Switched game to alttp, treating as ${STREAM_ONLINE_EVENT}!`
-          );
-          eventType = STREAM_ONLINE_EVENT;
         } else if (
-          cachedStream.title == event.title &&
-          cachedStream.game_id == event.category_id
+          cachedStreamForUser.title == event.title &&
+          cachedStreamForUser.game_id == event.category_id
         ) {
           console.log(`Title or game has not changed, skipping...`);
           return;
         }
-      } else if (eventType === STREAM_ONLINE_EVENT && cachedStream) {
+      } else if (
+        eventType === STREAM_ONLINE_EVENT &&
+        cachedStreamForUser &&
+        cachedStreamForUser.id == stream.id
+      ) {
         // This handles a weird scenario where:
         // - CHANNEL_UPDATE_EVENT gets fired
         // - we wait DELAY_FOR_API_SECONDS
