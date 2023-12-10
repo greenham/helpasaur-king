@@ -133,8 +133,10 @@ router.get(`/logout`, async (req, res) => {
   res.cookie(JWT_HEADER_COOKIE_NAME, "");
   res.cookie(JWT_FOOTER_COOKIE_NAME, "");
 
+  redirectPath = req.query.redirect || "/";
+
   // Redirect to client
-  res.redirect(CLIENT_POST_AUTH_REDIRECT_URL);
+  res.redirect(CLIENT_POST_AUTH_REDIRECT_URL + redirectPath);
 });
 
 module.exports = router;

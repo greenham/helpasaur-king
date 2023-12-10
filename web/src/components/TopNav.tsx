@@ -11,6 +11,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import { UserContext } from "../contexts/user";
 import { UserContextType } from "../types/users";
 import { getTwitchLoginUrl } from "../utils/utils";
+import { useLocation } from "react-router-dom";
 
 const RESOURCES = [
   {
@@ -67,6 +68,7 @@ function TopNav() {
   const userContext = React.useContext(UserContext) as UserContextType;
   const { data: user } = userContext;
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
+  const location = useLocation();
 
   return (
     <>
@@ -152,7 +154,11 @@ function TopNav() {
                   id="user-dropdown"
                 >
                   <NavDropdown.Item
-                    href={process.env.API_LOGOUT_URL}
+                    href={
+                      process.env.API_LOGOUT_URL +
+                      "?redirect=" +
+                      encodeURIComponent(location.pathname)
+                    }
                     rel="noopener,noreferrer"
                   >
                     <i className="fa-solid fa-arrow-right-from-bracket"></i>
