@@ -10,6 +10,7 @@ import App from "./App";
 import ErrorPage from "./error";
 import CommandsPage from "./pages/CommandsPage";
 import LivestreamsPage from "./pages/LivestreamsPage";
+import TwitchBotPage from "./pages/TwitchBotPage";
 import "./styles.scss";
 
 const router = createBrowserRouter([
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "commands",
         element: <CommandsPage />,
+      },
+      {
+        path: "twitch",
+        element: <TwitchBotPage />,
       },
     ],
   },

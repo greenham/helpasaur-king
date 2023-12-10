@@ -1,13 +1,20 @@
 import * as React from "react";
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
+import {
+  Button,
+  Container,
+  Image,
+  Navbar,
+  Nav,
+  NavDropdown,
+  OverlayTrigger,
+  Popover,
+} from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import { getTwitchLoginUrl } from "../utils/utils";
+import { useLocation } from "react-router-dom";
+import { useUser } from "../hooks/useUser";
 
-const resources = [
+const RESOURCES = [
   {
     href: "https://alttp-wiki.net/index.php/Main_Page",
     target: "_blank",
@@ -44,7 +51,7 @@ const resources = [
     target: "_blank",
     rel: "noopener,noreferrer",
     icon: "fa-brands fa-discord",
-    text: "Discord",
+    text: "ALttP Discord",
   },
 ];
 
@@ -53,29 +60,27 @@ const popover = (
     <Popover.Header as="h3">Hello!</Popover.Header>
     <Popover.Body className="bg-dark">
       I'm <strong>Helpasaur King</strong> and I'm very high in potassium... like
-      a banana!
+      a banana! 🍌
     </Popover.Body>
   </Popover>
 );
 
 function TopNav() {
+  const { data: user } = useUser();
   const logo = new URL("/src/img/logo.png", import.meta.url).toString();
+  const location = useLocation();
 
   return (
     <>
-      <Navbar
-        expand="lg"
-        bg={process.env.NODE_ENV === "production" ? "dark" : "primary"}
-        sticky="top"
-      >
+      <Navbar expand="lg" bg="dark" sticky="top">
         <Container>
           <OverlayTrigger placement="bottom" overlay={popover}>
             <Navbar.Brand>
               <img
                 alt=""
                 src={logo}
-                width="30"
-                height="30"
+                width="32"
+                height="32"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
@@ -94,8 +99,20 @@ function TopNav() {
                   Streams
                 </Nav.Link>
               </LinkContainer>
+              <LinkContainer to="twitch">
+                <Nav.Link>
+                  <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
+                </Nav.Link>
+              </LinkContainer>
             </Nav>
-            <Nav className="justify-content-end">
+            <Nav>
+              <Nav.Link
+                href="https://github.com/greenham/helpasaur-king"
+                target="_blank"
+                rel="noopener,noreferrer"
+              >
+                <i className="fa-brands fa-github"></i>&nbsp;&nbsp;GitHub
+              </Nav.Link>
               <NavDropdown
                 title={
                   <>
@@ -104,7 +121,7 @@ function TopNav() {
                 }
                 id="resources-dropdown"
               >
-                {resources.map((resource, index) =>
+                {RESOURCES.map((resource, index) =>
                   resource.divider ? (
                     <NavDropdown.Divider key={index} />
                   ) : (
@@ -120,20 +137,41 @@ function TopNav() {
                   )
                 )}
               </NavDropdown>
-              <Nav.Link
-                href="https://twitch.tv/helpasaurking"
-                target="_blank"
-                rel="noopener,noreferrer"
-              >
-                <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
-              </Nav.Link>
-              <Nav.Link
-                href="https://github.com/greenham/helpasaur-king"
-                target="_blank"
-                rel="noopener,noreferrer"
-              >
-                <i className="fa-brands fa-github"></i>&nbsp;&nbsp;GitHub
-              </Nav.Link>
+            </Nav>
+            <Nav className="justify-content-end">
+              {user ? (
+                <NavDropdown
+                  title={
+                    <Image
+                      src={user.twitchUserData.profile_image_url}
+                      roundedCircle
+                      className="bg-dark ml-3"
+                      alt={"Logged in as " + user.twitchUserData.display_name}
+                      width={32}
+                      height={32}
+                    />
+                  }
+                  id="user-dropdown"
+                >
+                  <NavDropdown.Item
+                    href={
+                      process.env.API_LOGOUT_URL +
+                      "?redirect=" +
+                      encodeURIComponent(location.pathname)
+                    }
+                    rel="noopener,noreferrer"
+                  >
+                    <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                    &nbsp;&nbsp;Log Out
+                  </NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <Nav.Link href={getTwitchLoginUrl()} rel="noopener,noreferrer">
+                  <Button variant="primary">
+                    <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
+                  </Button>
+                </Nav.Link>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
