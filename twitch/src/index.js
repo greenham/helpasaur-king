@@ -297,7 +297,7 @@ function init(config) {
     client.join(channel);
     client.say(
       channel,
-      "Hello, I'm Helpasaur King and I'm very high in potassium... like a banana! Use !help to see what I can do."
+      `Hello, I'm Helpasaur King and I'm very high in potassium... like a banana! Use ${cmdPrefix}help to see what I can do.`
     );
     channelList.push(channel);
     console.log(`Joined #${channel}`);
@@ -312,7 +312,7 @@ function init(config) {
 
     client.say(
       channel,
-      "😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com or the bot's twitch chat using !join)"
+      `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com or my twitch chat using ${cmdPrefix}join)`
     );
     client.part(channel);
     channelList = channelList.filter((c) => c !== channel);
