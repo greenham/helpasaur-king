@@ -176,7 +176,8 @@ function TopNav() {
               ) : (
                 <Nav.Link href={getTwitchLoginUrl()} rel="noopener,noreferrer">
                   <Button variant="primary">
-                    <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log In
+                    <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log in with
+                    Twitch
                   </Button>
                 </Nav.Link>
               )}

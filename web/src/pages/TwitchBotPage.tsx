@@ -19,12 +19,13 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     document.title = "Twitch Bot | Helpasaur King";
   }, []);
 
-  const { data: user, isLoading: userLoading } = useUser();
+  const { data: user, isPending: userLoading } = useUser();
 
-  const { data: twitchBotConfig, isLoading: twitchBotConfigLoading } = useQuery(
+  const { data: twitchBotConfig, isPending: twitchBotConfigLoading } = useQuery(
     {
       queryKey: ["twitchBotConfig"],
       queryFn: getTwitchBotConfig,
+      retry: 0,
     }
   );
 
@@ -159,11 +160,13 @@ const ConfirmLeaveModal: React.FunctionComponent<{
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Confirm</Modal.Title>
+        <Modal.Title>Confirm Request</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Are you sure you want the bot to leave your channel? You can have it
-        re-join at any time.
+        <Alert variant="dark" className="p-3">
+          Are you sure you want the bot to leave your channel? You can have it
+          re-join at any time.
+        </Alert>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="dark" onClick={handleClose}>
