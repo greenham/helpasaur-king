@@ -47,6 +47,18 @@ router.post("/find", async (req, res) => {
 router.post("/", requireJwtToken, userHasPermission, async (req, res) => {
   try {
     delete req.body._id;
+    const existingCommand = await Command.findOne({
+      $or: [{ command: req.body.command }, { aliases: req.body.command }],
+      deleted: { $ne: true },
+    });
+    if (existingCommand) {
+      return res.status(409).json({
+        message: `Command with name or alias "${req.body.command}" already exists`,
+      });
+    }
+
+    // @TODO: Ensure alias uniqueness
+
     const command = await Command.create(req.body);
     res.status(201).json(command);
   } catch (err) {
