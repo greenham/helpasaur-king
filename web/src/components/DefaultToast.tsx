@@ -58,8 +58,10 @@ const DefaultToast: React.FunctionComponent<IToast> = (props) => {
         {toastVariant.icon}
         <strong className="me-auto">{toastVariant.title}</strong>
       </Toast.Header>
-      <Toast.Body className="text-dark">
-        <strong>{message}</strong>
+      <Toast.Body>
+        <p className="fs-5">
+          <strong>{message}</strong>
+        </p>
       </Toast.Body>
     </Toast>
   );

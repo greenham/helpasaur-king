@@ -48,12 +48,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   useEffect(() => {
     setSearchResults(filterCommands(commands, debouncedSearchQuery));
-  }, [commands]);
-
-  useEffect(() => {
-    const filteredCommands = filterCommands(commands, debouncedSearchQuery);
-    return setSearchResults(filteredCommands);
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, commands]);
 
   const freshCommand = {
     _id: "",
@@ -136,7 +131,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         <Button
           onClick={handleNewCommandClick}
           variant="primary"
-          className="mb-3"
+          className="mb-3 mx-auto d-block"
+          size="lg"
         >
           <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
         </Button>
@@ -158,7 +154,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
       {searchResults.length > 0 && (
         <Alert variant="dark">
-          {searchResults.length} command
+          <strong>{searchResults.length}</strong> command
           {searchResults.length !== 1 ? "s" : ""} found.
         </Alert>
       )}
@@ -266,14 +262,18 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         />
       )}
       {deleteCommandModalActive && (
-        <Modal show={deleteCommandModalActive} onHide={hideDeleteCommandModal}>
+        <Modal
+          show={deleteCommandModalActive}
+          onHide={hideDeleteCommandModal}
+          centered={true}
+        >
           <Modal.Header closeButton>
-            <Modal.Title></Modal.Title>
+            <Modal.Title>Deleting: {commandToDelete.command}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Alert variant="danger">
-              Are you sure you want to delete{" "}
-              <strong>{commandToDelete.command}</strong>?
+            <Alert variant="danger" className="p-3">
+              Are you sure you want to delete the{" "}
+              <strong>{commandToDelete.command}</strong> command?
             </Alert>
           </Modal.Body>
           <Modal.Footer>
@@ -290,7 +290,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   );
 };
 
-function CommandAliasesStack(props: { aliases: string[] }) {
+export const CommandAliasesStack = (props: { aliases: string[] }) => {
   const { aliases } = props;
   return (
     <Stack
@@ -305,6 +305,6 @@ function CommandAliasesStack(props: { aliases: string[] }) {
       ))}
     </Stack>
   );
-}
+};
 
 export default CommandsList;

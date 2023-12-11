@@ -174,6 +174,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
         preceded by their configured prefix, which is <code>!</code> by default.
         e.g. <code>!nmg</code>
       </p>
+      <hr />
 
       {commandsLoading && (
         <Spinner animation="border" role="status">

@@ -4,32 +4,40 @@ const API_URL = process.env.API_URL;
 
 export const getCommands = async () => {
   const response = await fetch(`${API_URL}/commands`);
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
   }
   return response.json();
 };
 
 export const getLivestreams = async () => {
   const response = await fetch(`${API_URL}/streams/live`);
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
   }
   return response.json();
 };
 
 export const getConfig = async () => {
   const response = await fetch(`${API_URL}/web/config`);
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
   }
   return response.json();
 };
 
 export const getCurrentUser = async () => {
   const response = await fetch(`${API_URL}/me`, { credentials: "include" });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
   }
   return response.json();
 };
@@ -38,8 +46,10 @@ export const getTwitchBotConfig = async () => {
   const response = await fetch(`${API_URL}/me/twitch`, {
     credentials: "include",
   });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
   }
   return response.json();
 };
@@ -49,8 +59,10 @@ export const joinTwitchChannel = async () => {
     method: "POST",
     credentials: "include",
   });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
   }
   return response.json();
 };
@@ -60,8 +72,10 @@ export const leaveTwitchChannel = async () => {
     method: "POST",
     credentials: "include",
   });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
   }
   return response.json();
 };
@@ -73,6 +87,11 @@ export const createCommand = async (command: Command) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
   });
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
   return response.json();
 };
 
@@ -83,6 +102,11 @@ export const updateCommand = async (command: Command) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
   });
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
   return response.json();
 };
 
@@ -93,5 +117,18 @@ export const deleteCommand = async (command: Command) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
   });
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
   return response.json();
 };
+
+async function handleApiResponse(response: Response) {
+  if (!response.ok) {
+    const responseJson = await response.json();
+    const message = responseJson.message || "API returned an error";
+    throw new Error(message);
+  }
+}
