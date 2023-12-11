@@ -69,6 +69,9 @@ const TwitchUserBotManagement: React.FunctionComponent<
 
   const queryClient = useQueryClient();
   const toast = useToast();
+  const [showLeaveModal, setShowLeaveModal] = React.useState(false);
+  const handleShowLeaveModal = () => setShowLeaveModal(true);
+  const handleCloseLeaveModal = () => setShowLeaveModal(false);
 
   const handleJoinRequest = async () => {
     const joinResult = await joinTwitchChannel();
@@ -107,10 +110,6 @@ const TwitchUserBotManagement: React.FunctionComponent<
       </Alert>
     );
   }
-
-  const [showLeaveModal, setShowLeaveModal] = React.useState(false);
-  const handleShowLeaveModal = () => setShowLeaveModal(true);
-  const handleCloseLeaveModal = () => setShowLeaveModal(false);
 
   return (
     <>
