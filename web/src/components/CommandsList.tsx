@@ -290,7 +290,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   );
 };
 
-function CommandAliasesStack(props: { aliases: string[] }) {
+export const CommandAliasesStack = (props: { aliases: string[] }) => {
   const { aliases } = props;
   return (
     <Stack
@@ -305,6 +305,6 @@ function CommandAliasesStack(props: { aliases: string[] }) {
       ))}
     </Stack>
   );
-}
+};
 
 export default CommandsList;
