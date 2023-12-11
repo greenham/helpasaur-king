@@ -34,17 +34,17 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
       <hr />
       {!user && (
         <Alert>
-          <a href={getTwitchLoginUrl()} rel="noopener,noreferrer">
+          <Alert.Link href={getTwitchLoginUrl()} rel="noopener,noreferrer">
             Log in with your Twitch account
-          </a>{" "}
+          </Alert.Link>{" "}
           to manage the bot right here, or{" "}
-          <a
+          <Alert.Link
             href="https://twitch.tv/helpasaurking"
             target="_blank"
             rel="noopener,noreferrer"
           >
             go to the bot's Twitch chat
-          </a>{" "}
+          </Alert.Link>{" "}
           and send <code>!join</code> or <code>!leave</code>.
         </Alert>
       )}
