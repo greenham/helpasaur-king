@@ -129,14 +129,19 @@ const TwitchUserBotManagement: React.FunctionComponent<
         <h2>
           Hey, <strong>{user.twitchUserData.display_name}</strong>!
         </h2>
-        <h3 className="text-muted">Thanks for using HelpasaurKing.</h3>
-        <p className="lead my-5">
-          Eventually there will be more settings here like a custom command
-          prefix, enable/disable commands, maybe even some Twitch integrations
-          with channel points, polls, etc.
+        <h4 className="text-muted">
+          ✅ HelpasaurKing is currently helping in your channel.
+        </h4>
+        <hr />
+        <p className="lead mb-5">
+          Eventually there will be more features here like an easy toggle for
+          turning responses on/off (globally or per-command), custom command
+          prefixes, practice lists, maybe even some Twitch integrations with
+          channel points, polls, etc.
           <br />
           <br />
-          For now, you can only tell the bot to leave your channel at any time.
+          For now, you can only tell the bot to leave (or re-join) your channel
+          at any time.
         </p>
         <Button variant="secondary" onClick={handleShowLeaveModal} size="lg">
           <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my
