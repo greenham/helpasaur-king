@@ -8,10 +8,10 @@ const {
 } = require("discord.js");
 const axios = require("axios");
 const axiosRetry = require("axios-retry");
-const { API_URL, API_KEY } = process.env;
+const { API_HOST, API_KEY, SERVICE_NAME } = process.env;
 const helpaApi = axios.create({
-  baseURL: API_URL,
-  headers: { authorization: API_KEY },
+  baseURL: API_HOST,
+  headers: { authorization: API_KEY, "X-Service-Name": SERVICE_NAME },
 });
 
 axiosRetry(helpaApi, {
@@ -51,10 +51,19 @@ for (const file of eventFiles) {
   }
 }
 
-// Fetch config via API
-console.log(`Fetching config from API: ${API_URL}...`);
+// Authorize the service via the API
 helpaApi
-  .get(`${API_URL}/configs/discord`)
+  .get(`${API_HOST}/auth/service`)
+  .then((result) => {
+    console.log(`✅ Service authorized with API!`);
+    // Get the token from result
+    const { token } = result.data;
+    // Update the axios headers to use this Bearer token for all future requests
+    helpaApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    // Fetch config via API
+    console.log(`Fetching config from API...`);
+    return helpaApi.get(`${API_HOST}/api/configs/discord`);
+  })
   .then((result) => {
     // Store the config
     console.log(`✅ Config Retrieved!`);

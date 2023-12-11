@@ -67,7 +67,10 @@ services:
       target: ${TARGET}
     restart: on-failure
     environment:
-      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      SERVICE_NAME: discord-bot
+      API_HOST: ${API_HOST}
+      API_URL: ${API_URL}
+      API_SERVICE_AUTH_URL: ${API_SERVICE_AUTH_URL}
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
