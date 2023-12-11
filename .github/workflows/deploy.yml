@@ -1,4 +1,4 @@
-name: Test Deploy 3 to DigitalOcean
+name: Deploy to DigitalOcean
 
 on:
   push:
