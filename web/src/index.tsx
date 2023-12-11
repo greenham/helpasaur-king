@@ -8,6 +8,7 @@ import {
 
 import App from "./App";
 import ErrorPage from "./error";
+import PageNotFound from "./404";
 import CommandsPage from "./pages/CommandsPage";
 import LivestreamsPage from "./pages/LivestreamsPage";
 import TwitchBotPage from "./pages/TwitchBotPage";
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "admin",
         element: <AdminPage />,
+      },
+      {
+        path: "*",
+        element: <PageNotFound />,
       },
     ],
   },
