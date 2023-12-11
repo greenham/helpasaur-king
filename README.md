@@ -28,9 +28,12 @@ Global command list is available at https://helpasaur.com/commands
 
 # FAQ
 
-## How do I get the bot to join my Twitch channel?
+## How do I get the bot to join/leave my Twitch channel?
 
-Head to [https://twitch.tv/helpasaurking](https://twitch.tv/helpasaurking) and send `!join` in the chat.
+Two ways.
+
+1. **Web App**: Go to [https://helpasaur.com/twitch](https://helpasaur.com/twitch), log in with Twitch, and manage the bot there.
+2. **Twitch**: Go to [https://twitch.tv/helpasaurking](https://twitch.tv/helpasaurking) and send `!join` or `!leave` in the chat.
 
 ## How do I get the bot to join my Discord server?
 
