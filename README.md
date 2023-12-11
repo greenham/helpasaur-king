@@ -19,6 +19,8 @@ Global command list is available at https://helpasaur.com/commands
 
 - Command List: https://helpasaur.com/commands
 - ALttP Speedrun Stream Directory: https://helpasaur.com/streams
+- Twitch Bot Management: https://helpasaur.com/twitch
+  - Log in with Twitch to manage the bot (join, leave, customizations, etc.)
 
 ## Race Bot
 
