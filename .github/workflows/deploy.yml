@@ -19,7 +19,7 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
+          # add yarn build && yarn start:prod to end of script when we're ready to switch over
           script: |
             cd /srv/helpasaur-king
             git pull
-            yarn build && yarn start:prod
