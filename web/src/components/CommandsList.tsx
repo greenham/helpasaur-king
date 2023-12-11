@@ -48,12 +48,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   useEffect(() => {
     setSearchResults(filterCommands(commands, debouncedSearchQuery));
-  }, [commands]);
-
-  useEffect(() => {
-    const filteredCommands = filterCommands(commands, debouncedSearchQuery);
-    return setSearchResults(filteredCommands);
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, commands]);
 
   const freshCommand = {
     _id: "",
