@@ -120,8 +120,11 @@ const TwitchUserBotManagement: React.FunctionComponent<
           Eventually there will be more settings here like a custom command
           prefix, enable/disable commands, maybe even some Twitch integrations
           with channel points, polls, etc.
+          <br />
+          <br />
+          For now, you can request the bot to leave your channel at any time.
         </p>
-        <Button variant="danger" onClick={handleShowLeaveModal} size="lg">
+        <Button variant="dark" onClick={handleShowLeaveModal} size="lg">
           <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my
           channel
         </Button>

@@ -136,7 +136,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         <Button
           onClick={handleNewCommandClick}
           variant="primary"
-          className="mb-3"
+          className="mb-3 mx-auto d-block"
+          size="lg"
         >
           <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
         </Button>
@@ -158,7 +159,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
       {searchResults.length > 0 && (
         <Alert variant="dark">
-          {searchResults.length} command
+          <strong>{searchResults.length}</strong> command
           {searchResults.length !== 1 ? "s" : ""} found.
         </Alert>
       )}
