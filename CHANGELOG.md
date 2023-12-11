@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1
+
+- Enforce command name uniqueness when creating
+- Visual touches here and there, better error handling
+
 ## 1.5.0
 
 - Users can now log in via Twitch OAuth flow
