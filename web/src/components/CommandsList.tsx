@@ -262,14 +262,18 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         />
       )}
       {deleteCommandModalActive && (
-        <Modal show={deleteCommandModalActive} onHide={hideDeleteCommandModal}>
+        <Modal
+          show={deleteCommandModalActive}
+          onHide={hideDeleteCommandModal}
+          centered={true}
+        >
           <Modal.Header closeButton>
-            <Modal.Title></Modal.Title>
+            <Modal.Title>Deleting: {commandToDelete.command}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Alert variant="danger">
-              Are you sure you want to delete{" "}
-              <strong>{commandToDelete.command}</strong>?
+            <Alert variant="danger" className="p-3">
+              Are you sure you want to delete the{" "}
+              <strong>{commandToDelete.command}</strong> command?
             </Alert>
           </Modal.Body>
           <Modal.Footer>

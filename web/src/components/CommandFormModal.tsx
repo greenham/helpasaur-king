@@ -42,7 +42,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
   };
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal show={show} onHide={onHide} centered={true}>
       <Modal.Header closeButton>
         <Modal.Title>
           {command._id ? `Editing: ${command.command}` : "New Command"}
@@ -92,7 +92,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={onHide}>
-          Close
+          Cancel
         </Button>
         <Button variant="dark" onClick={handleSubmit}>
           <i className="fa-regular fa-floppy-disk px-1"></i> Save Changes
