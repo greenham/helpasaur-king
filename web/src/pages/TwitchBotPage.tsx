@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Alert, Button, Container, Modal } from "react-bootstrap";
+import { Alert, Button, Container, Modal, Spinner } from "react-bootstrap";
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { IUser } from "../types/users";
@@ -19,12 +19,23 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     document.title = "Twitch Bot | Helpasaur King";
   }, []);
 
-  const { data: user } = useUser();
+  const { data: user, isLoading: userLoading } = useUser();
 
-  const { data: twitchBotConfig } = useQuery({
-    queryKey: ["twitchBotConfig"],
-    queryFn: getTwitchBotConfig,
-  });
+  const { data: twitchBotConfig, isLoading: twitchBotConfigLoading } = useQuery(
+    {
+      queryKey: ["twitchBotConfig"],
+      queryFn: getTwitchBotConfig,
+    }
+  );
+
+  if (userLoading || twitchBotConfigLoading)
+    return (
+      <Container>
+        <Spinner animation="border" role="statues">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
 
   return (
     <Container id="twitch-bot-page" className="my-5">
@@ -114,16 +125,19 @@ const TwitchUserBotManagement: React.FunctionComponent<
   return (
     <>
       <Alert variant="dark" className="p-5">
-        <h2>Thanks for using HelpasaurKing!</h2>
+        <h2>
+          Hey, <strong>{user.twitchUserData.display_name}</strong>!
+        </h2>
+        <h3 className="text-muted">Thanks for using HelpasaurKing.</h3>
         <p className="lead my-5">
           Eventually there will be more settings here like a custom command
           prefix, enable/disable commands, maybe even some Twitch integrations
           with channel points, polls, etc.
           <br />
           <br />
-          For now, you can request the bot to leave your channel at any time.
+          For now, you can only tell the bot to leave your channel at any time.
         </p>
-        <Button variant="dark" onClick={handleShowLeaveModal} size="lg">
+        <Button variant="secondary" onClick={handleShowLeaveModal} size="lg">
           <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my
           channel
         </Button>
@@ -148,14 +162,16 @@ const ConfirmLeaveModal: React.FunctionComponent<{
         <Modal.Title>Confirm</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Are you sure you want the bot to leave your channel?
+        Are you sure you want the bot to leave your channel? You can have it
+        re-join at any time.
       </Modal.Body>
       <Modal.Footer>
         <Button variant="dark" onClick={handleClose}>
           Cancel
         </Button>
-        <Button variant="danger" onClick={handleConfirm}>
-          Yes, leave my channel
+        <Button variant="secondary" onClick={handleConfirm}>
+          <i className="fa-solid fa-right-from-bracket px-1"></i> Yes, leave my
+          channel
         </Button>
       </Modal.Footer>
     </Modal>
