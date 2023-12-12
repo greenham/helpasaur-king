@@ -7,11 +7,11 @@ const {
   Partials,
 } = require("discord.js");
 const { HelpaApi } = require("helpa-api-client");
-const { API_HOST, API_KEY, SERVICE_NAME } = process.env;
+
 const helpaApi = new HelpaApi({
-  apiHost: API_HOST,
-  apiKey: API_KEY,
-  serviceName: SERVICE_NAME,
+  apiHost: process.env.API_HOST,
+  apiKey: process.env.API_KEY,
+  serviceName: process.env.SERVICE_NAME,
 });
 
 const discordClient = new Client({
