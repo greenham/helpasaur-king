@@ -8,12 +8,6 @@ const {
 } = require("discord.js");
 const { HelpaApi } = require("helpa-api-client");
 
-const helpaApi = new HelpaApi({
-  apiHost: process.env.API_HOST,
-  apiKey: process.env.API_KEY,
-  serviceName: process.env.SERVICE_NAME,
-});
-
 const discordClient = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -40,6 +34,12 @@ for (const file of eventFiles) {
   }
 }
 
+const helpaApi = new HelpaApi({
+  apiHost: process.env.API_HOST,
+  apiKey: process.env.API_KEY,
+  serviceName: process.env.SERVICE_NAME,
+});
+
 const init = async () => {
   // Get the service config from the API
   discordClient.config = await helpaApi.getServiceConfig();
@@ -64,8 +64,8 @@ const init = async () => {
   discordClient.login(discordClient.config.token);
 };
 
-init();
-
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled promise rejection:", error);
 });
+
+init();
