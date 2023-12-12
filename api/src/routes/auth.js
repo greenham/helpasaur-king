@@ -13,6 +13,7 @@ const {
   JWT_HEADER_COOKIE_NAME,
   JWT_FOOTER_COOKIE_NAME,
   TWITCH_APP_OAUTH_REDIRECT_URL,
+  ALLOWED_SERVICES,
 } = process.env;
 const loginExpirationLength = "7d";
 
@@ -142,6 +143,9 @@ router.get(`/service`, requireAuthKey, async (req, res) => {
   const serviceName = req.headers["x-service-name"] || false;
   if (!serviceName) {
     return res.status(400).send({ message: "Missing service name" });
+  }
+  if (!ALLOWED_SERVICES.includes(serviceName)) {
+    return res.status(400).send({ message: "Invalid service name" });
   }
 
   // Issue a long-running JWT
