@@ -1,21 +1,20 @@
-const axios = require("axios");
 const { io } = require("socket.io-client");
+const { HelpaApi } = require("helpa-api-client");
 const RunnerWatcher = require("./lib/runner-watcher");
 const packageJson = require("../package.json");
 
-const { API_URL, API_KEY, WEBSOCKET_RELAY_SERVER } = process.env;
+const { SERVICE_NAME, WEBSOCKET_RELAY_SERVER } = process.env;
 
-const helpaApi = axios.create({
-  baseURL: API_URL,
-  headers: {
-    Authorization: API_KEY,
-  },
+const helpaApi = new HelpaApi({
+  apiHost: process.env.API_HOST,
+  apiKey: process.env.API_KEY,
+  serviceName: SERVICE_NAME,
 });
 
 async function init() {
   try {
-    const streamAlertsConfig = await helpaApi.get("/configs/streamAlerts");
-    const runnerwatcher = new RunnerWatcher(streamAlertsConfig.data.config);
+    const streamAlertsConfig = await helpaApi.getServiceConfig(SERVICE_NAME);
+    const runnerwatcher = new RunnerWatcher(streamAlertsConfig);
     const wsRelay = io(WEBSOCKET_RELAY_SERVER, {
       query: { clientId: `${packageJson.name} v${packageJson.version}` },
     });

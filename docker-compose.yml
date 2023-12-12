@@ -49,7 +49,7 @@ services:
       - ${API_SERVER_EXTERNAL_PORT}:3001
     environment:
       SERVICE_NAME: api
-      ALLOWED_SERVICES: discord,twitch,runnerwatcher,racebot,ws-relay
+      ALLOWED_SERVICES: discord,twitch,runnerwatcher,racebot,ws-relay,streamAlerts
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_EXTERNAL_PORT}/${MONGO_DATABASE_NAME}?authSource=admin
       PORT: ${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
@@ -149,8 +149,8 @@ services:
     ports:
       - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002
     environment:
-      SERVICE_NAME: runnerwatcher
-      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      SERVICE_NAME: streamAlerts
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
       TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL}
@@ -158,6 +158,7 @@ services:
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
+      - helpa-base
     networks:
       - int
       - ext
