@@ -12,7 +12,8 @@
     "axios-retry": "^3.8.1",
     "discord.js": "^14.14.1",
     "node-schedule": "^2.1.1",
-    "socket.io-client": "^4.5.4"
+    "socket.io-client": "^4.5.4",
+    "helpa-api-client": "file:../lib/helpa-api-client"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
