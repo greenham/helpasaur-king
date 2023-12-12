@@ -8,6 +8,7 @@ services:
   discord-bot:
     volumes:
       - ./discord/src:/app/src
+      - ./lib/helpa-api-client:/lib/helpa-api-client
 
   twitch-bot:
     volumes:

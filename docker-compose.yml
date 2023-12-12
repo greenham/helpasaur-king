@@ -1,6 +1,12 @@
 version: "3.8"
 
 services:
+  helpa-base:
+    build:
+      context: ./lib
+      target: builder
+    image: helpa-base:latest
+
   mongo:
     image: mongo:latest
     restart: on-failure
@@ -43,6 +49,7 @@ services:
       - ${API_SERVER_EXTERNAL_PORT}:3001
     environment:
       SERVICE_NAME: api
+      ALLOWED_SERVICES: discord,twitch,runnerwatcher,racebot,ws-relay
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_EXTERNAL_PORT}/${MONGO_DATABASE_NAME}?authSource=admin
       PORT: ${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
@@ -76,6 +83,7 @@ services:
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
+      - helpa-base
     networks:
       - int
       - ext
