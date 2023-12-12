@@ -13,6 +13,7 @@ services:
   twitch-bot:
     volumes:
       - ./twitch/src:/app/src
+      - ./lib/helpa-api-client:/lib/helpa-api-client
 
   web:
     volumes:

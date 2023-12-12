@@ -76,9 +76,7 @@ services:
     restart: on-failure
     environment:
       SERVICE_NAME: discord
-      API_HOST: ${API_HOST}
-      API_URL: ${API_URL}
-      API_SERVICE_AUTH_URL: ${API_SERVICE_AUTH_URL}
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
@@ -96,11 +94,12 @@ services:
     restart: on-failure
     environment:
       SERVICE_NAME: twitch
-      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
+      - helpa-base
     networks:
       - int
       - ext

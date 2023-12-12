@@ -1,22 +1,17 @@
 const tmi = require("tmi.js");
-const axios = require("axios");
 const { io } = require("socket.io-client");
-const { API_URL, API_KEY, WEBSOCKET_RELAY_SERVER } = process.env;
+const { HelpaApi } = require("helpa-api-client");
+const { WEBSOCKET_RELAY_SERVER } = process.env;
 const packageJson = require("../package.json");
-axios.defaults.headers.common["Authorization"] = API_KEY;
+
+const helpaApiClient = new HelpaApi({
+  apiHost: process.env.API_HOST,
+  apiKey: process.env.API_KEY,
+  serviceName: process.env.SERVICE_NAME,
+});
+
 let cooldowns = new Map();
 let cachedCommands = new Map();
-
-// Fetch config via API
-axios
-  .get(`${API_URL}/configs/twitch`)
-  .then((result) => {
-    init(result.data.config);
-  })
-  .catch((err) => {
-    console.error(`Error fetching config: ${err.message}`);
-    // @TODO: build in retry
-  });
 
 // Connect to websocket relay to communicate with other services
 const wsRelay = io(WEBSOCKET_RELAY_SERVER, {
@@ -33,7 +28,7 @@ wsRelay.on("connect", () => {
   console.log(`✅ Connected! Socket ID: ${wsRelay.id}`);
 });
 
-function init(config) {
+function init(config, helpaApi) {
   const {
     username,
     oauth: password,
@@ -127,17 +122,15 @@ function init(config) {
         channelList.push(userChannel);
 
         // call API to add this channel to the list
-        axios
-          .post(`${API_URL}/twitch/join`, { channel: userChannel })
+        helpaApi.api
+          .post(`/api/twitch/join`, { channel: userChannel })
           .then((result) => {
             console.log(
-              `Result of ${API_URL}/twitch/join: ${JSON.stringify(result.data)}`
+              `Result of /api/twitch/join: ${JSON.stringify(result.data)}`
             );
           })
           .catch((err) => {
-            console.error(
-              `Error calling ${API_URL}/twitch/join: ${err.message}`
-            );
+            console.error(`Error calling /api/twitch/join: ${err.message}`);
           });
 
         return;
@@ -174,19 +167,15 @@ function init(config) {
         channelList = channelList.filter((c) => c !== userChannel);
 
         // call API to remove this channel to the list
-        axios
-          .post(`${API_URL}/twitch/leave`, { channel: userChannel })
+        helpaApi.api
+          .post(`/api/twitch/leave`, { channel: userChannel })
           .then((result) => {
             console.log(
-              `Result of ${API_URL}/twitch/leave: ${JSON.stringify(
-                result.data
-              )}`
+              `Result of /api/twitch/leave: ${JSON.stringify(result.data)}`
             );
           })
           .catch((err) => {
-            console.error(
-              `Error calling ${API_URL}/twitch/leave: ${err.message}`
-            );
+            console.error(`Error calling /api/twitch/leave: ${err.message}`);
           });
 
         return;
@@ -209,7 +198,7 @@ function init(config) {
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
-        const response = await axios.post(`${API_URL}/commands/find`, {
+        const response = await helpaApi.api.post(`/api/commands/find`, {
           command: commandNoPrefix,
         });
 
@@ -274,7 +263,7 @@ function init(config) {
     }
 
     // Make an API call to log useage
-    await axios.post(`${API_URL}/commands/logs`, {
+    await helpaApi.api.post(`/api/commands/logs`, {
       command: command.command,
       alias: aliasUsed,
       source: "twitch",
@@ -319,6 +308,20 @@ function init(config) {
     console.log(`Left #${channel}`);
   });
 }
+
+// Get the service config from the API
+helpaApiClient
+  .getServiceConfig()
+  .then((config) => {
+    if (!config) {
+      throw new Error(`Unable to get service config from API!`);
+    }
+
+    init(config, helpaApiClient);
+  })
+  .catch((error) => {
+    console.error(`Error getting service config: ${error.message}`);
+  });
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled promise rejection:", error);
