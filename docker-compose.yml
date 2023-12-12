@@ -42,6 +42,7 @@ services:
     ports:
       - ${API_SERVER_EXTERNAL_PORT}:3001
     environment:
+      SERVICE_NAME: api
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_EXTERNAL_PORT}/${MONGO_DATABASE_NAME}?authSource=admin
       PORT: ${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
@@ -67,7 +68,7 @@ services:
       target: ${TARGET}
     restart: on-failure
     environment:
-      SERVICE_NAME: discord-bot
+      SERVICE_NAME: discord
       API_HOST: ${API_HOST}
       API_URL: ${API_URL}
       API_SERVICE_AUTH_URL: ${API_SERVICE_AUTH_URL}
@@ -86,6 +87,7 @@ services:
       target: ${TARGET}
     restart: on-failure
     environment:
+      SERVICE_NAME: twitch
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
@@ -140,6 +142,7 @@ services:
     ports:
       - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002
     environment:
+      SERVICE_NAME: runnerwatcher
       API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
       API_KEY: ${API_SECRET_KEY}
       TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
@@ -159,6 +162,7 @@ services:
       target: ${TARGET}
     restart: on-failure
     environment:
+      SERVICE_NAME: racebot
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
       RACETIME_BASE_URL: ${RACETIME_BASE_URL}
       RACETIME_HOSTNAME: ${RACETIME_HOSTNAME}
@@ -179,6 +183,7 @@ services:
     ports:
       - ${WEBSOCKET_RELAY_SERVER_PORT}:${WEBSOCKET_RELAY_SERVER_PORT}
     environment:
+      SERVICE_NAME: ws-relay
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
     networks:
       - int
