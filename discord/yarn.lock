@@ -154,14 +154,7 @@ axios-retry@^3.8.1:
     "@babel/runtime" "^7.15.4"
     is-retry-allowed "^2.2.0"
 
-axios-retry@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/axios-retry/-/axios-retry-4.0.0.tgz#d5cb8ea1db18e05ce6f08aa5fe8b2663bba48e60"
-  integrity sha512-F6P4HVGITD/v4z9Lw2mIA24IabTajvpDZmKa6zq/gGwn57wN5j1P3uWrAV0+diqnW6kTM2fTqmWNfgYWGmMuiA==
-  dependencies:
-    is-retry-allowed "^2.2.0"
-
-axios@^1.6.0, axios@^1.6.2:
+axios@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.2.tgz#de67d42c755b571d3e698df1b6504cde9b0ee9f2"
   integrity sha512-7i24Ri4pmDRfJTR7LDBhsOTtcm+9kjX5WiY1X3wIisx6G9So3pfMkEiU7emUBe46oceVImccTEM3k6C5dbVW8A==
@@ -329,7 +322,7 @@ has-flag@^3.0.0:
   version "1.0.0"
   dependencies:
     axios "^1.6.2"
-    axios-retry "^4.0.0"
+    axios-retry "^3.8.1"
 
 ignore-by-default@^1.0.1:
   version "1.0.1"

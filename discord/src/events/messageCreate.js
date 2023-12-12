@@ -1,7 +1,4 @@
 const { EmbedBuilder, Collection } = require("discord.js");
-const axios = require("axios");
-const { API_URL, API_KEY } = process.env;
-axios.defaults.headers.common["Authorization"] = API_KEY;
 const defaultConfig = {
   cmdPrefix: "!",
   textCmdCooldown: 10,
@@ -53,7 +50,7 @@ module.exports = {
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
-        const response = await axios.post(`${API_URL}/commands/find`, {
+        const response = await this.helpaApi.api.post(`/api/commands/find`, {
           command: commandNoPrefix,
         });
 
@@ -128,7 +125,7 @@ module.exports = {
     cooldowns.set(cooldownKey, Date.now());
 
     // Make an API call to log useage
-    await axios.post(`${API_URL}/commands/logs`, {
+    await this.helpaApi.api.post(`/api/commands/logs`, {
       command: command.command,
       alias: aliasUsed,
       source: "discord",
