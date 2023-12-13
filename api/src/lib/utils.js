@@ -18,7 +18,7 @@ const requireJwtToken = jwt({
   algorithms: ["HS256"],
   getToken: (req) => {
     // check Authorization header for Bearer token first
-    const authorizationHeader = req.headers.authorization;
+    const authorizationHeader = req.get("Authorization");
     if (authorizationHeader && authorizationHeader.split(" ")[0] === "Bearer") {
       return authorizationHeader.split(" ")[1];
     } else {
@@ -45,8 +45,45 @@ const userHasPermission = async (req, res, next) => {
   next();
 };
 
+const getRequestedChannel = async (req) => {
+  if (
+    !req.auth ||
+    !["service", "user"].includes(req.auth.entity) ||
+    !req.auth.sub
+  ) {
+    return false;
+  }
+
+  // check req.auth to see who is logged in
+  // if it's a service, then the channel is provided in the body of the request
+  // if it's a user, then the channel is the user's twitch login
+  // -- unless it's an admin, in which case they can specify a channel in the body -- if none is specified, then use the admin's twitch channel
+  let requestedChannel;
+  if (req.auth.entity === "service") {
+    if (!req.body.channel) {
+      return false;
+    }
+    requestedChannel = req.body.channel;
+  } else if (req.auth.entity === "user") {
+    // check if the logged-in user is an admin
+    const user = await User.findById(req.auth.sub);
+    if (user.permissions.includes("admin")) {
+      if (req.body.channel) {
+        requestedChannel = req.body.channel;
+      } else {
+        requestedChannel = user.twitchUserData.login;
+      }
+    } else {
+      requestedChannel = user.twitchUserData.login;
+    }
+  }
+
+  return requestedChannel;
+};
+
 module.exports = {
   requireAuthKey,
   requireJwtToken,
   userHasPermission,
+  getRequestedChannel,
 };
