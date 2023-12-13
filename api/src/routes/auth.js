@@ -17,13 +17,11 @@ const {
 } = process.env;
 const loginExpirationLength = "7d";
 
-const getStreamAlertsConfig = async () => {
-  return await Config.findOne({ id: "streamAlerts" });
-};
-
 // Endpoint: GET /auth/twitch
 router.get(`/twitch`, async (req, res) => {
-  const { config: streamAlertsConfig } = await getStreamAlertsConfig();
+  const { config: streamAlertsConfig } = await Config.findOne({
+    id: "streamAlerts",
+  });
 
   //const redirectPath = req.query.redirect || "/";
   const redirectUrl = CLIENT_POST_AUTH_REDIRECT_URL; // + redirectPath;
