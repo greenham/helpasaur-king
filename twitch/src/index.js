@@ -7,11 +7,16 @@ const helpaApiClient = new HelpaApi({
   serviceName: process.env.SERVICE_NAME,
 });
 
-helpaApiClient.getServiceConfig().then((config) => {
-  if (!config) {
-    throw new Error(`Unable to get service config from API!`);
-  }
+helpaApiClient
+  .getServiceConfig()
+  .then((config) => {
+    if (!config) {
+      throw new Error(`Unable to get service config from API!`);
+    }
 
-  const twitchBot = new TwitchBot(config, helpaApiClient);
-  twitchBot.connect();
-});
+    const bot = new TwitchBot(config, helpaApiClient);
+    bot.start();
+  })
+  .catch((error) => {
+    console.error("Error fetching service config:", error);
+  });

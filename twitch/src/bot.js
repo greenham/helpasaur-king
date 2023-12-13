@@ -14,7 +14,7 @@ class TwitchBot {
     this.wsRelay = null;
   }
 
-  connect() {
+  start() {
     this.bot = new tmi.Client({
       options: { debug: false },
       identity: {
