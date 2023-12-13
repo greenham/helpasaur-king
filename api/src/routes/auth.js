@@ -102,7 +102,7 @@ router.get(`/twitch`, async (req, res) => {
   }
 
   // Issue our own JWT
-  const idToken = jwt.sign({}, JWT_SECRET_KEY, {
+  const idToken = jwt.sign({ entity: "user" }, JWT_SECRET_KEY, {
     expiresIn: loginExpirationLength,
     subject: localUser._id.toString(),
   });
@@ -149,7 +149,7 @@ router.get(`/service`, requireAuthKey, async (req, res) => {
   }
 
   // Issue a long-running JWT
-  const idToken = jwt.sign({}, JWT_SECRET_KEY, {
+  const idToken = jwt.sign({ entity: "service" }, JWT_SECRET_KEY, {
     expiresIn: "365d",
     subject: serviceName,
   });
