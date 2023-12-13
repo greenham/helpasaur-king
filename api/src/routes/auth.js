@@ -6,7 +6,7 @@ const ms = require("ms");
 const TwitchApi = require("node-twitch").default;
 const Config = require("../models/config");
 const User = require("../models/user");
-const { requireAuthKey, requireJwtToken } = require("../lib/utils");
+const { requireAuthKey } = require("../lib/utils");
 const {
   CLIENT_POST_AUTH_REDIRECT_URL,
   JWT_SECRET_KEY,
@@ -134,10 +134,8 @@ router.get(`/twitch`, async (req, res) => {
 });
 
 // Endpoint: GET /auth/service
-// This will be for our internal services like the discord and twitch bots, runnerwatcher, etc.
-// We just need to use the requireAuthKey middleware to verify the request
-// Then we can issue a JWT for the service to use that does not expire
-// And also identifies the service
+// This is for our internal services like the discord and twitch bots, runnerwatcher, etc.
+// It issues the same kind of JWT as users get, but it's long-lived and identifies the service instead of a user
 router.get(`/service`, requireAuthKey, async (req, res) => {
   // Validate service name
   const serviceName = req.headers["x-service-name"] || false;
