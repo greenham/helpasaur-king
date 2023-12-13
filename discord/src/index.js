@@ -48,7 +48,7 @@ class DiscordBot {
     console.log(`Logging bot into Discord...`);
     this.discordClient.login(this.discordClient.config.token);
 
-    // @TODO: Make sure the login succeeds
+    // @TODO: Make sure the login succeeds before handling events
 
     // Start handling events
     this.handleEvents();

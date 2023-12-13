@@ -124,7 +124,7 @@ module.exports = {
     // Place command on cooldown
     cooldowns.set(cooldownKey, Date.now());
 
-    // Make an API call to log useage
+    // Log command use
     await this.helpaApi.api.post(`/api/commands/logs`, {
       command: command.command,
       alias: aliasUsed,
