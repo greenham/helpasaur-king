@@ -59,7 +59,7 @@ const DefaultToast: React.FunctionComponent<IToast> = (props) => {
         <strong className="me-auto">{toastVariant.title}</strong>
       </Toast.Header>
       <Toast.Body>
-        <p className="fs-5">
+        <p className="fs-5 text-primary">
           <strong>{message}</strong>
         </p>
       </Toast.Body>
