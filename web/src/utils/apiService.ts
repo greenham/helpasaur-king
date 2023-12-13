@@ -55,7 +55,7 @@ export const getTwitchBotConfig = async () => {
 };
 
 export const joinTwitchChannel = async () => {
-  const response = await fetch(`${API_URL}/me/twitch/join`, {
+  const response = await fetch(`${API_URL}/twitch/join`, {
     method: "POST",
     credentials: "include",
   });
@@ -68,7 +68,7 @@ export const joinTwitchChannel = async () => {
 };
 
 export const leaveTwitchChannel = async () => {
-  const response = await fetch(`${API_URL}/me/twitch/leave`, {
+  const response = await fetch(`${API_URL}/twitch/leave`, {
     method: "POST",
     credentials: "include",
   });
