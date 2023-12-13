@@ -23,8 +23,7 @@ router.post("/join", async (req, res) => {
 
     // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
     if (req.auth.entity !== "service" || req.auth.sub !== "twitch") {
-      console.log("Emitting joinChannel event");
-      // req.app.wsRelay.emit("joinChannel", requestedChannel);
+      req.app.wsRelay.emit("joinChannel", requestedChannel);
     }
 
     res.status(200).json({ result: true });
@@ -40,8 +39,6 @@ router.post("/leave", async (req, res) => {
     return res.status(400).json({ message: "Invalid channel provided" });
   }
 
-  console.log(`requestedChannel: ${requestedChannel}`);
-
   try {
     const twitchConfig = await Config.findOne({ id: "twitch" });
     if (!twitchConfig.config.channels.includes(requestedChannel)) {
@@ -56,8 +53,7 @@ router.post("/leave", async (req, res) => {
 
     // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
     if (req.auth.entity !== "service" || req.auth.sub !== "twitch") {
-      console.log("Emitting leaveChannel event");
-      // req.app.wsRelay.emit("leaveChannel", requestedChannel);
+      req.app.wsRelay.emit("leaveChannel", requestedChannel);
     }
 
     res.status(200).json({ result: true });
