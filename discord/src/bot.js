@@ -23,7 +23,7 @@ class DiscordBot {
     });
   }
 
-  async start() {
+  start() {
     this.discordClient.setRandomActivity = () => {
       let activity =
         this.config.activities[
