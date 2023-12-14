@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.0
+
+- All services now use JWTs for the API just like users
+- All endpoints are now secured with JWTs
+- Users and services now use the same endpoint for Twitch actions
+- Extracted Helpa API client into its own package
+- Adjusted docker builds to make this package available
+- Standardizing Twitch and Discord bot code
+- Make toast alert text more readable
+
 ## 1.5.1
 
 - Enforce command name uniqueness when creating
