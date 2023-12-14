@@ -21,6 +21,8 @@ class DiscordBot {
       ],
       partials: [Partials.Channel],
     });
+
+    this.discordClient.config = config;
   }
 
   start() {
