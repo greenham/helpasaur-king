@@ -26,11 +26,6 @@ class RunnerWatcher extends EventEmitter {
       );
     }
 
-    this.twitchApi = new TwitchApi({
-      client_id: this.config.clientId,
-      client_secret: this.config.clientSecret,
-    });
-
     this.listener = new TwitchEventListener();
 
     this.init();
@@ -64,8 +59,13 @@ class RunnerWatcher extends EventEmitter {
     };
 
     try {
+      const twitchApi = new TwitchApi({
+        client_id: this.config.clientId,
+        client_secret: this.config.clientSecret,
+      });
+
       // Pull stream info from Twitch API
-      let streamResult = await this.twitchApi.getStreams({
+      let streamResult = await twitchApi.getStreams({
         channel: user.id,
       });
 
@@ -165,7 +165,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Pull user info
-      let userResult = await this.twitchApi.getUsers(user.id);
+      let userResult = await twitchApi.getUsers(user.id);
       if (!userResult || !userResult.data || !userResult.data[0]) {
         console.log(`Unable to get data for user ${user.name}!`);
       } else {
