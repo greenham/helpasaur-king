@@ -234,7 +234,7 @@ class TwitchBot {
     this.bot.join(channel);
     this.bot.say(
       channel,
-      `Hello, I'm Helpasaur King and I'm very high in potassium... like a banana! Use ${this.config.cmdPrefix}help to see what I can do.`
+      `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Use ${this.config.cmdPrefix}help to see what I can do.`
     );
     this.channelList.push(channel);
     console.log(`Joined #${channel}`);
@@ -249,7 +249,7 @@ class TwitchBot {
 
     this.bot.say(
       channel,
-      `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com or my twitch chat using ${this.config.cmdPrefix}join)`
+      `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`
     );
     this.bot.part(channel);
     this.channelList = this.channelList.filter((c) => c !== channel);
