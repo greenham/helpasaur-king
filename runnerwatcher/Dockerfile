@@ -1,4 +1,4 @@
-FROM node:16-alpine as base
+FROM helpa-base:latest as base
 
 WORKDIR /app
 COPY package.json .

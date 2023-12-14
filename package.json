@@ -1,9 +1,9 @@
 {
   "name": "helpasaur-king",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
-    "build": "docker compose build",
+    "build": "docker compose build --force-rm",
     "start": "docker compose up -d",
     "stop": "docker compose down",
     "start:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",

@@ -1,9 +1,17 @@
 version: "3.8"
 
 services:
+  helpa-base:
+    build:
+      context: ./lib
+      target: builder
+    image: helpa-base:latest
+
   mongo:
     image: mongo:latest
     restart: on-failure
+    logging:
+      driver: none
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -19,6 +27,8 @@ services:
   mongo-express:
     image: mongo-express
     restart: on-failure
+    logging:
+      driver: none
     ports:
       - 8081:8081
     environment:
@@ -39,9 +49,13 @@ services:
       context: ./api
       target: ${TARGET}
     restart: on-failure
+    logging:
+      driver: local
     ports:
       - ${API_SERVER_EXTERNAL_PORT}:3001
     environment:
+      SERVICE_NAME: api
+      ALLOWED_SERVICES: discord,twitch,runnerwatcher,racebot,ws-relay,streamAlerts
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:${MONGO_EXTERNAL_PORT}/${MONGO_DATABASE_NAME}?authSource=admin
       PORT: ${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
@@ -66,12 +80,16 @@ services:
       context: ./discord
       target: ${TARGET}
     restart: on-failure
+    logging:
+      driver: local
     environment:
-      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      SERVICE_NAME: discord
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
+      - helpa-base
     networks:
       - int
       - ext
@@ -82,12 +100,16 @@ services:
       context: ./twitch
       target: ${TARGET}
     restart: on-failure
+    logging:
+      driver: local
     environment:
-      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      SERVICE_NAME: twitch
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
+      - helpa-base
     networks:
       - int
       - ext
@@ -104,6 +126,8 @@ services:
         TWITCH_APP_OAUTH_REDIRECT_URL: ${TWITCH_APP_OAUTH_REDIRECT_URL}
         WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     restart: on-failure
+    logging:
+      driver: local
     ports:
       - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
     depends_on:
@@ -115,6 +139,8 @@ services:
   nginx:
     image: nginx:1.21.6
     restart: always
+    logging:
+      driver: none
     ports:
       - 8888:80
     environment:
@@ -134,10 +160,13 @@ services:
       context: ./runnerwatcher
       target: ${TARGET}
     restart: on-failure
+    logging:
+      driver: local
     ports:
       - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002
     environment:
-      API_URL: http://api-server:${API_SERVER_EXTERNAL_PORT}/api
+      SERVICE_NAME: streamAlerts
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
       TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL}
@@ -145,6 +174,7 @@ services:
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
       - api-server
+      - helpa-base
     networks:
       - int
       - ext
@@ -155,7 +185,10 @@ services:
       context: ./racebot
       target: ${TARGET}
     restart: on-failure
+    logging:
+      driver: local
     environment:
+      SERVICE_NAME: racebot
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
       RACETIME_BASE_URL: ${RACETIME_BASE_URL}
       RACETIME_HOSTNAME: ${RACETIME_HOSTNAME}
@@ -173,9 +206,12 @@ services:
       context: ./ws-relay
       target: ${TARGET}
     restart: on-failure
+    logging:
+      driver: local
     ports:
       - ${WEBSOCKET_RELAY_SERVER_PORT}:${WEBSOCKET_RELAY_SERVER_PORT}
     environment:
+      SERVICE_NAME: ws-relay
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
     networks:
       - int

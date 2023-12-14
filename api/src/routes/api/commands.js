@@ -95,7 +95,12 @@ router.delete("/:id", requireJwtToken, userHasPermission, async (req, res) => {
   }
 });
 
-router.post("/logs", requireAuthKey, async (req, res) => {
+router.post("/logs", requireJwtToken, async (req, res) => {
+  // services only
+  if (!req.auth || !req.auth.entity || req.auth.entity !== "service") {
+    return res.sendStatus(401);
+  }
+
   try {
     const commandLog = await CommandLog.create(req.body);
     res.status(200).json(commandLog);
