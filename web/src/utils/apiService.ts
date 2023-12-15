@@ -125,6 +125,22 @@ export const deleteCommand = async (command: Command) => {
   return response.json();
 };
 
+export const addUserToStreamAlerts = async (twitchUsername: string) => {
+  const response = await fetch(`${API_URL}/streamAlerts/channels`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ channels: [twitchUsername] }),
+  });
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
+
+  return response.json();
+};
+
 async function handleApiResponse(response: Response) {
   if (!response.ok) {
     const responseJson = await response.json();

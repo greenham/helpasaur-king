@@ -7,6 +7,7 @@ export interface ToastVariant {
   icon: React.ReactNode;
   bgClass: string;
   title: string;
+  textClass?: string;
 }
 
 export interface ToastVariants {
@@ -18,21 +19,25 @@ const toastVariants: ToastVariants = {
     icon: <i className="fa-regular fa-circle-check px-1"></i>,
     bgClass: "success",
     title: "Success!",
+    textClass: "text-dark",
   },
   warning: {
     icon: <i className="fa-solid fa-triangle-exclamation px-1"></i>,
     bgClass: "warning",
     title: "Warning!",
+    textClass: "text-body-emphasis",
   },
   info: {
     icon: <i className="fa-solid fa-circle-info px-1"></i>,
     bgClass: "info",
     title: "Info",
+    textClass: "text-body-emphasis",
   },
   error: {
     icon: <i className="fa-solid fa-bug px-1"></i>,
     bgClass: "danger",
     title: "Error!",
+    textClass: "text-body-emphasis",
   },
 };
 
@@ -59,7 +64,7 @@ const DefaultToast: React.FunctionComponent<IToast> = (props) => {
         <strong className="me-auto">{toastVariant.title}</strong>
       </Toast.Header>
       <Toast.Body>
-        <p className="fs-5 text-primary">
+        <p className={`fs-5 ${toastVariant.textClass}`}>
           <strong>{message}</strong>
         </p>
       </Toast.Body>

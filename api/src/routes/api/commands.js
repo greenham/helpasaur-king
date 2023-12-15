@@ -2,14 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Command = require("../../models/command");
 const CommandLog = require("../../models/commandLog");
-const {
-  requireAuthKey,
-  requireJwtToken,
-  userHasPermission,
-} = require("../../lib/utils");
+const { requireJwtToken, userHasPermission } = require("../../lib/utils");
 
 // Endpoint: /commands
 
+// ======== PUBLIC ENDPOINTS ========
 // GET / -> returns all commands
 router.get("/", async (req, res) => {
   try {
@@ -43,6 +40,7 @@ router.post("/find", async (req, res) => {
   }
 });
 
+// ======== PROTECTED ENDPOINTS ========
 // POST / -> create new command
 router.post("/", requireJwtToken, userHasPermission, async (req, res) => {
   try {
@@ -97,6 +95,7 @@ router.delete("/:id", requireJwtToken, userHasPermission, async (req, res) => {
 
 router.post("/logs", requireJwtToken, async (req, res) => {
   // services only
+  // @TODO: move this to a middleware like userHasPermission
   if (!req.auth || !req.auth.entity || req.auth.entity !== "service") {
     return res.sendStatus(401);
   }
