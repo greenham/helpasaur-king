@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.1
+
+- Secure stream alerts endpoints
+- Admins can now add users to stream alerts via the web
+
 ## 1.6.0
 
 - All services now use JWTs for the API just like users
