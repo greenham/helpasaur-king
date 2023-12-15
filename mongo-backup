@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Read MONGO values from .env file
+source .env
+
+# Extract the container ID of the MongoDB container via docker ps
+container_id=$(docker ps | grep mongo\:latest | awk '{print $1}')
+
+# Execute mongodump command as root user
+docker exec -it $container_id mongodump --authenticationDatabase admin --username $MONGO_ROOT_USERNAME --password $MONGO_ROOT_PASSWORD  --db $MONGO_DATABASE_NAME
+
+# Copy dump file to local path using Docker
+docker cp $container_id:/dump mongo-backups
