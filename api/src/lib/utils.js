@@ -36,13 +36,13 @@ const getRequestedChannel = async (req) => {
   // if it's a user, then the channel is the user's twitch login
   // -- unless it's an admin, in which case they can specify a channel in the body -- if none is specified, then use the admin's twitch channel
   let requestedChannel;
-  if (req.user.permissions.include("service")) {
+  if (req.user.permissions.includes("service")) {
     if (!req.body.channel) {
       return false;
     }
     requestedChannel = req.body.channel;
   } else {
-    if (req.user.permissions.include("admin") && req.body.channel) {
+    if (req.user.permissions.includes("admin") && req.body.channel) {
       requestedChannel = req.body.channel;
     } else {
       const user = await User.findById(req.user.sub);
