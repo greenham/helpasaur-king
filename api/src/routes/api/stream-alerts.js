@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const TwitchApi = require("../../lib/twitch-api");
 const Config = require("../../models/config");
+const { userHasPermission } = require("../../lib/utils");
 const getTwitchApiClient = (config) => {
   return new TwitchApi({
     client_id: config.clientId,
@@ -17,7 +18,7 @@ const getTwitchApiClient = (config) => {
 //    { channels: Array<String> }
 //
 //  Adds new channels to stream alerts list and subscribes to necessary Twitch events
-router.post("/channels", async (req, res) => {
+router.post("/channels", userHasPermission, async (req, res) => {
   if (!req.body.hasOwnProperty("channels")) {
     return res
       .status(400)
@@ -84,7 +85,7 @@ router.post("/channels", async (req, res) => {
 });
 
 // DELETE /channels/:id -> remove channel by user ID, delete event subscriptions for that user ID
-router.delete("/channels/:id", async (req, res) => {
+router.delete("/channels/:id", userHasPermission, async (req, res) => {
   try {
     const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
     console.log(
@@ -130,7 +131,7 @@ router.delete("/channels/:id", async (req, res) => {
 });
 
 // GET /subscriptions -> get list of webhook subscriptions
-router.get("/subscriptions", async (req, res) => {
+router.get("/subscriptions", userHasPermission, async (req, res) => {
   try {
     const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
     const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config);
@@ -141,7 +142,7 @@ router.get("/subscriptions", async (req, res) => {
   }
 });
 
-router.delete("/subscriptions/all", async (req, res) => {
+router.delete("/subscriptions/all", userHasPermission, async (req, res) => {
   const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
   const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config);
   twitchApiClient
@@ -156,7 +157,7 @@ router.delete("/subscriptions/all", async (req, res) => {
 });
 
 // @TODO DRY this out into something that can do basic list management / user querying
-router.post("/channels/blacklist", async (req, res) => {
+router.post("/channels/blacklist", userHasPermission, async (req, res) => {
   if (!req.body.hasOwnProperty("channels")) {
     return res
       .status(400)
