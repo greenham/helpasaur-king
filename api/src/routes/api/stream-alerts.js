@@ -76,7 +76,7 @@ router.post("/channels", userHasPermission, async (req, res) => {
     await streamAlertsConfig.save();
     console.log(`Added ${channel} to stream alerts list`);
 
-    return { success: true, channel, subscriptionResults };
+    return { status: "success", channel, subscriptionResults };
   });
 
   Promise.allSettled(results).then(async (channelResults) => {
