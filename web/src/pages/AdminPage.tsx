@@ -26,6 +26,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
   const { data: user, isLoading: userLoading } = useUser();
 
   const [userToAdd, setUserToAdd] = React.useState("");
+  const [userAddInProgress, setUserAddInProgress] = React.useState(false);
   const handleUserToAddInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -33,10 +34,10 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
     setUserToAdd(value);
   };
   const handleAddUserToStreamAlerts = async () => {
+    setUserAddInProgress(true);
     try {
       const { data: userAddResult } = await addUserToStreamAlerts(userToAdd);
       const userResult = userAddResult[0].value;
-      console.log(userResult);
       if (userResult.status === "success") {
         toast.success(`Added ${userToAdd} to stream alerts!`);
         setUserToAdd("");
@@ -48,6 +49,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
     } catch (err) {
       toast.error(`Failed to add ${userToAdd} to stream alerts: ${err}`);
     }
+    setUserAddInProgress(false);
   };
 
   if (userLoading)
@@ -115,13 +117,20 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
             </FloatingLabel>
           </Col>
           <Col>
-            <Button
-              variant="dark"
-              onClick={handleAddUserToStreamAlerts}
-              size="lg"
-            >
-              <i className="fa-regular fa-square-plus px-1"></i> Add User
-            </Button>
+            {userAddInProgress ? (
+              <Spinner animation="border" role="statues">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            ) : (
+              <Button
+                variant="dark"
+                onClick={handleAddUserToStreamAlerts}
+                size="lg"
+                disabled={userAddInProgress}
+              >
+                <i className="fa-regular fa-square-plus px-1"></i> Add User
+              </Button>
+            )}
           </Col>
         </Row>
       </Container>
