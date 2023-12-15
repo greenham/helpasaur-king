@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const Command = require("../../models/command");
 const CommandLog = require("../../models/commandLog");
-const { requireJwtToken, userHasPermission } = require("../../lib/utils");
+const { requireJwtToken } = require("../../lib/utils");
+const guard = require("express-jwt-permissions")();
 
 // Endpoint: /commands
 
@@ -42,7 +43,7 @@ router.post("/find", async (req, res) => {
 
 // ======== PROTECTED ENDPOINTS ========
 // POST / -> create new command
-router.post("/", requireJwtToken, userHasPermission, async (req, res) => {
+router.post("/", requireJwtToken, guard.check("admin"), async (req, res) => {
   try {
     delete req.body._id;
     const existingCommand = await Command.findOne({
@@ -65,47 +66,57 @@ router.post("/", requireJwtToken, userHasPermission, async (req, res) => {
 });
 
 // PATCH /:id -> update command
-router.patch("/:id", requireJwtToken, userHasPermission, async (req, res) => {
-  try {
-    const command = await Command.findById(req.params.id);
-    if (!command) {
-      return res.sendStatus(404);
-    }
+router.patch(
+  "/:id",
+  requireJwtToken,
+  guard.check("admin"),
+  async (req, res) => {
+    try {
+      const command = await Command.findById(req.params.id);
+      if (!command) {
+        return res.sendStatus(404);
+      }
 
-    for (key in req.body) {
-      command[key] = req.body[key];
-    }
-    await command.save();
+      for (key in req.body) {
+        command[key] = req.body[key];
+      }
+      await command.save();
 
-    res.status(200).json(command);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+      res.status(200).json(command);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   }
-});
+);
 
 // DELETE /:id -> "delete" command by ID
-router.delete("/:id", requireJwtToken, userHasPermission, async (req, res) => {
-  try {
-    const command = await Command.deleteOne({ _id: req.params.id });
-    res.status(200).json(command);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+router.delete(
+  "/:id",
+  requireJwtToken,
+  guard.check("admin"),
+  async (req, res) => {
+    try {
+      const command = await Command.deleteOne({ _id: req.params.id });
+      res.status(200).json(command);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   }
-});
+);
 
-router.post("/logs", requireJwtToken, async (req, res) => {
-  // services only
-  // @TODO: move this to a middleware like userHasPermission
-  if (!req.auth || !req.auth.entity || req.auth.entity !== "service") {
-    return res.sendStatus(401);
+// services only
+router.post(
+  "/logs",
+  requireJwtToken,
+  guard.check("service"),
+  async (req, res) => {
+    try {
+      const commandLog = await CommandLog.create(req.body);
+      res.status(200).json(commandLog);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   }
-
-  try {
-    const commandLog = await CommandLog.create(req.body);
-    res.status(200).json(commandLog);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+);
 
 module.exports = router;

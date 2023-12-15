@@ -22,7 +22,7 @@ router.post("/join", async (req, res) => {
     await twitchConfig.save();
 
     // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
-    if (req.auth.entity !== "service" || req.auth.sub !== "twitch") {
+    if (req.user.entity !== "service" || req.user.sub !== "twitch") {
       req.app.wsRelay.emit("joinChannel", requestedChannel);
     }
 
@@ -52,7 +52,7 @@ router.post("/leave", async (req, res) => {
     await twitchConfig.save();
 
     // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
-    if (req.auth.entity !== "service" || req.auth.sub !== "twitch") {
+    if (req.user.entity !== "service" || req.user.sub !== "twitch") {
       req.app.wsRelay.emit("leaveChannel", requestedChannel);
     }
 

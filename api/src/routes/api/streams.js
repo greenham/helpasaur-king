@@ -35,19 +35,4 @@ router.get("/live", async (req, res) => {
   }
 });
 
-router.get("/games", async (req, res) => {
-  const { config: streamAlertsConfig } = await getStreamAlertsConfig();
-  const twitchApiClient = new TwitchApi({
-    client_id: streamAlertsConfig.clientId,
-    client_secret: streamAlertsConfig.clientSecret,
-  });
-
-  try {
-    const games = await twitchApiClient.getGames(streamAlertsConfig.gameName);
-    res.status(200).json(games.data);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
 module.exports = router;

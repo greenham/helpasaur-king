@@ -60,6 +60,8 @@ app.use(routes);
 app.use(function (err, req, res, next) {
   if (err.name === "UnauthorizedError") {
     res.status(401).json({ error: err.name + ": " + err.message });
+  } else if (err.code === "permission_denied") {
+    res.status(403).send("Forbidden");
   } else {
     next(err);
   }

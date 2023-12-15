@@ -149,7 +149,7 @@ router.get(`/service`, requireAuthKey, async (req, res) => {
     return res.status(400).send({ message: "Invalid service name" });
   }
 
-  // Issue a long-running JWT
+  // Issue a long-running JWT with the "service" permission and the service name as the subject
   const idToken = jwt.sign({ permissions: ["service"] }, JWT_SECRET_KEY, {
     expiresIn: "365d",
     subject: serviceName,
