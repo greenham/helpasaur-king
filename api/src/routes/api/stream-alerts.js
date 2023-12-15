@@ -12,6 +12,25 @@ const getTwitchApiClient = (config) => {
 
 // Endpoint: /streamAlerts
 
+router.get("/channels", userHasPermission, async (req, res) => {
+  try {
+    const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
+    // Put this list of strings in alphabetical order before returning
+    streamAlertsConfig.config.channels.sort((a, b) => {
+      if (a.login < b.login) {
+        return -1;
+      }
+      if (a.login > b.login) {
+        return 1;
+      }
+      return 0;
+    });
+    res.status(200).json(streamAlertsConfig.config.channels);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // POST /channels
 //
 //  Request Body:
@@ -98,7 +117,10 @@ router.delete("/channels/:id", userHasPermission, async (req, res) => {
     );
     if (channelIndex === undefined) {
       console.log(`${req.params.id} is not in the stream alerts list!`);
-      return res.status(200).json({ noop: true });
+      return res.status(200).json({
+        result: "noop",
+        message: `${req.params.id} is not in the stream alerts list!`,
+      });
     }
 
     // Delete event subscriptions
@@ -124,7 +146,7 @@ router.delete("/channels/:id", userHasPermission, async (req, res) => {
     streamAlertsConfig.markModified("config");
     await streamAlertsConfig.save();
 
-    res.status(200).json({ success: true });
+    res.status(200).json({ result: "success" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
