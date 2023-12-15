@@ -99,11 +99,15 @@ router.get(`/twitch`, async (req, res) => {
     console.error(`Error updating local user data!`, err);
   }
 
-  // Issue our own JWT
-  const idToken = jwt.sign({ entity: "user" }, JWT_SECRET_KEY, {
-    expiresIn: loginExpirationLength,
-    subject: localUser._id.toString(),
-  });
+  // Issue a JWT with the user's permissions and ID
+  const idToken = jwt.sign(
+    { permissions: localUser.permissions },
+    JWT_SECRET_KEY,
+    {
+      expiresIn: loginExpirationLength,
+      subject: localUser._id.toString(),
+    }
+  );
 
   console.log(
     `Generated ID token for Twitch user: ${twitchUserData.display_name}`
@@ -112,7 +116,8 @@ router.get(`/twitch`, async (req, res) => {
 
   // Set cookies on the client with the JWT
   // Split out the header, payload, and signature
-  // We're going to store these in separate cookies for security reasons
+  // We're going to store these in separate cookies for security reasons I guess?
+  // I don't really know what the point is, but it's what the docs say to do
   const idParts = idToken.split(".");
 
   const headerAndPayload = [idParts[0], idParts[1]].join(".");
@@ -145,7 +150,7 @@ router.get(`/service`, requireAuthKey, async (req, res) => {
   }
 
   // Issue a long-running JWT
-  const idToken = jwt.sign({ entity: "service" }, JWT_SECRET_KEY, {
+  const idToken = jwt.sign({ permissions: ["service"] }, JWT_SECRET_KEY, {
     expiresIn: "365d",
     subject: serviceName,
   });
