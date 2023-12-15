@@ -20,7 +20,7 @@ database.on("error", (error) => {
   console.log(error);
 });
 
-database.once("connected", async () => {
+database.once("connected", () => {
   console.log("Connected to MongoDB!");
 });
 
