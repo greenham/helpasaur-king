@@ -3,11 +3,27 @@
 # Read MONGO values from .env file
 source .env
 
+current_date=$(date +"%Y-%m-%d_%H%M%S")
+backup_file="mongo-backup-$current_date.tar.gz"
+
 # Extract the container ID of the MongoDB container via docker ps
 container_id=$(docker ps | grep mongo\:latest | awk '{print $1}')
 
-# Execute mongodump command as root user
-docker exec -it $container_id mongodump --authenticationDatabase admin --username $MONGO_ROOT_USERNAME --password $MONGO_ROOT_PASSWORD  --db $MONGO_DATABASE_NAME
+# Connect to it, then...
+# - Execute mongodump command
+# - Compress the dump and name with the current date
+docker exec -it $container_id \
+  mongodump --authenticationDatabase admin \
+  --username $MONGO_ROOT_USERNAME \
+  --password $MONGO_ROOT_PASSWORD \
+  --db $MONGO_DATABASE_NAME
+docker exec -it $container_id tar -zcvf "$backup_file" /dump
 
-# Copy dump file to local path using Docker
-docker cp $container_id:/dump mongo-backups
+# Create the backups/mongo folder if it doesn't exist
+mkdir -p ./backups/mongo
+
+# Copy the compressed backup to local path using Docker
+docker cp $container_id:/$backup_file ./backups/mongo/$backup_file
+
+# Remove the compressed backup from the MongoDB container
+docker exec -it $container_id rm -f $backup_file
