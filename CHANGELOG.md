@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.3
+
+- Granularly guard endpoints via express-jwt-permissions
+
 ## 1.6.2
 
 - Admins can now remove users from stream alerts via the web app
