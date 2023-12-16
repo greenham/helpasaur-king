@@ -24,7 +24,7 @@ import { TwitchUserData } from "../types/users";
 interface AdminPageProps {}
 const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
   useEffect(() => {
-    document.title = "Admin Panel | Helpasaur King";
+    document.title = "Admin | Helpasaur King";
   }, []);
 
   const toast = useToast();
@@ -113,7 +113,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
   return (
     <Container className="mt-5">
       <h1>
-        <i className="fa-solid fa-user-tie"></i> Admin Panel
+        <i className="fa-solid fa-user-tie"></i> Helpa Admin
       </h1>
       <hr />
 
@@ -198,7 +198,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
             </FloatingLabel>
           </Col>
           <Col>
-            {userAddInProgress ? (
+            {userRemoveInProgress ? (
               <Spinner animation="border" role="statues">
                 <span className="visually-hidden">Loading...</span>
               </Spinner>

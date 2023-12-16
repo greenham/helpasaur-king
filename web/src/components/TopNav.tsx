@@ -108,7 +108,6 @@ function TopNav() {
                 <LinkContainer to="admin">
                   <Nav.Link>
                     <i className="fa-solid fa-user-tie"></i>&nbsp;&nbsp;Admin
-                    Panel
                   </Nav.Link>
                 </LinkContainer>
               )}
