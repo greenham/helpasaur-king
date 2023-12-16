@@ -12,7 +12,7 @@ services:
     image: mongo:latest
     restart: on-failure
     logging:
-      driver: none
+      driver: syslog
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}

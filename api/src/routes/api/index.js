@@ -1,4 +1,5 @@
 const express = require("express");
+const guard = require("express-jwt-permissions")();
 const { requireJwtToken } = require("../../lib/utils");
 const router = express.Router();
 
@@ -11,8 +12,23 @@ router.use("/web", require("./web"));
 
 // Authorized Endpoints
 router.use("/me", requireJwtToken, require("./me"));
-router.use("/twitch", requireJwtToken, require("./twitch"));
-router.use("/streamAlerts", requireJwtToken, require("./stream-alerts"));
-router.use("/configs", requireJwtToken, require("./configs"));
+router.use(
+  "/twitch",
+  requireJwtToken,
+  guard.check([["admin"], ["service"]]),
+  require("./twitch")
+);
+router.use(
+  "/streamAlerts",
+  requireJwtToken,
+  guard.check([["admin"], ["service"]]),
+  require("./stream-alerts")
+);
+router.use(
+  "/configs",
+  requireJwtToken,
+  guard.check([["admin"], ["service"]]),
+  require("./configs")
+);
 
 module.exports = router;
