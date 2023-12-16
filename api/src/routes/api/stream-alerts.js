@@ -12,7 +12,7 @@ const getTwitchApiClient = (config) => {
 
 // Endpoint: /streamAlerts
 
-router.get("/channels", userHasPermission, async (req, res) => {
+router.get("/channels", guard.check("admin"), async (req, res) => {
   try {
     const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" });
     // Put this list of strings in alphabetical order before returning
