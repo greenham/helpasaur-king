@@ -1,6 +1,6 @@
 import { Command } from "../types/commands";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.API_HOST + "/api";
 
 export const getCommands = async () => {
   const response = await fetch(`${API_URL}/commands`);

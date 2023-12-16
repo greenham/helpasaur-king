@@ -12,7 +12,7 @@ const {
   JWT_SECRET_KEY,
   JWT_HEADER_COOKIE_NAME,
   JWT_FOOTER_COOKIE_NAME,
-  TWITCH_APP_OAUTH_REDIRECT_URL,
+  API_HOST,
   ALLOWED_SERVICES,
 } = process.env;
 const loginExpirationLength = "7d";
@@ -43,7 +43,7 @@ router.get(`/twitch`, async (req, res) => {
     `&client_secret=${streamAlertsConfig.clientSecret}` +
     `&code=${authCode}` +
     "&grant_type=authorization_code" +
-    `&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}`;
+    `&redirect_uri=${API_HOST + "/auth/twitch"}`;
 
   const response = await axios.post(requestUrl);
 

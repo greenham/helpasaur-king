@@ -163,8 +163,8 @@ function TopNav() {
                 >
                   <NavDropdown.Item
                     href={
-                      process.env.API_LOGOUT_URL +
-                      "?redirect=" +
+                      process.env.API_HOST +
+                      "/auth/logout?redirect=" +
                       encodeURIComponent(location.pathname)
                     }
                     rel="noopener,noreferrer"
