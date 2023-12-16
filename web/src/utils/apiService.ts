@@ -125,13 +125,42 @@ export const deleteCommand = async (command: Command) => {
   return response.json();
 };
 
-export const addUserToStreamAlerts = async (twitchUsername: string) => {
+export const getStreamAlertsChannels = async () => {
+  const response = await fetch(`${API_URL}/streamAlerts/channels`, {
+    credentials: "include",
+  });
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
+  return response.json();
+};
+
+export const addChannelToStreamAlerts = async (twitchUsername: string) => {
   const response = await fetch(`${API_URL}/streamAlerts/channels`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ channels: [twitchUsername] }),
   });
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
+
+  return response.json();
+};
+
+export const removeChannelFromStreamAlerts = async (twitchUserId: string) => {
+  const response = await fetch(
+    `${API_URL}/streamAlerts/channels/${twitchUserId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
   try {
     await handleApiResponse(response);
   } catch (e) {

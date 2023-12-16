@@ -6,3 +6,4 @@ docker-entrypoint-initdb.d
 racebot/build/
 web/build/
 web/.parcel-cache/
+backups/*

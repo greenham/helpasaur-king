@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.2
+
+- Admins can now remove users from stream alerts via the web app
+
+## 1.6.1
+
+- Secure stream alerts endpoints
+- Admins can now add users to stream alerts via the web app
+
 ## 1.6.0
 
 - All services now use JWTs for the API just like users
