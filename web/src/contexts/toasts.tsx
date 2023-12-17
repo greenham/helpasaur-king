@@ -1,8 +1,7 @@
 import * as React from "react";
-import { createContext, useReducer } from "react";
 import { toastReducer } from "../reducers/toasts";
 import DefaultToastContainer from "../components/DefaultToastContainer";
-import { IToast } from "../types/toasts";
+import { IStreamAlertToast, IToast } from "../types/toasts";
 
 interface ToastProviderProps {
   children: React.ReactNode;
@@ -13,17 +12,18 @@ interface ToastContextProps {
   info: (message: string) => void;
   error: (message: string) => void;
   remove: (id: number) => void;
+  streamAlert: (streamAlert: IStreamAlertToast) => void;
 }
 
 const initialState: { toasts: IToast[] } = {
   toasts: [],
 };
 
-export const ToastContext = createContext({} as ToastContextProps);
+export const ToastContext = React.createContext({} as ToastContextProps);
 export const ToastProvider: React.FunctionComponent<ToastProviderProps> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(toastReducer, initialState);
+  const [state, dispatch] = React.useReducer(toastReducer, initialState);
 
   const addToast = (variant: string, message: string) => {
     const id = Math.floor(Math.random() * 10000000);
@@ -50,7 +50,27 @@ export const ToastProvider: React.FunctionComponent<ToastProviderProps> = ({
     addToast("error", message);
   };
 
-  const value: ToastContextProps = { success, warning, info, error, remove };
+  const streamAlert = (streamAlertToast: IStreamAlertToast) => {
+    console.log(state.toasts);
+    console.log(streamAlertToast);
+    if (
+      state.toasts.some((toast: IToast) => toast.id === streamAlertToast.id)
+    ) {
+      console.log("Stream alert already exists in toasts");
+      return;
+    }
+
+    dispatch({ type: "ADD_TOAST", payload: streamAlertToast });
+  };
+
+  const value: ToastContextProps = {
+    success,
+    warning,
+    info,
+    error,
+    remove,
+    streamAlert,
+  };
 
   return (
     <ToastContext.Provider value={value}>

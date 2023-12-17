@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Toast } from "react-bootstrap";
-import { IToast } from "../types/toasts";
+import { IToast, IStreamAlertToast } from "../types/toasts";
 import { useToast } from "../hooks/useToast";
+import StreamCard from "./StreamCard";
 
 export interface ToastVariant {
   icon: React.ReactNode;
@@ -39,13 +40,33 @@ const toastVariants: ToastVariants = {
     title: "Error!",
     textClass: "text-body-emphasis",
   },
+  streamAlert: {
+    icon: <i className="fa-solid fa-broadcast-tower px-1"></i>,
+    bgClass: "success",
+    title: "Now live on Twitch!",
+    textClass: "text-dark",
+  },
 };
 
-const DefaultToast: React.FunctionComponent<IToast> = (props) => {
-  const { variant, message, id } = props;
+const DefaultToast: React.FunctionComponent<IToast | IStreamAlertToast> = (
+  props
+) => {
+  const { variant, title, message, id } = props;
   const toastVariant = toastVariants[variant];
   const [show, setShow] = React.useState(true);
   const toast = useToast();
+
+  let toastBody = (
+    <p className={`fs-5 ${toastVariant.textClass}`}>
+      <strong>{message}</strong>
+    </p>
+  );
+
+  if (variant === "streamAlert") {
+    const streamAlert = props as IStreamAlertToast;
+    toastBody = <StreamCard stream={streamAlert.stream} />;
+  }
+
   return (
     <Toast
       bg={toastVariant.bgClass}
@@ -61,7 +82,7 @@ const DefaultToast: React.FunctionComponent<IToast> = (props) => {
     >
       <Toast.Header>
         {toastVariant.icon}
-        <strong className="me-auto">{toastVariant.title}</strong>
+        <strong className="me-auto">{title ?? toastVariant.title}</strong>
       </Toast.Header>
       <Toast.Body>
         <p className={`fs-5 ${toastVariant.textClass}`}>

@@ -1,7 +1,11 @@
 const { Server } = require("socket.io");
 const { WEBSOCKET_RELAY_SERVER_PORT } = process.env;
 
-const wss = new Server();
+const wss = new Server({
+  cors: {
+    origin: "*",
+  },
+});
 const relayEvents = [
   "streamAlert",
   "weeklyRaceRoomCreated",

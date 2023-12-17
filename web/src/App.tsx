@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastProvider } from "./contexts/toasts";
+import { WebsocketRelayProvider } from "./contexts/ws-relay";
 import { useToast } from "./hooks/useToast";
 import TopNav from "./components/TopNav";
 
@@ -25,14 +26,16 @@ const App: React.FunctionComponent<AppProps> = () => {
   });
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ScrollRestoration />
-      <ToastProvider>
-        <TopNav />
-        <Outlet />
-      </ToastProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ToastProvider>
+      <WebsocketRelayProvider>
+        <QueryClientProvider client={queryClient}>
+          <ScrollRestoration />
+          <TopNav />
+          <Outlet />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </WebsocketRelayProvider>
+    </ToastProvider>
   );
 };
 
