@@ -38,7 +38,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
       </h1>
       <hr className="mb-5" />
       <h2>
-        <i className="fa-regular fa-bell"></i> Stream Alerts
+        <i className="fa-brands fa-watchman-monitoring"></i> Runnerwatcher
       </h2>
       <ManageStreamAlerts />
       <hr className="my-5" />

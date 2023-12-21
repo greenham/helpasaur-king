@@ -14,6 +14,7 @@ import {
   Form,
   Spinner,
   Button,
+  Badge,
 } from "react-bootstrap";
 
 interface ManageTwitchBotProps {}
@@ -88,6 +89,9 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
 
   return (
     <>
+      <h4>
+        <Badge bg="secondary">In {twitchBotChannels?.length} Channels</Badge>
+      </h4>
       <Container>
         <Row>
           <Col>

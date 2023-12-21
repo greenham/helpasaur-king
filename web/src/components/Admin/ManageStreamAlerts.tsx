@@ -14,6 +14,7 @@ import {
   Form,
   Spinner,
   Button,
+  Badge,
 } from "react-bootstrap";
 import { TwitchUserData } from "../../types/users";
 
@@ -91,6 +92,11 @@ const ManageStreamAlerts: React.FunctionComponent<
 
   return (
     <>
+      <h4>
+        <Badge bg="secondary">
+          Watching {streamAlertsChannels?.length} Channels
+        </Badge>
+      </h4>
       <Container>
         <Row>
           <Col>
