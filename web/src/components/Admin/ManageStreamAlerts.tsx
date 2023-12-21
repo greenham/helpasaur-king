@@ -92,12 +92,11 @@ const ManageStreamAlerts: React.FunctionComponent<
   return (
     <>
       <Container>
-        <h2>Add Channel to Stream Alerts</h2>
         <Row>
           <Col>
             <FloatingLabel
               controlId="channelToAdd"
-              label="Twitch channel"
+              label="Twitch username"
               className="mb-3"
             >
               <Form.Control
@@ -130,7 +129,6 @@ const ManageStreamAlerts: React.FunctionComponent<
       </Container>
 
       <Container>
-        <h2>Remove Channel from Stream Alerts</h2>
         <Row>
           <Col>
             <FloatingLabel

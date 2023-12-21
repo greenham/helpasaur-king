@@ -54,9 +54,8 @@ export const getTwitchBotConfig = async () => {
   return response.json();
 };
 
-export const joinTwitchChannel = async () => {
-  const response = await fetch(`${API_URL}/twitch/join`, {
-    method: "POST",
+export const getTwitchBotChannels = async () => {
+  const response = await fetch(`${API_URL}/twitch/channels`, {
     credentials: "include",
   });
   try {
@@ -67,10 +66,29 @@ export const joinTwitchChannel = async () => {
   return response.json();
 };
 
-export const leaveTwitchChannel = async () => {
+export const joinTwitchChannel = async (twitchUsername?: string) => {
+  const body = twitchUsername ? { channel: twitchUsername } : {};
+  const response = await fetch(`${API_URL}/twitch/join`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
+  return response.json();
+};
+
+export const leaveTwitchChannel = async (twitchUsername?: string) => {
+  const body = twitchUsername ? { channel: twitchUsername } : {};
   const response = await fetch(`${API_URL}/twitch/leave`, {
     method: "POST",
     credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   try {
     await handleApiResponse(response);

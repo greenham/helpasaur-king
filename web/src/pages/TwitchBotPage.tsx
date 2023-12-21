@@ -87,7 +87,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
 
   const handleJoinRequest = async () => {
     const joinResult = await joinTwitchChannel();
-    if (joinResult.result) {
+    if (joinResult.result === "success") {
       toast.success("Successfully joined your channel!");
       queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
     } else {
@@ -97,7 +97,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
 
   const handleLeaveRequest = async () => {
     const leaveResult = await leaveTwitchChannel();
-    if (leaveResult.result) {
+    if (leaveResult.result === "success") {
       toast.success("Successfully left your channel!");
       queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
     } else {

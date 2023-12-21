@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Alert, Container, ListGroup, Spinner } from "react-bootstrap";
 import { useUser } from "../hooks/useUser";
 import ManageStreamAlerts from "../components/Admin/ManageStreamAlerts";
+import ManageTwitchBot from "../components/Admin/ManageTwitchBot";
 
 interface AdminPageProps {}
 const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
@@ -35,29 +36,16 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
       <h1>
         <i className="fa-solid fa-user-tie"></i> Helpa Admin
       </h1>
-      <hr />
-
-      <Alert variant="dark" className="p-5">
-        <h2>TODO</h2>
-        <ListGroup>
-          <ListGroup.Item>
-            <i className="fa-regular fa-square px-2"></i> Stream alerts
-            management
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <i className="fa-regular fa-square px-2"></i> Twitch bot user
-            management
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <i className="fa-regular fa-square px-2"></i> User management
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <i className="fa-regular fa-square px-2"></i> Command logs
-          </ListGroup.Item>
-        </ListGroup>
-      </Alert>
-
+      <hr className="mb-5" />
+      <h2>
+        <i className="fa-regular fa-bell"></i> Stream Alerts
+      </h2>
       <ManageStreamAlerts />
+      <hr className="my-5" />
+      <h2>
+        <i className="fa-solid fa-robot"></i> Twitch Bot
+      </h2>
+      <ManageTwitchBot />
     </Container>
   );
 };
