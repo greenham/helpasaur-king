@@ -37,19 +37,19 @@ const ManageStreamAlerts: React.FunctionComponent<
     const value = e.target.value;
     setChannelToAdd(value);
   };
-  const handleAddUserToStreamAlerts = async () => {
+  const handleAddChannelToStreamAlerts = async () => {
     setChannelAddInProgress(true);
     try {
-      const { data: userAddResult } =
+      const { data: channelAddResult } =
         await addChannelToStreamAlerts(channelToAdd);
-      const userResult = userAddResult[0].value;
-      if (userResult.status === "success") {
+      const channelResult = channelAddResult[0].value;
+      if (channelResult.status === "success") {
         toast.success(`Added ${channelToAdd} to stream alerts!`);
         setChannelToAdd("");
         queryClient.invalidateQueries({ queryKey: ["streamAlertsChannels"] });
-      } else if (userResult.status === "error") {
+      } else if (channelResult.status === "error") {
         toast.error(
-          `Failed to add ${channelToAdd} to stream alerts: ${userResult.message}`
+          `Failed to add ${channelToAdd} to stream alerts: ${channelResult.message}`
         );
       }
     } catch (err) {
@@ -70,15 +70,16 @@ const ManageStreamAlerts: React.FunctionComponent<
   const handleRemoveChannelFromStreamAlerts = async () => {
     setChannelRemoveInProgress(true);
     try {
-      const userResult = await removeChannelFromStreamAlerts(channelToRemove);
-      if (userResult.result === "success") {
+      const channelResult =
+        await removeChannelFromStreamAlerts(channelToRemove);
+      if (channelResult.result === "success") {
         toast.success(`Removed ${channelToRemove} from stream alerts!`);
         setChannelToRemove("");
         queryClient.invalidateQueries({ queryKey: ["streamAlertsChannels"] });
-      } else if (userResult.result === "noop") {
-        toast.info(userResult.message);
-      } else if (userResult.result === "error") {
-        toast.error(userResult.message);
+      } else if (channelResult.result === "noop") {
+        toast.info(channelResult.message);
+      } else if (channelResult.result === "error") {
+        toast.error(channelResult.message);
       }
     } catch (err) {
       toast.error(
@@ -91,7 +92,7 @@ const ManageStreamAlerts: React.FunctionComponent<
   return (
     <>
       <Container>
-        <h2>Add User to Stream Alerts</h2>
+        <h2>Add Channel to Stream Alerts</h2>
         <Row>
           <Col>
             <FloatingLabel
@@ -117,7 +118,7 @@ const ManageStreamAlerts: React.FunctionComponent<
             ) : (
               <Button
                 variant="dark"
-                onClick={handleAddUserToStreamAlerts}
+                onClick={handleAddChannelToStreamAlerts}
                 size="lg"
                 disabled={channelAddInProgress}
               >
@@ -129,15 +130,15 @@ const ManageStreamAlerts: React.FunctionComponent<
       </Container>
 
       <Container>
-        <h2>Remove User from Stream Alerts</h2>
+        <h2>Remove Channel from Stream Alerts</h2>
         <Row>
           <Col>
             <FloatingLabel
-              controlId="userToRemove"
-              label="Choose a user to remove"
+              controlId="channelToRemove"
+              label="Choose a channel to remove"
             >
               <Form.Select
-                aria-label="Choose a user to remove"
+                aria-label="Choose a channel to remove"
                 value={channelToRemove}
                 onChange={handleChannelToRemoveInputChange}
               >
