@@ -12,12 +12,7 @@ router.use("/web", require("./web"));
 
 // Authorized Endpoints
 router.use("/me", requireJwtToken, require("./me"));
-router.use(
-  "/twitch",
-  requireJwtToken,
-  guard.check([["admin"], ["service"]]),
-  require("./twitch")
-);
+router.use("/twitch", requireJwtToken, require("./twitch"));
 router.use(
   "/streamAlerts",
   requireJwtToken,
