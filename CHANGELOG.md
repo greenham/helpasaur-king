@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.4
+
+- Fix extraneous guard on twitch endpoint
+- Better validation for command and alias uniqueness
+- Better error handling for twitch bot actions
+
 ## 1.6.3
 
 - Granularly guard endpoints via express-jwt-permissions
