@@ -25,7 +25,6 @@ router.post("/join", async (req, res) => {
 
   try {
     const twitchConfig = await Config.findOne({ id: "twitch" });
-    console.log(`Received join add for ${requestedChannel}`);
     if (twitchConfig.config.channels.includes(requestedChannel)) {
       return res.status(200).json({
         result: "noop",
