@@ -25,7 +25,7 @@ class TwitchBot {
       skipMembership: true,
     });
 
-    this.bot.connect();
+    this.bot.connect().catch(console.error);
 
     this.bot.on("message", this.handleMessage.bind(this));
 
@@ -199,7 +199,7 @@ class TwitchBot {
       return;
     }
 
-    this.bot.say(channel, command.response);
+    this.bot.say(channel, command.response).catch(console.error);
 
     this.cooldowns.set(cooldownKey, Date.now());
 
@@ -212,16 +212,20 @@ class TwitchBot {
       aliasUsed = commandNoPrefix;
     }
 
-    await this.helpaApi.api.post(`/api/commands/logs`, {
-      command: command.command,
-      alias: aliasUsed,
-      source: "twitch",
-      username: tags.username,
-      metadata: {
-        channel,
-        tags,
-      },
-    });
+    try {
+      await this.helpaApi.api.post(`/api/commands/logs`, {
+        command: command.command,
+        alias: aliasUsed,
+        source: "twitch",
+        username: tags.username,
+        metadata: {
+          channel,
+          tags,
+        },
+      });
+    } catch (err) {
+      console.error(`Error while logging command: ${err}`);
+    }
   }
 
   handleJoinChannel({ payload: channel }) {
@@ -231,13 +235,19 @@ class TwitchBot {
       return;
     }
 
-    this.bot.join(channel);
-    this.bot.say(
-      channel,
-      `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Use ${this.config.cmdPrefix}help to see what I can do.`
-    );
-    this.channelList.push(channel);
-    console.log(`Joined #${channel}`);
+    this.bot
+      .join(channel)
+      .then((channelsJoined) => {
+        this.bot
+          .say(
+            channel,
+            `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Use ${this.config.cmdPrefix}help to see what I can do.`
+          )
+          .catch(console.error);
+        this.channelList.push(channel);
+        console.log(`Joined #${channel}`);
+      })
+      .catch(console.error);
   }
 
   handleLeaveChannel({ payload: channel }) {
@@ -247,13 +257,19 @@ class TwitchBot {
       return;
     }
 
-    this.bot.say(
-      channel,
-      `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`
-    );
-    this.bot.part(channel);
-    this.channelList = this.channelList.filter((c) => c !== channel);
-    console.log(`Left #${channel}`);
+    this.bot
+      .say(
+        channel,
+        `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`
+      )
+      .catch(console.error);
+    this.bot
+      .part(channel)
+      .then((channelsLeft) => {
+        this.channelList = this.channelList.filter((c) => c !== channel);
+        console.log(`Left #${channel}`);
+      })
+      .catch(console.error);
   }
 }
 exports.TwitchBot = TwitchBot;
