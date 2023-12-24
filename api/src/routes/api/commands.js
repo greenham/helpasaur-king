@@ -8,7 +8,7 @@ const guard = require("express-jwt-permissions")();
 // Endpoint: /commands
 
 // ======== PUBLIC ENDPOINTS ========
-// GET / -> returns all commands
+// GET / -> returns all active commands
 router.get("/", async (req, res) => {
   try {
     const commands = await Command.find({ deleted: { $ne: true } });
@@ -31,10 +31,7 @@ router.get("/:id", async (req, res) => {
 // POST /find -> find command by name or alias
 router.post("/find", async (req, res) => {
   try {
-    const command = await Command.findOne({
-      $or: [{ command: req.body.command }, { aliases: req.body.command }],
-      deleted: { $ne: true },
-    });
+    const command = await Command.findByNameOrAlias(req.body.command);
     res.status(200).json(command);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -46,17 +43,14 @@ router.post("/find", async (req, res) => {
 router.post("/", requireJwtToken, guard.check("admin"), async (req, res) => {
   try {
     delete req.body._id;
-    const existingCommand = await Command.findOne({
-      $or: [{ command: req.body.command }, { aliases: req.body.command }],
-      deleted: { $ne: true },
-    });
-    if (existingCommand) {
+
+    // Ensure command name and alias uniqueness
+    const isUnique = await Command.isUnique(req.body.command, req.body.aliases);
+    if (!isUnique) {
       return res.status(409).json({
-        message: `Command with name or alias "${req.body.command}" already exists`,
+        message: `The command name or one of the aliases provided is already in use!`,
       });
     }
-
-    // @TODO: Ensure alias uniqueness
 
     const command = await Command.create(req.body);
     res.status(201).json(command);
@@ -96,6 +90,7 @@ router.delete(
   guard.check("admin"),
   async (req, res) => {
     try {
+      // @TODO: Make this a soft delete?
       const command = await Command.deleteOne({ _id: req.params.id });
       res.status(200).json(command);
     } catch (err) {
