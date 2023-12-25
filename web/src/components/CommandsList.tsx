@@ -57,6 +57,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     aliases: [],
     enabled: true,
     category: "",
+    aliasesText: "",
   };
   const [editCommandModalActive, setEditCommandModalActive] = useState(false);
   const hideEditCommandModal = () => setEditCommandModalActive(false);
