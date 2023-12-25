@@ -12,6 +12,10 @@ class TwitchBot {
     this.channelList = [this.config.username, ...this.config.channels];
     this.bot = null;
     this.wsRelay = null;
+    this.messages = {
+      onJoin: `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Use ${this.config.cmdPrefix}helpa to see what I can do.`,
+      onLeave: `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`,
+    };
   }
 
   start() {
@@ -235,19 +239,10 @@ class TwitchBot {
       return;
     }
 
-    this.bot
-      .join(channel)
-      .then((channelsJoined) => {
-        this.bot
-          .say(
-            channel,
-            `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Use ${this.config.cmdPrefix}help to see what I can do.`
-          )
-          .catch(console.error);
-        this.channelList.push(channel);
-        console.log(`Joined #${channel}`);
-      })
-      .catch(console.error);
+    this.bot.join(channel).catch(console.error);
+    this.bot.say(channel, this.messages.onJoin).catch(console.error);
+    this.channelList.push(channel);
+    console.log(`Joined #${channel}`);
   }
 
   handleLeaveChannel({ payload: channel }) {
@@ -257,19 +252,10 @@ class TwitchBot {
       return;
     }
 
-    this.bot
-      .say(
-        channel,
-        `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`
-      )
-      .catch(console.error);
-    this.bot
-      .part(channel)
-      .then((channelsLeft) => {
-        this.channelList = this.channelList.filter((c) => c !== channel);
-        console.log(`Left #${channel}`);
-      })
-      .catch(console.error);
+    this.bot.say(channel, this.messages.onLeave).catch(console.error);
+    this.bot.part(channel).catch(console.error);
+    this.channelList = this.channelList.filter((c) => c !== channel);
+    console.log(`Left #${channel}`);
   }
 }
 exports.TwitchBot = TwitchBot;
