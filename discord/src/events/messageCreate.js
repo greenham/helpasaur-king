@@ -1,8 +1,5 @@
 const { EmbedBuilder, Collection } = require("discord.js");
-const defaultConfig = {
-  cmdPrefix: "!",
-  textCmdCooldown: 10,
-};
+const { defaultGuildConfig } = require("../constants");
 let aliasList;
 let cachedCommands = new Collection();
 let cooldowns = new Collection();
@@ -13,15 +10,15 @@ module.exports = {
     const { author, content, guildId, client } = interaction;
     let command = false;
 
-    //  See if there's a specific configuration for this guild
+    //  See if there's an internal configuration for this guild
     let guildConfig = client.config.guilds.find((g) => g.id === guildId);
     if (!guildConfig) {
-      guildConfig = Object.assign({}, defaultConfig);
+      guildConfig = Object.assign({}, defaultGuildConfig);
     }
 
     const { cmdPrefix, textCmdCooldown } = guildConfig;
 
-    // Make sure it starts with the correct prefix
+    // Make sure the content starts with the correct prefix
     if (!content.startsWith(cmdPrefix)) return;
 
     // Sweep out everything that's not the command and make it case-insensitive

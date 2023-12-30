@@ -14,6 +14,12 @@ router.use("/web", require("./web"));
 router.use("/me", requireJwtToken, require("./me"));
 router.use("/twitch", requireJwtToken, require("./twitch"));
 router.use(
+  "/discord",
+  requireJwtToken,
+  guard.check(["service"]),
+  require("./discord")
+);
+router.use(
   "/streamAlerts",
   requireJwtToken,
   guard.check([["admin"], ["service"]]),
