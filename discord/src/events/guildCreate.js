@@ -16,7 +16,7 @@ module.exports = {
 
     if (!guildConfig) {
       guildConfig = Object.assign(
-        { id: guild.id, internalName: guild.name },
+        { id: guild.id, name: guild.name },
         defaultGuildConfig
       );
 
