@@ -23,7 +23,10 @@ module.exports = {
       console.log(`Creating config for guild ${guild.name} (${guild.id})`);
 
       // Create this guild via the API
-      this.helpaApi.api.post(`/api/discord/guildCreate`, guildConfig);
+      await this.helpaApi.api.post(`/api/discord/guildCreate`, guildConfig);
+
+      // Update the local config
+      client.config.guilds.push(guildConfig);
     }
   },
 };
