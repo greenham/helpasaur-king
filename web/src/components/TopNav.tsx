@@ -90,24 +90,28 @@ function TopNav() {
             <Nav className="me-auto">
               <LinkContainer to="commands">
                 <Nav.Link>
-                  <i className="fa-solid fa-terminal"></i>&nbsp;&nbsp;Commands
+                  <i className="fa-solid fa-terminal pe-1"></i>Commands
                 </Nav.Link>
               </LinkContainer>
               <LinkContainer to="streams">
                 <Nav.Link>
-                  <i className="fa-brands fa-twitch"></i>&nbsp;&nbsp;ALttP
-                  Streams
+                  <i className="fa-brands fa-twitch pe-1"></i>ALttP Streams
                 </Nav.Link>
               </LinkContainer>
               <LinkContainer to="twitch">
                 <Nav.Link>
-                  <i className="fa-solid fa-robot"></i>&nbsp;&nbsp;Twitch Bot
+                  <i className="fa-solid fa-robot pe-1"></i>Twitch Bot
+                </Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="discord">
+                <Nav.Link>
+                  <i className="fa-brands fa-discord pe-1"></i>Discord Bot
                 </Nav.Link>
               </LinkContainer>
               {user && user.permissions.includes("admin") && (
                 <LinkContainer to="admin">
                   <Nav.Link>
-                    <i className="fa-solid fa-user-tie"></i>&nbsp;&nbsp;Admin
+                    <i className="fa-solid fa-user-tie pe-1"></i>Admin
                   </Nav.Link>
                 </LinkContainer>
               )}
@@ -118,12 +122,12 @@ function TopNav() {
                 target="_blank"
                 rel="noopener,noreferrer"
               >
-                <i className="fa-brands fa-github"></i>&nbsp;&nbsp;GitHub
+                <i className="fa-brands fa-github pe-1"></i>GitHub
               </Nav.Link>
               <NavDropdown
                 title={
                   <>
-                    <i className="fa-solid fa-link"></i>&nbsp;&nbsp;Resources
+                    <i className="fa-solid fa-link pe-1"></i>Resources
                   </>
                 }
                 id="resources-dropdown"
@@ -138,7 +142,7 @@ function TopNav() {
                       target={resource.target}
                       rel={resource.rel}
                     >
-                      <i className={resource.icon}></i>&nbsp;&nbsp;
+                      <i className={`${resource.icon} pe-1`}></i>
                       {resource.text}
                     </NavDropdown.Item>
                   )
@@ -169,14 +173,13 @@ function TopNav() {
                     rel="noopener,noreferrer"
                   >
                     <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                    &nbsp;&nbsp;Log Out
+                    Log Out
                   </NavDropdown.Item>
                 </NavDropdown>
               ) : (
                 <Nav.Link href={getTwitchLoginUrl()} rel="noopener,noreferrer">
                   <Button variant="primary">
-                    <i className="fa-solid fa-key"></i>&nbsp;&nbsp;Log in with
-                    Twitch
+                    <i className="fa-solid fa-key pe-1"></i>Log in with Twitch
                   </Button>
                 </Nav.Link>
               )}

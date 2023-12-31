@@ -116,7 +116,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
           Twitch chat.
         </p>
         <Button variant="primary" onClick={handleJoinRequest} size="lg">
-          <i className="fa-solid fa-arrow-right-to-bracket px-1"></i> Join my
+          <i className="fa-solid fa-arrow-right-to-bracket pe-1"></i> Join my
           channel
         </Button>
       </Alert>
@@ -144,7 +144,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
           at any time.
         </p>
         <Button variant="secondary" onClick={handleShowLeaveModal} size="lg">
-          <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my
+          <i className="fa-solid fa-right-from-bracket pe-1"></i> Leave my
           channel
         </Button>
       </Alert>
