@@ -1,8 +1,10 @@
 const {
   ActivityType,
   Client,
+  Collection,
   GatewayIntentBits,
   Partials,
+  Events,
 } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -23,6 +25,7 @@ class DiscordBot {
     });
 
     this.discordClient.config = config;
+    this.discordClient.commands = new Collection();
   }
 
   start() {
@@ -42,9 +45,9 @@ class DiscordBot {
     console.log(`Logging bot into Discord...`);
     this.discordClient.login(this.config.token);
 
-    // @TODO: Make sure the login succeeds before handling events
-    // Start handling events
+    // @TODO: Make sure the login succeeds before proceeding
     this.handleEvents();
+    this.handleCommands();
   }
 
   handleEvents() {
@@ -66,6 +69,58 @@ class DiscordBot {
         this.discordClient.on(event.name, (...args) => event.execute(...args));
       }
     }
+  }
+
+  handleCommands() {
+    // Read in commands to be handled
+    const commandsPath = path.join(__dirname, "commands");
+    const commandFiles = fs
+      .readdirSync(commandsPath)
+      .filter((file) => file.endsWith(".js"));
+
+    for (const file of commandFiles) {
+      const filePath = path.join(commandsPath, file);
+      const command = require(filePath);
+      command.helpaApi = this.helpaApi;
+      // Set a new item in the Collection with the key as the command name and the value as the exported module
+      if ("data" in command && "execute" in command) {
+        this.discordClient.commands.set(command.data.name, command);
+      } else {
+        console.log(
+          `⚠ The command at ${filePath} is missing a required "data" or "execute" property.`
+        );
+      }
+    }
+
+    this.discordClient.on(Events.InteractionCreate, async (interaction) => {
+      if (!interaction.isChatInputCommand()) return;
+
+      const command = this.discordClient.commands.get(interaction.commandName);
+
+      if (!command) {
+        console.error(
+          `No command matching ${interaction.commandName} was found.`
+        );
+        return;
+      }
+
+      try {
+        await command.execute(interaction);
+      } catch (error) {
+        console.error(error);
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp({
+            content: "There was an error while executing this command!",
+            ephemeral: true,
+          });
+        } else {
+          await interaction.reply({
+            content: "There was an error while executing this command!",
+            ephemeral: true,
+          });
+        }
+      }
+    });
   }
 }
 exports.DiscordBot = DiscordBot;
