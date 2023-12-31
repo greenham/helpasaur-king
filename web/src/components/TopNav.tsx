@@ -18,28 +18,28 @@ const RESOURCES = [
   {
     href: "https://alttp-wiki.net/index.php/Main_Page",
     target: "_blank",
-    rel: "noopener,noreferrer",
+    rel: "noopener noreferrer",
     icon: "fa-solid fa-arrow-up-right-from-square",
     text: "Speedrun Wiki",
   },
   {
     href: "https://spannerisms.github.io/lttphack/",
     target: "_blank",
-    rel: "noopener,noreferrer",
+    rel: "noopener noreferrer",
     icon: "fa-solid fa-arrow-up-right-from-square",
     text: "Practice Hack",
   },
   {
     href: "https://strats.alttp.run/",
     target: "_blank",
-    rel: "noopener,noreferrer",
+    rel: "noopener noreferrer",
     icon: "fa-solid fa-arrow-up-right-from-square",
     text: "Strat Hub",
   },
   {
     href: "http://www.speedrun.com/alttp",
     target: "_blank",
-    rel: "noopener,noreferrer",
+    rel: "noopener noreferrer",
     icon: "fa-solid fa-arrow-up-right-from-square",
     text: "Leaderboards",
   },
@@ -49,7 +49,7 @@ const RESOURCES = [
   {
     href: "https://discord.gg/8cskCK4",
     target: "_blank",
-    rel: "noopener,noreferrer",
+    rel: "noopener noreferrer",
     icon: "fa-brands fa-discord",
     text: "ALttP Discord",
   },
@@ -120,7 +120,7 @@ function TopNav() {
               <Nav.Link
                 href="https://github.com/greenham/helpasaur-king"
                 target="_blank"
-                rel="noopener,noreferrer"
+                rel="noopener noreferrer"
               >
                 <i className="fa-brands fa-github pe-1"></i>GitHub
               </Nav.Link>
@@ -170,14 +170,14 @@ function TopNav() {
                       "/auth/logout?redirect=" +
                       encodeURIComponent(location.pathname)
                     }
-                    rel="noopener,noreferrer"
+                    rel="noopener noreferrer"
                   >
                     <i className="fa-solid fa-arrow-right-from-bracket"></i>
                     Log Out
                   </NavDropdown.Item>
                 </NavDropdown>
               ) : (
-                <Nav.Link href={getTwitchLoginUrl()} rel="noopener,noreferrer">
+                <Nav.Link href={getTwitchLoginUrl()} rel="noopener noreferrer">
                   <Button variant="primary">
                     <i className="fa-solid fa-key pe-1"></i>Log in with Twitch
                   </Button>
