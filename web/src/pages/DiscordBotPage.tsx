@@ -63,31 +63,42 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
       </Alert>
       <ListGroup>
         <ListGroup.Item variant="primary">
+          <i className="fa-solid fa-terminal pe-1"></i>
           <code className="fw-bold">/helpa-prefix &lt;prefix&gt;</code>
-          <Container>
-            Set the bot's command prefix
-            <br />
-            <small>
-              Default: <code>!</code>
-            </small>
+          <Container className="mt-2">
+            <p className="lead mb-0">Set the bot's command prefix</p>
+            <ul>
+              <li>
+                <small>
+                  Default: <code>!</code>
+                </small>
+              </li>
+            </ul>
           </Container>
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
+          <i className="fa-solid fa-terminal pe-1"></i>
           <code className="fw-bold">/helpa-cooldown &lt;cooldown&gt;</code>
-          <Container>
-            Set the cooldown for text commands (in seconds)
-            <br />
-            <small>
-              Default: <code>10</code>
-            </small>
+          <Container className="mt-2">
+            <p className="lead mb-0">
+              Set the cooldown for text commands (in seconds)
+            </p>
+            <ul>
+              <li>
+                <small>
+                  Default: <code>10</code>
+                </small>
+              </li>
+            </ul>
           </Container>
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
+          <i className="fa-solid fa-terminal pe-1"></i>
           <code className="fw-bold">
             /helpa-streams &lt;enable&gt; &lt;channel&gt;
           </code>
-          <Container>
-            Manage the stream alerts feature:
+          <Container className="mt-2">
+            <p className="lead mb-0">Manage the stream alerts feature:</p>
             <ul>
               <li>
                 <Badge>enable</Badge> - Enable or disable the feature
@@ -100,12 +111,13 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
           </Container>
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
+          <i className="fa-solid fa-terminal pe-1"></i>
           <code className="fw-bold">
             /helpa-weekly &lt;one-hour-warning&gt; &lt;race-room-alert&gt;
             &lt;channel&gt; &lt;role-to-ping&gt;
           </code>
-          <Container>
-            Manage the weekly race alerts feature:
+          <Container className="mt-2">
+            <p className="lead mb-0">Manage the weekly race alerts feature:</p>
             <ul>
               <li>
                 <Badge>one-hour-warning</Badge> - Enable or disable the 1 hour
@@ -117,7 +129,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
               </li>
               <li>
                 <Badge>channel</Badge> - The text channel where weekly alerts
-                will be posted
+                will be posted (required if either alert is enabled)
               </li>
               <li>
                 <Badge>role-to-ping</Badge> - <em>(Optional)</em> The role to
