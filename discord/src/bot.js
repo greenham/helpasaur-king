@@ -11,9 +11,6 @@ const path = require("node:path");
 
 class DiscordBot {
   constructor(config, helpaApi) {
-    this.config = config;
-    this.helpaApi = helpaApi;
-
     this.discordClient = new Client({
       intents: [
         GatewayIntentBits.Guilds,
@@ -26,13 +23,21 @@ class DiscordBot {
 
     this.discordClient.config = config;
     this.discordClient.commands = new Collection();
+
+    this.helpaApi = helpaApi;
+    // set an interval to run refreshConfig every minute
+    setInterval(() => {
+      this.refreshConfig();
+    }, 60000);
   }
 
   start() {
     this.discordClient.setRandomActivity = () => {
       let activity =
-        this.config.activities[
-          Math.floor(Math.random() * this.config.activities.length)
+        this.discordClient.config.activities[
+          Math.floor(
+            Math.random() * this.discordClient.config.activities.length
+          )
         ];
       console.log(`Setting Discord activity to: ${activity}`);
       this.discordClient.user.setActivity(activity, {
@@ -43,11 +48,29 @@ class DiscordBot {
 
     // Log the bot in to Discord
     console.log(`Logging bot into Discord...`);
-    this.discordClient.login(this.config.token);
+    this.discordClient.login(this.discordClient.config.token);
 
     // @TODO: Make sure the login succeeds before proceeding
     this.handleEvents();
     this.handleCommands();
+  }
+
+  refreshConfig() {
+    console.log(this.helpaApi.apiHost);
+    console.log(this.helpaApi.apiKey);
+    this.helpaApi
+      .getServiceConfig()
+      .then((config) => {
+        if (!config) {
+          throw new Error(`Unable to refresh service config from API!`);
+        }
+
+        this.discordClient.config = config;
+        console.log(`✅ Refreshed service config from API!`);
+      })
+      .catch((error) => {
+        console.error("🛑 Error fetching service config:", error);
+      });
   }
 
   handleEvents() {
