@@ -2,8 +2,6 @@ const { REST, Routes } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
 const { HelpaApi } = require("helpa-api-client");
-// @DEBUG: Hardcoded guild ID during development
-const guildId = "1013180792471560203";
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST,
   apiKey: process.env.API_KEY,
@@ -48,10 +46,10 @@ helpaApiClient
           `Started refreshing ${commands.length} application (/) commands.`
         );
 
-        // The put method is used to fully refresh all commands in the guild with the current set
+        // The put method is used to fully refresh all commands with the current set
         const data = await rest.put(
-          // CHANGE THE LINE BELOW TO THIS FOR GLOBAL DEPLOY: Routes.applicationCommands(clientId)
-          Routes.applicationGuildCommands(clientId, guildId),
+          // GUILD-SPECIFIC DEPLOY: Routes.applicationGuildCommands(clientId, guildId),
+          Routes.applicationCommands(clientId),
           { body: commands }
         );
 
@@ -59,7 +57,6 @@ helpaApiClient
           `Successfully reloaded ${data.length} application (/) commands.`
         );
       } catch (error) {
-        // And of course, make sure you catch and log any errors!
         console.error(error);
       }
     })();
