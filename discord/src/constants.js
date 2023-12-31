@@ -5,9 +5,8 @@ module.exports = {
     enableStreamAlerts: false,
     streamAlertsChannelId: null,
     enableWeeklyRaceAlert: false,
+    enableWeeklyRaceRoomAlert: false,
     weeklyRaceAlertChannelId: null,
     weeklyRaceAlertRoleId: null,
-    enableWeeklyRaceRoomAlert: false,
-    weeklyRaceRoomAlertChannelId: null,
   },
 };

@@ -20,8 +20,30 @@ module.exports = {
     .setDefaultMemberPermissions(0),
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
+
+    const currentGuildConfig = interaction.client.config.guilds.find(
+      (g) => g.id === interaction.guildId
+    );
+    const newEnableStreamAlerts = interaction.options.getBoolean("enable");
+    const newStreamAlertsChannel = interaction.options.getChannel("channel");
+
+    const guildUpdate = {
+      enableStreamAlerts: newEnableStreamAlerts,
+    };
+    currentGuildConfig.enableStreamAlerts = newEnableStreamAlerts;
+
+    if (newStreamAlertsChannel) {
+      guildUpdate.streamAlertsChannelId = newStreamAlertsChannel.id;
+      currentGuildConfig.streamAlertsChannelId = newStreamAlertsChannel.id;
+    }
+
+    await this.helpaApi.api.patch(
+      `/api/discord/guild/${interaction.guildId}`,
+      guildUpdate
+    );
+
     await interaction.editReply({
-      content: "I totally set that value for you.",
+      content: "I totally set those values for you.",
       ephemeral: true,
     });
   },

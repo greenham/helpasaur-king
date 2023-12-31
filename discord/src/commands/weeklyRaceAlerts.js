@@ -51,12 +51,13 @@ module.exports = {
     currentGuildConfig.enableWeeklyRaceRoomAlert = newEnableWeeklyRaceRoomAlert;
 
     if (newWeeklyRaceAlertChannel) {
-      guildUpdate.weeklyRaceAlertChannel = newWeeklyRaceAlertChannel.id;
-      currentGuildConfig.weeklyRaceAlertChannel = newWeeklyRaceAlertChannel.id;
+      guildUpdate.weeklyRaceAlertChannelId = newWeeklyRaceAlertChannel.id;
+      currentGuildConfig.weeklyRaceAlertChannelId =
+        newWeeklyRaceAlertChannel.id;
     }
     if (newWeeklyRaceAlertRole) {
-      guildUpdate.weeklyRaceAlertRole = newWeeklyRaceAlertRole.id;
-      currentGuildConfig.weeklyRaceAlertRole = newWeeklyRaceAlertRole.id;
+      guildUpdate.weeklyRaceAlertRoleId = newWeeklyRaceAlertRole.id;
+      currentGuildConfig.weeklyRaceAlertRoleId = newWeeklyRaceAlertRole.id;
     }
 
     await this.helpaApi.api.patch(
