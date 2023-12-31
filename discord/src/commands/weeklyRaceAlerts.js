@@ -32,6 +32,38 @@ module.exports = {
     .setDefaultMemberPermissions(0),
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
+
+    const currentGuildConfig = interaction.client.config.guilds.find(
+      (g) => g.id === interaction.guildId
+    );
+    const newEnableWeeklyRaceAlert =
+      interaction.options.getBoolean("one-hour-warning");
+    const newEnableWeeklyRaceRoomAlert =
+      interaction.options.getBoolean("race-room-alert");
+    const newWeeklyRaceAlertChannel = interaction.options.getChannel("channel");
+    const newWeeklyRaceAlertRole = interaction.options.getRole("role-to-ping");
+
+    const guildUpdate = {
+      enableWeeklyRaceAlert: newEnableWeeklyRaceAlert,
+      enableWeeklyRaceRoomAlert: newEnableWeeklyRaceRoomAlert,
+    };
+    currentGuildConfig.enableWeeklyRaceAlert = newEnableWeeklyRaceAlert;
+    currentGuildConfig.enableWeeklyRaceRoomAlert = newEnableWeeklyRaceRoomAlert;
+
+    if (newWeeklyRaceAlertChannel) {
+      guildUpdate.weeklyRaceAlertChannel = newWeeklyRaceAlertChannel.id;
+      currentGuildConfig.weeklyRaceAlertChannel = newWeeklyRaceAlertChannel.id;
+    }
+    if (newWeeklyRaceAlertRole) {
+      guildUpdate.weeklyRaceAlertRole = newWeeklyRaceAlertRole.id;
+      currentGuildConfig.weeklyRaceAlertRole = newWeeklyRaceAlertRole.id;
+    }
+
+    await this.helpaApi.api.patch(
+      `/api/discord/guild/${interaction.guildId}`,
+      guildUpdate
+    );
+
     await interaction.editReply({
       content: "I totally set those values for you.",
       ephemeral: true,
