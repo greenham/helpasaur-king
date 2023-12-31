@@ -15,6 +15,21 @@ module.exports = {
     .setDefaultMemberPermissions(0),
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
+    const newCooldown = interaction.options.getInteger("cooldown");
+    const currentGuildConfig = interaction.client.config.guilds.find(
+      (g) => g.id === interaction.guildId
+    );
+    if (currentGuildConfig.textCmdCooldown === newCooldown) {
+      await interaction.editReply({
+        content: "That's already the cooldown!",
+        ephemeral: true,
+      });
+      return;
+    }
+    await this.helpaApi.api.patch(`/api/discord/guild/${interaction.guildId}`, {
+      textCmdCooldown: newCooldown,
+    });
+    currentGuildConfig.textCmdCooldown = newCooldown;
     await interaction.editReply({
       content: "I totally set the cooldown for you.",
       ephemeral: true,
