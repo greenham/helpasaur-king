@@ -40,15 +40,21 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
           <ListGroup>
             <ListGroup.Item>
               <i className="fa-regular fa-square-check pe-1"></i>
-              Responds to <Link to="/commands">static commands</Link>
+              Responds to <Link to="/commands">static commands</Link>{" "}
+              <span className="text-muted">
+                (in a server <em>or</em> a DM)
+              </span>
             </ListGroup.Item>
             <ListGroup.Item>
               <i className="fa-regular fa-square-check pe-1"></i>Posts alerts
-              when featured ALttP streams go live
+              when featured <Link to="/streams">ALttP streams</Link> go live
             </ListGroup.Item>
             <ListGroup.Item>
               <i className="fa-regular fa-square-check pe-1"></i>Posts alerts
-              for weekly races (1 hour warning, race room creation)
+              for weekly races{" "}
+              <span className="text-muted">
+                (1 hour warning, race room creation)
+              </span>
             </ListGroup.Item>
           </ListGroup>
         </Col>
