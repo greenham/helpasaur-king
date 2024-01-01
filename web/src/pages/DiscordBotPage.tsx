@@ -7,6 +7,7 @@ import {
   Container,
   ListGroup,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -61,17 +62,19 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         <Col>
           <Alert variant="dark" className="p-5 border-1 border-secondary">
             <h2>Would you like the bot to join your Discord server?</h2>
-            <Button
-              variant="primary"
-              href={joinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              size="lg"
-              disabled={joinUrl === ""}
-            >
-              <i className="fa-regular fa-square-plus pe-1"></i> Add to your
-              server
-            </Button>
+            {!joinUrl && <Spinner animation="border" />}
+            {joinUrl && (
+              <Button
+                variant="primary"
+                href={joinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="lg"
+              >
+                <i className="fa-regular fa-square-plus pe-1"></i> Add to your
+                server
+              </Button>
+            )}
           </Alert>
         </Col>
       </Row>
