@@ -52,6 +52,7 @@ router.post(
   }
 );
 
+// PATCH /api/discord/guild/:id
 router.patch(
   "/guild/:id",
   requireJwtToken,
