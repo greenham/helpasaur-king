@@ -1,5 +1,13 @@
 import * as React from "react";
-import { Alert, Badge, Button, Container, ListGroup } from "react-bootstrap";
+import {
+  Alert,
+  Badge,
+  Button,
+  Col,
+  Container,
+  ListGroup,
+  Row,
+} from "react-bootstrap";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -18,40 +26,42 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
 
       <hr />
 
-      <Alert variant="dark" className="p-5">
-        <h2>Would you like the bot to join your Discord server?</h2>
-        <Button
-          variant="primary"
-          href="https://discord.com/api/oauth2/authorize?client_id=1015622937300181123&permissions=17978733153344&scope=bot"
-          target="_blank"
-          rel="noopener noreferrer"
-          size="lg"
-        >
-          <i className="fa-regular fa-square-plus pe-1"></i> Add to your server
-        </Button>
-      </Alert>
+      <Row xs={1} lg={2}>
+        <Col>
+          <h2 id="features">Features</h2>
+          <ListGroup>
+            <ListGroup.Item>
+              <i className="fa-regular fa-square-check pe-1"></i>
+              Responds to <Link to="/commands">static commands</Link>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <i className="fa-regular fa-square-check pe-1"></i>Posts alerts
+              when ALttP streams go live
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <i className="fa-regular fa-square-check pe-1"></i>Posts alerts
+              for weekly races (1 hour warning, race room creation)
+            </ListGroup.Item>
+          </ListGroup>
+        </Col>
+        <Col>
+          <Alert variant="dark" className="p-5">
+            <h2>Would you like the bot to join your Discord server?</h2>
+            <Button
+              variant="primary"
+              href="https://discord.com/api/oauth2/authorize?client_id=1015622937300181123&permissions=17978733153344&scope=bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              size="lg"
+            >
+              <i className="fa-regular fa-square-plus pe-1"></i> Add to your
+              server
+            </Button>
+          </Alert>
+        </Col>
+      </Row>
 
-      <hr />
-
-      <h2>Features</h2>
-      <ListGroup>
-        <ListGroup.Item>
-          <i className="fa-regular fa-square-check pe-1"></i>
-          Responds to <Link to="/commands">static commands</Link>
-        </ListGroup.Item>
-        <ListGroup.Item>
-          <i className="fa-regular fa-square-check pe-1"></i>Posts alerts when
-          ALttP streams go live
-        </ListGroup.Item>
-        <ListGroup.Item>
-          <i className="fa-regular fa-square-check pe-1"></i>Posts alerts for
-          weekly races (1 hour warning, race room creation)
-        </ListGroup.Item>
-      </ListGroup>
-
-      <hr />
-
-      <h2>Command List</h2>
+      <h2 id="commands">Command List</h2>
       <p>
         Start typing <code>/helpa</code> in your server to see available
         commands.
@@ -59,7 +69,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
       <Alert variant="dark">
         <i className="fa-solid fa-pencil pe-1"></i>
         <strong>Note:</strong> These are only available to users with the{" "}
-        <em>Administrator</em> role!
+        <em>Administrator</em> role in your server!
       </Alert>
       <ListGroup>
         <ListGroup.Item variant="primary">
