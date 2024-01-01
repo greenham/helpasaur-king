@@ -10,12 +10,20 @@ import {
 } from "react-bootstrap";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { getDiscordJoinUrl } from "../utils/apiService";
 
 interface DiscordBotPageProps {}
 
 const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
+  const [joinUrl, setJoinUrl] = React.useState<string>("");
+
   useEffect(() => {
     document.title = "Discord Bot | Helpasaur King";
+    getDiscordJoinUrl().then((response) => {
+      if (response.result === "success") {
+        setJoinUrl(response.url);
+      }
+    });
   }, []);
 
   return (
@@ -49,10 +57,11 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
             <h2>Would you like the bot to join your Discord server?</h2>
             <Button
               variant="primary"
-              href="https://discord.com/api/oauth2/authorize?client_id=1015622937300181123&permissions=17978733153344&scope=bot"
+              href={joinUrl}
               target="_blank"
               rel="noopener noreferrer"
               size="lg"
+              disabled={joinUrl === ""}
             >
               <i className="fa-regular fa-square-plus pe-1"></i> Add to your
               server
