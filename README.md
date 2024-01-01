@@ -6,7 +6,7 @@ Global command list is available at https://helpasaur.com/commands
 
 ## Discord Bot
 
-- Simple call-and-response [commands](https://helpasaur.com/commands)
+- Simple call-and-response [commands](https://helpasaur.com/commands) (responds to DMs too!)
 - Posts go-lives for A Link to the Past Twitch streams
 - Pings role for weekly race an hour before
 - Posts weekly race room details after [Race Bot](#race-bot) creates it
