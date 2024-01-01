@@ -21,10 +21,11 @@ Global command list is available at https://helpasaur.com/commands
 - ALttP Speedrun Stream Directory: https://helpasaur.com/streams
 - Twitch Bot Management: https://helpasaur.com/twitch
   - Log in with Twitch to manage the bot (join, leave, customizations, etc.)
+- Discord Bot Info: https://helpasaur.com/discord
 
 ## Race Bot
 
-- Automatically creates racetime.gg room for weekly race
+- Automatically creates [racetime.gg](https://racetime.gg) room for weekly race
 
 # FAQ
 
@@ -37,4 +38,4 @@ Two ways.
 
 ## How do I get the bot to join my Discord server?
 
-Sorry, this is invite-only right now.
+See [https://helpasaur.com/discord](https://helpasaur.com/discord) for the join link and commands to configure the bot.
