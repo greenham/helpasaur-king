@@ -63,10 +63,15 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
       </Alert>
       <ListGroup>
         <ListGroup.Item variant="primary">
-          <i className="fa-solid fa-terminal pe-1"></i>
-          <code className="fw-bold">/helpa-prefix &lt;prefix&gt;</code>
           <Container className="mt-2">
-            <p className="lead mb-0">Set the bot's command prefix</p>
+            <h5>Set the bot's command prefix</h5>
+            <p>
+              <i className="fa-solid fa-terminal pe-1"></i>
+              <code className="fw-bold">/helpa-prefix</code>&nbsp;
+              <small className="font-monospace text-muted">
+                &lt;prefix&gt;
+              </small>
+            </p>
             <ul>
               <li>
                 <small>
@@ -77,11 +82,14 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
           </Container>
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
-          <i className="fa-solid fa-terminal pe-1"></i>
-          <code className="fw-bold">/helpa-cooldown &lt;cooldown&gt;</code>
           <Container className="mt-2">
-            <p className="lead mb-0">
-              Set the cooldown for text commands (in seconds)
+            <h5>Set the cooldown for text commands (in seconds)</h5>
+            <p>
+              <i className="fa-solid fa-terminal pe-1"></i>
+              <code className="fw-bold">/helpa-cooldown</code>&nbsp;
+              <small className="font-monospace text-muted">
+                &lt;cooldown&gt;
+              </small>
             </p>
             <ul>
               <li>
@@ -93,12 +101,15 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
           </Container>
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
-          <i className="fa-solid fa-terminal pe-1"></i>
-          <code className="fw-bold">
-            /helpa-streams &lt;enable&gt; &lt;channel&gt;
-          </code>
           <Container className="mt-2">
-            <p className="lead mb-0">Manage the stream alerts feature:</p>
+            <h5>Manage the stream alerts feature</h5>
+            <p>
+              <i className="fa-solid fa-terminal pe-1"></i>
+              <code className="fw-bold">/helpa-streams</code>&nbsp;
+              <small className="font-monospace text-muted">
+                &lt;enable&gt; &lt;channel&gt;
+              </small>
+            </p>
             <ul>
               <li>
                 <Badge>enable</Badge> - Enable or disable the feature
@@ -111,13 +122,16 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
           </Container>
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
-          <i className="fa-solid fa-terminal pe-1"></i>
-          <code className="fw-bold">
-            /helpa-weekly &lt;one-hour-warning&gt; &lt;race-room-alert&gt;
-            &lt;channel&gt; &lt;role-to-ping&gt;
-          </code>
           <Container className="mt-2">
-            <p className="lead mb-0">Manage the weekly race alerts feature:</p>
+            <h5>Manage the weekly race alerts feature</h5>
+            <p>
+              <i className="fa-solid fa-terminal pe-1"></i>
+              <code className="fw-bold">/helpa-weekly</code>&nbsp;
+              <small className="font-monospace text-muted">
+                &lt;one-hour-warning&gt; &lt;race-room-alert&gt; &lt;channel&gt;
+                &lt;role-to-ping&gt;
+              </small>
+            </p>
             <ul>
               <li>
                 <Badge>one-hour-warning</Badge> - Enable or disable the 1 hour
