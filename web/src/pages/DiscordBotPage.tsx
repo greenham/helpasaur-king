@@ -26,7 +26,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
 
       <hr />
 
-      <Row xs={1} lg={2}>
+      <Row xs={1} lg={2} className="g-4">
         <Col>
           <h2 id="features">Features</h2>
           <ListGroup>
@@ -36,7 +36,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
             </ListGroup.Item>
             <ListGroup.Item>
               <i className="fa-regular fa-square-check pe-1"></i>Posts alerts
-              when ALttP streams go live
+              when featured ALttP streams go live
             </ListGroup.Item>
             <ListGroup.Item>
               <i className="fa-regular fa-square-check pe-1"></i>Posts alerts
@@ -45,7 +45,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
           </ListGroup>
         </Col>
         <Col>
-          <Alert variant="dark" className="p-5">
+          <Alert variant="dark" className="p-5 border-1 border-secondary">
             <h2>Would you like the bot to join your Discord server?</h2>
             <Button
               variant="primary"
