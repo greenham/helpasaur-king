@@ -184,12 +184,12 @@ module.exports = {
       // Get a list of guilds that have race room alerts enabled
       let alerts = client.config.guilds
         .filter(
-          (g) => g.enableWeeklyRaceRoomAlert && g.weeklyRaceRoomAlertChannelId
+          (g) => g.enableWeeklyRaceRoomAlert && g.weeklyRaceAlertChannelId
         )
         .map((g) => {
           return {
-            channelId: g.weeklyRaceRoomAlertChannelId,
-            roleId: g.weeklyRaceAlertRoleId || false,
+            channelId: g.weeklyRaceAlertChannelId,
+            roleId: g.weeklyRaceAlertRoleId,
           };
         });
 
