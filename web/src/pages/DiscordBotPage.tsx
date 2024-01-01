@@ -92,7 +92,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
       <ListGroup>
         <ListGroup.Item variant="primary">
           <Container className="mt-2">
-            <h5>Set the bot's command prefix</h5>
+            <h5># Set the bot's command prefix</h5>
             <p className="p-3 border border-1 border-info rounded-3">
               <i className="fa-solid fa-terminal pe-1"></i>
               <code className="fw-bold">/helpa-prefix</code>&nbsp;
@@ -111,7 +111,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
           <Container className="mt-2">
-            <h5>Set the cooldown for text commands (in seconds)</h5>
+            <h5># Set the cooldown for text commands (in seconds)</h5>
             <p className="p-3 border border-1 border-info rounded-3">
               <i className="fa-solid fa-terminal pe-1"></i>
               <code className="fw-bold">/helpa-cooldown</code>&nbsp;
@@ -130,7 +130,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
           <Container className="mt-2">
-            <h5>Manage the stream alerts feature</h5>
+            <h5># Manage the stream alerts feature</h5>
             <p className="p-3 border border-1 border-info rounded-3">
               <i className="fa-solid fa-terminal pe-1"></i>
               <code className="fw-bold">/helpa-streams</code>&nbsp;
@@ -151,7 +151,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         </ListGroup.Item>
         <ListGroup.Item variant="primary">
           <Container className="mt-2">
-            <h5>Manage the weekly race alerts feature</h5>
+            <h5># Manage the weekly race alerts feature</h5>
             <p className="p-3 border border-1 border-info rounded-3">
               <i className="fa-solid fa-terminal pe-1"></i>
               <code className="fw-bold">/helpa-weekly</code>&nbsp;
