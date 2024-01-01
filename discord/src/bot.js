@@ -2,9 +2,9 @@ const {
   ActivityType,
   Client,
   Collection,
+  Events,
   GatewayIntentBits,
   Partials,
-  Events,
 } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -23,15 +23,6 @@ class DiscordBot {
 
     this.discordClient.config = config;
     this.discordClient.commands = new Collection();
-
-    this.helpaApi = helpaApi;
-    // set an interval to run refreshConfig every minute
-    setInterval(() => {
-      this.refreshConfig();
-    }, 60000);
-  }
-
-  start() {
     this.discordClient.setRandomActivity = () => {
       let activity =
         this.discordClient.config.activities[
@@ -46,6 +37,14 @@ class DiscordBot {
       });
     };
 
+    this.helpaApi = helpaApi;
+    // Update service config every minute so we pick up guild changes quickly
+    setInterval(() => {
+      this.refreshConfig();
+    }, 60000);
+  }
+
+  start() {
     // Log the bot in to Discord
     console.log(`Logging bot into Discord...`);
     this.discordClient.login(this.discordClient.config.token);
@@ -56,8 +55,6 @@ class DiscordBot {
   }
 
   refreshConfig() {
-    console.log(this.helpaApi.apiHost);
-    console.log(this.helpaApi.apiKey);
     this.helpaApi
       .getServiceConfig()
       .then((config) => {
@@ -69,7 +66,7 @@ class DiscordBot {
         console.log(`✅ Refreshed service config from API!`);
       })
       .catch((error) => {
-        console.error("🛑 Error fetching service config:", error);
+        console.error("🛑 Error refreshing service config:", error);
       });
   }
 
