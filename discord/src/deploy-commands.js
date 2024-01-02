@@ -60,6 +60,21 @@ helpaApiClient
         console.error(error);
       }
     })();
+
+    // or delete them as needed
+    // (async () => {
+    //   try {
+    //     console.log(
+    //       `Started deleting ${commands.length} application (/) commands.`
+    //     );
+    //     const data = await rest.put(Routes.applicationCommands(clientId), {
+    //       body: [],
+    //     });
+    //     console.log("Successfully deleted all application commands.");
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // })();
   })
   .catch((error) => {
     console.error("Error fetching service config:", error);
