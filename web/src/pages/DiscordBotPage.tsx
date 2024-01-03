@@ -185,7 +185,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         {commandGroups.map((group, index) => (
           <ListGroup.Item key={index} variant="primary">
             <Container className="mt-2 py-4">
-              <h4># {group.title}</h4>
+              <h4 className="text-info-emphasis"># {group.title}</h4>
               {group.commands.map((command, index) => (
                 <div>
                   {command.title && <h5>&middot; {command.title}</h5>}
