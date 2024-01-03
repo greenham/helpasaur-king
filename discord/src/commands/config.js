@@ -230,9 +230,7 @@ module.exports = {
       guildUpdate
     );
     await interaction.editReply({
-      content: `Updated ${inlineCode(guildConfigKey)} to ${inlineCode(
-        newValue
-      )}!`,
+      content: `Updated ${inlineCode(subcommand)} to ${inlineCode(newValue)}!`,
       ephemeral: true,
     });
   },
