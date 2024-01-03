@@ -13,6 +13,96 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getDiscordJoinUrl } from "../utils/apiService";
 
+const commandGroups = [
+  {
+    title: "Set the bot's command prefix",
+    commands: [
+      {
+        title: "",
+        command: "/helpa-config",
+        subcommand: "prefix",
+        argument: "character",
+        description: "The character to use as the prefix",
+        defaultValue: "!",
+      },
+    ],
+  },
+  {
+    title: "Set the cooldown for text commands",
+    commands: [
+      {
+        title: "",
+        command: "/helpa-config",
+        subcommand: "cooldown",
+        argument: "seconds",
+        description: "Number of seconds before the same command can be used",
+        defaultValue: "10",
+      },
+    ],
+  },
+  {
+    title: "Manage the stream alerts feature",
+    commands: [
+      {
+        title: "On/Off",
+        command: "/helpa-config",
+        subcommand: "stream-alerts",
+        argument: "enable",
+        description: "Enable or disable the stream alerts feature",
+        defaultValue: "False",
+      },
+      {
+        title: "Channel",
+        command: "/helpa-config",
+        subcommand: "stream-alerts-channel",
+        argument: "channel",
+        description: "The text channel where stream alerts will be posted",
+        defaultValue: "None",
+      },
+    ],
+  },
+  {
+    title: "Manage the weekly race alerts feature",
+    commands: [
+      {
+        title: "One Hour Warning",
+        command: "/helpa-config",
+        subcommand: "weekly-one-hour-warning",
+        argument: "enable",
+        description:
+          "Enable or disable the 1 hour warning before the race starts",
+        defaultValue: "False",
+      },
+      {
+        title: "Race Room Alert",
+        command: "/helpa-config",
+        subcommand: "weekly-race-room-alert",
+        argument: "enable",
+        description:
+          "Enable or disable the alert with the link to the race room once created",
+        defaultValue: "False",
+      },
+      {
+        title: "Channel",
+        command: "/helpa-config",
+        subcommand: "weekly-alerts-channel",
+        argument: "channel",
+        description: "The text channel where weekly alerts will be posted",
+        defaultValue: "None",
+      },
+      {
+        title: "Role to Ping",
+        command: "/helpa-config",
+        subcommand: "weekly-alerts-role",
+        argument: "role",
+        description:
+          "(Optional) The role to ping when sending the alerts -- send this command without the role argument to clear the current role",
+        defaultValue: "None",
+      },
+    ],
+  },
+];
+
 interface DiscordBotPageProps {}
 
 const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
@@ -84,102 +174,43 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         Start typing <code>/helpa</code> in your server to see available
         commands.
       </p>
-      <Alert variant="dark">
+      <Alert variant="dark" className="border-1 border-primary">
         <i className="fa-solid fa-pencil pe-1"></i>
         <strong>Note:</strong> These are only available to users with the{" "}
         <em>Administrator</em> role in your server!
       </Alert>
+
+      <h3>Configuration</h3>
       <ListGroup>
-        <ListGroup.Item variant="primary">
-          <Container className="mt-2">
-            <h5># Set the bot's command prefix</h5>
-            <p className="p-3 border border-1 border-info rounded-3">
-              <i className="fa-solid fa-terminal pe-1"></i>
-              <code className="fw-bold">/helpa-prefix</code>&nbsp;
-              <small className="font-monospace text-muted">
-                &lt;prefix&gt;
-              </small>
-            </p>
-            <ul>
-              <li>
-                <small>
-                  Default: <code>!</code>
-                </small>
-              </li>
-            </ul>
-          </Container>
-        </ListGroup.Item>
-        <ListGroup.Item variant="primary">
-          <Container className="mt-2">
-            <h5># Set the cooldown for text commands (in seconds)</h5>
-            <p className="p-3 border border-1 border-info rounded-3">
-              <i className="fa-solid fa-terminal pe-1"></i>
-              <code className="fw-bold">/helpa-cooldown</code>&nbsp;
-              <small className="font-monospace text-muted">
-                &lt;cooldown&gt;
-              </small>
-            </p>
-            <ul>
-              <li>
-                <small>
-                  Default: <code>10</code>
-                </small>
-              </li>
-            </ul>
-          </Container>
-        </ListGroup.Item>
-        <ListGroup.Item variant="primary">
-          <Container className="mt-2">
-            <h5># Manage the stream alerts feature</h5>
-            <p className="p-3 border border-1 border-info rounded-3">
-              <i className="fa-solid fa-terminal pe-1"></i>
-              <code className="fw-bold">/helpa-streams</code>&nbsp;
-              <small className="font-monospace text-muted">
-                &lt;enable&gt; &lt;channel&gt;
-              </small>
-            </p>
-            <ul>
-              <li>
-                <Badge>enable</Badge> - Enable or disable the feature
-              </li>
-              <li>
-                <Badge>channel</Badge> - The text channel where stream alerts
-                will be posted
-              </li>
-            </ul>
-          </Container>
-        </ListGroup.Item>
-        <ListGroup.Item variant="primary">
-          <Container className="mt-2">
-            <h5># Manage the weekly race alerts feature</h5>
-            <p className="p-3 border border-1 border-info rounded-3">
-              <i className="fa-solid fa-terminal pe-1"></i>
-              <code className="fw-bold">/helpa-weekly</code>&nbsp;
-              <small className="font-monospace text-muted">
-                &lt;one-hour-warning&gt; &lt;race-room-alert&gt; &lt;channel&gt;
-                &lt;role-to-ping&gt;
-              </small>
-            </p>
-            <ul>
-              <li>
-                <Badge>one-hour-warning</Badge> - Enable or disable the 1 hour
-                warning before the race starts
-              </li>
-              <li>
-                <Badge>race-room-alert</Badge> - Enable or disable the link to
-                the race room once it's created
-              </li>
-              <li>
-                <Badge>channel</Badge> - The text channel where weekly alerts
-                will be posted (required if either alert is enabled)
-              </li>
-              <li>
-                <Badge>role-to-ping</Badge> - <em>(Optional)</em> The role to
-                ping when sending the alerts
-              </li>
-            </ul>
-          </Container>
-        </ListGroup.Item>
+        {commandGroups.map((group, index) => (
+          <ListGroup.Item key={index} variant="primary">
+            <Container className="mt-2 py-4">
+              <h4># {group.title}</h4>
+              {group.commands.map((command, index) => (
+                <div>
+                  {command.title && <h5>&middot; {command.title}</h5>}
+                  <p
+                    key={index}
+                    className="p-3 border border-1 border-info rounded-3"
+                  >
+                    <i className="fa-solid fa-terminal pe-1"></i>
+                    <code className="fw-bold">{command.command}</code>&nbsp;
+                    <Badge>{command.subcommand}</Badge>&nbsp;
+                    <small className="font-monospace text-muted">
+                      &lt;{command.argument}&gt;
+                    </small>
+                  </p>
+                  <ul>
+                    <li className="font-monospace">
+                      <em>{command.argument}</em> - {command.description}{" "}
+                      (Default: <code>{command.defaultValue}</code>)
+                    </li>
+                  </ul>
+                </div>
+              ))}
+            </Container>
+          </ListGroup.Item>
+        ))}
       </ListGroup>
     </Container>
   );
