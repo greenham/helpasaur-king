@@ -7,7 +7,6 @@ module.exports = {
     const { client } = guild;
 
     // See if there's an existing configuration for this guild
-    // @CONSIDER: Refreshing the config via the API before this
     let guildConfig = client.config.guilds.find((g) => g.id === guild.id);
     if (guildConfig) {
       console.log(`Guild ${guild.name} (${guild.id}) is already configured`);
