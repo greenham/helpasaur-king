@@ -174,7 +174,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         Start typing <code>/helpa</code> in your server to see available
         commands.
       </p>
-      <Alert variant="dark" className="border-1 border-primary">
+      <Alert variant="dark" className="border-1 border-warning">
         <i className="fa-solid fa-pencil pe-1"></i>
         <strong>Note:</strong> These are only available to users with the{" "}
         <em>Administrator</em> role in your server!
