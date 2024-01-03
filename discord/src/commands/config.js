@@ -164,7 +164,7 @@ module.exports = {
         {
           typeFn: "getBoolean",
           key: "enable",
-          guildConfigKey: "enableWeeklyOneHourWarning",
+          guildConfigKey: "enableWeeklyRaceAlert",
         },
       ],
       [
@@ -181,7 +181,7 @@ module.exports = {
           typeFn: "getChannel",
           key: "channel",
           valueProperty: "id",
-          guildConfigKey: "weeklyAlertsChannelId",
+          guildConfigKey: "weeklyRaceAlertChannelId",
         },
       ],
       [
@@ -190,7 +190,8 @@ module.exports = {
           typeFn: "getRole",
           key: "role",
           valueProperty: "id",
-          guildConfigKey: "weeklyAlertsRoleId",
+          guildConfigKey: "weeklyRaceAlertRoleId",
+          valueOnNull: null,
         },
       ],
     ]);
@@ -207,7 +208,10 @@ module.exports = {
 
     const { typeFn, key, guildConfigKey } = commandConfig;
     let newValue = interaction.options[typeFn](key);
-    if (commandConfig.valueProperty) {
+    if (newValue === null && commandConfig.valueOnNull !== undefined) {
+      newValue = commandConfig.valueOnNull;
+    }
+    if (newValue !== null && commandConfig.valueProperty) {
       newValue = newValue[commandConfig.valueProperty];
     }
     if (currentGuildConfig[guildConfigKey] === newValue) {
@@ -226,9 +230,9 @@ module.exports = {
       guildUpdate
     );
     await interaction.editReply({
-      content: `Updated ${subcommand} config option to ${inlineCode(
+      content: `Updated ${inlineCode(guildConfigKey)} to ${inlineCode(
         newValue
-      )}! ${JSON.stringify(guildUpdate)}`,
+      )}!`,
       ephemeral: true,
     });
   },
