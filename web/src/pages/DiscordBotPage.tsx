@@ -15,7 +15,7 @@ import { getDiscordJoinUrl } from "../utils/apiService";
 
 const commandGroups = [
   {
-    title: "Set the bot's command prefix",
+    title: "Set the command prefix",
     commands: [
       {
         title: "",
@@ -151,7 +151,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         </Col>
         <Col>
           <Alert variant="dark" className="p-5 border-1 border-secondary">
-            <h2>Would you like the bot to join your Discord server?</h2>
+            <h2>Would you like HelpasaurKing to help your Discord server?</h2>
             {!joinUrl && <Spinner animation="border" />}
             {joinUrl && (
               <Button
