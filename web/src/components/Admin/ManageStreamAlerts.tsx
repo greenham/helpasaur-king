@@ -127,7 +127,7 @@ const ManageStreamAlerts: React.FunctionComponent<
                 size="lg"
                 disabled={channelAddInProgress}
               >
-                <i className="fa-regular fa-square-plus px-1"></i> Add Channel
+                <i className="fa-regular fa-square-plus pe-1"></i> Add Channel
               </Button>
             )}
           </Col>
@@ -167,7 +167,7 @@ const ManageStreamAlerts: React.FunctionComponent<
                 size="lg"
                 disabled={channelRemoveInProgress}
               >
-                <i className="fa-regular fa-square-minus px-1"></i> Remove
+                <i className="fa-regular fa-square-minus pe-1"></i> Remove
                 Channel
               </Button>
             )}

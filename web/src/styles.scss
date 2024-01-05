@@ -5,6 +5,7 @@
 // - Attempt a fix for dropdown not floating over sticky content
 $zindex-sticky: 1000;
 $zindex-dropdown: 1025;
+$list-group-border-width: "1px";
 
 @import "../node_modules/bootswatch/dist/vapor/variables";
 @import "../node_modules/bootstrap/scss/bootstrap";

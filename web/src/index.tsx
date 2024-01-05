@@ -12,6 +12,7 @@ import PageNotFound from "./404";
 import CommandsPage from "./pages/CommandsPage";
 import LivestreamsPage from "./pages/LivestreamsPage";
 import TwitchBotPage from "./pages/TwitchBotPage";
+import DiscordBotPage from "./pages/DiscordBotPage";
 import AdminPage from "./pages/AdminPage";
 import "./styles.scss";
 
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "twitch",
         element: <TwitchBotPage />,
+      },
+      {
+        path: "discord",
+        element: <DiscordBotPage />,
       },
       {
         path: "admin",

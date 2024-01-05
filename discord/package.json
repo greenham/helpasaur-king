@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./src/index.js",
-    "start:dev": "nodemon ./src"
+    "start:dev": "nodemon ./src",
+    "deploy-commands": "node ./src/deploy-commands.js"
   },
   "dependencies": {
     "discord.js": "^14.14.1",

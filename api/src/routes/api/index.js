@@ -13,6 +13,7 @@ router.use("/web", require("./web"));
 // Authorized Endpoints
 router.use("/me", requireJwtToken, require("./me"));
 router.use("/twitch", requireJwtToken, require("./twitch"));
+router.use("/discord", require("./discord"));
 router.use(
   "/streamAlerts",
   requireJwtToken,

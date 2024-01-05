@@ -122,7 +122,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
                 size="lg"
                 disabled={channelJoinInProgress}
               >
-                <i className="fa-regular fa-square-plus px-1"></i> Join Channel
+                <i className="fa-regular fa-square-plus pe-1"></i> Join Channel
               </Button>
             )}
           </Col>
@@ -162,7 +162,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
                 size="lg"
                 disabled={channelRemoveInProgress}
               >
-                <i className="fa-regular fa-square-minus px-1"></i> Leave
+                <i className="fa-regular fa-square-minus pe-1"></i> Leave
                 Channel
               </Button>
             )}

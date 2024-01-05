@@ -32,6 +32,16 @@ export const getConfig = async () => {
   return response.json();
 };
 
+export const getDiscordJoinUrl = async () => {
+  const response = await fetch(`${API_URL}/discord/joinUrl`);
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
+  return response.json();
+};
+
 export const getCurrentUser = async () => {
   const response = await fetch(`${API_URL}/me`, { credentials: "include" });
   try {

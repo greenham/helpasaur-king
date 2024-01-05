@@ -109,14 +109,14 @@ const TwitchUserBotManagement: React.FunctionComponent<
   if (!twitchBotConfig?.botHasJoined) {
     return (
       <Alert variant="dark" className="p-5">
-        <h2>Would you like the bot to join your Twitch chat?</h2>
+        <h2>Would you like HelpasaurKing to help your Twitch chat?</h2>
         <p className="lead my-5">
           Click the button below to have the bot join your Twitch chat. You can
           request it to leave at any time from this page or from the bot's
           Twitch chat.
         </p>
         <Button variant="primary" onClick={handleJoinRequest} size="lg">
-          <i className="fa-solid fa-arrow-right-to-bracket px-1"></i> Join my
+          <i className="fa-solid fa-arrow-right-to-bracket pe-1"></i> Join my
           channel
         </Button>
       </Alert>
@@ -144,7 +144,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
           at any time.
         </p>
         <Button variant="secondary" onClick={handleShowLeaveModal} size="lg">
-          <i className="fa-solid fa-right-from-bracket px-1"></i> Leave my
+          <i className="fa-solid fa-right-from-bracket pe-1"></i> Leave my
           channel
         </Button>
       </Alert>
