@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0
+
+- Added support for users to self-manage the discord bot
+  - Added page at https://helpasaur.com/discord with instructions and command list
+  - Support configuration through slash commands (server owners only to start)
+
 ## 1.6.4
 
 - Fix extraneous guard on twitch endpoint
