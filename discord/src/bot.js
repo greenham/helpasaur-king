@@ -63,7 +63,6 @@ class DiscordBot {
         }
 
         this.discordClient.config = config;
-        console.log(`✅ Refreshed service config from API!`);
       })
       .catch((error) => {
         console.error("🛑 Error refreshing service config:", error);
