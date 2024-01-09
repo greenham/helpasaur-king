@@ -118,7 +118,12 @@ module.exports = {
     }
 
     // Reply to the user
-    await interaction.reply({ embeds: [response] });
+    try {
+      await interaction.reply({ embeds: [response] });
+    } catch (err) {
+      console.error(`Error while replying to command: ${err}`);
+      return;
+    }
 
     // Place command on cooldown
     cooldowns.set(cooldownKey, Date.now());
