@@ -7,17 +7,22 @@ module.exports = {
     const { client } = guild;
 
     // See if there's an existing configuration for this guild
-    let guildConfig = client.config.guilds.find((g) => g.id === guild.id);
-    if (guildConfig) {
+    const guildConfigIndex = client.config.guilds.findIndex(
+      (g) => g.id === guild.id
+    );
+    if (guildConfigIndex !== -1) {
       console.log(`Guild ${guild.name} (${guild.id}) is already configured`);
       // Re-activate guild if necessary
-      if (!guildConfig.active) {
+      if (!client.config.guilds[guildConfigIndex].active) {
         console.log(`Re-activating guild ${guild.name} (${guild.id})`);
         try {
           await this.helpaApi.api.patch(`/api/discord/guild/${guild.id}`, {
             active: true,
           });
           console.log(`Re-activated guild ${guild.name} (${guild.id})`);
+
+          // Update the local config
+          client.config.guilds[guildConfigIndex].active = true;
         } catch (err) {
           console.error(
             `Error re-activating guild ${guild.name} (${guild.id}): ${err.message}`
@@ -31,7 +36,7 @@ module.exports = {
       return;
     }
 
-    guildConfig = Object.assign(
+    const guildConfig = Object.assign(
       { id: guild.id, name: guild.name },
       defaultGuildConfig
     );

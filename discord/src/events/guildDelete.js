@@ -24,7 +24,7 @@ module.exports = {
       });
 
       // Update the local config
-      client.config.guilds.splice(guildConfigIndex, 1);
+      client.config.guilds[guildConfigIndex].active = false;
     } catch (err) {
       console.error(
         `Error deleting guild ${guild.name} (${guild.id}) via API: ${err.message}`

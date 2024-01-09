@@ -8,7 +8,6 @@ module.exports = {
   name: "messageCreate",
   async execute(interaction) {
     const { author, content, guildId, client } = interaction;
-    let command = false;
 
     //  See if there's an internal configuration for this guild
     let guildConfig = client.config.guilds.find((g) => g.id === guildId);
@@ -46,6 +45,7 @@ module.exports = {
       cachedCommand = false;
     }
 
+    let command = false;
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
