@@ -16,6 +16,8 @@ module.exports = {
       guildConfig = Object.assign({}, defaultGuildConfig);
     }
 
+    if (guildConfig.active === false) return;
+
     const { cmdPrefix, textCmdCooldown } = guildConfig;
 
     // Make sure the content starts with the correct prefix
