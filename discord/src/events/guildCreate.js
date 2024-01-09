@@ -10,6 +10,24 @@ module.exports = {
     let guildConfig = client.config.guilds.find((g) => g.id === guild.id);
     if (guildConfig) {
       console.log(`Guild ${guild.name} (${guild.id}) is already configured`);
+      // Re-activate guild if necessary
+      if (!guildConfig.active) {
+        console.log(`Re-activating guild ${guild.name} (${guild.id})`);
+        try {
+          await this.helpaApi.api.patch(`/api/discord/guild/${guild.id}`, {
+            active: true,
+          });
+          console.log(`Re-activated guild ${guild.name} (${guild.id})`);
+        } catch (err) {
+          console.error(
+            `Error re-activating guild ${guild.name} (${guild.id}): ${err.message}`
+          );
+        }
+      } else {
+        console.log(
+          `Guild ${guild.name} (${guild.id}) is already active, nothing to do here.`
+        );
+      }
       return;
     }
 
