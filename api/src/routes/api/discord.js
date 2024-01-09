@@ -24,9 +24,9 @@ router.get("/joinUrl", async (req, res) => {
   }
 });
 
-// POST /api/discord/guildCreate
+// POST /api/discord/guild
 router.post(
-  "/guildCreate",
+  "/guild",
   requireJwtToken,
   guard.check(["service"]),
   async (req, res) => {
@@ -42,6 +42,42 @@ router.post(
       }
 
       discordConfig.config.guilds.push(req.body);
+      discordConfig.markModified("config");
+      await discordConfig.save();
+
+      res.status(201).json({ result: "success", message: "OK" });
+    } catch (err) {
+      res.status(500).json({ result: "error", message: err.message });
+    }
+  }
+);
+
+// DELETE /api/discord/guild/:id
+router.delete(
+  "/guild/:id",
+  requireJwtToken,
+  guard.check(["service"]),
+  async (req, res) => {
+    if (!req.params.id || !req.params.id.match(/\d+/)) {
+      return res.status(404).json({
+        result: "error",
+        message: `Invalid guild id provided!`,
+      });
+    }
+
+    try {
+      const discordConfig = await Config.findOne({ id: "discord" });
+      const guildIndex = discordConfig.config.guilds.findIndex(
+        (g) => g.id === req.params.id
+      );
+      if (guildIndex === -1) {
+        return res.status(200).json({
+          result: "noop",
+          message: `Not in guild (${req.params.id})!`,
+        });
+      }
+
+      discordConfig.config.guilds.splice(guildIndex, 1);
       discordConfig.markModified("config");
       await discordConfig.save();
 

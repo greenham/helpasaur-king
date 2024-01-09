@@ -13,19 +13,24 @@ module.exports = {
       return;
     }
 
-    if (!guildConfig) {
-      guildConfig = Object.assign(
-        { id: guild.id, name: guild.name },
-        defaultGuildConfig
-      );
+    guildConfig = Object.assign(
+      { id: guild.id, name: guild.name },
+      defaultGuildConfig
+    );
 
-      console.log(`Creating config for guild ${guild.name} (${guild.id})`);
+    console.log(`Creating config for guild ${guild.name} (${guild.id})`);
 
-      // Create this guild via the API
-      await this.helpaApi.api.post(`/api/discord/guildCreate`, guildConfig);
+    // Create this guild via the API
+    try {
+      await this.helpaApi.api.post(`/api/discord/guild`, guildConfig);
 
       // Update the local config
       client.config.guilds.push(guildConfig);
+    } catch (err) {
+      console.error(
+        `Error creating guild ${guild.name} (${guild.id}) via API: ${err.message}`
+      );
+      return;
     }
   },
 };
