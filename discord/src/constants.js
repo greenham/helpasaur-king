@@ -1,5 +1,6 @@
 module.exports = {
   defaultGuildConfig: {
+    active: true,
     cmdPrefix: "!",
     textCmdCooldown: 10,
     enableStreamAlerts: false,

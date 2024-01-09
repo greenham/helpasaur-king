@@ -7,6 +7,7 @@ const Config = require("../../models/config");
 // Endpoint: /discord
 
 // GET /api/discord/joinUrl
+// - Returns the URL to join the bot to a guild
 router.get("/joinUrl", async (req, res) => {
   try {
     const discordConfig = await Config.findOne({ id: "discord" });
@@ -24,9 +25,10 @@ router.get("/joinUrl", async (req, res) => {
   }
 });
 
-// POST /api/discord/guildCreate
+// POST /api/discord/guild
+// - Creates a new guild
 router.post(
-  "/guildCreate",
+  "/guild",
   requireJwtToken,
   guard.check(["service"]),
   async (req, res) => {
@@ -45,7 +47,7 @@ router.post(
       discordConfig.markModified("config");
       await discordConfig.save();
 
-      res.status(200).json({ result: "success", message: "OK" });
+      res.status(201).json({ result: "success", message: "OK" });
     } catch (err) {
       res.status(500).json({ result: "error", message: err.message });
     }
@@ -53,11 +55,19 @@ router.post(
 );
 
 // PATCH /api/discord/guild/:id
+// - Updates an existing guild
 router.patch(
   "/guild/:id",
   requireJwtToken,
   guard.check(["service"]),
   async (req, res) => {
+    if (!req.params.id || !req.params.id.match(/\d+/)) {
+      return res.status(400).json({
+        result: "error",
+        message: `Invalid guild id provided!`,
+      });
+    }
+
     try {
       // assume req.body contains a valid patch for a guild object
       // update this in config for discord (guilds array)

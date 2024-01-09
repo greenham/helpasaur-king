@@ -54,7 +54,10 @@ module.exports = {
 
       // Look up which guilds/channels/roles should be alerted
       let alerts = client.config.guilds
-        .filter((g) => g.enableWeeklyRaceAlert && g.weeklyRaceAlertChannelId)
+        .filter(
+          (g) =>
+            g.active && g.enableWeeklyRaceAlert && g.weeklyRaceAlertChannelId
+        )
         .map((g) => {
           return {
             channelId: g.weeklyRaceAlertChannelId,
@@ -123,7 +126,9 @@ module.exports = {
 
       // Get a list of guilds that have stream alerts enabled
       let alerts = client.config.guilds
-        .filter((g) => g.enableStreamAlerts && g.streamAlertsChannelId)
+        .filter(
+          (g) => g.active && g.enableStreamAlerts && g.streamAlertsChannelId
+        )
         .map((g) => {
           return { channelId: g.streamAlertsChannelId };
         });
@@ -184,7 +189,10 @@ module.exports = {
       // Get a list of guilds that have race room alerts enabled
       let alerts = client.config.guilds
         .filter(
-          (g) => g.enableWeeklyRaceRoomAlert && g.weeklyRaceAlertChannelId
+          (g) =>
+            g.active &&
+            g.enableWeeklyRaceRoomAlert &&
+            g.weeklyRaceAlertChannelId
         )
         .map((g) => {
           return {

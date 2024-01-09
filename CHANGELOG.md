@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.1
+
+- Support activating / de-activating discord bot (soft delete on guildDelete)
+
 ## 1.7.0
 
 - Added support for users to self-manage the discord bot
