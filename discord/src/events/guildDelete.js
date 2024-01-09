@@ -17,9 +17,11 @@ module.exports = {
 
     console.log(`Removing config for guild ${guild.name} (${guild.id})`);
 
-    // Delete this guild via the API
+    // De-activate this guild via the API
     try {
-      await this.helpaApi.api.delete(`/api/discord/guild/${guild.id}`);
+      await this.helpaApi.api.patch(`/api/discord/guild/${guild.id}`, {
+        active: false,
+      });
 
       // Update the local config
       client.config.guilds.splice(guildConfigIndex, 1);

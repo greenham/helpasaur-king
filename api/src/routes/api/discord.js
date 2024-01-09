@@ -7,6 +7,7 @@ const Config = require("../../models/config");
 // Endpoint: /discord
 
 // GET /api/discord/joinUrl
+// - Returns the URL to join the bot to a guild
 router.get("/joinUrl", async (req, res) => {
   try {
     const discordConfig = await Config.findOne({ id: "discord" });
@@ -25,6 +26,7 @@ router.get("/joinUrl", async (req, res) => {
 });
 
 // POST /api/discord/guild
+// - Creates a new guild
 router.post(
   "/guild",
   requireJwtToken,
@@ -52,8 +54,9 @@ router.post(
   }
 );
 
-// DELETE /api/discord/guild/:id
-router.delete(
+// PATCH /api/discord/guild/:id
+// - Updates an existing guild
+router.patch(
   "/guild/:id",
   requireJwtToken,
   guard.check(["service"]),
@@ -65,35 +68,6 @@ router.delete(
       });
     }
 
-    try {
-      const discordConfig = await Config.findOne({ id: "discord" });
-      const guildIndex = discordConfig.config.guilds.findIndex(
-        (g) => g.id === req.params.id
-      );
-      if (guildIndex === -1) {
-        return res.status(200).json({
-          result: "noop",
-          message: `Not in guild (${req.params.id})!`,
-        });
-      }
-
-      discordConfig.config.guilds.splice(guildIndex, 1);
-      discordConfig.markModified("config");
-      await discordConfig.save();
-
-      res.status(200).json({ result: "success", message: "OK" });
-    } catch (err) {
-      res.status(500).json({ result: "error", message: err.message });
-    }
-  }
-);
-
-// PATCH /api/discord/guild/:id
-router.patch(
-  "/guild/:id",
-  requireJwtToken,
-  guard.check(["service"]),
-  async (req, res) => {
     try {
       // assume req.body contains a valid patch for a guild object
       // update this in config for discord (guilds array)
