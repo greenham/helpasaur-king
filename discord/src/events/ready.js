@@ -141,7 +141,7 @@ module.exports = {
         if (!channel) return;
 
         console.log(
-          `Sending stream alert to to ${channel.guild.name} (#${channel.name})`
+          `Sending stream alert for ${stream.user.login} to ${channel.guild.name} (#${channel.name})`
         );
 
         let streamAlertEmbed = new EmbedBuilder()
