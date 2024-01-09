@@ -62,7 +62,7 @@ router.patch(
   guard.check(["service"]),
   async (req, res) => {
     if (!req.params.id || !req.params.id.match(/\d+/)) {
-      return res.status(404).json({
+      return res.status(400).json({
         result: "error",
         message: `Invalid guild id provided!`,
       });
