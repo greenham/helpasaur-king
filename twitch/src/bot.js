@@ -151,6 +151,34 @@ class TwitchBot {
       }
     }
 
+    // @TODO: Check here for prac commands and handle them
+    switch (commandNoPrefix) {
+      case "pracadd":
+        const entryName = args.join(" ");
+        try {
+          const response = await this.helpaApi.api.post(
+            `/api/prac/list/default/entry`,
+            {
+              twitchUserId: tags.username, // @TODO: replace with tags["user-id"]
+              entry: entryName,
+            }
+          );
+          console.log(response.data.message);
+          this.bot.say(channel, response.data.message).catch(console.error);
+          return;
+        } catch (err) {
+          console.error(`Error adding entry to practice list: ${err}`);
+          this.bot
+            .say(channel, `Error adding entry to practice list: ${err}`)
+            .catch(console.error);
+          return;
+        }
+      case "pracrand":
+        break;
+      case "pracdel":
+        break;
+    }
+
     let command = false;
     let cachedCommand = this.cachedCommands.get(commandNoPrefix);
 

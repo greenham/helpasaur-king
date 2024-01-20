@@ -26,5 +26,6 @@ router.use(
   guard.check([["admin"], ["service"]]),
   require("./configs")
 );
+router.use("/prac", require("./prac"));
 
 module.exports = router;
