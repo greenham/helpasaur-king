@@ -60,7 +60,7 @@ router.post(
       }
       res
         .status(201)
-        .json({ message: `Added entry #${newId} to ${listName}!` });
+        .json({ message: `Added entry #${newId} to your practice list!` });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

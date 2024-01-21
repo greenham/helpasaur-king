@@ -58,6 +58,7 @@ class TwitchBot {
 
   async handleMessage(channel, tags, message, self) {
     if (self || !message.startsWith(this.config.cmdPrefix)) return;
+    console.log(JSON.stringify(tags, null, 2));
 
     if (this.config.blacklistedUsers.includes(tags.username)) {
       console.log(
@@ -156,10 +157,16 @@ class TwitchBot {
     }
 
     // Check here for prac commands and handle them
-    // (Only handle these for the broadcaster for now)
-    // @TODO: support moderators being able to use these commands if
-    // the user has that enabled (tags.mod === true)
-    if (channel === `#${tags.username}`) {
+    // By default, the broadcaster and mods can use these commands
+    // but they only apply to the channel in which they are issued
+    // @TODO: allow users to disable mods ability to use these commands
+    const betaUsers = ["#twinmo23", "#greenham"];
+    if (
+      betaUsers.includes(channel) &&
+      (channel === `#${tags.username}` || tags.mod === true)
+    ) {
+      // @TODO: replace targetUser with tags["room-id"] once per-user configurations are a thing
+      const targetUser = channel.replace("#", "");
       const listName = "default";
       switch (commandNoPrefix) {
         case "pracadd":
@@ -174,9 +181,8 @@ class TwitchBot {
           }
           const entryName = args.join(" ");
           try {
-            // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api.post(
-              `/api/prac/${tags.username}/lists/${listName}/entries`,
+              `/api/prac/${targetUser}/lists/${listName}/entries`,
               {
                 entry: entryName,
               }
@@ -198,9 +204,8 @@ class TwitchBot {
           }
         case "pracrand":
           try {
-            // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api(
-              `/api/prac/${tags.username}/lists/${listName}/entries/random`
+              `/api/prac/${targetUser}/lists/${listName}/entries/random`
             );
             console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
@@ -220,9 +225,8 @@ class TwitchBot {
         case "pracdel":
           const entryId = parseInt(args[0]);
           try {
-            // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api.delete(
-              `/api/prac/${tags.username}/lists/${listName}/entries/${entryId}`
+              `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
             );
             console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
@@ -241,9 +245,8 @@ class TwitchBot {
           }
         case "praclist":
           try {
-            // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api(
-              `/api/prac/${tags.username}/lists/${listName}`
+              `/api/prac/${targetUser}/lists/${listName}`
             );
             console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
@@ -262,9 +265,8 @@ class TwitchBot {
           }
         case "pracclear":
           try {
-            // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api.delete(
-              `/api/prac/${tags.username}/lists/${listName}`
+              `/api/prac/${targetUser}/lists/${listName}`
             );
             console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
