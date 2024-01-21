@@ -72,7 +72,7 @@ function TopNav() {
 
   return (
     <>
-      <Navbar expand="lg" bg="dark" sticky="top">
+      <Navbar expand="xl" bg="dark" sticky="top">
         <Container>
           <OverlayTrigger placement="bottom" overlay={popover}>
             <Navbar.Brand>
