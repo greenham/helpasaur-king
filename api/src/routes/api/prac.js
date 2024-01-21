@@ -7,11 +7,12 @@ const guard = require("express-jwt-permissions")();
 // Endpoint: /prac
 
 // ======== PROTECTED ENDPOINTS ========
-// POST / -> create new entry in the default list for this user
+// POST /:twitchUserId/lists/:listName/entry
+// -> creates a new entry in the :listName list for :twitchUserId
 // payload will be like:
-// { entry: string }
+// { entry: String }
 router.post(
-  "/:twitchUserId/list/:listName/entry",
+  "/:twitchUserId/lists/:listName/entries",
   requireJwtToken,
   guard.check("service"),
   async (req, res) => {
@@ -23,7 +24,12 @@ router.post(
 
     const listName = req.params.listName ?? "default";
 
-    // @TODO validate the entry (char limit, etc.)
+    // @TODO sanitize and validate the entry (char limit, etc.)
+    const entry = req.body.entry ?? false;
+    if (!entry) {
+      res.status(400).json({ message: "Missing entry!" });
+      return;
+    }
 
     try {
       // temp: twitchUserId will be the username
@@ -38,7 +44,7 @@ router.post(
       let newId;
       if (result) {
         // user has a list already, append to it
-        result.entries.push(req.body.entry);
+        result.entries.push(entry);
         result.markModified("entries");
         await result.save();
         newId = result.entries.length;
@@ -47,7 +53,7 @@ router.post(
         const newList = new PracLists({
           twitchUserId,
           name: listName,
-          entries: [req.body.entry],
+          entries: [entry],
         });
         await newList.save();
         newId = 1;
@@ -62,7 +68,7 @@ router.post(
 );
 
 router.get(
-  "/:twitchUserId/list/:listName/entry/random",
+  "/:twitchUserId/lists/:listName/entries/random",
   requireJwtToken,
   guard.check("service"),
   async (req, res) => {
@@ -94,11 +100,10 @@ router.get(
   }
 );
 
-// ☐ Broadcaster in twitch chat can remove a room from the list
-// the ID of the entry is the index + 1 (remember this when deleting)
-// ☐ !pracdel <room id>
+// !pracdel <room id>
+// the ID of the entry is the index + 1
 router.delete(
-  "/:twitchUserId/list/:listName/entry/:entryId",
+  "/:twitchUserId/lists/:listName/entries/:entryId",
   requireJwtToken,
   guard.check("service"),
   async (req, res) => {
@@ -135,7 +140,7 @@ router.delete(
 );
 
 router.get(
-  "/:twitchUserId/list/:listName",
+  "/:twitchUserId/lists/:listName",
   requireJwtToken,
   guard.check("service"),
   async (req, res) => {
@@ -156,7 +161,11 @@ router.get(
         res.status(404).json({ message: "No practice list found!" });
         return;
       }
-      res.status(200).json({ message: result.entries.join(" | ") });
+      res.status(200).json({
+        message: result.entries
+          .map((e, idx) => `[${idx + 1}] ${e}`)
+          .join(" || "),
+      });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

@@ -4,6 +4,8 @@ const packageJson = require("../package.json");
 const { WEBSOCKET_RELAY_SERVER } = process.env;
 
 class TwitchBot {
+  PRACADD_COMMAND = "pracadd";
+
   constructor(config, helpaApi) {
     this.config = config;
     this.helpaApi = helpaApi;
@@ -67,6 +69,8 @@ class TwitchBot {
     const args = message.slice(1).split(" ");
     const commandNoPrefix = args.shift().toLowerCase();
 
+    // Handle commands in the bot's channel
+    // - join, leave
     if (channel === `#${this.config.username}`) {
       if (commandNoPrefix === "join") {
         let userChannel = tags.username;
@@ -151,93 +155,111 @@ class TwitchBot {
       }
     }
 
-    // @TODO: Check here for prac commands and handle them
-    // @TODO: Only handle this for the broadcaster
-    switch (commandNoPrefix) {
-      case "pracadd":
-        const entryName = args.join(" ");
-        try {
-          // @TODO: replace username with tags["user-id"]
-          const response = await this.helpaApi.api.post(
-            `/api/prac/${tags.username}/list/default/entry`,
-            {
-              entry: entryName,
-            }
-          );
-          console.log(response.data.message);
-          this.bot.say(channel, response.data.message).catch(console.error);
-          return;
-        } catch (err) {
-          console.error(`Error adding entry to practice list: ${err.message}`);
-          this.bot
-            .say(channel, `Error adding entry to practice list: ${err.message}`)
-            .catch(console.error);
-          return;
-        }
-      case "pracrand":
-        try {
-          // @TODO: replace username with tags["user-id"]
-          const response = await this.helpaApi.api(
-            `/api/prac/${tags.username}/list/default/entry/random`
-          );
-          console.log(response.data.message);
-          this.bot.say(channel, response.data.message).catch(console.error);
-          return;
-        } catch (err) {
-          console.error(
-            `Error fetching random entry from practice list: ${err.message}`
-          );
-          this.bot
-            .say(
-              channel,
-              `Error fetching random entry from practice list: ${err.message}`
-            )
-            .catch(console.error);
-          return;
-        }
-      case "pracdel":
-        const entryId = parseInt(args[0]);
-        try {
-          // @TODO: replace username with tags["user-id"]
-          const response = await this.helpaApi.api.delete(
-            `/api/prac/${tags.username}/list/default/entry/${entryId}`
-          );
-          console.log(response.data.message);
-          this.bot.say(channel, response.data.message).catch(console.error);
-          return;
-        } catch (err) {
-          console.error(
-            `Error removing entry #${entryId} from practice list: ${err.response.data.message}`
-          );
-          this.bot
-            .say(
-              channel,
+    // Check here for prac commands and handle them
+    // (Only handle these for the broadcaster for now)
+    // @TODO: support moderators being able to use these commands if
+    // the user has that enabled (tags.mod === true)
+    if (channel === `#${tags.username}`) {
+      switch (commandNoPrefix) {
+        case "pracadd":
+          if (args.length === 0) {
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> You must specify an entry name! e.g. ${this.config.cmdPrefix}pracadd gtower mimics`
+              )
+              .catch(console.error);
+            return;
+          }
+          const entryName = args.join(" ");
+          try {
+            // @TODO: replace username with tags["user-id"]
+            const response = await this.helpaApi.api.post(
+              `/api/prac/${tags.username}/lists/default/entries`,
+              {
+                entry: entryName,
+              }
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            console.error(
+              `Error adding entry to practice list: ${err.response.data.message}`
+            );
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> Error adding entry to practice list: ${err.response.data.message}`
+              )
+              .catch(console.error);
+            return;
+          }
+        case "pracrand":
+          try {
+            // @TODO: replace username with tags["user-id"]
+            const response = await this.helpaApi.api(
+              `/api/prac/${tags.username}/lists/default/entries/random`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            console.error(
+              `Error fetching random entry from practice list: ${err.response.data.message}`
+            );
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> Error fetching random entry from practice list: ${err.response.data.message}`
+              )
+              .catch(console.error);
+            return;
+          }
+        case "pracdel":
+          const entryId = parseInt(args[0]);
+          try {
+            // @TODO: replace username with tags["user-id"]
+            const response = await this.helpaApi.api.delete(
+              `/api/prac/${tags.username}/lists/default/entries/${entryId}`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            console.error(
               `Error removing entry #${entryId} from practice list: ${err.response.data.message}`
-            )
-            .catch(console.error);
-          return;
-        }
-      case "praclist":
-        try {
-          // @TODO: replace username with tags["user-id"]
-          const response = await this.helpaApi.api(
-            `/api/prac/${tags.username}/list/default`
-          );
-          console.log(response.data.message);
-          this.bot.say(channel, response.data.message).catch(console.error);
-          return;
-        } catch (err) {
-          console.error(
-            `Error fetching practice list: ${err.response.data.message}`
-          );
-          this.bot
-            .say(
-              channel,
+            );
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> Error removing entry #${entryId} from practice list: ${err.response.data.message}`
+              )
+              .catch(console.error);
+            return;
+          }
+        case "praclist":
+          try {
+            // @TODO: replace username with tags["user-id"]
+            const response = await this.helpaApi.api(
+              `/api/prac/${tags.username}/lists/default`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            console.error(
               `Error fetching practice list: ${err.response.data.message}`
-            )
-            .catch(console.error);
-          return;
-        }
+            );
+            this.bot
+              .say(
+                channel,
+                `Error fetching practice list: ${err.response.data.message}`
+              )
+              .catch(console.error);
+            return;
+          }
+      }
     }
 
     let command = false;
