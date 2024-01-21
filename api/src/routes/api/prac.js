@@ -25,7 +25,7 @@ router.post(
     const listName = req.params.listName ?? "default";
 
     // @TODO sanitize and validate the entry (char limit, etc.)
-    const entry = req.body.entry ?? false;
+    const entry = trim(req.body.entry) ?? false;
     if (!entry) {
       res.status(400).json({ message: "Missing entry!" });
       return;
