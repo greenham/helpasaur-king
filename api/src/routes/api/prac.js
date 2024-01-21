@@ -172,4 +172,37 @@ router.get(
   }
 );
 
+router.delete(
+  "/:twitchUserId/lists/:listName",
+  requireJwtToken,
+  guard.check("service"),
+  async (req, res) => {
+    const twitchUserId = req.params.twitchUserId ?? false;
+    if (!twitchUserId) {
+      res.status(400).json({ message: "Missing twitchUserId!" });
+      return;
+    }
+
+    const listName = req.params.listName ?? "default";
+
+    try {
+      const result = await PracLists.deleteOne({
+        twitchUserId,
+        name: listName,
+      });
+
+      console.log(`delete result: ${result}`);
+
+      if (!result) {
+        res.status(404).json({ message: "No matching practice list found!" });
+        return;
+      }
+
+      res.status(200).json({ message: `Practice list cleared!` });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
+
 module.exports = router;

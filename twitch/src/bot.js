@@ -160,6 +160,7 @@ class TwitchBot {
     // @TODO: support moderators being able to use these commands if
     // the user has that enabled (tags.mod === true)
     if (channel === `#${tags.username}`) {
+      const listName = "default";
       switch (commandNoPrefix) {
         case "pracadd":
           if (args.length === 0) {
@@ -175,7 +176,7 @@ class TwitchBot {
           try {
             // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api.post(
-              `/api/prac/${tags.username}/lists/default/entries`,
+              `/api/prac/${tags.username}/lists/${listName}/entries`,
               {
                 entry: entryName,
               }
@@ -199,7 +200,7 @@ class TwitchBot {
           try {
             // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api(
-              `/api/prac/${tags.username}/lists/default/entries/random`
+              `/api/prac/${tags.username}/lists/${listName}/entries/random`
             );
             console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
@@ -221,7 +222,7 @@ class TwitchBot {
           try {
             // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api.delete(
-              `/api/prac/${tags.username}/lists/default/entries/${entryId}`
+              `/api/prac/${tags.username}/lists/${listName}/entries/${entryId}`
             );
             console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
@@ -242,7 +243,7 @@ class TwitchBot {
           try {
             // @TODO: replace username with tags["user-id"]
             const response = await this.helpaApi.api(
-              `/api/prac/${tags.username}/lists/default`
+              `/api/prac/${tags.username}/lists/${listName}`
             );
             console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
@@ -255,6 +256,27 @@ class TwitchBot {
               .say(
                 channel,
                 `Error fetching practice list: ${err.response.data.message}`
+              )
+              .catch(console.error);
+            return;
+          }
+        case "pracclear":
+          try {
+            // @TODO: replace username with tags["user-id"]
+            const response = await this.helpaApi.api.delete(
+              `/api/prac/${tags.username}/lists/${listName}`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            console.error(
+              `Error clearing practice list: ${err.response.data.message}`
+            );
+            this.bot
+              .say(
+                channel,
+                `Error clearing practice list: ${err.response.data.message}`
               )
               .catch(console.error);
             return;
