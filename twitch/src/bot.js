@@ -4,8 +4,6 @@ const packageJson = require("../package.json");
 const { WEBSOCKET_RELAY_SERVER } = process.env;
 
 class TwitchBot {
-  PRACADD_COMMAND = "pracadd";
-
   constructor(config, helpaApi) {
     this.config = config;
     this.helpaApi = helpaApi;
