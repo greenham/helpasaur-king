@@ -268,7 +268,10 @@ class TwitchBot {
               err,
               "Error clearing practice list",
               channel,
-              tags
+              tags,
+              {
+                404: `Nothing to clear!`,
+              }
             );
             return;
           }
