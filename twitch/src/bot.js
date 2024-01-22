@@ -67,6 +67,8 @@ class TwitchBot {
     const args = message.slice(1).split(" ");
     const commandNoPrefix = args.shift().toLowerCase();
 
+    // Handle commands in the bot's channel
+    // - join, leave
     if (channel === `#${this.config.username}`) {
       if (commandNoPrefix === "join") {
         let userChannel = tags.username;
@@ -148,6 +150,131 @@ class TwitchBot {
         }
 
         return;
+      }
+    }
+
+    // Check here for prac commands and handle them
+    // By default, the broadcaster and mods can use these commands
+    // but they only apply to the channel in which they are issued
+    // @TODO: allow users to disable mods ability to use these commands
+    const betaUsers = ["#twinmo23", "#greenham", "#helpasaurking"];
+    if (
+      betaUsers.includes(channel) &&
+      (channel === `#${tags.username}` || tags.mod === true)
+    ) {
+      // @TODO: replace targetUser with tags["room-id"] once per-user configurations are a thing
+      const targetUser = channel.replace("#", "");
+      const listName = "default";
+      switch (commandNoPrefix) {
+        case "pracadd":
+          if (args.length === 0) {
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> You must specify an entry name! e.g. ${this.config.cmdPrefix}pracadd gtower mimics`
+              )
+              .catch(console.error);
+            return;
+          }
+
+          const entryName = args.join(" ");
+          try {
+            const response = await this.helpaApi.api.post(
+              `/api/prac/${targetUser}/lists/${listName}/entries`,
+              {
+                entry: entryName,
+              }
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            this.handleApiError(
+              err,
+              "Error adding entry to practice list",
+              channel,
+              tags
+            );
+            return;
+          }
+        case "pracrand":
+          try {
+            const response = await this.helpaApi.api(
+              `/api/prac/${targetUser}/lists/${listName}/entries/random`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            this.handleApiError(
+              err,
+              "Error fetching random entry from practice list",
+              channel,
+              tags,
+              {
+                404: `No entries found in practice list! Add one using ${this.config.cmdPrefix}pracadd <entry name>`,
+              }
+            );
+            return;
+          }
+        case "pracdel":
+          const entryId = parseInt(args[0]);
+          try {
+            const response = await this.helpaApi.api.delete(
+              `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            this.handleApiError(
+              err,
+              `Error removing entry #${entryId} from practice list`,
+              channel,
+              tags
+            );
+            return;
+          }
+        case "praclist":
+          try {
+            const response = await this.helpaApi.api(
+              `/api/prac/${targetUser}/lists/${listName}`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            this.handleApiError(
+              err,
+              "Error fetching practice list",
+              channel,
+              tags,
+              {
+                404: `No entries found in practice list! Add one using ${this.config.cmdPrefix}pracadd <entry name>`,
+              }
+            );
+            return;
+          }
+        case "pracclear":
+          try {
+            const response = await this.helpaApi.api.delete(
+              `/api/prac/${targetUser}/lists/${listName}`
+            );
+            console.log(response.data.message);
+            this.bot.say(channel, response.data.message).catch(console.error);
+            return;
+          } catch (err) {
+            this.handleApiError(
+              err,
+              "Error clearing practice list",
+              channel,
+              tags,
+              {
+                404: `Nothing to clear!`,
+              }
+            );
+            return;
+          }
       }
     }
 
@@ -257,5 +384,47 @@ class TwitchBot {
     this.channelList = this.channelList.filter((c) => c !== channel);
     console.log(`Left #${channel}`);
   }
+
+  handleApiError(err, errorMessageBase, channel, tags, statusErrors = null) {
+    console.error(errorMessageBase);
+    if (err.response) {
+      console.error(
+        `${err.response.status} Error: ${err.response.data.message}`
+      );
+
+      if (statusErrors && statusErrors[err.response.status]) {
+        this.bot
+          .say(
+            channel,
+            `@${tags["display-name"]} >> ${statusErrors[err.response.status]}`
+          )
+          .catch(console.error);
+      } else {
+        this.bot
+          .say(
+            channel,
+            `@${tags["display-name"]} >> ${err.response.status} ${errorMessageBase}: ${err.response.data.message}`
+          )
+          .catch(console.error);
+      }
+    } else if (err.request) {
+      console.error("No response received from API!");
+      this.bot
+        .say(
+          channel,
+          `@${tags["display-name"]} >> ${errorMessageBase}: Helpa might be asleep. ResidentSleeper`
+        )
+        .catch(console.error);
+    } else {
+      console.error(`Error during request setup: ${err.message}`);
+      this.bot
+        .say(
+          channel,
+          `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
+        )
+        .catch(console.error);
+    }
+  }
 }
+
 exports.TwitchBot = TwitchBot;

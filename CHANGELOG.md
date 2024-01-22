@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.2
+
+- [BETA] Support per-channel practice lists via Twitch chat commands
+  - Can be used by the broadcaster and mods
+  - Currently only enabled for a few select channels during beta
+  - Commands:
+    - `!pracadd <entry>` -- adds a new entry to the list
+    - `!pracrand` -- supplies a random entry from the list
+    - `!praclist` -- returns the entire list
+    - `!pracdel <#>` -- deletes a specific entry in the list
+    - `!pracclear` -- clears the entire list
+
 ## 1.7.1
 
 - Support activating / de-activating discord bot (soft delete on guildDelete)
