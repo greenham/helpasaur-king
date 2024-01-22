@@ -94,7 +94,7 @@ router.get(
       const randomIndex = Math.floor(Math.random() * result.entries.length);
       const randomEntry = result.entries[randomIndex];
       res.status(200).json({
-        message: `Practice this: [${randomIndex + 1}] ${randomEntry}`,
+        message: `Practice this [${randomIndex + 1}]: ${randomEntry} `,
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -164,7 +164,9 @@ router.get(
         return;
       }
       res.status(200).json({
-        message: result.entries.map((e, idx) => `${idx + 1}. ${e}`).join(" | "),
+        message: result.entries
+          .map((e, idx) => `[${idx + 1}] ${e}`)
+          .join(" | "),
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
