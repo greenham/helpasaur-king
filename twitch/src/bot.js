@@ -162,6 +162,7 @@ class TwitchBot {
       betaUsers.includes(channel) &&
       (channel === `#${tags.username}` || tags.mod === true)
     ) {
+      console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
       // @TODO: replace targetUser with tags["room-id"] once per-user configurations are a thing
       const targetUser = channel.replace("#", "");
       const listName = "default";
@@ -256,6 +257,16 @@ class TwitchBot {
             return;
           }
         case "pracclear":
+          if (targetUser !== tags.username) {
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> Only ${targetUser} can clear their practice list!`
+              )
+              .catch(console.error);
+            return;
+          }
+
           try {
             const response = await this.helpaApi.api.delete(
               `/api/prac/${targetUser}/lists/${listName}`
