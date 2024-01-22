@@ -192,8 +192,6 @@ router.delete(
         name: listName,
       });
 
-      console.log(`delete result: ${result}`);
-
       if (!result) {
         res.status(404).json({ message: "No matching practice list found!" });
         return;
