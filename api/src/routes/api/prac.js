@@ -8,9 +8,7 @@ const guard = require("express-jwt-permissions")();
 
 // ======== PROTECTED ENDPOINTS ========
 // POST /:twitchUserId/lists/:listName/entries
-// -> creates a new entry in the :listName list for :twitchUserId
-// payload will be like:
-// { entry: String }
+// Adds a new entry to the practice list
 router.post(
   "/:twitchUserId/lists/:listName/entries",
   requireJwtToken,
@@ -68,6 +66,7 @@ router.post(
   }
 );
 
+// Gets a random entry from the practice list
 router.get(
   "/:twitchUserId/lists/:listName/entries/random",
   requireJwtToken,
@@ -103,8 +102,7 @@ router.get(
   }
 );
 
-// !pracdel <room id>
-// the ID of the entry is the index + 1
+// Deletes a specifc entry from the practice list
 router.delete(
   "/:twitchUserId/lists/:listName/entries/:entryId",
   requireJwtToken,
@@ -142,6 +140,7 @@ router.delete(
   }
 );
 
+// Gets the entire practice list
 router.get(
   "/:twitchUserId/lists/:listName",
   requireJwtToken,
@@ -165,9 +164,7 @@ router.get(
         return;
       }
       res.status(200).json({
-        message: result.entries
-          .map((e, idx) => `[${idx + 1}] ${e}`)
-          .join(" || "),
+        message: result.entries.map((e, idx) => `${idx + 1}. ${e}`).join(" | "),
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -175,6 +172,7 @@ router.get(
   }
 );
 
+// Clears the entire practice list
 router.delete(
   "/:twitchUserId/lists/:listName",
   requireJwtToken,
