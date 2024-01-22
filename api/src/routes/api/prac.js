@@ -7,7 +7,7 @@ const guard = require("express-jwt-permissions")();
 // Endpoint: /prac
 
 // ======== PROTECTED ENDPOINTS ========
-// POST /:twitchUserId/lists/:listName/entry
+// POST /:twitchUserId/lists/:listName/entries
 // -> creates a new entry in the :listName list for :twitchUserId
 // payload will be like:
 // { entry: String }
@@ -35,11 +35,11 @@ router.post(
       // temp: twitchUserId will be the username
       // @TODO: convert to using the actual user ID
       // once we have per-channel config support in place
-
       const result = await PracLists.findOne({
         twitchUserId: twitchUserId,
         name: listName,
       });
+
       // @TODO: Convert this to an actual ID that stays consistent for the lifetime of the entry
       let newId;
       if (result) {
@@ -58,9 +58,10 @@ router.post(
         await newList.save();
         newId = 1;
       }
-      res
-        .status(201)
-        .json({ message: `Added entry #${newId} to your practice list!` });
+
+      res.status(201).json({
+        message: `Added entry #${newId} to practice list for ${twitchUserId}!`,
+      });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -85,8 +86,10 @@ router.get(
         twitchUserId,
         name: listName,
       });
-      if (!result) {
-        res.status(404).json({ message: "No practice list found!" });
+      if (!result || result.entries.length === 0) {
+        res
+          .status(404)
+          .json({ message: `Practice list for ${twitchUserId} is empty!` });
         return;
       }
       const randomIndex = Math.floor(Math.random() * result.entries.length);
