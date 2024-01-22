@@ -58,7 +58,6 @@ class TwitchBot {
 
   async handleMessage(channel, tags, message, self) {
     if (self || !message.startsWith(this.config.cmdPrefix)) return;
-    console.log(JSON.stringify(tags, null, 2));
 
     if (this.config.blacklistedUsers.includes(tags.username)) {
       console.log(
@@ -160,7 +159,7 @@ class TwitchBot {
     // By default, the broadcaster and mods can use these commands
     // but they only apply to the channel in which they are issued
     // @TODO: allow users to disable mods ability to use these commands
-    const betaUsers = ["#twinmo23", "#greenham"];
+    const betaUsers = ["#twinmo23", "#greenham", "#helpasaurking"];
     if (
       betaUsers.includes(channel) &&
       (channel === `#${tags.username}` || tags.mod === true)
@@ -179,6 +178,7 @@ class TwitchBot {
               .catch(console.error);
             return;
           }
+
           const entryName = args.join(" ");
           try {
             const response = await this.helpaApi.api.post(
@@ -191,15 +191,35 @@ class TwitchBot {
             this.bot.say(channel, response.data.message).catch(console.error);
             return;
           } catch (err) {
-            console.error(
-              `Error adding entry to practice list: ${err.response.data.message}`
-            );
-            this.bot
-              .say(
-                channel,
-                `@${tags["display-name"]} >> Error adding entry to practice list: ${err.response.data.message}`
-              )
-              .catch(console.error);
+            const errorMessageBase = `Error adding entry to practice list`;
+            console.error(errorMessageBase);
+            if (err.response) {
+              console.error(
+                `${err.response.status} Error: ${err.response.data.message}`
+              );
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${err.response.status} ${errorMessageBase}: ${err.response.data.message}`
+                )
+                .catch(console.error);
+            } else if (err.request) {
+              console.error("No response received from API!");
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: Helpa might be asleep. ResidentSleeper`
+                )
+                .catch(console.error);
+            } else {
+              console.error(`Error during request setup: ${err.message}`);
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
+                )
+                .catch(console.error);
+            }
             return;
           }
         case "pracrand":
@@ -211,15 +231,41 @@ class TwitchBot {
             this.bot.say(channel, response.data.message).catch(console.error);
             return;
           } catch (err) {
-            console.error(
-              `Error fetching random entry from practice list: ${err.response.data.message}`
-            );
-            this.bot
-              .say(
-                channel,
-                `@${tags["display-name"]} >> Error fetching random entry from practice list: ${err.response.data.message}`
-              )
-              .catch(console.error);
+            const errorMessageBase = `Error fetching random entry from practice list`;
+            console.error(errorMessageBase);
+            if (err.response) {
+              if (err.response.status === 404) {
+                this.bot
+                  .say(
+                    channel,
+                    `@${tags["display-name"]} >> No entries found in practice list! Add one using ${this.config.cmdPrefix}pracadd <entry name>`
+                  )
+                  .catch(console.error);
+              } else {
+                this.bot
+                  .say(
+                    channel,
+                    `@${tags["display-name"]} >> ${err.response.status} ${errorMessageBase}: ${err.response.data.message}`
+                  )
+                  .catch(console.error);
+              }
+            } else if (err.request) {
+              console.error("No response received from API!");
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: Helpa might be asleep. ResidentSleeper`
+                )
+                .catch(console.error);
+            } else {
+              console.error(`Error during request setup: ${err.message}`);
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
+                )
+                .catch(console.error);
+            }
             return;
           }
         case "pracdel":
@@ -232,15 +278,35 @@ class TwitchBot {
             this.bot.say(channel, response.data.message).catch(console.error);
             return;
           } catch (err) {
-            console.error(
-              `Error removing entry #${entryId} from practice list: ${err.response.data.message}`
-            );
-            this.bot
-              .say(
-                channel,
-                `@${tags["display-name"]} >> Error removing entry #${entryId} from practice list: ${err.response.data.message}`
-              )
-              .catch(console.error);
+            const errorMessageBase = `Error removing entry #${entryId} from practice list`;
+            console.error(errorMessageBase);
+            if (err.response) {
+              console.error(
+                `${err.response.status} Error: ${err.response.data.message}`
+              );
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: ${err.response.data.message}`
+                )
+                .catch(console.error);
+            } else if (err.request) {
+              console.error("No response received from API!");
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: Helpa might be asleep. ResidentSleeper`
+                )
+                .catch(console.error);
+            } else {
+              console.error(`Error during request setup: ${err.message}`);
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
+                )
+                .catch(console.error);
+            }
             return;
           }
         case "praclist":
@@ -252,15 +318,44 @@ class TwitchBot {
             this.bot.say(channel, response.data.message).catch(console.error);
             return;
           } catch (err) {
-            console.error(
-              `Error fetching practice list: ${err.response.data.message}`
-            );
-            this.bot
-              .say(
-                channel,
-                `Error fetching practice list: ${err.response.data.message}`
-              )
-              .catch(console.error);
+            const errorMessageBase = `Error fetching practice list`;
+            console.error(errorMessageBase);
+            if (err.response) {
+              console.error(
+                `${err.response.status} Error: ${err.response.data.message}`
+              );
+              if (err.response.status === 404) {
+                this.bot
+                  .say(
+                    channel,
+                    `@${tags["display-name"]} >> No entries found in practice list! Add one using ${this.config.cmdPrefix}pracadd <entry name>`
+                  )
+                  .catch(console.error);
+              } else {
+                this.bot
+                  .say(
+                    channel,
+                    `@${tags["display-name"]} >> ${errorMessageBase}: ${err.response.data.message}`
+                  )
+                  .catch(console.error);
+              }
+            } else if (err.request) {
+              console.error("No response received from API!");
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: Helpa might be asleep. ResidentSleeper`
+                )
+                .catch(console.error);
+            } else {
+              console.error(`Error during request setup: ${err.message}`);
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
+                )
+                .catch(console.error);
+            }
             return;
           }
         case "pracclear":
@@ -272,15 +367,32 @@ class TwitchBot {
             this.bot.say(channel, response.data.message).catch(console.error);
             return;
           } catch (err) {
-            console.error(
-              `Error clearing practice list: ${err.response.data.message}`
-            );
-            this.bot
-              .say(
-                channel,
-                `Error clearing practice list: ${err.response.data.message}`
-              )
-              .catch(console.error);
+            const errorMessageBase = `Error clearing practice list`;
+            console.error(errorMessageBase);
+            if (err.response) {
+              this.bot
+                .say(
+                  channel,
+                  `Error clearing practice list: ${err.response.data.message}`
+                )
+                .catch(console.error);
+            } else if (err.request) {
+              console.error("No response received from API!");
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: Helpa might be asleep. ResidentSleeper`
+                )
+                .catch(console.error);
+            } else {
+              console.error(`Error during request setup: ${err.message}`);
+              this.bot
+                .say(
+                  channel,
+                  `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
+                )
+                .catch(console.error);
+            }
             return;
           }
       }
