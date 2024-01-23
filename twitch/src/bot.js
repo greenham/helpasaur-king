@@ -9,7 +9,6 @@ class TwitchBot {
     this.helpaApi = helpaApi;
     this.cooldowns = new Map();
     this.cachedCommands = new Map();
-    this.channelList = [this.config.username, ...this.config.channels];
     this.bot = null;
     this.wsRelay = null;
     this.messages = {
@@ -18,9 +17,25 @@ class TwitchBot {
     };
   }
 
-  start() {
+  // {
+  //    roomId: u.twitchUserData.id,
+  //    channelName: u.twitchUserData.login,
+  //    displayName: u.twitchUserData.display_name,
+  //    active: true,
+  //    commandPrefix: '!',
+  //    textCommandCooldown: 10,
+  //    practiceListsEnabled: true,
+  //    allowModsToManagePracticeLists: true,
+  //    createdAt: ISODate('2024-01-21T22:47:24.975Z'),
+  //    lastUpdated: ISODate('2024-01-21T22:47:24.975Z')
+  // }
+  start(channels) {
+    this.channelList = [
+      this.config.username,
+      ...channels.map((c) => c.channelName),
+    ];
     this.bot = new tmi.Client({
-      options: { debug: false },
+      options: { debug: true },
       identity: {
         username: this.config.username,
         password: this.config.oauth,
@@ -55,6 +70,12 @@ class TwitchBot {
   }
 
   async handleMessage(channel, tags, message, self) {
+    // @TODO: Look up the config for this channel
+    // -- we'll definitely want to cache this
+    // -- this method gets hit a lot
+    // -- alternatively, we do optimistic updates on this side
+    // -- and for anything updated server-side, that gets pushed to the bot somehow?
+    // -- or we just fetch on an interval 😁
     if (self || !message.startsWith(this.config.cmdPrefix)) return;
 
     if (this.config.blacklistedUsers.includes(tags.username)) {
@@ -157,6 +178,7 @@ class TwitchBot {
     // By default, the broadcaster and mods can use these commands
     // but they only apply to the channel in which they are issued
     // @TODO: allow users to disable mods ability to use these commands
+    // -- Check User.allowModsToManagePracticeLists
     const betaUsers = ["#twinmo23", "#greenham", "#helpasaurking"];
     if (
       betaUsers.includes(channel) &&

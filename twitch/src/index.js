@@ -15,7 +15,16 @@ helpaApiClient
     }
 
     const bot = new TwitchBot(config, helpaApiClient);
-    bot.start();
+
+    // Get the list of active channels the bot should join
+    helpaApiClient
+      .api("/api/configs/twitch/activeChannels")
+      .then((channels) => {
+        bot.start(channels.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching active channels:", error);
+      });
   })
   .catch((error) => {
     console.error("Error fetching service config:", error);

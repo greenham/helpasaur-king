@@ -70,9 +70,21 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
   );
 };
 
+interface TwitchBotConfig {
+  active: boolean;
+  commandsEnabled: boolean;
+  commandPrefix: string;
+  textCommandCooldown: number;
+  practiceListsEnabled: boolean;
+  allowModsToManagePracticeLists: boolean;
+  weeklyRaceAlertEnabled: boolean;
+  createdAt: Date;
+  lastUpdated: Date;
+}
+
 interface TwitchUserBotManagementProps {
   user: IUser;
-  twitchBotConfig: { botHasJoined: boolean };
+  twitchBotConfig: TwitchBotConfig;
 }
 const TwitchUserBotManagement: React.FunctionComponent<
   TwitchUserBotManagementProps
@@ -106,7 +118,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
     handleCloseLeaveModal();
   };
 
-  if (!twitchBotConfig?.botHasJoined) {
+  if (!twitchBotConfig?.active) {
     return (
       <Alert variant="dark" className="p-5">
         <h2>Would you like HelpasaurKing to help your Twitch chat?</h2>
