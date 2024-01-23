@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const Config = require("../../models/config");
+const User = require("../../models/user");
 const { getRequestedChannel } = require("../../lib/utils");
 const guard = require("express-jwt-permissions")();
 
 // GET /channels -> returns list of channels currently auto-joined by the bot (admin-only)
 router.get("/channels", guard.check("admin"), async (req, res) => {
   try {
-    const twitchConfig = await Config.findOne({ id: "twitch" });
-    // Put in alphabetical order before returning
-    twitchConfig.config.channels.sort();
-    res.status(200).json(twitchConfig.config.channels);
+    const users = await User.find({ "twitchBotConfig.active": true });
+    const channels = users.map((u) => u.twitchUserData.login).sort();
+    res.status(200).json(channels);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -24,6 +24,7 @@ router.post("/join", async (req, res) => {
   }
 
   try {
+    // @TODO: Convert this to use the twitchBotConfig from the User model
     const twitchConfig = await Config.findOne({ id: "twitch" });
     if (twitchConfig.config.channels.includes(requestedChannel)) {
       return res.status(200).json({
@@ -58,6 +59,7 @@ router.post("/leave", async (req, res) => {
   }
 
   try {
+    // @TODO: Convert this to use the twitchBotConfig from the User model
     const twitchConfig = await Config.findOne({ id: "twitch" });
     if (!twitchConfig.config.channels.includes(requestedChannel)) {
       return res
