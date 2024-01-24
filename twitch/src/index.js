@@ -21,6 +21,7 @@ helpaApiClient
       .api("/api/configs/twitch/activeChannels")
       .then((channels) => {
         bot.start(channels.data);
+        // @TODO: Re-fetch this on an interval?
       })
       .catch((error) => {
         console.error("Error fetching active channels:", error);

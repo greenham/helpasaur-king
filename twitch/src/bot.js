@@ -34,6 +34,11 @@ class TwitchBot {
       this.config.username,
       ...channels.map((c) => c.channelName),
     ];
+    this.channelMap = new Map();
+    // map roomId => config
+    channels.forEach((c) => {
+      this.channelMap.set(c.roomId, c);
+    });
     this.bot = new tmi.Client({
       options: { debug: true },
       identity: {
@@ -70,17 +75,118 @@ class TwitchBot {
   }
 
   async handleMessage(channel, tags, message, self) {
-    // @TODO: Look up the config for this channel
-    // -- we'll definitely want to cache this
-    // -- this method gets hit a lot
-    // -- alternatively, we do optimistic updates on this side
-    // -- and for anything updated server-side, that gets pushed to the bot somehow?
-    // -- or we just fetch on an interval 😁
-    if (self || !message.startsWith(this.config.cmdPrefix)) return;
+    if (self) return;
+
+    // Handle commands in the bot's channel (using the global default command prefix)
+    // - join, leave
+    if (channel === `#${this.config.username}`) {
+      if (!message.startsWith(this.config.cmdPrefix)) return;
+      const args = message.slice(1).split(" ");
+      const commandNoPrefix = args.shift().toLowerCase();
+      switch (commandNoPrefix) {
+        case "join":
+          let channelToJoin = tags.username;
+
+          if (args[0] && tags.mod) {
+            channelToJoin = args[0].toLowerCase();
+          }
+
+          console.log(
+            `Received request from ${tags.username} to join ${channelToJoin}`
+          );
+
+          if (this.channelList.includes(channelToJoin)) {
+            return this.bot.say(
+              channel,
+              `@${tags["display-name"]} >> I am already in ${channelToJoin}!`
+            );
+          }
+
+          this.bot.say(
+            channel,
+            `@${tags["display-name"]} >> Joining ${channelToJoin}... please mod ${this.config.username} to avoid accidental timeouts or bans!`
+          );
+
+          this.bot.join(channelToJoin);
+          this.channelList.push(channelToJoin);
+
+          try {
+            const result = await this.helpaApi.api.post(`/api/twitch/join`, {
+              channel: channelToJoin,
+            });
+
+            if (result.data.result === "success") {
+              // update the local map with the new channel config
+              this.channelMap.set(
+                result.data.twitchBotConfig.roomId,
+                result.data.twitchBotConfig
+              );
+            }
+
+            console.log(
+              `Result of /api/twitch/join: ${JSON.stringify(result.data)}`
+            );
+          } catch (err) {
+            console.error(`Error calling /api/twitch/join: ${err.message}`);
+          }
+          break;
+
+        case "leave":
+          let channelToLeave = tags.username;
+
+          if (args[0] && tags.mod) {
+            channelToLeave = args[0].toLowerCase();
+          }
+
+          console.log(
+            `Received request from ${tags.username} to leave ${channelToLeave}`
+          );
+
+          if (!this.channelList.includes(channelToLeave)) {
+            return this.bot.say(
+              channel,
+              `@${tags["display-name"]} >> I am not in ${channelToLeave}!`
+            );
+          }
+
+          this.bot.say(
+            channel,
+            `@${tags["display-name"]} >> Leaving ${channelToLeave}... use ${channelConfig.commandPrefix}join in this channel to re-join at any time!`
+          );
+
+          this.bot.part(channelToLeave);
+
+          this.channelList = this.channelList.filter(
+            (c) => c !== channelToLeave
+          );
+          this.channelMap.delete(tags["room-id"]);
+
+          try {
+            const result = await this.helpaApi.api.post(`/api/twitch/leave`, {
+              channel: channelToLeave,
+            });
+
+            console.log(
+              `Result of /api/twitch/leave: ${JSON.stringify(result.data)}`
+            );
+          } catch (err) {
+            console.error(`Error calling /api/twitch/leave: ${err.message}`);
+          }
+          break;
+      }
+
+      return;
+    }
+
+    // Look up the config for this channel in the local cache
+    const channelConfig = this.channelMap.get(tags["room-id"]);
+    if (!channelConfig) return;
+
+    if (!message.startsWith(channelConfig.commandPrefix)) return;
 
     if (this.config.blacklistedUsers.includes(tags.username)) {
       console.log(
-        `Received command from blacklisted user: ${tags.username} (${tags["user-id"]})`
+        `Received command from blacklisted user ${tags.username} (${tags["user-id"]}) in ${channel}`
       );
       return;
     }
@@ -88,102 +194,16 @@ class TwitchBot {
     const args = message.slice(1).split(" ");
     const commandNoPrefix = args.shift().toLowerCase();
 
-    // Handle commands in the bot's channel
-    // - join, leave
-    if (channel === `#${this.config.username}`) {
-      if (commandNoPrefix === "join") {
-        let userChannel = tags.username;
-
-        if (args[0] && tags.mod) {
-          userChannel = args[0].toLowerCase();
-        }
-
-        console.log(
-          `Received request from ${tags.username} to join ${userChannel}`
-        );
-
-        if (this.channelList.includes(userChannel)) {
-          return this.bot.say(
-            channel,
-            `@${tags["display-name"]} >> I am already in ${userChannel}!`
-          );
-        }
-
-        this.bot.say(
-          channel,
-          `@${tags["display-name"]} >> Joining ${userChannel}... please mod ${this.config.username} to avoid accidental timeouts or bans!`
-        );
-
-        this.bot.join(userChannel);
-
-        this.channelList.push(userChannel);
-
-        try {
-          const result = await this.helpaApi.api.post(`/api/twitch/join`, {
-            channel: userChannel,
-          });
-
-          console.log(
-            `Result of /api/twitch/join: ${JSON.stringify(result.data)}`
-          );
-        } catch (err) {
-          console.error(`Error calling /api/twitch/join: ${err.message}`);
-        }
-
-        return;
-      } else if (commandNoPrefix === "leave") {
-        let userChannel = tags.username;
-
-        if (args[0] && tags.mod) {
-          userChannel = args[0].toLowerCase();
-        }
-
-        console.log(
-          `Received request from ${tags.username} to leave ${userChannel}`
-        );
-
-        if (!this.channelList.includes(userChannel)) {
-          return this.bot.say(
-            channel,
-            `@${tags["display-name"]} >> I am not in ${userChannel}!`
-          );
-        }
-
-        this.bot.say(
-          channel,
-          `@${tags["display-name"]} >> Leaving ${userChannel}... use ${this.config.cmdPrefix}join in this channel to re-join at any time!`
-        );
-
-        this.bot.part(userChannel);
-
-        this.channelList = this.channelList.filter((c) => c !== userChannel);
-
-        try {
-          const result = await this.helpaApi.api.post(`/api/twitch/leave`, {
-            channel: userChannel,
-          });
-
-          console.log(
-            `Result of /api/twitch/leave: ${JSON.stringify(result.data)}`
-          );
-        } catch (err) {
-          console.error(`Error calling /api/twitch/leave: ${err.message}`);
-        }
-
-        return;
-      }
-    }
-
-    // Check here for prac commands and handle them
-    // By default, the broadcaster and mods can use these commands
-    // but they only apply to the channel in which they are issued
-    // @TODO: allow users to disable mods ability to use these commands
-    // -- Check User.allowModsToManagePracticeLists
-    const betaUsers = ["#twinmo23", "#greenham", "#helpasaurking"];
+    // Handle practice list commands if they're enabled for this channel
+    // - By default, only the broadcaster can use these commands
+    // - But mods can optionally be allowed to use them if configured
+    // - Commands will only apply to the channel in which they are issued
     if (
-      betaUsers.includes(channel) &&
-      (channel === `#${tags.username}` || tags.mod === true)
+      channelConfig.practiceListsEnabled &&
+      (channelConfig.roomId === tags["user-id"] ||
+        (channelConfig.allowModsToManagePracticeLists && tags.mod === true))
     ) {
+      // TODO: Move this log into each case below and make it specific to that action
       console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
       // @TODO: replace targetUser with tags["room-id"] once per-user configurations are a thing
       const targetUser = channel.replace("#", "");
@@ -194,7 +214,7 @@ class TwitchBot {
             this.bot
               .say(
                 channel,
-                `@${tags["display-name"]} >> You must specify an entry name! e.g. ${this.config.cmdPrefix}pracadd gtower mimics`
+                `@${tags["display-name"]} >> You must specify an entry name! e.g. ${channelConfig.commandPrefix}pracadd gtower mimics`
               )
               .catch(console.error);
             return;
@@ -235,7 +255,7 @@ class TwitchBot {
               channel,
               tags,
               {
-                404: `No entries found in practice list! Add one using ${this.config.cmdPrefix}pracadd <entry name>`,
+                404: `No entries found in practice list! Add one using ${channelConfig.commandPrefix}pracadd <entry name>`,
               }
             );
             return;
@@ -273,7 +293,7 @@ class TwitchBot {
               channel,
               tags,
               {
-                404: `No entries found in practice list! Add one using ${this.config.cmdPrefix}pracadd <entry name>`,
+                404: `No entries found in practice list! Add one using ${channelConfig.commandPrefix}pracadd <entry name>`,
               }
             );
             return;
@@ -349,9 +369,9 @@ class TwitchBot {
     let timeUsed = this.cooldowns.get(cooldownKey);
     if (timeUsed) {
       let now = Date.now();
-      if (now - timeUsed <= this.config.textCmdCooldown * 1000) {
+      if (now - timeUsed <= channelConfig.textCommandColldown * 1000) {
         onCooldown =
-          (this.config.textCmdCooldown * 1000 - (now - timeUsed)) / 1000;
+          (channelConfig.textCommandColldown * 1000 - (now - timeUsed)) / 1000;
       }
     }
 

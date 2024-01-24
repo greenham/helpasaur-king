@@ -106,7 +106,9 @@ router.post("/join", async (req, res) => {
     req.app.wsRelay.emit("joinChannel", user.twitchUserData.login);
   }
 
-  res.status(200).json({ result: "success" });
+  res
+    .status(200)
+    .json({ result: "success", twitchBotConfig: user.twitchBotConfig });
 });
 
 // POST /leave -> removes requested or logged-in user from join list for twitch bot
