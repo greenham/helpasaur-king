@@ -26,6 +26,9 @@ router.post("/join", async (req, res) => {
     (!req.user.permissions.includes("admin") || !req.body.channel)
   ) {
     user = await User.findById(req.user.sub);
+    user.twitchBotConfig.active = true;
+    user.markModified("twitchBotConfig");
+    await user.save();
   } else {
     // otherwise, extract the requested channel from the service or admin request
     const requestedChannel = await getRequestedChannel(req);
@@ -82,10 +85,6 @@ router.post("/join", async (req, res) => {
             twitchUserData,
             twitchBotConfig: { active: true },
           });
-          // Set twitchBotConfig.active = true
-          // user.twitchBotConfig.active = true;
-          // user.markModified("twitchBotConfig");
-          // await user.save();
         } catch (err) {
           console.error(
             `Error creating new user for ${requestedChannel}!`,
@@ -118,19 +117,18 @@ router.post("/leave", async (req, res) => {
   }
 
   try {
-    // @TODO: Convert this to use the twitchBotConfig from the User model
-    const twitchConfig = await Config.findOne({ id: "twitch" });
-    if (!twitchConfig.config.channels.includes(requestedChannel)) {
+    const user = await User.findOne({
+      "twitchUserData.login": requestedChannel,
+    });
+    if (!user) {
       return res
         .status(200)
         .json({ result: "noop", message: `Not in ${requestedChannel}!` });
     }
 
-    twitchConfig.config.channels = twitchConfig.config.channels.filter(
-      (c) => c !== requestedChannel
-    );
-    twitchConfig.markModified("config");
-    await twitchConfig.save();
+    user.twitchBotConfig.active = false;
+    user.markModified("twitchBotConfig");
+    await user.save();
 
     // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
     if (
