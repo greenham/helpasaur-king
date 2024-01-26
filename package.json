@@ -1,6 +1,6 @@
 {
   "name": "helpasaur-king",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "build": "docker compose build --force-rm",
