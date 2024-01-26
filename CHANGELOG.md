@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.3
+
+- Support search links with hash locations e.g. [https://helpasaur.com/commands#tutorial](https://helpasaur.com/commands#tutorial)
+
 ## 1.7.2
 
 - [BETA] Support per-channel practice lists via Twitch chat commands
