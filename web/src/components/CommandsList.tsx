@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 import {
   Alert,
@@ -30,7 +31,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const { commands, userCanEdit } = props;
 
   // Set up searching
-  const [searchQuery, setSearchQuery] = useState("");
+  const { hash } = useLocation();
+  const [searchQuery, setSearchQuery] = useState(hash.replace("#", ""));
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const [searchResults, setSearchResults] = useState<Array<Command>>([]);
   const filterCommands = (commandsToFilter: Command[], query: string) => {
@@ -48,6 +50,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   useEffect(() => {
     setSearchResults(filterCommands(commands, debouncedSearchQuery));
+    window.location.replace("#" + debouncedSearchQuery);
   }, [debouncedSearchQuery, commands]);
 
   const freshCommand = {
