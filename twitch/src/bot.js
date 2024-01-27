@@ -205,9 +205,10 @@ class TwitchBot {
     ) {
       // TODO: Move this log into each case below and make it specific to that action
       console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
-      // @TODO: replace targetUser with tags["room-id"] once per-user configurations are a thing
-      const targetUser = channel.replace("#", "");
+
+      const targetUser = tags["room-id"];
       const listName = "default";
+
       switch (commandNoPrefix) {
         case "pracadd":
           if (args.length === 0) {
@@ -299,7 +300,7 @@ class TwitchBot {
             return;
           }
         case "pracclear":
-          if (targetUser !== tags.username) {
+          if (targetUser !== tags["user-id"]) {
             this.bot
               .say(
                 channel,

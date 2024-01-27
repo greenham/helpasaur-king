@@ -30,15 +30,12 @@ router.post(
     }
 
     try {
-      // temp: twitchUserId will be the username
-      // @TODO: convert to using the actual user ID
-      // once we have per-channel config support in place
       const result = await PracLists.findOne({
-        twitchUserId: twitchUserId,
+        twitchUserId,
         name: listName,
       });
 
-      // @TODO: Convert this to an actual ID that stays consistent for the lifetime of the entry
+      // @TODO: Convert this to an actual ID that stays consistent for the lifetime of the entry?
       let newId;
       if (result) {
         // user has a list already, append to it
