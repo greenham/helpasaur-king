@@ -48,6 +48,11 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     );
   };
 
+  // Handle updates to the location hash
+  useEffect(() => {
+    setSearchQuery(hash.replace("#", ""));
+  }, [hash]);
+
   useEffect(() => {
     setSearchResults(filterCommands(commands, debouncedSearchQuery));
     window.location.replace("#" + debouncedSearchQuery);
