@@ -55,7 +55,7 @@ router.post(
       }
 
       res.status(201).json({
-        message: `Added entry #${newId} to practice list for ${twitchUserId}!`,
+        message: `Added entry #${newId} to ${listName} practice list.`,
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -77,6 +77,9 @@ router.get(
 
     const listName = req.params.listName ?? "default";
 
+    // check query params for exclude
+    const exclude = req.query.exclude ?? false;
+
     try {
       const result = await PracLists.findOne({
         twitchUserId,
@@ -85,13 +88,15 @@ router.get(
       if (!result || result.entries.length === 0) {
         res
           .status(404)
-          .json({ message: `Practice list for ${twitchUserId} is empty!` });
+          .json({ message: `${listName} practice list is empty!` });
         return;
       }
       const randomIndex = Math.floor(Math.random() * result.entries.length);
       const randomEntry = result.entries[randomIndex];
       res.status(200).json({
-        message: `Practice this [${randomIndex + 1}]: ${randomEntry} `,
+        message: `Practice this: ${randomEntry} [${randomIndex + 1}]`,
+        id: randomIndex,
+        entry: randomEntry,
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -130,7 +135,9 @@ router.delete(
       result.entries.splice(entryId - 1, 1);
       result.markModified("entries");
       await result.save();
-      res.status(200).json({ message: `Entry #${entryId} deleted!` });
+      res.status(200).json({
+        message: `Deleted entry #${entryId} from ${listName} practice list!`,
+      });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -161,6 +168,7 @@ router.get(
         return;
       }
       res.status(200).json({
+        entries: result.entries,
         message: result.entries
           .map((e, idx) => `[${idx + 1}] ${e}`)
           .join(" | "),

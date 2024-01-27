@@ -1,5 +1,6 @@
 const { io } = require("socket.io-client");
 const tmi = require("tmi.js");
+const crypto = require("crypto");
 const packageJson = require("../package.json");
 const { WEBSOCKET_RELAY_SERVER } = process.env;
 
@@ -11,10 +12,12 @@ class TwitchBot {
     this.cachedCommands = new Map();
     this.bot = null;
     this.wsRelay = null;
+    // @TODO: Replace HelpasaurKing with this.config.botDisplayName
     this.messages = {
-      onJoin: `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Use ${this.config.cmdPrefix}helpa to see what I can do.`,
+      onJoin: `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Commands: https://helpasaur.com/commands | Manage: https://helpasaur.com/twitch`,
       onLeave: `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`,
     };
+    this.lastRandomRoomMap = new Map();
   }
 
   // {
@@ -30,17 +33,9 @@ class TwitchBot {
   //    lastUpdated: ISODate('2024-01-21T22:47:24.975Z')
   // }
   start(channels) {
-    this.channelList = [
-      this.config.username,
-      ...channels.map((c) => c.channelName),
-    ];
-    this.channelMap = new Map();
-    // map roomId => config
-    channels.forEach((c) => {
-      this.channelMap.set(c.roomId, c);
-    });
+    this.setActiveChannels(channels);
     this.bot = new tmi.Client({
-      options: { debug: true },
+      options: { debug: false },
       identity: {
         username: this.config.username,
         password: this.config.oauth,
@@ -72,6 +67,11 @@ class TwitchBot {
 
     this.wsRelay.on("joinChannel", this.handleJoinChannel.bind(this));
     this.wsRelay.on("leaveChannel", this.handleLeaveChannel.bind(this));
+
+    // Update active channels list every minute so we pick up config changes quickly
+    setInterval(() => {
+      this.refreshActiveChannels();
+    }, 60000);
   }
 
   async handleMessage(channel, tags, message, self) {
@@ -96,16 +96,20 @@ class TwitchBot {
           );
 
           if (this.channelList.includes(channelToJoin)) {
-            return this.bot.say(
-              channel,
-              `@${tags["display-name"]} >> I am already in ${channelToJoin}!`
-            );
+            return this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> I am already in ${channelToJoin}!`
+              )
+              .catch(console.error);
           }
 
-          this.bot.say(
-            channel,
-            `@${tags["display-name"]} >> Joining ${channelToJoin}... please mod ${this.config.username} to avoid accidental timeouts or bans!`
-          );
+          this.bot
+            .say(
+              channel,
+              `@${tags["display-name"]} >> Joining ${channelToJoin}... please mod ${this.config.username} to avoid accidental timeouts or bans!`
+            )
+            .catch(console.error);
 
           this.bot.join(channelToJoin);
           this.channelList.push(channelToJoin);
@@ -143,16 +147,20 @@ class TwitchBot {
           );
 
           if (!this.channelList.includes(channelToLeave)) {
-            return this.bot.say(
-              channel,
-              `@${tags["display-name"]} >> I am not in ${channelToLeave}!`
-            );
+            return this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> I am not in ${channelToLeave}!`
+              )
+              .catch(console.error);
           }
 
-          this.bot.say(
-            channel,
-            `@${tags["display-name"]} >> Leaving ${channelToLeave}... use ${channelConfig.commandPrefix}join in this channel to re-join at any time!`
-          );
+          this.bot
+            .say(
+              channel,
+              `@${tags["display-name"]} >> Leaving ${channelToLeave}... use ${this.config.cmdPrefix}join in this channel to re-join at any time!`
+            )
+            .catch(console.error);
 
           this.bot.part(channelToLeave);
 
@@ -203,9 +211,6 @@ class TwitchBot {
       (channelConfig.roomId === tags["user-id"] ||
         (channelConfig.allowModsToManagePracticeLists && tags.mod === true))
     ) {
-      // TODO: Move this log into each case below and make it specific to that action
-      console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
-
       const targetUser = tags["room-id"];
       const listName = "default";
 
@@ -222,6 +227,10 @@ class TwitchBot {
           }
 
           const entryName = args.join(" ");
+          console.log(
+            `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry: ${entryName}`
+          );
+
           try {
             const response = await this.helpaApi.api.post(
               `/api/prac/${targetUser}/lists/${listName}/entries`,
@@ -242,12 +251,45 @@ class TwitchBot {
             return;
           }
         case "pracrand":
+          console.log(
+            `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
+          );
+
           try {
+            // get their list
             const response = await this.helpaApi.api(
-              `/api/prac/${targetUser}/lists/${listName}/entries/random`
+              `/api/prac/${targetUser}/lists/${listName}`
             );
-            console.log(response.data.message);
-            this.bot.say(channel, response.data.message).catch(console.error);
+            const entries = response.data.entries;
+
+            // choose a random entry
+            let randomIndex = Math.floor(Math.random() * entries.length);
+            let randomEntry = entries[randomIndex];
+
+            // if they have more than 2 entries, make sure we don't get the same one twice in a row
+            if (entries.length > 2) {
+              let lastRandomEntry = this.lastRandomRoomMap.get(channel);
+              while (
+                crypto.createHash("md5").update(randomEntry).digest("hex") ===
+                lastRandomEntry
+              ) {
+                randomIndex = Math.floor(Math.random() * entries.length);
+                randomEntry = entries[randomIndex];
+              }
+            }
+
+            this.bot
+              .say(
+                channel,
+                `Practice this: ${randomEntry} [${randomIndex + 1}]`
+              )
+              .catch(console.error);
+
+            // remember the last random entry we gave them
+            this.lastRandomRoomMap.set(
+              channel,
+              crypto.createHash("md5").update(randomEntry).digest("hex")
+            );
             return;
           } catch (err) {
             this.handleApiError(
@@ -263,6 +305,9 @@ class TwitchBot {
           }
         case "pracdel":
           const entryId = parseInt(args[0]);
+          console.log(
+            `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry ID: ${entryId}`
+          );
           try {
             const response = await this.helpaApi.api.delete(
               `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
@@ -280,12 +325,21 @@ class TwitchBot {
             return;
           }
         case "praclist":
+          console.log(
+            `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
+          );
           try {
             const response = await this.helpaApi.api(
               `/api/prac/${targetUser}/lists/${listName}`
             );
-            console.log(response.data.message);
-            this.bot.say(channel, response.data.message).catch(console.error);
+            this.bot
+              .say(
+                channel,
+                response.data.entries
+                  .map((e, idx) => `[${idx + 1}] ${e}`)
+                  .join(" | ")
+              )
+              .catch(console.error);
             return;
           } catch (err) {
             this.handleApiError(
@@ -304,17 +358,20 @@ class TwitchBot {
             this.bot
               .say(
                 channel,
-                `@${tags["display-name"]} >> Only ${targetUser} can clear their practice list!`
+                `@${tags["display-name"]} >> Only the broadcaster can clear their practice list!`
               )
               .catch(console.error);
             return;
           }
 
+          console.log(
+            `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
+          );
+
           try {
             const response = await this.helpaApi.api.delete(
               `/api/prac/${targetUser}/lists/${listName}`
             );
-            console.log(response.data.message);
             this.bot.say(channel, response.data.message).catch(console.error);
             return;
           } catch (err) {
@@ -370,9 +427,9 @@ class TwitchBot {
     let timeUsed = this.cooldowns.get(cooldownKey);
     if (timeUsed) {
       let now = Date.now();
-      if (now - timeUsed <= channelConfig.textCommandColldown * 1000) {
+      if (now - timeUsed <= channelConfig.textCommandCooldown * 1000) {
         onCooldown =
-          (channelConfig.textCommandColldown * 1000 - (now - timeUsed)) / 1000;
+          (channelConfig.textCommandCooldown * 1000 - (now - timeUsed)) / 1000;
       }
     }
 
@@ -413,7 +470,8 @@ class TwitchBot {
     }
   }
 
-  handleJoinChannel({ payload: channel }) {
+  handleJoinChannel({ payload }) {
+    const { channel } = payload;
     console.log(`Received joinChannel event for: ${channel}`);
     if (this.channelList.includes(channel)) {
       console.log(`Already in #${channel}`);
@@ -422,7 +480,10 @@ class TwitchBot {
 
     this.bot.join(channel).catch(console.error);
     this.bot.say(channel, this.messages.onJoin).catch(console.error);
-    this.channelList.push(channel);
+
+    // update local configs
+    this.refreshActiveChannels();
+
     console.log(`Joined #${channel}`);
   }
 
@@ -433,9 +494,13 @@ class TwitchBot {
       return;
     }
 
+    // say our goodbyes o/
     this.bot.say(channel, this.messages.onLeave).catch(console.error);
     this.bot.part(channel).catch(console.error);
-    this.channelList = this.channelList.filter((c) => c !== channel);
+
+    // update local configs
+    this.refreshActiveChannels();
+
     console.log(`Left #${channel}`);
   }
 
@@ -478,6 +543,33 @@ class TwitchBot {
         )
         .catch(console.error);
     }
+  }
+
+  refreshActiveChannels() {
+    this.helpaApi
+      .api("/api/configs/twitch/activeChannels")
+      .then((response) => {
+        if (!response) {
+          throw new Error(`Unable to refresh active channel list from API!`);
+        }
+
+        this.setActiveChannels(response.data);
+      })
+      .catch((error) => {
+        console.error("🛑 Error refreshing active channel list:", error);
+      });
+  }
+
+  setActiveChannels(channels) {
+    this.channelList = [
+      this.config.username,
+      ...channels.map((c) => c.channelName),
+    ];
+    this.channelMap = new Map();
+    // map roomId => config
+    channels.forEach((c) => {
+      this.channelMap.set(c.roomId, c);
+    });
   }
 }
 

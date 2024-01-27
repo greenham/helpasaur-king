@@ -33,7 +33,9 @@ router.post("/join", async (req, res) => {
     // otherwise, extract the requested channel from the service or admin request
     const requestedChannel = await getRequestedChannel(req);
     if (!requestedChannel) {
-      return res.status(400).json({ message: "Invalid channel provided" });
+      return res
+        .status(400)
+        .json({ result: "error", message: "Invalid channel provided" });
     }
 
     try {
@@ -103,19 +105,29 @@ router.post("/join", async (req, res) => {
 
   // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
   if (!req.user.permissions.includes("service") || req.user.sub !== "twitch") {
-    req.app.wsRelay.emit("joinChannel", user.twitchUserData.login);
+    req.app.wsRelay.emit("joinChannel", {
+      channel: user.twitchUserData.login,
+    });
   }
 
   res
     .status(200)
-    .json({ result: "success", twitchBotConfig: user.twitchBotConfig });
+    .json({
+      result: "success",
+      twitchBotConfig: {
+        roomId: user.twitchUserData.id,
+        ...user.twitchBotConfig,
+      },
+    });
 });
 
 // POST /leave -> removes requested or logged-in user from join list for twitch bot
 router.post("/leave", async (req, res) => {
   const requestedChannel = await getRequestedChannel(req);
   if (!requestedChannel) {
-    return res.status(400).json({ message: "Invalid channel provided" });
+    return res
+      .status(400)
+      .json({ result: "error", message: "Invalid channel provided" });
   }
 
   try {
