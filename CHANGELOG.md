@@ -14,6 +14,7 @@
     - **Enable/disable practice lists** _(still in BETA from 1.7.2, but will soon be opt-in for all!)_
     - **Enable/disable weekly race alerts** _(will post the race room link in your chat ~30 minutes before the weekly starts)_
   - This also resolves the issue of the bot being orphaned after username changes!
+- `!pracrand` will no longer return the same room twice in a row as long as there are more than 2 items in the list
 
 ## 1.7.3
 
