@@ -59,6 +59,39 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  twitchBotConfig: {
+    /* active is used to determine if the bot should join the channel */
+    active: {
+      type: Boolean,
+      default: false,
+    },
+    commandsEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    commandPrefix: {
+      type: String,
+      default: "!",
+    },
+    textCommandCooldown: {
+      type: Number,
+      default: 10,
+    },
+    practiceListsEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    allowModsToManagePracticeLists: {
+      type: Boolean,
+      default: false,
+    },
+    weeklyRaceAlertEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    createdAt: { type: Date, default: Date.now },
+    lastUpdated: { type: Date, default: Date.now },
+  },
 });
 
 const User = mongoose.model("User", userSchema);
