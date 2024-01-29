@@ -22,4 +22,4 @@ jobs:
           script: |
             cd /srv/helpa
             git pull
-            yarn build helpa-base && yarn build && yarn start:prod --force-recreate
+            yarn build helpa-base && yarn build && yarn start:prod

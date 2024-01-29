@@ -1,6 +1,6 @@
 {
   "name": "helpasaur-king",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "build": "docker compose build --force-rm",
@@ -14,5 +14,9 @@
     "boom:dev": "yarn stop && yarn build helpa-base && yarn build && yarn start:dev --force-recreate && yarn logs"
   },
   "author": "https://github.com/greenham",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.1",
+    "helpa-api-client": "file:./lib/helpa-api-client"
+  }
 }
