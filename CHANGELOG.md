@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.8.0
+
+### Twitch Bot
+
+- Support for per-channel configurations! 🥳
+  - Instead of just joining a static list of channels, the Twitch Bot will now join _users_ who have the bot active. 😲
+  - This opens up the ability for users to configure the bot specifically for their channel instead of being tied to the global defaults
+  - The ability to change these values is not exposed _yet_, but will eventually be through chat commands as well as the web UI.
+  - Users will **eventually** be able to control things like:
+    - **Command prefix** _(free yourself from the shackles of `!`)_
+    - **Enable/disable commands** _(if you just want the bot to shut up for a bit, but don't want to kick it out)_
+    - **Enable/disable practice lists** _(still in BETA from 1.7.2, but will soon be opt-in for all!)_
+    - **Enable/disable weekly race alerts** _(will post the race room link in your chat ~30 minutes before the weekly starts)_
+  - This also resolves the issue of the bot being orphaned after username changes!
+
 ## 1.7.3
 
 - Support search links with hash locations e.g. [https://helpasaur.com/commands#tutorial](https://helpasaur.com/commands#tutorial)
