@@ -9,7 +9,7 @@ services:
     image: helpa-base:latest
 
   mongo:
-    image: mongo:latest
+    image: mongo:7-jammy
     restart: on-failure
     logging:
       driver: syslog

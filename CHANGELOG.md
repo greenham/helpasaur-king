@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.1
+
+- Pinned mongo version to 7-jammy to resolve issue with upgrading to 8
+- Resolved dependabot alerts for various packages
+
 ## 1.8.0
 
 ### Twitch Bot
