@@ -7,7 +7,7 @@ current_date=$(date +"%Y-%m-%d_%H%M%S")
 backup_file="mongo-backup-$current_date.tar.gz"
 
 # Extract the container ID of the MongoDB container via docker ps
-container_id=$(docker ps | grep mongo\:latest | awk '{print $1}')
+container_id=$(docker ps | grep mongo\: | awk '{print $1}')
 
 # Connect to it, then...
 # - Execute mongodump command
