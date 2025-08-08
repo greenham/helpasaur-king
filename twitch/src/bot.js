@@ -67,6 +67,7 @@ class TwitchBot {
 
     this.wsRelay.on("joinChannel", this.handleJoinChannel.bind(this));
     this.wsRelay.on("leaveChannel", this.handleLeaveChannel.bind(this));
+    this.wsRelay.on("configUpdate", this.handleConfigUpdate.bind(this));
 
     // Update active channels list every minute so we pick up config changes quickly
     setInterval(() => {
@@ -201,6 +202,122 @@ class TwitchBot {
 
     const args = message.slice(1).split(" ");
     const commandNoPrefix = args.shift().toLowerCase();
+
+    // Handle praclists toggle command - only broadcaster can toggle the feature
+    if (
+      commandNoPrefix === "praclists" &&
+      channelConfig.roomId === tags["user-id"]
+    ) {
+      const subCommand = args[0]?.toLowerCase();
+      
+      if (!subCommand) {
+        // Show current status and help
+        const status = channelConfig.practiceListsEnabled ? "enabled" : "disabled";
+        const commands = channelConfig.practiceListsEnabled 
+          ? ` Commands: ${channelConfig.commandPrefix}pracadd, ${channelConfig.commandPrefix}pracrand, ${channelConfig.commandPrefix}praclist, ${channelConfig.commandPrefix}pracdel, ${channelConfig.commandPrefix}pracclear`
+          : "";
+        this.bot
+          .say(
+            channel,
+            `@${tags["display-name"]} >> Practice lists are currently ${status}.${commands} | Toggle: ${channelConfig.commandPrefix}praclists on/off`
+          )
+          .catch(console.error);
+        return;
+      }
+
+      if (subCommand === "on") {
+        if (channelConfig.practiceListsEnabled) {
+          this.bot
+            .say(
+              channel,
+              `@${tags["display-name"]} >> Practice lists are already enabled!`
+            )
+            .catch(console.error);
+          return;
+        }
+
+        console.log(`[${channel}] Enabling practice lists...`);
+        
+        try {
+          const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
+            channel: tags.username,
+            practiceListsEnabled: true,
+          });
+
+          if (result.data.result === "success") {
+            // Update local config
+            channelConfig.practiceListsEnabled = true;
+            this.channelMap.set(tags["room-id"], channelConfig);
+            
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> Practice lists enabled! Commands: ${channelConfig.commandPrefix}pracadd <entry>, ${channelConfig.commandPrefix}pracrand, ${channelConfig.commandPrefix}praclist, ${channelConfig.commandPrefix}pracdel <#>, ${channelConfig.commandPrefix}pracclear`
+              )
+              .catch(console.error);
+          }
+        } catch (err) {
+          this.handleApiError(
+            err,
+            "Error enabling practice lists",
+            channel,
+            tags
+          );
+        }
+        return;
+      }
+
+      if (subCommand === "off") {
+        if (!channelConfig.practiceListsEnabled) {
+          this.bot
+            .say(
+              channel,
+              `@${tags["display-name"]} >> Practice lists are already disabled!`
+            )
+            .catch(console.error);
+          return;
+        }
+
+        console.log(`[${channel}] Disabling practice lists...`);
+        
+        try {
+          const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
+            channel: tags.username,
+            practiceListsEnabled: false,
+          });
+
+          if (result.data.result === "success") {
+            // Update local config
+            channelConfig.practiceListsEnabled = false;
+            this.channelMap.set(tags["room-id"], channelConfig);
+            
+            this.bot
+              .say(
+                channel,
+                `@${tags["display-name"]} >> Practice lists disabled.`
+              )
+              .catch(console.error);
+          }
+        } catch (err) {
+          this.handleApiError(
+            err,
+            "Error disabling practice lists",
+            channel,
+            tags
+          );
+        }
+        return;
+      }
+
+      // Invalid subcommand
+      this.bot
+        .say(
+          channel,
+          `@${tags["display-name"]} >> Invalid command. Use ${channelConfig.commandPrefix}praclists on/off to toggle practice lists.`
+        )
+        .catch(console.error);
+      return;
+    }
 
     // Handle practice list commands if they're enabled for this channel
     // - By default, only the broadcaster can use these commands
@@ -502,6 +619,16 @@ class TwitchBot {
     this.refreshActiveChannels();
 
     console.log(`Left #${channel}`);
+  }
+
+  handleConfigUpdate({ payload }) {
+    console.log(`Received configUpdate event for: ${payload.channelName}`);
+    
+    // Update the local channel configuration
+    if (this.channelMap.has(payload.roomId)) {
+      this.channelMap.set(payload.roomId, payload);
+      console.log(`Updated configuration for #${payload.channelName}`);
+    }
   }
 
   handleApiError(err, errorMessageBase, channel, tags, statusErrors = null) {
