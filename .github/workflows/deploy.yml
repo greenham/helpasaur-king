@@ -1,9 +1,8 @@
 name: Deploy to DigitalOcean
 
 on:
-  push:
-    branches:
-      - main # Set a branch to trigger deployment
+  release:
+    types: [published]
 
 jobs:
   deploy:
