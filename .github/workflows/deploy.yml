@@ -61,6 +61,10 @@ jobs:
           RELEASE_NOTES="${{ github.event.release.body }}"
           RELEASE_DATE=$(date +%Y-%m-%d)
           
+          # Process release notes to demote headers by one level (## -> ###, ### -> ####, etc.)
+          # This ensures GitHub's auto-generated "## What's Changed" becomes "### What's Changed"
+          PROCESSED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/^##/#&/g')
+          
           # Create temporary file with new changelog entry
           echo "# Changelog" > CHANGELOG.tmp.md
           echo "" >> CHANGELOG.tmp.md
@@ -68,7 +72,7 @@ jobs:
           echo "" >> CHANGELOG.tmp.md
           echo "_${RELEASE_DATE}_" >> CHANGELOG.tmp.md
           echo "" >> CHANGELOG.tmp.md
-          echo "$RELEASE_NOTES" >> CHANGELOG.tmp.md
+          echo "$PROCESSED_NOTES" >> CHANGELOG.tmp.md
           echo "" >> CHANGELOG.tmp.md
           
           # Append existing changelog content (skip the first two lines - title and empty line)
