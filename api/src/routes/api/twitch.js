@@ -158,4 +158,83 @@ router.post("/leave", async (req, res) => {
   }
 });
 
+// PATCH /config -> updates twitch bot configuration for a channel
+router.patch("/config", async (req, res) => {
+  const requestedChannel = await getRequestedChannel(req);
+  if (!requestedChannel) {
+    return res
+      .status(400)
+      .json({ result: "error", message: "Invalid channel provided" });
+  }
+
+  // Validate that only allowed config fields are being updated
+  const allowedFields = [
+    "commandsEnabled",
+    "commandPrefix",
+    "textCommandCooldown",
+    "practiceListsEnabled",
+    "allowModsToManagePracticeLists",
+    "weeklyRaceAlertEnabled",
+  ];
+
+  const updates = {};
+  for (const field of allowedFields) {
+    if (req.body.hasOwnProperty(field)) {
+      updates[`twitchBotConfig.${field}`] = req.body[field];
+    }
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res
+      .status(400)
+      .json({ result: "error", message: "No valid fields to update" });
+  }
+
+  try {
+    const user = await User.findOne({
+      "twitchUserData.login": requestedChannel,
+    });
+    
+    if (!user) {
+      return res
+        .status(404)
+        .json({ result: "error", message: `User ${requestedChannel} not found` });
+    }
+
+    // Apply updates
+    for (const [path, value] of Object.entries(updates)) {
+      const keys = path.split(".");
+      let current = user;
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+    }
+
+    user.twitchBotConfig.lastUpdated = Date.now();
+    user.markModified("twitchBotConfig");
+    await user.save();
+
+    // Emit configuration update event to the twitch bot
+    if (!req.user.permissions.includes("service") || req.user.sub !== "twitch") {
+      req.app.wsRelay.emit("configUpdate", {
+        roomId: user.twitchUserData.id,
+        channelName: user.twitchUserData.login,
+        displayName: user.twitchUserData.display_name,
+        ...user.twitchBotConfig,
+      });
+    }
+
+    res.status(200).json({ 
+      result: "success",
+      twitchBotConfig: {
+        roomId: user.twitchUserData.id,
+        ...user.twitchBotConfig,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
