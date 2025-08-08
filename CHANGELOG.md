@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.2
+
+_2025-08-08_
+
+## What's Changed
+* feat: Enable users to toggle practice lists via Twitch chat by @greenham in https://github.com/greenham/helpasaur-king/pull/73
+* Bump mongoose from 7.6.8 to 8.9.5 in /api by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/72
+
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.8.1...1.8.2
+
 ## 1.8.1
 
 - Pinned mongo version to 7-jammy to resolve issue with upgrading to 8
