@@ -8,6 +8,7 @@
     "start:dev": "nodemon ./src"
   },
   "dependencies": {
+    "express": "^4.19.2",
     "helpa-api-client": "file:../lib/helpa-api-client",
     "socket.io-client": "^4.7.2",
     "tmi.js": "^1.8.5"

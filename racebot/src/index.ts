@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import schedule from "node-schedule";
 import { io } from "socket.io-client";
 import WebSocket from "ws";
+import express from "express";
 import RacetimeBot from "./lib/racetime";
 import * as Racetime from "./lib/racetime/types";
 
@@ -206,6 +207,24 @@ const scheduleWeeklyRace = () => {
 if (process.env.NODE_ENV === "production") {
   scheduleWeeklyRace();
 }
+
+// Start health check server
+const healthApp = express();
+const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012;
+
+healthApp.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy", 
+    service: "racebot",
+    wsRelayConnected: wsRelay.connected,
+    environment: process.env.NODE_ENV,
+    schedulerActive: process.env.NODE_ENV === "production"
+  });
+});
+
+healthApp.listen(healthPort, () => {
+  console.log(`Health check endpoint available on port ${healthPort}`);
+});
 
 process.on("SIGINT", function () {
   schedule.gracefulShutdown().then(() => process.exit(0));

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "discord.js": "^14.14.1",
+    "express": "^4.19.2",
     "helpa-api-client": "file:../lib/helpa-api-client",
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.5.4"

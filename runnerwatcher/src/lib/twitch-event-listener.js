@@ -22,6 +22,11 @@ class TwitchEventListener extends EventEmitter {
     // Need raw body for verification
     this.app.use(express.raw({ type: "application/json" }));
 
+    // Health check endpoint
+    this.app.get("/health", (req, res) => {
+      res.status(200).json({ status: "healthy", service: "runnerwatcher" });
+    });
+
     this.app.post("/eventsub", (req, res) => {
       const signature = req.get(TWITCH_MESSAGE_SIGNATURE);
       const messageId = req.get(TWITCH_MESSAGE_ID);

@@ -19,15 +19,18 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 
 ## Essential Development Commands
 
+**IMPORTANT: Always use these yarn commands instead of direct docker/docker-compose commands**
+
 ```bash
 # Development (from root)
-yarn start:dev          # Start all services with hot reload
+yarn start:dev          # Start all services with hot reload (uses docker-compose.dev.yml overlay)
 yarn start:dev:logs     # Start and follow logs
 yarn logs               # View service logs
 yarn boom:dev           # Full rebuild and restart for development
+yarn stop               # Stop all services
 
 # Production (from root)
-yarn start:prod         # Start production containers
+yarn start:prod         # Start production containers (uses docker-compose.prod.yml overlay)
 yarn build              # Build all Docker images
 yarn stop               # Stop all services
 
