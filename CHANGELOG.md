@@ -1,26 +1,15 @@
 # Changelog
 
-## 1.9.1
-
-_2025-08-09_
-
-### What's Changed
-* feat: Migrate from Yarn to pnpm by @greenham in https://github.com/greenham/helpasaur-king/pull/87
-* Optimize Docker base image and improve build efficiency by @greenham in https://github.com/greenham/helpasaur-king/pull/88
-
-
-**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.9.0...1.9.1
-
 ## 1.9.0
 
 _2025-08-09_
 
 ### What's Changed
-* Fix: Improve yarn install reliability in Docker builds by @greenham in https://github.com/greenham/helpasaur-king/pull/83
-* feat: Add comprehensive health checks for all services by @greenham in https://github.com/greenham/helpasaur-king/pull/84
-* Upgrade axios in helpa-api-client to ^1.8.2 per #145 and #161 by @greenham in https://github.com/greenham/helpasaur-king/pull/85
-* Security/upgrade axios retry by @greenham in https://github.com/greenham/helpasaur-king/pull/86
 
+- Fix: Improve yarn install reliability in Docker builds by @greenham in https://github.com/greenham/helpasaur-king/pull/83
+- feat: Add comprehensive health checks for all services by @greenham in https://github.com/greenham/helpasaur-king/pull/84
+- Upgrade axios in helpa-api-client to ^1.8.2 per #145 and #161 by @greenham in https://github.com/greenham/helpasaur-king/pull/85
+- Security/upgrade axios retry by @greenham in https://github.com/greenham/helpasaur-king/pull/86
 
 **Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.8.3...1.9.0
 
@@ -29,14 +18,14 @@ _2025-08-09_
 _2025-08-09_
 
 ### What's Changed
-* Bump @babel/runtime from 7.23.8 to 7.28.2 in /twitch by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/76
-* Bump @babel/runtime from 7.23.9 to 7.28.2 by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/77
-* Bump axios from 1.7.4 to 1.8.2 in /api by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/78
-* Bump @babel/runtime from 7.23.8 to 7.28.2 in /discord by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/80
-* Bump form-data from 4.0.0 to 4.0.4 in /discord by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/79
-* feat: tag Docker images with release version for automatic container updates by @greenham in https://github.com/greenham/helpasaur-king/pull/81
-* Bump form-data from 4.0.0 to 4.0.4 in /racebot by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/82
 
+- Bump @babel/runtime from 7.23.8 to 7.28.2 in /twitch by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/76
+- Bump @babel/runtime from 7.23.9 to 7.28.2 by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/77
+- Bump axios from 1.7.4 to 1.8.2 in /api by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/78
+- Bump @babel/runtime from 7.23.8 to 7.28.2 in /discord by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/80
+- Bump form-data from 4.0.0 to 4.0.4 in /discord by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/79
+- feat: tag Docker images with release version for automatic container updates by @greenham in https://github.com/greenham/helpasaur-king/pull/81
+- Bump form-data from 4.0.0 to 4.0.4 in /racebot by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/82
 
 **Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.8.2...1.8.3
 
@@ -45,9 +34,9 @@ _2025-08-09_
 _2025-08-08_
 
 ### What's Changed
-* feat: Enable users to toggle practice lists via Twitch chat by @greenham in https://github.com/greenham/helpasaur-king/pull/73
-* Bump mongoose from 7.6.8 to 8.9.5 in /api by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/72
 
+- feat: Enable users to toggle practice lists via Twitch chat by @greenham in https://github.com/greenham/helpasaur-king/pull/73
+- Bump mongoose from 7.6.8 to 8.9.5 in /api by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/72
 
 **Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.8.1...1.8.2
 
