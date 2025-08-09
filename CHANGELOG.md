@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.1
+
+_2025-08-09_
+
+### What's Changed
+* feat: Migrate from Yarn to pnpm by @greenham in https://github.com/greenham/helpasaur-king/pull/87
+* Optimize Docker base image and improve build efficiency by @greenham in https://github.com/greenham/helpasaur-king/pull/88
+
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.9.0...1.9.1
+
 ## 1.9.0
 
 _2025-08-09_
