@@ -1,5 +1,6 @@
 FROM helpa-base:latest as builder
 
+COPY pnpm-lock.yaml ./
 COPY web/package.json ./
 # Install ALL dependencies (including dev) for build
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \

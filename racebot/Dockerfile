@@ -1,5 +1,6 @@
 FROM helpa-base:latest as builder
 
+COPY pnpm-lock.yaml ./
 COPY racebot/package.json ./
 # Install ALL dependencies (including dev) for build
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
@@ -10,6 +11,7 @@ RUN pnpm build
 
 FROM helpa-base:latest as base
 
+COPY pnpm-lock.yaml ./
 COPY racebot/package.json ./
 
 FROM base as dev

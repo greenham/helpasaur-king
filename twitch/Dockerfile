@@ -1,6 +1,8 @@
 FROM helpa-base:latest as base
 
+COPY pnpm-lock.yaml ./
 COPY twitch/package.json ./
+COPY lib/helpa-api-client /lib/helpa-api-client
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --shamefully-hoist
 
