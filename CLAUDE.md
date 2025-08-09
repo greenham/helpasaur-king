@@ -29,16 +29,18 @@ pnpm logs               # View service logs
 pnpm boom:dev           # Full rebuild and restart for development
 pnpm stop               # Stop all services
 
+# Building (from root)
+pnpm build              # Build all Docker images locally
+pnpm build:base         # Build only the helpa-base image
+
 # Testing with ghcr.io images (from root)
-pnpm pull:ghcr          # Pull images from GitHub Container Registry
-pnpm start:ghcr         # Start using ghcr.io images (uses docker-compose.ghcr.yml overlay)
+pnpm pull:ghcr          # Pull latest images from GitHub Container Registry
+pnpm start:ghcr         # Start using ghcr.io images with dev overlay
 pnpm start:ghcr:logs    # Start with ghcr.io images and follow logs
 VERSION=1.9.1 pnpm start:ghcr  # Start specific version from ghcr.io
 
-# Production (from root)
-pnpm start:prod         # Start production containers (uses docker-compose.prod.yml overlay)
-pnpm build              # Build all Docker images
-pnpm stop               # Stop all services
+# Version management
+pnpm version:bump       # Bump version in all package.json files
 
 # Service-specific development (when working on individual services)
 cd api && npm run dev                    # API with nodemon
@@ -135,7 +137,9 @@ graph TD
 ## Testing & Deployment
 
 - No formal test suite - manual testing in dev environment
-- GitHub Actions CI/CD pipeline deploys to DigitalOcean on main branch push
+- GitHub Actions CI/CD pipeline:
+  - Builds and pushes images to ghcr.io on release
+  - Manual deployment trigger via workflow_dispatch
 - Production URLs: helpasaur.com, api.helpasaur.com, rw.helpasaur.com
 
 ## Common Tasks
