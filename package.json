@@ -4,6 +4,7 @@
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "build": "DOCKER_BUILDKIT=1 docker compose build --force-rm",
+    "build:base": "DOCKER_BUILDKIT=1 docker compose build --force-rm helpa-base",
     "start": "docker compose up -d",
     "stop": "docker compose down",
     "start:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
@@ -11,7 +12,7 @@
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "logs": "docker compose logs -f --tail 1000",
     "push:images": "docker compose push --ignore-push-failures",
-    "boom:dev": "pnpm -w stop && pnpm -w build helpa-base && pnpm -w build && pnpm -w start:dev --force-recreate && pnpm -w logs"
+    "boom:dev": "pnpm -w stop && pnpm -w build:base && pnpm -w build && pnpm -w start:dev --force-recreate && pnpm -w logs"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
