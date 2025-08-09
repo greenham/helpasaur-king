@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+env:
+  # Define the list of services once for reuse throughout the workflow
+  SERVICES: "api discord twitch web runnerwatcher racebot ws-relay"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -28,7 +32,9 @@ jobs:
             BUILD_TARGET=prod VERSION=$VERSION yarn start:prod
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
-            for SERVICE in api discord twitch web runnerwatcher racebot ws-relay; do
+            # Note: SERVICES env var is not available in SSH session, so we define it here
+            SERVICES="api discord twitch web runnerwatcher racebot ws-relay"
+            for SERVICE in $SERVICES; do
               echo "Cleaning helpa-$SERVICE images..."
               docker images "helpa-$SERVICE" --format "{{.Tag}}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | head -n -3 | while read TAG; do
                 echo "Removing helpa-$SERVICE:$TAG"
@@ -38,40 +44,50 @@ jobs:
             # Remove dangling images
             docker image prune -f
             echo "Docker cleanup complete"
-            
+
   update-changelog-and-version:
     needs: deploy
     runs-on: ubuntu-latest
     if: success()
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          
+          node-version: "18"
+
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
       - name: Update version in package.json
         run: |
           # Extract version from release tag (removes 'v' prefix if present)
           VERSION="${{ github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
-          
+
           # Update root package.json
           npm version "$VERSION" --no-git-tag-version --allow-same-version
-          
-          echo "Updated version to $VERSION"
-          
+
+          # Update all service package.json files to keep versions in sync
+          for SERVICE_DIR in ${{ env.SERVICES }}; do
+            if [ -f "$SERVICE_DIR/package.json" ]; then
+              echo "Updating version in $SERVICE_DIR/package.json"
+              cd "$SERVICE_DIR"
+              npm version "$VERSION" --no-git-tag-version --allow-same-version
+              cd ..
+            fi
+          done
+
+          echo "Updated all package.json files to version $VERSION"
+
       - name: Update CHANGELOG.md
         run: |
           # Extract version and release notes
@@ -79,11 +95,11 @@ jobs:
           VERSION="${VERSION#v}"
           RELEASE_NOTES="${{ github.event.release.body }}"
           RELEASE_DATE=$(date +%Y-%m-%d)
-          
+
           # Process release notes to demote headers by one level (## -> ###, ### -> ####, etc.)
           # This ensures GitHub's auto-generated "## What's Changed" becomes "### What's Changed"
           PROCESSED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/^##/#&/g')
-          
+
           # Create temporary file with new changelog entry
           echo "# Changelog" > CHANGELOG.tmp.md
           echo "" >> CHANGELOG.tmp.md
@@ -93,20 +109,27 @@ jobs:
           echo "" >> CHANGELOG.tmp.md
           echo "$PROCESSED_NOTES" >> CHANGELOG.tmp.md
           echo "" >> CHANGELOG.tmp.md
-          
+
           # Append existing changelog content (skip the first two lines - title and empty line)
           tail -n +3 CHANGELOG.md >> CHANGELOG.tmp.md
-          
+
           # Replace the original file
           mv CHANGELOG.tmp.md CHANGELOG.md
-          
+
           echo "Updated CHANGELOG.md with version $VERSION"
-          
+
       - name: Commit and push changes
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
-          
+
+          # Add all modified package.json files and the changelog
           git add package.json CHANGELOG.md
+
+          # Add all service package.json files
+          for SERVICE_DIR in ${{ env.SERVICES }}; do
+            git add "$SERVICE_DIR/package.json" 2>/dev/null || true
+          done
+
           git commit -m "chore: update version to $VERSION and changelog [skip ci]" || echo "No changes to commit"
           git push origin main

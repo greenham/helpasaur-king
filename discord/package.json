@@ -1,6 +1,6 @@
 {
   "name": "helpa-discord",
-  "version": "2.0.0",
+  "version": "1.8.3",
   "main": "./src/index.js",
   "license": "MIT",
   "scripts": {
@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "discord.js": "^14.14.1",
+    "express": "^4.19.2",
     "helpa-api-client": "file:../lib/helpa-api-client",
+    "ms": "^2.1.3",
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.5.4"
   },

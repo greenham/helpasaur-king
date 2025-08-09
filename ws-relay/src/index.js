@@ -1,7 +1,55 @@
 const { Server } = require("socket.io");
+const { createServer } = require("http");
+const ms = require("ms");
+const packageJson = require("../package.json");
 const { WEBSOCKET_RELAY_SERVER_PORT } = process.env;
 
-const wss = new Server();
+// Track relay stats
+const startTime = Date.now();
+let totalConnections = 0;
+let currentConnections = 0;
+let messagesRelayed = 0;
+const eventCounts = {};
+
+// Create HTTP server with health check endpoint
+const httpServer = createServer((req, res) => {
+  if (req.url === "/health" && req.method === "GET") {
+    const uptimeMs = Date.now() - startTime;
+    
+    // Get connected clients count
+    let clientCount = 0;
+    if (wss) {
+      clientCount = wss.sockets.sockets.size || 0;
+    }
+    
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ 
+      status: "healthy", 
+      service: "ws-relay",
+      version: packageJson.version,
+      uptime: ms(uptimeMs, { long: true }),
+      uptimeMs: uptimeMs,
+      connections: {
+        current: currentConnections,
+        total: totalConnections,
+        clients: clientCount
+      },
+      messages: {
+        total: messagesRelayed,
+        byEvent: eventCounts,
+        rate: uptimeMs > 0 ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(2)}/min` : "0/min"
+      },
+      port: WEBSOCKET_RELAY_SERVER_PORT,
+      environment: process.env.NODE_ENV || "development",
+    }));
+  } else {
+    // Let Socket.io handle other requests
+    res.writeHead(404);
+    res.end();
+  }
+});
+
+const wss = new Server(httpServer);
 const relayEvents = [
   "streamAlert",
   "weeklyRaceRoomCreated",
@@ -12,14 +60,19 @@ const relayEvents = [
 wss.on("connection", (socket) => {
   const clientId = socket.handshake.query.clientId || "Unknown";
   socket.data.clientId = clientId;
+  totalConnections++;
+  currentConnections++;
   console.log(`Client connected: ${socket.id} (${clientId})`);
   socket.on("disconnect", () => {
+    currentConnections--;
     console.log(`Client disconnected: ${socket.id} (${socket.data.clientId})`);
   });
 
   relayEvents.forEach((event) => {
     socket.on(event, (data) => {
       console.log(`Received ${event} event:`, data);
+      messagesRelayed++;
+      eventCounts[event] = (eventCounts[event] || 0) + 1;
       const relayData = {
         payload: data,
         source: socket.data.clientId,
@@ -29,7 +82,7 @@ wss.on("connection", (socket) => {
   });
 });
 
-wss.listen(WEBSOCKET_RELAY_SERVER_PORT);
+httpServer.listen(WEBSOCKET_RELAY_SERVER_PORT);
 
 console.log(
   `Websocket relay server listening on port ${WEBSOCKET_RELAY_SERVER_PORT}`

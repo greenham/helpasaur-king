@@ -2,8 +2,10 @@ import { v4 as uuidv4 } from "uuid";
 import schedule from "node-schedule";
 import { io } from "socket.io-client";
 import WebSocket from "ws";
+import express from "express";
 import RacetimeBot from "./lib/racetime";
 import * as Racetime from "./lib/racetime/types";
+import packageJson from "../package.json";
 
 const requiredEnvVariables = [
   "WEBSOCKET_RELAY_SERVER",
@@ -111,6 +113,11 @@ const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
 
 const scheduleWeeklyRace = () => {
   const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, () => {
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[${new Date().toISOString()}] Weekly race job triggered - skipping race room creation in non-production environment`);
+      return;
+    }
+
     let weeklyRaceRoomSlug = "";
 
     console.log(`Creating weekly race room...`);
@@ -192,6 +199,8 @@ const scheduleWeeklyRace = () => {
       })
       .catch(console.error);
   });
+
+
   weeklyRaceJob.on("scheduled", (date) => {
     console.log(
       `Weekly race room creation scheduled, next invocation: ${date}`
@@ -201,11 +210,39 @@ const scheduleWeeklyRace = () => {
   console.log(
     `Weekly race room creation scheduled, next invocation: ${weeklyRaceJob.nextInvocation()}`
   );
+
+  // Start health check server
+  const healthApp = express();
+  const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012;
+
+  healthApp.get("/health", (_req, res) => {
+    try {
+      res.status(200).json({ 
+        status: "healthy", 
+        service: "racebot",
+        version: packageJson.version,
+        wsRelayConnected: wsRelay.connected,
+        environment: process.env.NODE_ENV,
+        schedulerActive: weeklyRaceJob !== null,
+        nextRace: weeklyRaceJob?.nextInvocation() || null,
+      });
+    } catch (error) {
+      console.error("Health check error:", error);
+      res.status(503).json({
+        status: "unhealthy",
+        service: "racebot",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  healthApp.listen(healthPort, () => {
+    console.log(`Health check endpoint available on port ${healthPort}`);
+  });
 };
 
-if (process.env.NODE_ENV === "production") {
-  scheduleWeeklyRace();
-}
+
+scheduleWeeklyRace();
 
 process.on("SIGINT", function () {
   schedule.gracefulShutdown().then(() => process.exit(0));

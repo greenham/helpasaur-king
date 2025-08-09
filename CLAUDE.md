@@ -19,15 +19,18 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 
 ## Essential Development Commands
 
+**IMPORTANT: Always use these yarn commands instead of direct docker/docker-compose commands**
+
 ```bash
 # Development (from root)
-yarn start:dev          # Start all services with hot reload
+yarn start:dev          # Start all services with hot reload (uses docker-compose.dev.yml overlay)
 yarn start:dev:logs     # Start and follow logs
 yarn logs               # View service logs
 yarn boom:dev           # Full rebuild and restart for development
+yarn stop               # Stop all services
 
 # Production (from root)
-yarn start:prod         # Start production containers
+yarn start:prod         # Start production containers (uses docker-compose.prod.yml overlay)
 yarn build              # Build all Docker images
 yarn stop               # Stop all services
 
@@ -38,6 +41,57 @@ cd twitch && npm run dev                 # Twitch bot with nodemon
 cd web && npm run dev                    # React app with Parcel dev server
 cd racebot && npm run dev                # Race bot with ts-node-dev
 cd runnerwatcher && npm run dev          # Runner watcher with nodemon
+```
+
+## Service Dependency Graph
+
+```mermaid
+graph TD
+    %% Core Infrastructure
+    mongo[MongoDB]
+    mongo-express[Mongo Express]
+    ws-relay[WebSocket Relay]
+    helpa-base[Helpa Base Library]
+    
+    %% Services
+    api[API Server]
+    discord[Discord Bot]
+    twitch[Twitch Bot]
+    web[Web App]
+    nginx[Nginx]
+    runnerwatcher[Runner Watcher]
+    racebot[Race Bot]
+    
+    %% Dependencies
+    mongo-express -->|service_healthy| mongo
+    
+    api -->|service_healthy| mongo
+    api -->|service_healthy| ws-relay
+    
+    discord -->|service_healthy| api
+    discord -->|service_completed| helpa-base
+    
+    twitch -->|service_healthy| api
+    twitch -->|service_completed| helpa-base
+    
+    runnerwatcher -->|service_healthy| api
+    runnerwatcher -->|service_healthy| ws-relay
+    runnerwatcher -->|service_completed| helpa-base
+    
+    racebot -->|service_healthy| ws-relay
+    
+    web -->|service_healthy| api
+    
+    nginx -->|service_started| web
+    
+    %% Styling
+    classDef infrastructure fill:#d4a,stroke:#333,stroke-width:2px
+    classDef service fill:#89c,stroke:#333,stroke-width:2px
+    classDef frontend fill:#8b8,stroke:#333,stroke-width:2px
+    
+    class mongo,mongo-express,ws-relay,helpa-base infrastructure
+    class api,discord,twitch,runnerwatcher,racebot service
+    class web,nginx frontend
 ```
 
 ## Database & Infrastructure

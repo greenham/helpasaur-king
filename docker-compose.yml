@@ -24,6 +24,12 @@ services:
       - mongodb_data_container:/data/db
     networks:
       - int
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   mongo-express:
     image: mongo-express
@@ -40,10 +46,17 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME}
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --spider http://localhost:8081 2>&1 | grep -q '401 Unauthorized' && exit 0 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   api-server:
     image: helpa-api:${VERSION:-${BUILD_TARGET}}
@@ -71,10 +84,19 @@ services:
       CLIENT_POST_AUTH_REDIRECT_URL: ${CLIENT_POST_AUTH_REDIRECT_URL}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+      ws-relay:
+        condition: service_healthy
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${API_SERVER_EXTERNAL_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   discord-bot:
     image: helpa-discord:${VERSION:-${BUILD_TARGET}}
@@ -84,17 +106,28 @@ services:
     restart: on-failure
     logging:
       driver: local
+    ports:
+      - ${DISCORD_HEALTH_PORT}:${DISCORD_HEALTH_PORT}
     environment:
       SERVICE_NAME: discord
       API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
+      DISCORD_HEALTH_PORT: ${DISCORD_HEALTH_PORT}
     depends_on:
-      - api-server
-      - helpa-base
+      api-server:
+        condition: service_healthy
+      helpa-base:
+        condition: service_completed_successfully
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${DISCORD_HEALTH_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   twitch-bot:
     image: helpa-twitch:${VERSION:-${BUILD_TARGET}}
@@ -104,17 +137,28 @@ services:
     restart: on-failure
     logging:
       driver: local
+    ports:
+      - ${TWITCH_HEALTH_PORT}:${TWITCH_HEALTH_PORT}
     environment:
       SERVICE_NAME: twitch
       API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
+      TWITCH_HEALTH_PORT: ${TWITCH_HEALTH_PORT}
     depends_on:
-      - api-server
-      - helpa-base
+      api-server:
+        condition: service_healthy
+      helpa-base:
+        condition: service_completed_successfully
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${TWITCH_HEALTH_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   web:
     image: helpa-web:${VERSION:-${BUILD_TARGET}}
@@ -131,10 +175,17 @@ services:
     ports:
       - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
     depends_on:
-      - api-server
+      api-server:
+        condition: service_healthy
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   nginx:
     image: nginx:1.21.6
@@ -147,10 +198,17 @@ services:
       - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/static:/srv/static
     depends_on:
-      - web
+      web:
+        condition: service_started
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   runnerwatcher:
     image: helpa-runnerwatcher:${VERSION:-${BUILD_TARGET}}
@@ -171,11 +229,21 @@ services:
       TWITCH_WEBHOOK_LISTENER_PORT: ${TWITCH_WEBHOOK_LISTENER_PORT}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
-      - api-server
-      - helpa-base
+      api-server:
+        condition: service_healthy
+      ws-relay:
+        condition: service_healthy
+      helpa-base:
+        condition: service_completed_successfully
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${TWITCH_WEBHOOK_LISTENER_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
 
   racebot:
     image: helpa-racebot:${VERSION:-${BUILD_TARGET}}
@@ -185,6 +253,8 @@ services:
     restart: on-failure
     logging:
       driver: local
+    ports:
+      - ${RACEBOT_HEALTH_PORT}:${RACEBOT_HEALTH_PORT}
     environment:
       SERVICE_NAME: racebot
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
@@ -194,9 +264,19 @@ services:
       RACETIME_GAME_CATEGORY_SLUG_Z3: ${RACETIME_GAME_CATEGORY_SLUG_Z3}
       RACETIME_BOT_CLIENT_ID: ${RACETIME_BOT_CLIENT_ID}
       RACETIME_BOT_CLIENT_SECRET: ${RACETIME_BOT_CLIENT_SECRET}
+      RACEBOT_HEALTH_PORT: ${RACEBOT_HEALTH_PORT}
+    depends_on:
+      ws-relay:
+        condition: service_healthy
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${RACEBOT_HEALTH_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   ws-relay:
     image: helpa-ws-relay:${VERSION:-${BUILD_TARGET}}
@@ -213,6 +293,12 @@ services:
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
     networks:
       - int
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${WEBSOCKET_RELAY_SERVER_PORT}/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   mongodb_data_container:

@@ -1,6 +1,6 @@
 {
   "name": "helpa-twitch",
-  "version": "1.0.0",
+  "version": "1.8.3",
   "main": "./src/index.js",
   "license": "MIT",
   "scripts": {
@@ -8,7 +8,9 @@
     "start:dev": "nodemon ./src"
   },
   "dependencies": {
+    "express": "^4.19.2",
     "helpa-api-client": "file:../lib/helpa-api-client",
+    "ms": "^2.1.3",
     "socket.io-client": "^4.7.2",
     "tmi.js": "^1.8.5"
   },

@@ -1,6 +1,8 @@
 const express = require("express");
 const crypto = require("crypto");
 const EventEmitter = require("events");
+const ms = require("ms");
+const packageJson = require("../../package.json");
 
 const { TWITCH_EVENTSUB_SECRET_KEY } = process.env;
 
@@ -18,9 +20,37 @@ class TwitchEventListener extends EventEmitter {
   constructor() {
     super();
     this.app = express();
+    this.listeningPort = null;
+    this.startTime = Date.now();
+    this.eventsReceived = 0;
 
     // Need raw body for verification
     this.app.use(express.raw({ type: "application/json" }));
+
+    // Health check endpoint
+    this.app.get("/health", (_req, res) => {
+      try {
+        const uptimeMs = Date.now() - this.startTime;
+        res.status(200).json({ 
+          status: "healthy", 
+          service: "runnerwatcher",
+          version: packageJson.version,
+          port: this.listeningPort || "not started",
+          uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
+          uptimeMs: uptimeMs, // keep raw ms for monitoring tools
+          eventsReceived: this.eventsReceived,
+          environment: process.env.NODE_ENV || "development",
+          webhookConfigured: !!process.env.TWITCH_EVENTSUB_WEBHOOK_URL, // just boolean, not the actual URL
+        });
+      } catch (error) {
+        console.error("Health check error:", error);
+        res.status(503).json({
+          status: "unhealthy",
+          service: "runnerwatcher",
+          error: error.message
+        });
+      }
+    });
 
     this.app.post("/eventsub", (req, res) => {
       const signature = req.get(TWITCH_MESSAGE_SIGNATURE);
@@ -48,6 +78,7 @@ class TwitchEventListener extends EventEmitter {
           break;
 
         case MESSAGE_TYPE_NOTIFICATION:
+          this.eventsReceived++;
           this.handleNotification(notification);
           res.send(""); // Default .send is a 200 status
           break;
@@ -67,6 +98,7 @@ class TwitchEventListener extends EventEmitter {
   }
 
   listen(port) {
+    this.listeningPort = port;
     this.app.listen(port, () => {
       console.log(`Twitch Event Listener running on port ${port}`);
     });

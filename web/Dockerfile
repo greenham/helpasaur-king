@@ -1,10 +1,13 @@
-FROM node:16-alpine as base
+FROM node:18-alpine as base
 
 WORKDIR /app
 
+# Copy package files for dependency caching
 COPY package.json yarn.lock ./
 
-RUN yarn config set network-timeout 600000 -g && \
+# Cache yarn dependencies
+RUN --mount=type=cache,target=/root/.yarn \
+    yarn config set network-timeout 600000 -g && \
     yarn install --frozen-lockfile --network-timeout 100000
 
 COPY . .
