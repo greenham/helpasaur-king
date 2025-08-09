@@ -1,0 +1,145 @@
+name: Build and Push Images
+
+on:
+  release:
+    types: [published]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/greenham/helpasaur-king
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
+      - name: Build and push helpa-base
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./lib/Dockerfile
+          target: builder
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-base:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-base:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push API
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./api/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-api:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Discord Bot
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./discord/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-discord:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-discord:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Twitch Bot
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./twitch/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-twitch:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-twitch:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Web
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./web/Dockerfile
+          target: prod
+          push: true
+          build-args: |
+            API_HOST=${{ secrets.API_HOST }}
+            TWITCH_APP_CLIENT_ID=${{ secrets.TWITCH_APP_CLIENT_ID }}
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-web:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Runner Watcher
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./runnerwatcher/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Racebot
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./racebot/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-racebot:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-racebot:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push WS Relay
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./ws-relay/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

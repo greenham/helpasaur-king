@@ -4,9 +4,9 @@ This project now uses GitHub Container Registry (ghcr.io) to store and distribut
 
 ## How it Works
 
-1. **Build Phase**: When a release is published, GitHub Actions builds all Docker images and pushes them to ghcr.io
-2. **Deploy Phase**: The production server pulls the pre-built images from ghcr.io (no building on production)
-3. **Cleanup**: Old image versions are automatically cleaned up, keeping only the last 3 versions
+1. **Build Phase**: When a release is published on GitHub, the `build-and-push.yml` workflow automatically builds all Docker images and pushes them to ghcr.io with the release version tag
+2. **Deploy Phase**: Manual trigger of `deploy-to-prod.yml` workflow to deploy a specific version to production (the server pulls pre-built images from ghcr.io)
+3. **Cleanup**: Old image versions are automatically cleaned up on the production server, keeping only the last 3 versions
 
 ## Required GitHub Secrets
 
@@ -68,7 +68,22 @@ The production server only needs (in the deployment path):
 - All data in `/data/db` inside the container is preserved
 - Even if MongoDB container restarts, it reconnects to the same volume
 
-## Manual Deployment
+## Deployment Workflow
+
+### Automatic Build on Release
+When you publish a new release on GitHub:
+1. The `build-and-push.yml` workflow automatically triggers
+2. All Docker images are built and pushed to ghcr.io with the version tag
+3. Images are tagged with both the version number and `latest`
+
+### Manual Production Deployment
+To deploy a version to production:
+1. Go to Actions → Deploy to Production workflow
+2. Click "Run workflow"
+3. Enter the version to deploy (e.g., `1.9.1` or `latest`)
+4. Click "Run workflow" to start deployment
+
+### Manual Deployment via SSH
 
 If you need to manually deploy a specific version:
 
