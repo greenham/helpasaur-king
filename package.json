@@ -12,7 +12,8 @@
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "logs": "docker compose logs -f --tail 1000",
     "push:images": "docker compose push --ignore-push-failures",
-    "boom:dev": "pnpm -w stop && pnpm -w build:base && pnpm -w build && pnpm -w start:dev --force-recreate && pnpm -w logs"
+    "boom:dev": "pnpm -w stop && pnpm -w build:base && pnpm -w build && pnpm -w start:dev --force-recreate && pnpm -w logs",
+    "version:bump": "bash scripts/bump-version.sh"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
