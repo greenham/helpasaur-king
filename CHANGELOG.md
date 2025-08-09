@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.8.3
+
+_2025-08-09_
+
+### What's Changed
+* Bump @babel/runtime from 7.23.8 to 7.28.2 in /twitch by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/76
+* Bump @babel/runtime from 7.23.9 to 7.28.2 by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/77
+* Bump axios from 1.7.4 to 1.8.2 in /api by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/78
+* Bump @babel/runtime from 7.23.8 to 7.28.2 in /discord by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/80
+* Bump form-data from 4.0.0 to 4.0.4 in /discord by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/79
+* feat: tag Docker images with release version for automatic container updates by @greenham in https://github.com/greenham/helpasaur-king/pull/81
+* Bump form-data from 4.0.0 to 4.0.4 in /racebot by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/82
+
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.8.2...1.8.3
+
 ## 1.8.2
 
 _2025-08-08_
