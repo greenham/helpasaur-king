@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install
+RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
+    yarn config set network-timeout 600000 -g && \
+    yarn install --frozen-lockfile --network-timeout 100000
 
 COPY . .
 
