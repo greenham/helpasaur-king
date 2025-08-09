@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.9.0
+
+_2025-08-09_
+
+### What's Changed
+* Fix: Improve yarn install reliability in Docker builds by @greenham in https://github.com/greenham/helpasaur-king/pull/83
+* feat: Add comprehensive health checks for all services by @greenham in https://github.com/greenham/helpasaur-king/pull/84
+* Upgrade axios in helpa-api-client to ^1.8.2 per #145 and #161 by @greenham in https://github.com/greenham/helpasaur-king/pull/85
+* Security/upgrade axios retry by @greenham in https://github.com/greenham/helpasaur-king/pull/86
+
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.8.3...1.9.0
+
 ## 1.8.3
 
 _2025-08-09_
