@@ -13,7 +13,7 @@ const eventCounts = {};
 
 // Create HTTP server with health check endpoint
 const httpServer = createServer((req, res) => {
-  if (req.url === "/health" && req.method === "GET") {
+  if (req.url === "/health" && (req.method === "GET" || req.method === "HEAD")) {
     const uptimeMs = Date.now() - startTime;
     
     // Get connected clients count
@@ -23,25 +23,31 @@ const httpServer = createServer((req, res) => {
     }
     
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ 
-      status: "healthy", 
-      service: "ws-relay",
-      version: packageJson.version,
-      uptime: ms(uptimeMs, { long: true }),
-      uptimeMs: uptimeMs,
-      connections: {
-        current: currentConnections,
-        total: totalConnections,
-        clients: clientCount
-      },
-      messages: {
-        total: messagesRelayed,
-        byEvent: eventCounts,
-        rate: uptimeMs > 0 ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(2)}/min` : "0/min"
-      },
-      port: WEBSOCKET_RELAY_SERVER_PORT,
-      environment: process.env.NODE_ENV || "development",
-    }));
+    
+    // For HEAD requests, just send headers without body
+    if (req.method === "HEAD") {
+      res.end();
+    } else {
+      res.end(JSON.stringify({ 
+        status: "healthy", 
+        service: "ws-relay",
+        version: packageJson.version,
+        uptime: ms(uptimeMs, { long: true }),
+        uptimeMs: uptimeMs,
+        connections: {
+          current: currentConnections,
+          total: totalConnections,
+          clients: clientCount
+        },
+        messages: {
+          total: messagesRelayed,
+          byEvent: eventCounts,
+          rate: uptimeMs > 0 ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(2)}/min` : "0/min"
+        },
+        port: WEBSOCKET_RELAY_SERVER_PORT,
+        environment: process.env.NODE_ENV || "development",
+      }));
+    }
   } else {
     // Let Socket.io handle other requests
     res.writeHead(404);

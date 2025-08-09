@@ -1,31 +1,28 @@
-FROM node:18-alpine as base
+FROM helpa-base:latest as builder
 
-# Install pnpm
-RUN npm install -g pnpm@8
-
-WORKDIR /app
-
-# Copy package files for dependency caching
 COPY racebot/package.json ./
-
-# Install dependencies without workspace (standalone mode)
+# Install ALL dependencies (including dev) for build
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --shamefully-hoist
 
 COPY racebot/ .
-
-# Build the typescript files
 RUN pnpm build
+
+FROM helpa-base:latest as base
+
+COPY racebot/package.json ./
 
 FROM base as dev
 ENV NODE_ENV=development
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --shamefully-hoist
+COPY racebot/ .
 CMD ["pnpm", "start:dev"]
 
 FROM base as prod
 ENV NODE_ENV=production
-COPY --from=base /app/build ./build
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --prod --shamefully-hoist
+# Copy built artifacts from builder stage
+COPY --from=builder /app/build ./build
 CMD ["pnpm", "start"]
