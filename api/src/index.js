@@ -24,13 +24,11 @@ const trackRequests = (req, res, next) => {
   requestCount++;
 
   // Track errors
-  const originalSend = res.send;
-  res.send = function (data) {
+  res.on("finish", () => {
     if (res.statusCode >= 400) {
       errorCount++;
     }
-    return originalSend.apply(res, arguments);
-  };
+  });
 
   next();
 };
@@ -81,24 +79,33 @@ app.use(cookieParser());
 
 // Health check endpoint
 app.get("/health", async (req, res) => {
-  const uptimeMs = Date.now() - startTime;
+  try {
+    const uptimeMs = Date.now() - startTime;
 
-  res.status(200).json({
-    status: "healthy",
-    service: "api",
-    uptime: ms(uptimeMs, { long: true }),
-    uptimeMs: uptimeMs,
-    requestCount: requestCount,
-    errorCount: errorCount,
-    errorRate:
-      requestCount > 0
-        ? `${((errorCount / requestCount) * 100).toFixed(2)}%`
-        : "0%",
-    dbConnected: database.readyState === 1,
-    websocketConnected: wsRelay.connected,
-    environment: process.env.NODE_ENV || "development",
-    version: packageJson.version,
-  });
+    res.status(200).json({
+      status: "healthy",
+      service: "api",
+      uptime: ms(uptimeMs, { long: true }),
+      uptimeMs: uptimeMs,
+      requestCount: requestCount,
+      errorCount: errorCount,
+      errorRate:
+        requestCount > 0
+          ? `${((errorCount / requestCount) * 100).toFixed(2)}%`
+          : "0%",
+      dbConnected: database.readyState === 1,
+      websocketConnected: wsRelay.connected,
+      environment: process.env.NODE_ENV || "development",
+      version: packageJson.version,
+    });
+  } catch (error) {
+    console.error("Health check error:", error);
+    res.status(503).json({
+      status: "unhealthy",
+      service: "api",
+      error: error.message,
+    });
+  }
 });
 
 // Set up routes
