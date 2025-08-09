@@ -33,7 +33,7 @@ _2025-08-09_
 
 _2025-08-08_
 
-## What's Changed
+### What's Changed
 * feat: Enable users to toggle practice lists via Twitch chat by @greenham in https://github.com/greenham/helpasaur-king/pull/73
 * Bump mongoose from 7.6.8 to 8.9.5 in /api by @dependabot[bot] in https://github.com/greenham/helpasaur-king/pull/72
 
