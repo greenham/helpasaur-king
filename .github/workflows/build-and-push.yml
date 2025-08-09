@@ -60,6 +60,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/helpa-api:${{ steps.version.outputs.VERSION }}
             ${{ env.IMAGE_PREFIX }}/helpa-api:latest
+          build-contexts: |
+            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -73,6 +75,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/helpa-discord:${{ steps.version.outputs.VERSION }}
             ${{ env.IMAGE_PREFIX }}/helpa-discord:latest
+          build-contexts: |
+            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -86,6 +90,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/helpa-twitch:${{ steps.version.outputs.VERSION }}
             ${{ env.IMAGE_PREFIX }}/helpa-twitch:latest
+          build-contexts: |
+            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -102,6 +108,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/helpa-web:${{ steps.version.outputs.VERSION }}
             ${{ env.IMAGE_PREFIX }}/helpa-web:latest
+          build-contexts: |
+            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -115,6 +123,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:${{ steps.version.outputs.VERSION }}
             ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:latest
+          build-contexts: |
+            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -128,6 +138,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/helpa-racebot:${{ steps.version.outputs.VERSION }}
             ${{ env.IMAGE_PREFIX }}/helpa-racebot:latest
+          build-contexts: |
+            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -141,5 +153,7 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:${{ steps.version.outputs.VERSION }}
             ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:latest
+          build-contexts: |
+            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
