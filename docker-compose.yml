@@ -46,10 +46,10 @@ services:
       - ext
 
   api-server:
-    image: helpa-api:${TARGET}
+    image: helpa-api:${VERSION:-${BUILD_TARGET}}
     build:
       context: ./api
-      target: ${TARGET}
+      target: ${BUILD_TARGET}
     restart: on-failure
     logging:
       driver: local
@@ -77,10 +77,10 @@ services:
       - ext
 
   discord-bot:
-    image: helpa-discord:${TARGET}
+    image: helpa-discord:${VERSION:-${BUILD_TARGET}}
     build:
       context: ./discord
-      target: ${TARGET}
+      target: ${BUILD_TARGET}
     restart: on-failure
     logging:
       driver: local
@@ -97,10 +97,10 @@ services:
       - ext
 
   twitch-bot:
-    image: helpa-twitch:${TARGET}
+    image: helpa-twitch:${VERSION:-${BUILD_TARGET}}
     build:
       context: ./twitch
-      target: ${TARGET}
+      target: ${BUILD_TARGET}
     restart: on-failure
     logging:
       driver: local
@@ -117,10 +117,10 @@ services:
       - ext
 
   web:
-    image: helpa-web:${TARGET}
+    image: helpa-web:${VERSION:-${BUILD_TARGET}}
     build:
       context: ./web
-      target: ${TARGET}
+      target: ${BUILD_TARGET}
       args:
         API_HOST: ${API_HOST}
         TWITCH_APP_CLIENT_ID: ${TWITCH_APP_CLIENT_ID}
@@ -153,10 +153,10 @@ services:
       - ext
 
   runnerwatcher:
-    image: helpa-runnerwatcher:${TARGET}
+    image: helpa-runnerwatcher:${VERSION:-${BUILD_TARGET}}
     build:
       context: ./runnerwatcher
-      target: ${TARGET}
+      target: ${BUILD_TARGET}
     restart: on-failure
     logging:
       driver: local
@@ -178,10 +178,10 @@ services:
       - ext
 
   racebot:
-    image: helpa-racebot:${TARGET}
+    image: helpa-racebot:${VERSION:-${BUILD_TARGET}}
     build:
       context: ./racebot
-      target: ${TARGET}
+      target: ${BUILD_TARGET}
     restart: on-failure
     logging:
       driver: local
@@ -199,10 +199,10 @@ services:
       - ext
 
   ws-relay:
-    image: helpa-ws-relay:${TARGET}
+    image: helpa-ws-relay:${VERSION:-${BUILD_TARGET}}
     build:
       context: ./ws-relay
-      target: ${TARGET}
+      target: ${BUILD_TARGET}
     restart: on-failure
     logging:
       driver: local
