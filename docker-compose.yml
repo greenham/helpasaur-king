@@ -231,6 +231,8 @@ services:
     depends_on:
       api-server:
         condition: service_healthy
+      ws-relay:
+        condition: service_healthy
       helpa-base:
         condition: service_completed_successfully
     networks:
@@ -263,6 +265,9 @@ services:
       RACETIME_BOT_CLIENT_ID: ${RACETIME_BOT_CLIENT_ID}
       RACETIME_BOT_CLIENT_SECRET: ${RACETIME_BOT_CLIENT_SECRET}
       RACEBOT_HEALTH_PORT: ${RACEBOT_HEALTH_PORT}
+    depends_on:
+      ws-relay:
+        condition: service_healthy
     networks:
       - int
       - ext

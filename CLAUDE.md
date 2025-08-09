@@ -43,6 +43,57 @@ cd racebot && npm run dev                # Race bot with ts-node-dev
 cd runnerwatcher && npm run dev          # Runner watcher with nodemon
 ```
 
+## Service Dependency Graph
+
+```mermaid
+graph TD
+    %% Core Infrastructure
+    mongo[MongoDB]
+    mongo-express[Mongo Express]
+    ws-relay[WebSocket Relay]
+    helpa-base[Helpa Base Library]
+    
+    %% Services
+    api[API Server]
+    discord[Discord Bot]
+    twitch[Twitch Bot]
+    web[Web App]
+    nginx[Nginx]
+    runnerwatcher[Runner Watcher]
+    racebot[Race Bot]
+    
+    %% Dependencies
+    mongo-express -->|service_healthy| mongo
+    
+    api -->|service_healthy| mongo
+    api -->|service_healthy| ws-relay
+    
+    discord -->|service_healthy| api
+    discord -->|service_completed| helpa-base
+    
+    twitch -->|service_healthy| api
+    twitch -->|service_completed| helpa-base
+    
+    runnerwatcher -->|service_healthy| api
+    runnerwatcher -->|service_healthy| ws-relay
+    runnerwatcher -->|service_completed| helpa-base
+    
+    racebot -->|service_healthy| ws-relay
+    
+    web -->|service_healthy| api
+    
+    nginx -->|service_started| web
+    
+    %% Styling
+    classDef infrastructure fill:#f9f,stroke:#333,stroke-width:2px
+    classDef service fill:#bbf,stroke:#333,stroke-width:2px
+    classDef frontend fill:#bfb,stroke:#333,stroke-width:2px
+    
+    class mongo,mongo-express,ws-relay,helpa-base infrastructure
+    class api,discord,twitch,runnerwatcher,racebot service
+    class web,nginx frontend
+```
+
 ## Database & Infrastructure
 
 - **MongoDB 7**: Main database, accessed via Mongoose ODM
