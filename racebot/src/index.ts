@@ -112,6 +112,11 @@ const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
 
 const scheduleWeeklyRace = () => {
   const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, () => {
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[${new Date().toISOString()}] Weekly race job triggered - skipping race room creation in non-production environment`);
+      return;
+    }
+
     let weeklyRaceRoomSlug = "";
 
     console.log(`Creating weekly race room...`);
@@ -193,6 +198,8 @@ const scheduleWeeklyRace = () => {
       })
       .catch(console.error);
   });
+
+
   weeklyRaceJob.on("scheduled", (date) => {
     console.log(
       `Weekly race room creation scheduled, next invocation: ${date}`
@@ -202,29 +209,29 @@ const scheduleWeeklyRace = () => {
   console.log(
     `Weekly race room creation scheduled, next invocation: ${weeklyRaceJob.nextInvocation()}`
   );
+
+  // Start health check server
+  const healthApp = express();
+  const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012;
+
+  healthApp.get("/health", (_req, res) => {
+    res.status(200).json({ 
+      status: "healthy", 
+      service: "racebot",
+      wsRelayConnected: wsRelay.connected,
+      environment: process.env.NODE_ENV,
+      schedulerActive: weeklyRaceJob !== null,
+      nextRace: weeklyRaceJob?.nextInvocation() || null
+    });
+  });
+
+  healthApp.listen(healthPort, () => {
+    console.log(`Health check endpoint available on port ${healthPort}`);
+  });
 };
 
-if (process.env.NODE_ENV === "production") {
-  scheduleWeeklyRace();
-}
 
-// Start health check server
-const healthApp = express();
-const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012;
-
-healthApp.get("/health", (req, res) => {
-  res.status(200).json({ 
-    status: "healthy", 
-    service: "racebot",
-    wsRelayConnected: wsRelay.connected,
-    environment: process.env.NODE_ENV,
-    schedulerActive: process.env.NODE_ENV === "production"
-  });
-});
-
-healthApp.listen(healthPort, () => {
-  console.log(`Health check endpoint available on port ${healthPort}`);
-});
+scheduleWeeklyRace();
 
 process.on("SIGINT", function () {
   schedule.gracefulShutdown().then(() => process.exit(0));

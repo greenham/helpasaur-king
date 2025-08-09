@@ -106,6 +106,8 @@ services:
     restart: on-failure
     logging:
       driver: local
+    ports:
+      - ${DISCORD_HEALTH_PORT}:${DISCORD_HEALTH_PORT}
     environment:
       SERVICE_NAME: discord
       API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
@@ -135,6 +137,8 @@ services:
     restart: on-failure
     logging:
       driver: local
+    ports:
+      - ${TWITCH_HEALTH_PORT}:${TWITCH_HEALTH_PORT}
     environment:
       SERVICE_NAME: twitch
       API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
@@ -247,6 +251,8 @@ services:
     restart: on-failure
     logging:
       driver: local
+    ports:
+      - ${RACEBOT_HEALTH_PORT}:${RACEBOT_HEALTH_PORT}
     environment:
       SERVICE_NAME: racebot
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
