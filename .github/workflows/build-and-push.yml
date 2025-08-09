@@ -8,7 +8,7 @@ on:
       custom_tag:
         description: "Optional custom tag to apply to all images (e.g., 1.9.1, test, beta)"
         required: false
-        default: "latest"
+        default: ""
         type: string
 
 env:
