@@ -10,7 +10,7 @@ WORKDIR /app
 RUN apk add --no-cache curl wget
 
 # Copy the shared library (available for services that need it)
-COPY ./helpa-api-client /lib/helpa-api-client
+COPY ./lib/helpa-api-client /lib/helpa-api-client
 
 # Create common directories that services might need
 RUN mkdir -p /app/src /app/build /app/dist
