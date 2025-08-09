@@ -16,7 +16,6 @@
   "author": "https://github.com/greenham",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.4.1",
     "helpa-api-client": "file:./lib/helpa-api-client"
   }
 }
