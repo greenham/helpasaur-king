@@ -54,6 +54,11 @@ app.wsRelay = wsRelay;
 // Use cookie-parser
 app.use(cookieParser());
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "healthy", service: "api" });
+});
+
 // Set up routes
 app.use(routes);
 

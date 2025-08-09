@@ -24,6 +24,12 @@ services:
       - mongodb_data_container:/data/db
     networks:
       - int
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   mongo-express:
     image: mongo-express
@@ -40,7 +46,8 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME}
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     networks:
       - int
       - ext
@@ -71,10 +78,19 @@ services:
       CLIENT_POST_AUTH_REDIRECT_URL: ${CLIENT_POST_AUTH_REDIRECT_URL}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+      ws-relay:
+        condition: service_healthy
     networks:
       - int
       - ext
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${API_SERVER_EXTERNAL_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   discord-bot:
     image: helpa-discord:${VERSION:-${BUILD_TARGET}}
@@ -90,8 +106,10 @@ services:
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
-      - api-server
-      - helpa-base
+      api-server:
+        condition: service_healthy
+      helpa-base:
+        condition: service_completed_successfully
     networks:
       - int
       - ext
@@ -110,8 +128,10 @@ services:
       API_KEY: ${API_SECRET_KEY}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
-      - api-server
-      - helpa-base
+      api-server:
+        condition: service_healthy
+      helpa-base:
+        condition: service_completed_successfully
     networks:
       - int
       - ext
@@ -131,7 +151,8 @@ services:
     ports:
       - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
     depends_on:
-      - api-server
+      api-server:
+        condition: service_healthy
     networks:
       - int
       - ext
@@ -147,7 +168,8 @@ services:
       - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/static:/srv/static
     depends_on:
-      - web
+      web:
+        condition: service_started
     networks:
       - int
       - ext
@@ -171,8 +193,10 @@ services:
       TWITCH_WEBHOOK_LISTENER_PORT: ${TWITCH_WEBHOOK_LISTENER_PORT}
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
     depends_on:
-      - api-server
-      - helpa-base
+      api-server:
+        condition: service_healthy
+      helpa-base:
+        condition: service_completed_successfully
     networks:
       - int
       - ext
@@ -213,6 +237,12 @@ services:
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
     networks:
       - int
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${WEBSOCKET_RELAY_SERVER_PORT}/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   mongodb_data_container:
