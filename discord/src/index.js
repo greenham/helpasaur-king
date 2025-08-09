@@ -1,6 +1,7 @@
 const { HelpaApi } = require("helpa-api-client");
 const { DiscordBot } = require("./bot");
 const express = require("express");
+const ms = require("ms");
 
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST,
@@ -28,11 +29,20 @@ helpaApiClient
       const healthApp = express();
       const healthPort = process.env.DISCORD_HEALTH_PORT || 3010;
       
-      healthApp.get("/health", (req, res) => {
+      healthApp.get("/health", (_req, res) => {
         res.status(200).json({ 
           status: "healthy", 
           service: "discord",
-          connected: bot.discordClient.ws.status === 0
+          connected: bot.discordClient.ws.status === 0,
+          uptime: bot.discordClient.uptime ? ms(bot.discordClient.uptime, { long: true }) : "0 ms",
+          uptimeMs: bot.discordClient.uptime, // keep raw ms for monitoring tools
+          ping: bot.discordClient.ws.ping ? `${bot.discordClient.ws.ping}ms` : "N/A",
+          guilds: bot.discordClient.guilds.cache.size, // number of servers
+          users: bot.discordClient.users.cache.size, // cached users
+          channels: bot.discordClient.channels.cache.size, // cached channels
+          commands: bot.discordClient.commands?.size || 0, // registered commands
+          readyAt: bot.discordClient.readyAt, // timestamp when bot became ready
+          environment: process.env.NODE_ENV || "development"
         });
       });
       

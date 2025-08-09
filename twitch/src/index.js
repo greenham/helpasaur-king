@@ -1,6 +1,7 @@
 const { HelpaApi } = require("helpa-api-client");
 const { TwitchBot } = require("./bot");
 const express = require("express");
+const ms = require("ms");
 
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST,
@@ -27,12 +28,20 @@ helpaApiClient
         const healthApp = express();
         const healthPort = process.env.TWITCH_HEALTH_PORT || 3011;
         
-        healthApp.get("/health", (req, res) => {
+        healthApp.get("/health", (_req, res) => {
+          const connectionState = bot.bot?.readyState() || "CLOSED";
+          const uptimeMs = bot.bot?._connectTimestamp ? Date.now() - bot.bot._connectTimestamp : 0;
           res.status(200).json({ 
             status: "healthy", 
             service: "twitch",
-            connected: bot.bot && bot.bot.readyState() === "OPEN",
-            channels: bot.channelList ? bot.channelList.length : 0
+            connected: connectionState === "OPEN",
+            connectionState: connectionState,
+            channelCount: bot.channelList ? bot.channelList.length : 0, // just the count, not names
+            uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
+            uptimeMs: uptimeMs, // keep raw ms for monitoring tools
+            commandPrefix: bot.config?.cmdPrefix || "!",
+            username: bot.config?.username || "unknown", // bot's public username is ok
+            environment: process.env.NODE_ENV || "development"
           });
         });
         

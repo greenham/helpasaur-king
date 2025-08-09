@@ -4,6 +4,7 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const { io } = require("socket.io-client");
 const cookieParser = require("cookie-parser");
+const ms = require("ms");
 const routes = require("./routes");
 const {
   MONGODB_URL,
@@ -12,6 +13,27 @@ const {
   WEBSOCKET_RELAY_SERVER,
 } = process.env;
 const packageJson = require("../package.json");
+
+// Track API stats
+const startTime = Date.now();
+let requestCount = 0;
+let errorCount = 0;
+
+// Middleware to track requests
+const trackRequests = (req, res, next) => {
+  requestCount++;
+
+  // Track errors
+  const originalSend = res.send;
+  res.send = function (data) {
+    if (res.statusCode >= 400) {
+      errorCount++;
+    }
+    return originalSend.apply(res, arguments);
+  };
+
+  next();
+};
 
 mongoose.connect(MONGODB_URL);
 const database = mongoose.connection;
@@ -48,6 +70,9 @@ app.use(cors({ origin: originWhitelist, credentials: true }));
 // Set up logging
 app.use(logger("short"));
 
+// Track requests
+app.use(trackRequests);
+
 // Allow the app to use the websocket relay
 app.wsRelay = wsRelay;
 
@@ -55,8 +80,25 @@ app.wsRelay = wsRelay;
 app.use(cookieParser());
 
 // Health check endpoint
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "healthy", service: "api" });
+app.get("/health", async (req, res) => {
+  const uptimeMs = Date.now() - startTime;
+
+  res.status(200).json({
+    status: "healthy",
+    service: "api",
+    uptime: ms(uptimeMs, { long: true }),
+    uptimeMs: uptimeMs,
+    requestCount: requestCount,
+    errorCount: errorCount,
+    errorRate:
+      requestCount > 0
+        ? `${((errorCount / requestCount) * 100).toFixed(2)}%`
+        : "0%",
+    dbConnected: database.readyState === 1,
+    websocketConnected: wsRelay.connected,
+    environment: process.env.NODE_ENV || "development",
+    version: packageJson.version,
+  });
 });
 
 // Set up routes
