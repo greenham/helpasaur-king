@@ -2,6 +2,7 @@ const express = require("express");
 const crypto = require("crypto");
 const EventEmitter = require("events");
 const ms = require("ms");
+const packageJson = require("../../package.json");
 
 const { TWITCH_EVENTSUB_SECRET_KEY } = process.env;
 
@@ -28,17 +29,27 @@ class TwitchEventListener extends EventEmitter {
 
     // Health check endpoint
     this.app.get("/health", (_req, res) => {
-      const uptimeMs = Date.now() - this.startTime;
-      res.status(200).json({ 
-        status: "healthy", 
-        service: "runnerwatcher",
-        port: this.listeningPort || "not started",
-        uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
-        uptimeMs: uptimeMs, // keep raw ms for monitoring tools
-        eventsReceived: this.eventsReceived,
-        environment: process.env.NODE_ENV || "development",
-        webhookConfigured: !!process.env.TWITCH_EVENTSUB_WEBHOOK_URL // just boolean, not the actual URL
-      });
+      try {
+        const uptimeMs = Date.now() - this.startTime;
+        res.status(200).json({ 
+          status: "healthy", 
+          service: "runnerwatcher",
+          version: packageJson.version,
+          port: this.listeningPort || "not started",
+          uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
+          uptimeMs: uptimeMs, // keep raw ms for monitoring tools
+          eventsReceived: this.eventsReceived,
+          environment: process.env.NODE_ENV || "development",
+          webhookConfigured: !!process.env.TWITCH_EVENTSUB_WEBHOOK_URL, // just boolean, not the actual URL
+        });
+      } catch (error) {
+        console.error("Health check error:", error);
+        res.status(503).json({
+          status: "unhealthy",
+          service: "runnerwatcher",
+          error: error.message
+        });
+      }
     });
 
     this.app.post("/eventsub", (req, res) => {

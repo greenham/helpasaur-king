@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+env:
+  # Define the list of services once for reuse throughout the workflow
+  SERVICES: "api discord twitch web runnerwatcher racebot ws-relay"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -28,7 +32,9 @@ jobs:
             BUILD_TARGET=prod VERSION=$VERSION yarn start:prod
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
-            for SERVICE in api discord twitch web runnerwatcher racebot ws-relay; do
+            # Note: SERVICES env var is not available in SSH session, so we define it here
+            SERVICES="api discord twitch web runnerwatcher racebot ws-relay"
+            for SERVICE in $SERVICES; do
               echo "Cleaning helpa-$SERVICE images..."
               docker images "helpa-$SERVICE" --format "{{.Tag}}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | head -n -3 | while read TAG; do
                 echo "Removing helpa-$SERVICE:$TAG"
@@ -70,7 +76,25 @@ jobs:
           # Update root package.json
           npm version "$VERSION" --no-git-tag-version --allow-same-version
           
-          echo "Updated version to $VERSION"
+          # Update all service package.json files to keep versions in sync
+          for SERVICE_DIR in ${{ env.SERVICES }}; do
+            if [ -f "$SERVICE_DIR/package.json" ]; then
+              echo "Updating version in $SERVICE_DIR/package.json"
+              cd "$SERVICE_DIR"
+              npm version "$VERSION" --no-git-tag-version --allow-same-version
+              cd ..
+            fi
+          done
+          
+          # Update shared library package.json if it exists
+          if [ -f "lib/helpa-api-client/package.json" ]; then
+            echo "Updating version in lib/helpa-api-client/package.json"
+            cd lib/helpa-api-client
+            npm version "$VERSION" --no-git-tag-version --allow-same-version
+            cd ../..
+          fi
+          
+          echo "Updated all package.json files to version $VERSION"
           
       - name: Update CHANGELOG.md
         run: |
@@ -107,6 +131,16 @@ jobs:
           VERSION="${{ github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
           
+          # Add all modified package.json files and the changelog
           git add package.json CHANGELOG.md
+          
+          # Add all service package.json files
+          for SERVICE_DIR in ${{ env.SERVICES }}; do
+            git add "$SERVICE_DIR/package.json" 2>/dev/null || true
+          done
+          
+          # Add shared library package.json if it exists
+          git add lib/helpa-api-client/package.json 2>/dev/null || true
+          
           git commit -m "chore: update version to $VERSION and changelog [skip ci]" || echo "No changes to commit"
           git push origin main

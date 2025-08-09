@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const { createServer } = require("http");
 const ms = require("ms");
+const packageJson = require("../package.json");
 const { WEBSOCKET_RELAY_SERVER_PORT } = process.env;
 
 // Track relay stats
@@ -25,6 +26,7 @@ const httpServer = createServer((req, res) => {
     res.end(JSON.stringify({ 
       status: "healthy", 
       service: "ws-relay",
+      version: packageJson.version,
       uptime: ms(uptimeMs, { long: true }),
       uptimeMs: uptimeMs,
       connections: {
@@ -38,7 +40,7 @@ const httpServer = createServer((req, res) => {
         rate: uptimeMs > 0 ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(2)}/min` : "0/min"
       },
       port: WEBSOCKET_RELAY_SERVER_PORT,
-      environment: process.env.NODE_ENV || "development"
+      environment: process.env.NODE_ENV || "development",
     }));
   } else {
     // Let Socket.io handle other requests

@@ -5,6 +5,7 @@ import WebSocket from "ws";
 import express from "express";
 import RacetimeBot from "./lib/racetime";
 import * as Racetime from "./lib/racetime/types";
+import packageJson from "../package.json";
 
 const requiredEnvVariables = [
   "WEBSOCKET_RELAY_SERVER",
@@ -215,14 +216,24 @@ const scheduleWeeklyRace = () => {
   const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012;
 
   healthApp.get("/health", (_req, res) => {
-    res.status(200).json({ 
-      status: "healthy", 
-      service: "racebot",
-      wsRelayConnected: wsRelay.connected,
-      environment: process.env.NODE_ENV,
-      schedulerActive: weeklyRaceJob !== null,
-      nextRace: weeklyRaceJob?.nextInvocation() || null
-    });
+    try {
+      res.status(200).json({ 
+        status: "healthy", 
+        service: "racebot",
+        version: packageJson.version,
+        wsRelayConnected: wsRelay.connected,
+        environment: process.env.NODE_ENV,
+        schedulerActive: weeklyRaceJob !== null,
+        nextRace: weeklyRaceJob?.nextInvocation() || null,
+      });
+    } catch (error) {
+      console.error("Health check error:", error);
+      res.status(503).json({
+        status: "unhealthy",
+        service: "racebot",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
   });
 
   healthApp.listen(healthPort, () => {

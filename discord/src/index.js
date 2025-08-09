@@ -2,6 +2,7 @@ const { HelpaApi } = require("helpa-api-client");
 const { DiscordBot } = require("./bot");
 const express = require("express");
 const ms = require("ms");
+const packageJson = require("../package.json");
 
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST,
@@ -29,6 +30,7 @@ helpaApiClient
           res.status(200).json({
             status: "healthy",
             service: "discord",
+            version: packageJson.version,
             connected: bot.discordClient.ws.status === 0,
             uptime: bot.discordClient.uptime
               ? ms(bot.discordClient.uptime, { long: true })

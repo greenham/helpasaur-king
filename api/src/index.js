@@ -85,6 +85,7 @@ app.get("/health", async (req, res) => {
     res.status(200).json({
       status: "healthy",
       service: "api",
+      version: packageJson.version,
       uptime: ms(uptimeMs, { long: true }),
       uptimeMs: uptimeMs,
       requestCount: requestCount,
@@ -96,7 +97,6 @@ app.get("/health", async (req, res) => {
       dbConnected: database.readyState === 1,
       websocketConnected: wsRelay.connected,
       environment: process.env.NODE_ENV || "development",
-      version: packageJson.version,
     });
   } catch (error) {
     console.error("Health check error:", error);
