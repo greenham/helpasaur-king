@@ -19,6 +19,7 @@ jobs:
         with:
           sparse-checkout: |
             docker-compose.yml
+            docker-compose.ghcr.yml
             docker-compose.prod.yml
             nginx/
             mongo-backup
@@ -30,7 +31,7 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "docker-compose.yml,docker-compose.prod.yml,nginx/,mongo-backup,renew-certs"
+          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,nginx/,mongo-backup,renew-certs"
           target: "${{ secrets.DEPLOY_PATH }}"
           overwrite: true
           rm: false
@@ -58,11 +59,11 @@ jobs:
 
             # Pull the new images from ghcr.io
             echo "Pulling images from GitHub Container Registry..."
-            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml pull
 
             # Start production services with version-tagged images
             echo "Starting services..."
-            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d
 
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."

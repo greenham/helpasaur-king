@@ -50,7 +50,8 @@ https://github.com/greenham/helpasaur-king/packages
 
 The production server only needs (in the deployment path):
 - `docker-compose.yml` - Base Docker configuration
-- `docker-compose.prod.yml` - Production overrides with ghcr.io image references
+- `docker-compose.ghcr.yml` - Image overrides to use ghcr.io
+- `docker-compose.prod.yml` - Production-specific settings (SSL, ports, etc.)
 - `.env` - Runtime environment variables (NOT in git, managed separately)
 - `nginx/` - Nginx configuration files
 - `mongo-backup` - MongoDB backup script (for cron jobs)
@@ -95,8 +96,8 @@ ssh user@your-server
 cd /path/to/deployment
 
 # Pull and start a specific version
-VERSION=1.9.1 docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-VERSION=1.9.1 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+VERSION=1.9.1 docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml pull
+VERSION=1.9.1 docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d
 ```
 
 ## Backup Recommendation
@@ -131,7 +132,7 @@ For a new production server:
 
 4. Start the services:
    ```bash
-   VERSION=latest docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+   VERSION=latest docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d
    ```
 
 5. Set up cron jobs for maintenance (if not already configured):

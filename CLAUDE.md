@@ -29,6 +29,12 @@ pnpm logs               # View service logs
 pnpm boom:dev           # Full rebuild and restart for development
 pnpm stop               # Stop all services
 
+# Testing with ghcr.io images (from root)
+pnpm pull:ghcr          # Pull images from GitHub Container Registry
+pnpm start:ghcr         # Start using ghcr.io images (uses docker-compose.ghcr.yml overlay)
+pnpm start:ghcr:logs    # Start with ghcr.io images and follow logs
+VERSION=1.9.1 pnpm start:ghcr  # Start specific version from ghcr.io
+
 # Production (from root)
 pnpm start:prod         # Start production containers (uses docker-compose.prod.yml overlay)
 pnpm build              # Build all Docker images
