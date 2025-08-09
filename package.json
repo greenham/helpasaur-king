@@ -7,12 +7,11 @@
     "start": "docker compose up -d",
     "stop": "docker compose down",
     "start:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
-    "start:dev:logs": "yarn start:dev && yarn logs",
+    "start:dev:logs": "pnpm -w start:dev && pnpm -w logs",
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "logs": "docker compose logs -f --tail 1000",
     "push:images": "docker compose push --ignore-push-failures",
-    "boom:dev": "yarn stop && yarn build helpa-base && yarn build && yarn start:dev --force-recreate && yarn logs",
-    "regenerate-locks": "for dir in api discord twitch web runnerwatcher racebot ws-relay; do echo \"Regenerating yarn.lock in $dir...\"; cd $dir && rm -f yarn.lock && yarn install && cd ..; done && echo \"All yarn.lock files regenerated!\""
+    "boom:dev": "pnpm -w stop && pnpm -w build helpa-base && pnpm -w build && pnpm -w start:dev --force-recreate && pnpm -w logs"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",

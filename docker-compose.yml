@@ -61,7 +61,8 @@ services:
   api-server:
     image: helpa-api:${VERSION:-${BUILD_TARGET}}
     build:
-      context: ./api
+      context: .
+      dockerfile: ./api/Dockerfile
       target: ${BUILD_TARGET}
     restart: on-failure
     logging:
@@ -101,7 +102,8 @@ services:
   discord-bot:
     image: helpa-discord:${VERSION:-${BUILD_TARGET}}
     build:
-      context: ./discord
+      context: .
+      dockerfile: ./discord/Dockerfile
       target: ${BUILD_TARGET}
     restart: on-failure
     logging:
@@ -132,7 +134,8 @@ services:
   twitch-bot:
     image: helpa-twitch:${VERSION:-${BUILD_TARGET}}
     build:
-      context: ./twitch
+      context: .
+      dockerfile: ./twitch/Dockerfile
       target: ${BUILD_TARGET}
     restart: on-failure
     logging:
@@ -163,7 +166,8 @@ services:
   web:
     image: helpa-web:${VERSION:-${BUILD_TARGET}}
     build:
-      context: ./web
+      context: .
+      dockerfile: ./web/Dockerfile
       target: ${BUILD_TARGET}
       args:
         API_HOST: ${API_HOST}
@@ -213,7 +217,8 @@ services:
   runnerwatcher:
     image: helpa-runnerwatcher:${VERSION:-${BUILD_TARGET}}
     build:
-      context: ./runnerwatcher
+      context: .
+      dockerfile: ./runnerwatcher/Dockerfile
       target: ${BUILD_TARGET}
     restart: on-failure
     logging:
@@ -248,7 +253,8 @@ services:
   racebot:
     image: helpa-racebot:${VERSION:-${BUILD_TARGET}}
     build:
-      context: ./racebot
+      context: .
+      dockerfile: ./racebot/Dockerfile
       target: ${BUILD_TARGET}
     restart: on-failure
     logging:
@@ -281,7 +287,8 @@ services:
   ws-relay:
     image: helpa-ws-relay:${VERSION:-${BUILD_TARGET}}
     build:
-      context: ./ws-relay
+      context: .
+      dockerfile: ./ws-relay/Dockerfile
       target: ${BUILD_TARGET}
     restart: on-failure
     logging:

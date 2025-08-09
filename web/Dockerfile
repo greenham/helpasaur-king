@@ -1,16 +1,18 @@
 FROM node:18-alpine as base
 
+# Install pnpm
+RUN npm install -g pnpm@8
+
 WORKDIR /app
 
 # Copy package files for dependency caching
-COPY package.json yarn.lock ./
+COPY web/package.json ./
 
-# Cache yarn dependencies
-RUN --mount=type=cache,target=/root/.yarn \
-    yarn config set network-timeout 600000 -g && \
-    yarn install --frozen-lockfile --network-timeout 100000
+# Install dependencies without workspace (standalone mode)
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --shamefully-hoist
 
-COPY . .
+COPY web/ .
 
 ARG API_HOST
 ENV API_HOST=$API_HOST
@@ -19,14 +21,14 @@ ARG TWITCH_APP_CLIENT_ID
 ENV TWITCH_APP_CLIENT_ID=$TWITCH_APP_CLIENT_ID
 
 # Build the app
-RUN yarn clean && yarn build
+RUN pnpm clean && pnpm build
 
 FROM base as dev
 ENV NODE_ENV=development
-CMD ["yarn", "start"]
+CMD ["pnpm", "start"]
 
 FROM base as prod
 ENV NODE_ENV=production
 COPY --from=base /app/build ./build
-RUN yarn global add serve
+RUN npm install -g serve
 CMD ["serve", "-s", "./build"]

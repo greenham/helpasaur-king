@@ -1,28 +1,30 @@
 FROM helpa-base:latest as base
 
+# Install pnpm
+RUN npm install -g pnpm@8
+
 WORKDIR /app
 
 # Copy package files for dependency caching
-COPY package.json yarn.lock ./
+COPY runnerwatcher/package.json ./
+# Copy the shared library
+COPY lib/helpa-api-client /lib/helpa-api-client
 
-# Cache yarn dependencies
-RUN --mount=type=cache,target=/root/.yarn \
-    yarn config set network-timeout 600000 -g && \
-    yarn install --frozen-lockfile --network-timeout 100000
+# Install dependencies without workspace (standalone mode)
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --shamefully-hoist
 
 FROM base as dev
 ENV NODE_ENV=development
-RUN --mount=type=cache,target=/root/.yarn \
-    yarn config set network-timeout 600000 -g && \
-    yarn global add nodemon && \
-    yarn install --frozen-lockfile --network-timeout 100000
-CMD ["yarn", "start:dev"]
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    npm install -g nodemon && \
+    pnpm install --shamefully-hoist
+CMD ["pnpm", "start:dev"]
 
 FROM base as prod
 ENV NODE_ENV=production
 # Copy only production dependencies from base
-RUN --mount=type=cache,target=/root/.yarn \
-    yarn config set network-timeout 600000 -g && \
-    yarn install --production --frozen-lockfile --network-timeout 100000
-COPY src /app/src
-CMD ["yarn", "start"]
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --prod --shamefully-hoist
+COPY runnerwatcher/src /app/src
+CMD ["pnpm", "start"]

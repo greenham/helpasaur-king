@@ -1,0 +1,11 @@
+packages:
+  # All service directories
+  - 'api'
+  - 'discord'
+  - 'twitch'
+  - 'web'
+  - 'runnerwatcher'
+  - 'racebot'
+  - 'ws-relay'
+  # Shared library
+  - 'lib/helpa-api-client'
