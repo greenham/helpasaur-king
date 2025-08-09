@@ -5,10 +5,10 @@ on:
     types: [published]
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to build (e.g., 1.9.1 or latest)'
+      custom_tag:
+        description: "Optional custom tag to apply to all images (e.g., 1.9.1, test, beta)"
         required: false
-        default: 'latest'
+        default: "latest"
         type: string
 
 env:
@@ -42,7 +42,7 @@ jobs:
           if [ "${{ github.event_name }}" = "release" ]; then
             VERSION="${{ github.event.release.tag_name }}"
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
+            VERSION="${{ github.event.inputs.custom_tag }}"
           else
             VERSION="latest"
           fi
