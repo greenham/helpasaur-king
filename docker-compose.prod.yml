@@ -1,4 +1,29 @@
 services:
+  # Override image references to use ghcr.io
+  helpa-base:
+    image: ghcr.io/greenham/helpasaur-king/helpa-base:${VERSION:-latest}
+
+  api-server:
+    image: ghcr.io/greenham/helpasaur-king/helpa-api:${VERSION:-latest}
+
+  discord-bot:
+    image: ghcr.io/greenham/helpasaur-king/helpa-discord:${VERSION:-latest}
+
+  twitch-bot:
+    image: ghcr.io/greenham/helpasaur-king/helpa-twitch:${VERSION:-latest}
+
+  web:
+    image: ghcr.io/greenham/helpasaur-king/helpa-web:${VERSION:-latest}
+
+  runnerwatcher:
+    image: ghcr.io/greenham/helpasaur-king/helpa-runnerwatcher:${VERSION:-latest}
+
+  racebot:
+    image: ghcr.io/greenham/helpasaur-king/helpa-racebot:${VERSION:-latest}
+
+  ws-relay:
+    image: ghcr.io/greenham/helpasaur-king/helpa-ws-relay:${VERSION:-latest}
+
   mongo:
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.prod.js:/docker-entrypoint-initdb.d/db-init.prod.js:ro

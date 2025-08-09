@@ -1,18 +1,177 @@
-name: Deploy to DigitalOcean
+name: Deploy to Production
 
 on:
   release:
     types: [published]
 
 env:
-  # Define the list of services once for reuse throughout the workflow
-  SERVICES: "api discord twitch web runnerwatcher racebot ws-relay"
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/greenham/helpasaur-king
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
+      - name: Build and push helpa-base
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./lib/Dockerfile
+          target: builder
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-base:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-base:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push API
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./api/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-api:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Discord Bot
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./discord/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-discord:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-discord:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Twitch Bot
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./twitch/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-twitch:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-twitch:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Web
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./web/Dockerfile
+          target: prod
+          push: true
+          build-args: |
+            API_HOST=${{ secrets.API_HOST }}
+            TWITCH_APP_CLIENT_ID=${{ secrets.TWITCH_APP_CLIENT_ID }}
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-web:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Runner Watcher
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./runnerwatcher/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Racebot
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./racebot/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-racebot:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-racebot:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push WS Relay
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./ws-relay/Dockerfile
+          target: prod
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:${{ steps.version.outputs.VERSION }}
+            ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://helpasaur.com
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docker-compose.yml
+            docker-compose.prod.yml
+            nginx/
+            docker-entrypoint-initdb.d/
+
+      - name: Copy files to production server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          source: "docker-compose.yml,docker-compose.prod.yml,nginx/,docker-entrypoint-initdb.d/"
+          target: "/srv/helpa/"
+          overwrite: true
+          rm: false
+
       - name: Deploy to DigitalOcean
         uses: appleboy/ssh-action@master
         with:
@@ -21,28 +180,43 @@ jobs:
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
             cd /srv/helpa
-            git pull
+            
             # Extract version from release tag for image tagging
             export VERSION="${{ github.event.release.tag_name }}"
             export VERSION="${VERSION#v}"  # Remove 'v' prefix if present
             echo "Deploying version: $VERSION"
-            # Install pnpm if not available
-            npm install -g pnpm@8
-            # Build with version tag
-            pnpm -w build:base && BUILD_TARGET=prod VERSION=$VERSION pnpm -w build
-            # Start with version-tagged images
-            BUILD_TARGET=prod VERSION=$VERSION pnpm -w start:prod
+            
+            # Ensure .env file exists
+            if [ ! -f .env ]; then
+              echo "ERROR: .env file not found in /srv/helpa"
+              echo "Please ensure .env file with runtime variables is present on the server"
+              exit 1
+            fi
+            
+            # Pull the new images from ghcr.io
+            echo "Pulling images from GitHub Container Registry..."
+            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+            
+            # Start production services with version-tagged images
+            echo "Starting services..."
+            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
-            # Note: SERVICES env var is not available in SSH session, so we define it here
-            SERVICES="api discord twitch web runnerwatcher racebot ws-relay"
+            SERVICES="api discord twitch web runnerwatcher racebot ws-relay helpa-base"
             for SERVICE in $SERVICES; do
-              echo "Cleaning helpa-$SERVICE images..."
-              docker images "helpa-$SERVICE" --format "{{.Tag}}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | head -n -3 | while read TAG; do
-                echo "Removing helpa-$SERVICE:$TAG"
-                docker rmi "helpa-$SERVICE:$TAG" || true
+              if [ "$SERVICE" = "helpa-base" ]; then
+                IMAGE_NAME="ghcr.io/greenham/helpasaur-king/helpa-base"
+              else
+                IMAGE_NAME="ghcr.io/greenham/helpasaur-king/helpa-$SERVICE"
+              fi
+              echo "Cleaning $IMAGE_NAME images..."
+              docker images "$IMAGE_NAME" --format "{{.Tag}}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | head -n -3 | while read TAG; do
+                echo "Removing $IMAGE_NAME:$TAG"
+                docker rmi "$IMAGE_NAME:$TAG" || true
               done
             done
+            
             # Remove dangling images
             docker image prune -f
             echo "Docker cleanup complete"
@@ -56,57 +230,51 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: main
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-
-      - name: Configure Git
+      - name: Setup Git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
 
-      - name: Update version in package.json
+      - name: Update version in package.json files
         run: |
-          # Extract version from release tag (removes 'v' prefix if present)
           VERSION="${{ github.event.release.tag_name }}"
-          VERSION="${VERSION#v}"
+          VERSION="${VERSION#v}"  # Remove 'v' prefix if present
 
-          # Update root package.json
-          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          # Update version in root package.json
+          npm version $VERSION --no-git-tag-version --allow-same-version
 
-          # Update all service package.json files to keep versions in sync
-          for SERVICE_DIR in ${{ env.SERVICES }}; do
+          # Define services list locally since env vars don't persist across steps
+          SERVICES="api discord twitch web runnerwatcher racebot ws-relay"
+
+          # Update version in all service package.json files
+          for SERVICE_DIR in $SERVICES; do
             if [ -f "$SERVICE_DIR/package.json" ]; then
               echo "Updating version in $SERVICE_DIR/package.json"
               cd "$SERVICE_DIR"
-              npm version "$VERSION" --no-git-tag-version --allow-same-version
+              npm version $VERSION --no-git-tag-version --allow-same-version
               cd ..
             fi
           done
 
-          echo "Updated all package.json files to version $VERSION"
-
-      - name: Update CHANGELOG.md
+      - name: Generate Changelog Entry
         run: |
-          # Extract version and release notes
           VERSION="${{ github.event.release.tag_name }}"
-          VERSION="${VERSION#v}"
+          RELEASE_DATE=$(date +"%Y-%m-%d")
           RELEASE_NOTES="${{ github.event.release.body }}"
-          RELEASE_DATE=$(date +%Y-%m-%d)
 
-          # Process release notes to demote headers by one level (## -> ###, ### -> ####, etc.)
-          # This ensures GitHub's auto-generated "## What's Changed" becomes "### What's Changed"
-          PROCESSED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/^##/#&/g')
-
-          # Create temporary file with new changelog entry
-          echo "# Changelog" > CHANGELOG.tmp.md
+          # Create a temporary file with the new changelog entry
+          echo "# Helpasaur King Changelog" > CHANGELOG.tmp.md
           echo "" >> CHANGELOG.tmp.md
+
+          # Add the new version section
           echo "## $VERSION" >> CHANGELOG.tmp.md
-          echo "" >> CHANGELOG.tmp.md
+
+          # Process release notes to clean up GitHub's formatting
+          PROCESSED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/^### /#### /g' | sed 's/^## /### /g' | sed 's/^# /## /g')
+
           echo "_${RELEASE_DATE}_" >> CHANGELOG.tmp.md
           echo "" >> CHANGELOG.tmp.md
           echo "$PROCESSED_NOTES" >> CHANGELOG.tmp.md
