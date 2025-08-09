@@ -26,6 +26,18 @@ jobs:
             yarn build helpa-base && BUILD_TARGET=prod VERSION=$VERSION yarn build
             # Start with version-tagged images
             BUILD_TARGET=prod VERSION=$VERSION yarn start:prod
+            # Clean up old Docker images (keep last 3 versions of each service)
+            echo "Cleaning up old Docker images..."
+            for SERVICE in api discord twitch web runnerwatcher racebot ws-relay; do
+              echo "Cleaning helpa-$SERVICE images..."
+              docker images "helpa-$SERVICE" --format "{{.Tag}}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | head -n -3 | while read TAG; do
+                echo "Removing helpa-$SERVICE:$TAG"
+                docker rmi "helpa-$SERVICE:$TAG" || true
+              done
+            done
+            # Remove dangling images
+            docker image prune -f
+            echo "Docker cleanup complete"
             
   update-changelog-and-version:
     needs: deploy
