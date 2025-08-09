@@ -12,13 +12,13 @@ This project now uses GitHub Container Registry (ghcr.io) to store and distribut
 
 Make sure these secrets are set in your repository settings (Settings → Secrets and variables → Actions):
 
-### Existing Secrets (should already be set):
+### Deployment Secrets:
 - `DROPLET_IP` - Your DigitalOcean droplet IP address
 - `DROPLET_USER` - SSH user for deployment (usually `root` or a sudo user)
 - `DROPLET_SSH_KEY` - Private SSH key for accessing the droplet
-- `PERSONAL_ACCESS_TOKEN` - GitHub PAT for pushing changelog updates
+- `DEPLOY_PATH` - Path on the server where the application is deployed (e.g., `/srv/helpa`)
 
-### New Secrets Required:
+### Build Secrets:
 - `API_HOST` - The API host URL (e.g., `https://api.helpasaur.com`)
 - `TWITCH_APP_CLIENT_ID` - Your Twitch application client ID
 
@@ -48,7 +48,7 @@ https://github.com/greenham/helpasaur-king/packages
 
 ## Production Server Setup
 
-The production server at `/srv/helpa` only needs:
+The production server only needs (in the deployment path):
 - `docker-compose.yml` - Base Docker configuration
 - `docker-compose.prod.yml` - Production overrides with ghcr.io image references
 - `.env` - Runtime environment variables (NOT in git, managed separately)
@@ -65,8 +65,8 @@ If you need to manually deploy a specific version:
 # SSH into the production server
 ssh user@your-server
 
-# Navigate to the project directory
-cd /srv/helpa
+# Navigate to the project directory (using your DEPLOY_PATH)
+cd /path/to/deployment
 
 # Pull and start a specific version
 VERSION=1.9.1 docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
@@ -77,10 +77,10 @@ VERSION=1.9.1 docker compose -f docker-compose.yml -f docker-compose.prod.yml up
 
 For a new production server:
 
-1. Create the directory:
+1. Create the deployment directory:
    ```bash
-   mkdir -p /srv/helpa
-   cd /srv/helpa
+   mkdir -p /path/to/deployment
+   cd /path/to/deployment
    ```
 
 2. Copy the required files from the repository (or let the deployment do it)

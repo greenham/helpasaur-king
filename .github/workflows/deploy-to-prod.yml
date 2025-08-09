@@ -1,8 +1,13 @@
 name: Deploy to Production
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to deploy (e.g., 1.9.1 or latest)"
+        required: true
+        default: "latest"
+        type: string
 
 env:
   REGISTRY: ghcr.io
@@ -14,7 +19,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,7 +37,7 @@ jobs:
       - name: Extract version
         id: version
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${{ github.event.inputs.version }}"
           VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"
@@ -147,9 +152,6 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: https://helpasaur.com
 
     steps:
       - name: Checkout code
@@ -168,7 +170,7 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           source: "docker-compose.yml,docker-compose.prod.yml,nginx/,docker-entrypoint-initdb.d/"
-          target: "/srv/helpa/"
+          target: "${{ secrets.DEPLOY_PATH }}"
           overwrite: true
           rm: false
 
@@ -179,127 +181,40 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            cd /srv/helpa
-            
-            # Extract version from release tag for image tagging
-            export VERSION="${{ github.event.release.tag_name }}"
+            cd ${{ secrets.DEPLOY_PATH }}
+
+            # Use the version from workflow input
+            export VERSION="${{ github.event.inputs.version }}"
             export VERSION="${VERSION#v}"  # Remove 'v' prefix if present
             echo "Deploying version: $VERSION"
-            
+
             # Ensure .env file exists
             if [ ! -f .env ]; then
-              echo "ERROR: .env file not found in /srv/helpa"
+              echo "ERROR: .env file not found in ${{ secrets.DEPLOY_PATH }}"
               echo "Please ensure .env file with runtime variables is present on the server"
               exit 1
             fi
-            
+
             # Pull the new images from ghcr.io
             echo "Pulling images from GitHub Container Registry..."
             VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-            
+
             # Start production services with version-tagged images
             echo "Starting services..."
             VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-            
+
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
-            SERVICES="api discord twitch web runnerwatcher racebot ws-relay helpa-base"
+            SERVICES="api discord twitch web runnerwatcher racebot ws-relay base"
             for SERVICE in $SERVICES; do
-              if [ "$SERVICE" = "helpa-base" ]; then
-                IMAGE_NAME="ghcr.io/greenham/helpasaur-king/helpa-base"
-              else
-                IMAGE_NAME="ghcr.io/greenham/helpasaur-king/helpa-$SERVICE"
-              fi
+              IMAGE_NAME="ghcr.io/greenham/helpasaur-king/helpa-$SERVICE"
               echo "Cleaning $IMAGE_NAME images..."
               docker images "$IMAGE_NAME" --format "{{.Tag}}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | head -n -3 | while read TAG; do
                 echo "Removing $IMAGE_NAME:$TAG"
                 docker rmi "$IMAGE_NAME:$TAG" || true
               done
             done
-            
+
             # Remove dangling images
             docker image prune -f
             echo "Docker cleanup complete"
-
-  update-changelog-and-version:
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          fetch-depth: 0
-
-      - name: Setup Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Update version in package.json files
-        run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          VERSION="${VERSION#v}"  # Remove 'v' prefix if present
-
-          # Update version in root package.json
-          npm version $VERSION --no-git-tag-version --allow-same-version
-
-          # Define services list locally since env vars don't persist across steps
-          SERVICES="api discord twitch web runnerwatcher racebot ws-relay"
-
-          # Update version in all service package.json files
-          for SERVICE_DIR in $SERVICES; do
-            if [ -f "$SERVICE_DIR/package.json" ]; then
-              echo "Updating version in $SERVICE_DIR/package.json"
-              cd "$SERVICE_DIR"
-              npm version $VERSION --no-git-tag-version --allow-same-version
-              cd ..
-            fi
-          done
-
-      - name: Generate Changelog Entry
-        run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          RELEASE_DATE=$(date +"%Y-%m-%d")
-          RELEASE_NOTES="${{ github.event.release.body }}"
-
-          # Create a temporary file with the new changelog entry
-          echo "# Helpasaur King Changelog" > CHANGELOG.tmp.md
-          echo "" >> CHANGELOG.tmp.md
-
-          # Add the new version section
-          echo "## $VERSION" >> CHANGELOG.tmp.md
-
-          # Process release notes to clean up GitHub's formatting
-          PROCESSED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/^### /#### /g' | sed 's/^## /### /g' | sed 's/^# /## /g')
-
-          echo "_${RELEASE_DATE}_" >> CHANGELOG.tmp.md
-          echo "" >> CHANGELOG.tmp.md
-          echo "$PROCESSED_NOTES" >> CHANGELOG.tmp.md
-          echo "" >> CHANGELOG.tmp.md
-
-          # Append existing changelog content (skip the first two lines - title and empty line)
-          tail -n +3 CHANGELOG.md >> CHANGELOG.tmp.md
-
-          # Replace the original file
-          mv CHANGELOG.tmp.md CHANGELOG.md
-
-          echo "Updated CHANGELOG.md with version $VERSION"
-
-      - name: Commit and push changes
-        run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          VERSION="${VERSION#v}"
-
-          # Add all modified package.json files and the changelog
-          git add package.json CHANGELOG.md
-
-          # Add all service package.json files
-          for SERVICE_DIR in ${{ env.SERVICES }}; do
-            git add "$SERVICE_DIR/package.json" 2>/dev/null || true
-          done
-
-          git commit -m "chore: update version to $VERSION and changelog [skip ci]" || echo "No changes to commit"
-          git push origin main
