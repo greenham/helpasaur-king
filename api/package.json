@@ -24,10 +24,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
-  },
-  "overrides": {
-    "axios": {
-      "follow-redirects": "^1.15.4"
-    }
   }
 }

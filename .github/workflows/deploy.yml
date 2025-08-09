@@ -26,10 +26,12 @@ jobs:
             export VERSION="${{ github.event.release.tag_name }}"
             export VERSION="${VERSION#v}"  # Remove 'v' prefix if present
             echo "Deploying version: $VERSION"
+            # Install pnpm if not available
+            npm install -g pnpm@8
             # Build with version tag
-            yarn build helpa-base && BUILD_TARGET=prod VERSION=$VERSION yarn build
+            pnpm -w build helpa-base && BUILD_TARGET=prod VERSION=$VERSION pnpm -w build
             # Start with version-tagged images
-            BUILD_TARGET=prod VERSION=$VERSION yarn start:prod
+            BUILD_TARGET=prod VERSION=$VERSION pnpm -w start:prod
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
             # Note: SERVICES env var is not available in SSH session, so we define it here
