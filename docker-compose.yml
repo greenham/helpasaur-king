@@ -330,11 +330,11 @@ services:
       # This allows uptime-kuma to connect to the host machine on Linux
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "node", "extra/healthcheck"]
-      interval: 60s
-      timeout: 30s
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3001/', (res) => { process.exit(res.statusCode === 200 || res.statusCode === 302 ? 0 : 1); }).on('error', () => { process.exit(1); });\""]
+      interval: 30s
+      timeout: 10s
       retries: 3
-      start_period: 180s
+      start_period: 30s
 
 volumes:
   mongodb_data_container:
