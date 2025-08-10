@@ -21,9 +21,11 @@ jobs:
             docker-compose.yml
             docker-compose.ghcr.yml
             docker-compose.prod.yml
+            docker-compose.monitoring.yml
             nginx/
             mongo-backup
             renew-certs
+            scripts/monitoring.sh
 
       - name: Copy files to production server
         uses: appleboy/scp-action@master
@@ -31,7 +33,7 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,nginx/,mongo-backup,renew-certs"
+          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,docker-compose.monitoring.yml,nginx/,mongo-backup,renew-certs,scripts/monitoring.sh"
           target: "${{ secrets.DEPLOY_PATH }}"
           overwrite: true
           rm: false
@@ -64,6 +66,15 @@ jobs:
             # Start production services with version-tagged images
             echo "Starting services with --force-recreate to ensure new images are used..."
             VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d --force-recreate
+            
+            # Ensure monitoring stack is running (independent of app version)
+            echo "Checking monitoring stack..."
+            if ! docker compose -f docker-compose.monitoring.yml ps | grep -q "uptime-kuma.*Up"; then
+              echo "Starting monitoring stack..."
+              docker compose -f docker-compose.monitoring.yml up -d
+            else
+              echo "Monitoring stack is already running"
+            fi
 
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
