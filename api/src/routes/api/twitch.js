@@ -5,6 +5,7 @@ const Config = require("../../models/config");
 const User = require("../../models/user");
 const { getRequestedChannel } = require("../../lib/utils");
 const guard = require("express-jwt-permissions")();
+const { ALLOWED_COMMAND_PREFIXES } = require("../../constants");
 
 // GET /channels -> returns list of channels currently auto-joined by the bot (admin-only)
 router.get("/channels", guard.check("admin"), async (req, res) => {
@@ -177,10 +178,27 @@ router.patch("/config", async (req, res) => {
     "weeklyRaceAlertEnabled",
   ];
 
+
   const updates = {};
   for (const field of allowedFields) {
     if (req.body.hasOwnProperty(field)) {
-      updates[`twitchBotConfig.${field}`] = req.body[field];
+      const value = req.body[field];
+      
+      // Validate commandPrefix if provided
+      if (field === "commandPrefix") {
+        if (typeof value !== "string" || value.length !== 1) {
+          return res
+            .status(400)
+            .json({ result: "error", message: "Command prefix must be exactly one character" });
+        }
+        if (!ALLOWED_COMMAND_PREFIXES.includes(value)) {
+          return res
+            .status(400)
+            .json({ result: "error", message: `Invalid command prefix. Allowed: ${ALLOWED_COMMAND_PREFIXES.join(", ")}` });
+        }
+      }
+      
+      updates[`twitchBotConfig.${field}`] = value;
     }
   }
 

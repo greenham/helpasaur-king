@@ -22,6 +22,16 @@ $list-group-border-width: "1px";
   align-items: center;
   justify-content: center;
   
+  &.clickable {
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  // Hide any Bootstrap dropdown arrows
+  &::after {
+    display: none !important;
+  }
+  
   .prefix-char {
     display: inline-block;
     padding: 0.5rem 1rem;
@@ -38,13 +48,17 @@ $list-group-border-width: "1px";
     min-width: 3rem;
     text-align: center;
     transition: all 0.3s ease;
-    
-    &:hover {
-      box-shadow: 
-        0 0 30px rgba(13, 110, 253, 0.3),
-        inset 0 0 30px rgba(13, 110, 253, 0.15);
-      transform: scale(1.05);
-    }
+  }
+  
+  &.clickable:hover .prefix-char {
+    box-shadow: 
+      0 0 30px rgba(13, 110, 253, 0.3),
+      inset 0 0 30px rgba(13, 110, 253, 0.15);
+    transform: scale(1.05);
+  }
+  
+  &.clickable:active .prefix-char {
+    transform: scale(0.98);
   }
 }
 

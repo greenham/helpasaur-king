@@ -9,6 +9,7 @@ router.use(express.json());
 router.use("/commands", require("./commands"));
 router.use("/streams", require("./streams"));
 router.use("/web", require("./web"));
+router.use("/public", require("./public"));
 
 // Authorized Endpoints
 router.use("/me", requireJwtToken, require("./me"));

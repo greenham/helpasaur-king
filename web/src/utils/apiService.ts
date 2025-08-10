@@ -111,6 +111,16 @@ export const leaveTwitchChannel = async (twitchUsername?: string) => {
   return response.json();
 };
 
+export const getPublicConstants = async () => {
+  const response = await fetch(`${API_URL}/public/configs`);
+  try {
+    await handleApiResponse(response);
+  } catch (e) {
+    throw e;
+  }
+  return response.json();
+};
+
 export const updateTwitchBotConfig = async (config: Partial<{
   practiceListsEnabled: boolean;
   allowModsToManagePracticeLists: boolean;

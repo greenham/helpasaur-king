@@ -1,10 +1,11 @@
 import * as React from "react";
-import { Alert, Button, Container, Modal, Spinner, Form, ListGroup, InputGroup } from "react-bootstrap";
+import { Alert, Button, Container, Modal, Spinner, Form, ListGroup, Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { IUser } from "../types/users";
 import {
   getTwitchBotConfig,
+  getPublicConstants,
   joinTwitchChannel,
   leaveTwitchChannel,
   updateTwitchBotConfig,
@@ -115,8 +116,6 @@ const ConfigToggle: React.FC<ConfigToggleProps> = ({ id, checked, onChange, disa
   );
 };
 
-// Define allowed prefix characters (excluding / for Discord compatibility)
-const ALLOWED_PREFIX_CHARS = "!@#$%^&*()_-=+`~[]{}\\|;:'\",.<>?";
 
 const TwitchUserBotManagement: React.FunctionComponent<
   TwitchUserBotManagementProps
@@ -130,16 +129,15 @@ const TwitchUserBotManagement: React.FunctionComponent<
   const handleCloseLeaveModal = () => setShowLeaveModal(false);
   
   // State for command prefix editing
-  const [isEditingPrefix, setIsEditingPrefix] = useState(false);
-  const [prefixInput, setPrefixInput] = useState(twitchBotConfig?.commandPrefix || "!");
-  const [prefixError, setPrefixError] = useState("");
+  const [showPrefixDropdown, setShowPrefixDropdown] = useState(false);
 
-  // Update prefix input when config changes
-  useEffect(() => {
-    if (twitchBotConfig?.commandPrefix) {
-      setPrefixInput(twitchBotConfig.commandPrefix);
-    }
-  }, [twitchBotConfig?.commandPrefix]);
+  // Fetch public constants from API
+  const { data: publicConstants } = useQuery({
+    queryKey: ["publicConstants"],
+    queryFn: getPublicConstants,
+  });
+
+  const allowedPrefixes = publicConstants?.twitch?.commandPrefixes || [];
 
   const handleJoinRequest = async () => {
     const joinResult = await joinTwitchChannel();
@@ -195,46 +193,17 @@ const TwitchUserBotManagement: React.FunctionComponent<
     }
   };
 
-  const validatePrefix = (prefix: string): string => {
-    if (!prefix || prefix.length === 0) {
-      return "Prefix cannot be empty";
-    }
-    if (prefix.length > 1) {
-      return "Prefix must be exactly one character";
-    }
-    if (!ALLOWED_PREFIX_CHARS.includes(prefix)) {
-      return `Invalid character. Allowed: ${ALLOWED_PREFIX_CHARS}`;
-    }
-    return "";
-  };
-
-  const handlePrefixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPrefix = e.target.value;
-    setPrefixInput(newPrefix);
-    setPrefixError(validatePrefix(newPrefix));
-  };
-
-  const handlePrefixSave = async () => {
-    const error = validatePrefix(prefixInput);
-    if (error) {
-      setPrefixError(error);
-      return;
+  const handlePrefixChange = async (newPrefix: string) => {
+    if (newPrefix === twitchBotConfig.commandPrefix) {
+      return; // No change needed
     }
 
     try {
-      await updateConfigMutation.mutateAsync({ commandPrefix: prefixInput });
-      toast.success(`Command prefix changed to "${prefixInput}"`);
-      setIsEditingPrefix(false);
-      setPrefixError("");
+      await updateConfigMutation.mutateAsync({ commandPrefix: newPrefix });
+      toast.success(`Command prefix changed to "${newPrefix}"`);
     } catch (error: any) {
       toast.error(`Failed to update prefix: ${error?.message || 'Unknown error'}`);
     }
-  };
-
-  const handlePrefixCancel = () => {
-    setPrefixInput(twitchBotConfig.commandPrefix);
-    setPrefixError("");
-    setIsEditingPrefix(false);
   };
 
   return (
@@ -253,86 +222,8 @@ const TwitchUserBotManagement: React.FunctionComponent<
         </Button>
       </Alert>
 
-      <h3>Configuration</h3>
+      <h3><i className="fa-solid fa-sliders me-2"></i>Configuration</h3>
       <ListGroup className="mb-4">
-        <ListGroup.Item variant="primary">
-          <Container className="mt-2 py-4">
-            <h4 className="text-info-emphasis mb-3"># Command Prefix</h4>
-            <div className="d-flex justify-content-between align-items-start">
-              <div className="flex-grow-1">
-                <p className="mb-2 fs-5">
-                  Set the character that triggers bot commands in your channel.
-                </p>
-                <p className="text-muted mb-0">
-                  Must be exactly one character from the allowed set.
-                </p>
-              </div>
-              <div className="ms-3" style={{ minWidth: "250px" }}>
-                {!isEditingPrefix ? (
-                  <div className="d-flex align-items-center justify-content-end">
-                    <div className="prefix-display me-3">
-                      <span className="prefix-char">{twitchBotConfig.commandPrefix}</span>
-                    </div>
-                    <Button
-                      variant="outline-info"
-                      onClick={() => setIsEditingPrefix(true)}
-                      disabled={updateConfigMutation.isPending}
-                    >
-                      <i className="fa-solid fa-edit"></i> Change
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <InputGroup>
-                      <Form.Control
-                        type="text"
-                        value={prefixInput}
-                        onChange={handlePrefixChange}
-                        maxLength={1}
-                        isInvalid={!!prefixError}
-                        placeholder="!"
-                        style={{ 
-                          maxWidth: "80px", 
-                          textAlign: "center", 
-                          fontFamily: "monospace",
-                          fontSize: "1.5rem",
-                          fontWeight: "bold"
-                        }}
-                        disabled={updateConfigMutation.isPending}
-                        autoFocus
-                      />
-                      <Button
-                        variant="success"
-                        onClick={handlePrefixSave}
-                        disabled={!!prefixError || updateConfigMutation.isPending}
-                        size="lg"
-                      >
-                        <i className="fa-solid fa-check"></i> Save
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        onClick={handlePrefixCancel}
-                        disabled={updateConfigMutation.isPending}
-                        size="lg"
-                      >
-                        <i className="fa-solid fa-times"></i> Cancel
-                      </Button>
-                    </InputGroup>
-                    {prefixError && (
-                      <Form.Text className="text-danger d-block mt-1">
-                        {prefixError}
-                      </Form.Text>
-                    )}
-                    <Form.Text className="text-muted d-block mt-1">
-                      Allowed: {ALLOWED_PREFIX_CHARS}
-                    </Form.Text>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Container>
-        </ListGroup.Item>
-
         <ListGroup.Item variant="primary">
           <Container className="mt-2 py-4">
             <h4 className="text-info-emphasis mb-3"># Commands</h4>
@@ -360,6 +251,52 @@ const TwitchUserBotManagement: React.FunctionComponent<
                 />
               </div>
             </div>
+
+            {twitchBotConfig.commandsEnabled && (
+              <div className="mt-4 ps-4 border-start border-3 border-info">
+                <h5 className="text-info mb-2">&middot; Command Prefix</h5>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="flex-grow-1">
+                    <p className="mb-2 fs-6">
+                      Set the character that triggers bot commands.
+                    </p>
+                    <p className="text-muted mb-0">
+                      Click the current prefix to change it.
+                    </p>
+                  </div>
+                  <div className="ms-3 d-flex align-items-center" style={{ minWidth: "100px" }}>
+                    <Dropdown show={showPrefixDropdown} onToggle={setShowPrefixDropdown}>
+                      <Dropdown.Toggle
+                        as="div"
+                        className="prefix-display clickable"
+                        onClick={() => setShowPrefixDropdown(!showPrefixDropdown)}
+                      >
+                        <span className="prefix-char">{twitchBotConfig.commandPrefix}</span>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu align="end">
+                        {allowedPrefixes.map((prefix: string) => (
+                          <Dropdown.Item
+                            key={prefix}
+                            active={prefix === twitchBotConfig.commandPrefix}
+                            onClick={() => {
+                              handlePrefixChange(prefix);
+                              setShowPrefixDropdown(false);
+                            }}
+                            style={{
+                              fontFamily: "monospace",
+                              fontSize: "1.2rem",
+                              fontWeight: "bold"
+                            }}
+                          >
+                            {prefix}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                </div>
+              </div>
+            )}
           </Container>
         </ListGroup.Item>
 
