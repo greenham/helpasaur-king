@@ -66,8 +66,8 @@ jobs:
             VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml pull
 
             # Start production services with version-tagged images
-            echo "Starting services..."
-            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d
+            echo "Starting services with --force-recreate to ensure new images are used..."
+            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d --force-recreate
 
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
