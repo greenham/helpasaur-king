@@ -10,7 +10,10 @@
     "build": "DOCKER_BUILDKIT=1 docker compose build --force-rm",
     "logs": "docker compose logs -f --tail 1000",
     "boom": "pnpm stop && pnpm build && pnpm start --force-recreate && pnpm logs",
-    "version:bump": "bash scripts/bump-version.sh"
+    "version:bump": "bash scripts/bump-version.sh",
+    "monitoring:start": "docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.monitoring.yml up -d uptime-kuma",
+    "monitoring:stop": "docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.monitoring.yml stop uptime-kuma",
+    "start:with-monitoring": "pnpm start && pnpm monitoring:start"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
