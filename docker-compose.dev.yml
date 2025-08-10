@@ -17,9 +17,6 @@ services:
       - ./twitch/src:/app/src
       - ./lib/helpa-api-client:/lib/helpa-api-client
 
-  web:
-    volumes:
-      - ./web/src:/app/src
 
   runnerwatcher:
     volumes:

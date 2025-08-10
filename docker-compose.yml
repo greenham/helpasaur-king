@@ -179,6 +179,9 @@ services:
     networks:
       - int
       - ext
+    extra_hosts:
+      # This allows nginx to connect to the host machine on Linux
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 10s
