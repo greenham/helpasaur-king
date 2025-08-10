@@ -12,6 +12,8 @@ on:
 jobs:
   deploy-web:
     uses: ./.github/workflows/deploy-gh-pages.yml
+    with:
+      custom_domain: helpasaur.com
     secrets: inherit
 
   deploy:
