@@ -1,4 +1,8 @@
 services:
+  mongo:
+    volumes:
+      - ./docker-entrypoint-initdb.d/db-init.dev.js:/docker-entrypoint-initdb.d/db-init.dev.js:ro
+
   api-server:
     volumes:
       - ./api/src:/app/src

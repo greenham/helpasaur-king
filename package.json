@@ -11,9 +11,6 @@
     "start:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
     "start:dev:logs": "pnpm start:dev && pnpm logs",
     "boom:dev": "pnpm stop && pnpm build:base && pnpm build && pnpm start:dev --force-recreate && pnpm logs",
-    "pull:ghcr": "VERSION=${VERSION:-latest} docker compose -f docker-compose.yml -f docker-compose.ghcr.yml pull",
-    "start:ghcr": "VERSION=${VERSION:-latest} docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.dev.yml up -d",
-    "start:ghcr:logs": "pnpm start:ghcr && pnpm logs",
     "version:bump": "bash scripts/bump-version.sh"
   },
   "author": "https://github.com/greenham",
