@@ -15,109 +15,155 @@ cd "$PROJECT_ROOT"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+BOLD='\033[1m'
+DIM='\033[2m'
 NC='\033[0m' # No Color
 
 case "$1" in
     start)
-        echo -e "${GREEN}Starting monitoring stack...${NC}"
-        docker compose -f "$COMPOSE_FILE" up -d
-        echo -e "${GREEN}Monitoring stack started!${NC}"
-        echo "Access Uptime Kuma at: http://localhost:${UPTIME_KUMA_PORT:-3013}"
+        echo -e "\n${BOLD}${BLUE}🔍 Starting Monitoring Stack${NC}"
+        echo -e "${CYAN}└─ Uptime Kuma monitoring service${NC}\n"
+        
+        echo -e "${YELLOW}⚡ Starting services...${NC}"
+        if docker compose -f "$COMPOSE_FILE" up -d; then
+            echo -e "${GREEN}✅ Monitoring stack started successfully!${NC}"
+            echo -e "\n${CYAN}📊 Access Uptime Kuma at: ${BOLD}http://localhost:${UPTIME_KUMA_PORT:-3013}${NC}\n"
+        else
+            echo -e "${RED}❌ Failed to start monitoring stack${NC}"
+            exit 1
+        fi
         ;;
     
     stop)
-        echo -e "${YELLOW}Stopping monitoring stack...${NC}"
-        docker compose -f "$COMPOSE_FILE" down
-        echo -e "${GREEN}Monitoring stack stopped!${NC}"
+        echo -e "\n${BOLD}${YELLOW}⏹️  Stopping Monitoring Stack${NC}\n"
+        if docker compose -f "$COMPOSE_FILE" down; then
+            echo -e "${GREEN}✅ Monitoring stack stopped successfully!${NC}\n"
+        else
+            echo -e "${RED}❌ Failed to stop monitoring stack${NC}"
+            exit 1
+        fi
         ;;
     
     restart)
-        echo -e "${YELLOW}Restarting monitoring stack...${NC}"
-        docker compose -f "$COMPOSE_FILE" restart
-        echo -e "${GREEN}Monitoring stack restarted!${NC}"
+        echo -e "\n${BOLD}${YELLOW}🔄 Restarting Monitoring Stack${NC}\n"
+        if docker compose -f "$COMPOSE_FILE" restart; then
+            echo -e "${GREEN}✅ Monitoring stack restarted successfully!${NC}\n"
+        else
+            echo -e "${RED}❌ Failed to restart monitoring stack${NC}"
+            exit 1
+        fi
         ;;
     
     status)
-        echo -e "${GREEN}Monitoring stack status:${NC}"
+        echo -e "\n${BOLD}${BLUE}📊 Monitoring Stack Status${NC}"
+        echo -e "${DIM}────────────────────────────────────${NC}"
         docker compose -f "$COMPOSE_FILE" ps
+        echo -e "${DIM}────────────────────────────────────${NC}\n"
         ;;
     
     logs)
         shift
+        echo -e "\n${BOLD}${BLUE}📝 Monitoring Stack Logs${NC}\n"
         docker compose -f "$COMPOSE_FILE" logs "$@"
         ;;
     
     pull)
-        echo -e "${GREEN}Pulling latest monitoring images...${NC}"
-        docker compose -f "$COMPOSE_FILE" pull
-        echo -e "${GREEN}Images updated!${NC}"
+        echo -e "\n${BOLD}${BLUE}📦 Updating Monitoring Images${NC}\n"
+        echo -e "${YELLOW}⬇️  Pulling latest images...${NC}"
+        if docker compose -f "$COMPOSE_FILE" pull; then
+            echo -e "${GREEN}✅ Images updated successfully!${NC}\n"
+        else
+            echo -e "${RED}❌ Failed to update images${NC}"
+            exit 1
+        fi
         ;;
     
     backup)
-        echo -e "${GREEN}Backing up Uptime Kuma data...${NC}"
+        echo -e "\n${BOLD}${BLUE}💾 Backing Up Monitoring Data${NC}\n"
         BACKUP_DIR="${PROJECT_ROOT}/backups/monitoring"
         mkdir -p "$BACKUP_DIR"
         TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
         BACKUP_FILE="$BACKUP_DIR/uptime-kuma_${TIMESTAMP}.tar.gz"
         
+        echo -e "${YELLOW}📦 Creating backup...${NC}"
         # Create backup of the volume
-        docker run --rm -v uptime-kuma_data:/data -v "$BACKUP_DIR":/backup \
-            alpine tar czf "/backup/uptime-kuma_${TIMESTAMP}.tar.gz" -C /data .
-        
-        echo -e "${GREEN}Backup created: $BACKUP_FILE${NC}"
+        if docker run --rm -v uptime-kuma_data:/data -v "$BACKUP_DIR":/backup \
+            alpine tar czf "/backup/uptime-kuma_${TIMESTAMP}.tar.gz" -C /data .; then
+            echo -e "${GREEN}✅ Backup created: ${BOLD}$BACKUP_FILE${NC}"
+        else
+            echo -e "${RED}❌ Failed to create backup${NC}"
+            exit 1
+        fi
         
         # Keep only last 5 backups
+        echo -e "${YELLOW}🧹 Cleaning old backups...${NC}"
         ls -t "$BACKUP_DIR"/uptime-kuma_*.tar.gz | tail -n +6 | xargs -r rm
-        echo "Kept last 5 backups"
+        echo -e "${GREEN}✅ Kept last 5 backups${NC}\n"
         ;;
     
     restore)
         if [ -z "$2" ]; then
-            echo -e "${RED}Please provide backup file path${NC}"
-            echo "Usage: $0 restore <backup-file>"
+            echo -e "\n${RED}❌ Please provide backup file path${NC}"
+            echo -e "${CYAN}Usage: $0 restore <backup-file>${NC}\n"
             exit 1
         fi
         
-        if [ ! -f "$2" ]; then
-            echo -e "${RED}Backup file not found: $2${NC}"
+        BACKUP_FILE="$2"
+        if [ ! -f "$BACKUP_FILE" ]; then
+            echo -e "\n${RED}❌ Backup file not found: $BACKUP_FILE${NC}\n"
             exit 1
         fi
         
-        echo -e "${YELLOW}WARNING: This will replace current monitoring data!${NC}"
-        read -p "Continue? (y/N) " -n 1 -r
+        echo -e "\n${BOLD}${BLUE}📥 Restore Monitoring Data${NC}"
+        echo -e "${CYAN}├─ Source: ${BOLD}$BACKUP_FILE${NC}"
+        echo -e "${CYAN}└─ Target: Uptime Kuma volume${NC}\n"
+        
+        echo -e "${RED}⚠️  WARNING: This will overwrite current monitoring data!${NC}"
+        read -p "$(echo -e ${YELLOW}Continue? [y/N]: ${NC})" -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            echo "Restore cancelled"
+            echo -e "${YELLOW}✗ Restore cancelled${NC}\n"
             exit 0
         fi
         
-        echo -e "${GREEN}Restoring from backup...${NC}"
-        
         # Stop monitoring stack
+        echo -e "\n${YELLOW}⏹️  Stopping monitoring stack...${NC}"
         docker compose -f "$COMPOSE_FILE" down
         
-        # Restore the volume
-        docker run --rm -v uptime-kuma_data:/data -v "$(dirname "$2")":/backup \
-            alpine sh -c "rm -rf /data/* && tar xzf /backup/$(basename "$2") -C /data"
+        # Restore the backup
+        echo -e "${YELLOW}📥 Restoring backup...${NC}"
+        if docker run --rm -v uptime-kuma_data:/data -v "$(dirname "$BACKUP_FILE")":/backup \
+            alpine sh -c "rm -rf /data/* && tar xzf /backup/$(basename "$BACKUP_FILE") -C /data"; then
+            echo -e "${GREEN}✅ Data restored successfully${NC}"
+        else
+            echo -e "${RED}❌ Failed to restore backup${NC}"
+            exit 1
+        fi
         
         # Start monitoring stack
+        echo -e "${YELLOW}⚡ Starting monitoring stack...${NC}"
         docker compose -f "$COMPOSE_FILE" up -d
         
-        echo -e "${GREEN}Restore completed!${NC}"
+        echo -e "\n${GREEN}${BOLD}✅ Restore complete!${NC}\n"
         ;;
     
     *)
-        echo "Usage: $0 {start|stop|restart|status|logs|pull|backup|restore}"
-        echo ""
-        echo "Commands:"
-        echo "  start    - Start the monitoring stack"
-        echo "  stop     - Stop the monitoring stack"
-        echo "  restart  - Restart the monitoring stack"
-        echo "  status   - Show monitoring stack status"
-        echo "  logs     - View monitoring stack logs"
-        echo "  pull     - Pull latest images"
-        echo "  backup   - Backup Uptime Kuma data"
-        echo "  restore  - Restore Uptime Kuma data from backup"
+        echo -e "\n${BOLD}${BLUE}🔍 Monitoring Stack Manager${NC}"
+        echo -e "${DIM}────────────────────────────────────${NC}"
+        echo -e "${CYAN}Usage: ${BOLD}$0 {command} [options]${NC}\n"
+        echo -e "${BOLD}Commands:${NC}"
+        echo -e "  ${GREEN}start${NC}    - Start the monitoring stack"
+        echo -e "  ${YELLOW}stop${NC}     - Stop the monitoring stack"
+        echo -e "  ${YELLOW}restart${NC}  - Restart the monitoring stack"
+        echo -e "  ${BLUE}status${NC}   - Show monitoring stack status"
+        echo -e "  ${BLUE}logs${NC}     - View monitoring logs"
+        echo -e "  ${CYAN}pull${NC}     - Pull latest monitoring images"
+        echo -e "  ${MAGENTA}backup${NC}   - Create backup of monitoring data"
+        echo -e "  ${MAGENTA}restore${NC}  - Restore monitoring data from backup"
+        echo -e "\n${DIM}Example: $0 start${NC}\n"
         exit 1
         ;;
 esac
