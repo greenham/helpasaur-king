@@ -21,27 +21,3 @@ services:
   ws-relay:
     networks:
       - int
-  
-  # Monitoring dashboard
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
-    restart: unless-stopped
-    ports:
-      - 3013:3001  # Internal port 3001, exposed on 3013 to avoid conflicts
-    volumes:
-      - uptime-kuma_data:/app/data
-    networks:
-      - ext
-      - int
-    environment:
-      - NODE_ENV=production
-    healthcheck:
-      test: ["CMD", "node", "extra/healthcheck"]
-      interval: 60s
-      timeout: 30s
-      retries: 3
-      start_period: 180s
-
-volumes:
-  uptime-kuma_data:

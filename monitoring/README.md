@@ -2,71 +2,29 @@
 
 This directory contains configuration and scripts for setting up Uptime Kuma monitoring.
 
-## Quick Setup Methods
+## Setup Method
 
-### Method 1: Database Import (Easiest)
+### Database Import
 
-1. Start Uptime Kuma and create your admin account
-2. Go to **Settings** → **Backup** → **Import**
-3. Upload the `uptime-kuma-backup.json` file
-4. All monitors, tags, and settings will be imported
-
-### Method 2: API Script (Automated)
-
-1. Install dependencies:
-   ```bash
-   cd monitoring
-   npm install axios socket.io-client
-   ```
-
-2. Run the setup script:
-   ```bash
-   # For local development
-   node setup-monitors.js http://localhost:3013 admin yourpassword
-   
-   # For production
-   node setup-monitors.js https://status.helpasaur.com admin yourpassword
-   ```
-
-### Method 3: Manual Configuration
-
-Use the `monitors-config.json` as a reference to manually create monitors in the UI.
+1. Start Uptime Kuma: `pnpm start` (includes uptime-kuma service)
+2. Access dashboard at http://localhost:3013
+3. Create your admin account when prompted
+4. Go to **Settings** → **Backup** → **Import**
+5. Upload the `docker-services.json` file (contains all backend services)
+6. Import the environment-specific web app monitor:
+   - **Development**: Import `web-app-dev.json` (monitors localhost:3000)
+   - **Production**: Import `web-app-prod.json` (monitors helpasaur.com)
 
 ## Files
 
-- `monitors-config.json` - Monitor definitions for all services
-- `setup-monitors.js` - Automated setup script using the API
-- `uptime-kuma-backup.json` - Full database export (created after initial setup)
-
-## Creating a Backup
-
-After setting up your monitors, create a backup for easy restoration:
-
-1. Go to **Settings** → **Backup** → **Export**
-2. Select "Export Backup" 
-3. Save as `uptime-kuma-backup.json` in this directory
-4. Commit to repository (passwords are hashed)
-
-## Customizing Monitors
-
-Edit `monitors-config.json` to add/modify monitors. Each monitor supports:
-
-```json
-{
-  "name": "Service Name",
-  "type": "http|port|ping|keyword",
-  "url": "http://service:port/health",
-  "interval": 60,
-  "retryInterval": 60,
-  "maxretries": 3,
-  "accepted_statuscodes": ["200"],
-  "tags": ["internal", "api"]
-}
-```
+- `docker-services.json` - Monitor definitions for all backend services (same across environments)
+- `web-app-dev.json` - Web app monitor for local development (http://host.docker.internal:3000 - accesses host machine from container)
+- `web-app-prod.json` - Web app monitor for production (https://helpasaur.com)
 
 ## Tags
 
 Tags help organize monitors. Default tags:
+
 - `internal` - Docker network services
 - `external` - Public endpoints
 - `api` - API services
@@ -75,38 +33,32 @@ Tags help organize monitors. Default tags:
 - `frontend` - Web interfaces
 - `infrastructure` - Core services
 
-## Notifications
-
-Add your Discord webhook URL to `monitors-config.json`:
-
-```json
-"notifications": [
-  {
-    "name": "Discord Alerts",
-    "type": "discord",
-    "discordWebhookUrl": "https://discord.com/api/webhooks/..."
-  }
-]
-```
-
 ## Docker Network Access
 
 For local monitoring, services must be on the same Docker network. The compose files handle this automatically.
 
 ## Testing
 
-1. Start monitoring locally:
+1. Start services with monitoring:
+
    ```bash
-   pnpm monitoring:start
+   pnpm start
    ```
 
-2. Access at http://localhost:3013
+2. Access Uptime Kuma at http://localhost:3013
 
 3. Import configuration using one of the methods above
 
 4. Test by stopping a service:
+
    ```bash
    docker stop helpa-api-server-1
    ```
 
 5. Verify alerts are triggered
+
+## Production Notes
+
+- Uptime Kuma is accessible at https://status.helpasaur.com (configured in nginx)
+- Data persists in the `uptime-kuma_data` Docker volume
+- The service runs on internal port 3001, exposed on port 3013 (configurable via `UPTIME_KUMA_PORT`)
