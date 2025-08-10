@@ -10,12 +10,6 @@ on:
         type: string
 
 jobs:
-  deploy-web:
-    uses: ./.github/workflows/deploy-gh-pages.yml
-    with:
-      custom_domain: helpasaur.com
-    secrets: inherit
-
   deploy:
     runs-on: ubuntu-latest
 
@@ -86,3 +80,10 @@ jobs:
             # Remove dangling images
             docker image prune -f
             echo "Docker cleanup complete"
+
+  deploy-web:
+    needs: deploy  # Wait for backend deployment to complete successfully
+    uses: ./.github/workflows/deploy-gh-pages.yml
+    with:
+      custom_domain: helpasaur.com
+    secrets: inherit
