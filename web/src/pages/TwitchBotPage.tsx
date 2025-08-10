@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Alert, Button, Container, Modal, Spinner, Form, Card, Row, Col } from "react-bootstrap";
+import { Alert, Button, Container, Modal, Spinner, Form, ListGroup } from "react-bootstrap";
 import { useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { IUser } from "../types/users";
@@ -87,6 +87,34 @@ interface TwitchUserBotManagementProps {
   user: IUser;
   twitchBotConfig: TwitchBotConfig;
 }
+// Custom toggle component for better UX
+interface ConfigToggleProps {
+  id: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  label?: string;
+}
+
+const ConfigToggle: React.FC<ConfigToggleProps> = ({ id, checked, onChange, disabled, label }) => {
+  return (
+    <div className="config-toggle clickable-area" onClick={() => !disabled && onChange(!checked)}>
+      <Form.Check
+        type="switch"
+        id={id}
+        checked={checked}
+        onChange={(e) => e.stopPropagation()} // Prevent double toggle
+        disabled={disabled}
+        label={
+          <span className={checked ? "enabled" : "disabled"}>
+            {label || (checked ? "Enabled" : "Disabled")}
+          </span>
+        }
+      />
+    </div>
+  );
+};
+
 const TwitchUserBotManagement: React.FunctionComponent<
   TwitchUserBotManagementProps
 > = (props) => {
@@ -168,118 +196,99 @@ const TwitchUserBotManagement: React.FunctionComponent<
         </Button>
       </Alert>
 
-      <Card className="mb-4">
-        <Card.Header>
-          <h4><i className="fa-solid fa-cog"></i> Bot Configuration</h4>
-        </Card.Header>
-        <Card.Body>
-          <Row className="mb-3">
-            <Col md={8}>
-              <h5>Practice Lists</h5>
-              <p className="text-muted">
-                Enable practice lists to track and randomize practice items in your channel.
-                Commands: !pracadd, !pracrand, !praclist, !pracdel, !pracclear
-              </p>
-            </Col>
-            <Col md={4} className="d-flex align-items-center justify-content-end">
-              <Form.Check
-                type="switch"
-                id="practice-lists-switch"
-                label={twitchBotConfig.practiceListsEnabled ? "Enabled" : "Disabled"}
-                checked={twitchBotConfig.practiceListsEnabled}
-                onChange={(e) => 
-                  handleToggle(
-                    "practiceListsEnabled", 
-                    e.target.checked,
-                    e.target.checked ? "Practice lists enabled!" : "Practice lists disabled!"
-                  )
-                }
-                disabled={updateConfigMutation.isPending}
-              />
-            </Col>
-          </Row>
-
-          {twitchBotConfig.practiceListsEnabled && (
-            <Row className="mb-3 ms-3">
-              <Col md={8}>
-                <h6>Allow Mods to Manage Practice Lists</h6>
-                <p className="text-muted">
-                  When enabled, moderators can add, remove, and manage practice list entries.
-                  When disabled, only you can manage the practice lists.
+      <h3>Configuration</h3>
+      <ListGroup className="mb-4">
+        <ListGroup.Item variant="primary">
+          <Container className="mt-2 py-4">
+            <h4 className="text-info-emphasis"># Commands</h4>
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="flex-grow-1">
+                <p className="mb-2">
+                  Enable or disable all bot commands in your channel.
                 </p>
-              </Col>
-              <Col md={4} className="d-flex align-items-center justify-content-end">
-                <Form.Check
-                  type="switch"
-                  id="mod-access-switch"
-                  label={twitchBotConfig.allowModsToManagePracticeLists ? "Enabled" : "Disabled"}
-                  checked={twitchBotConfig.allowModsToManagePracticeLists}
-                  onChange={(e) => 
+                <p className="text-muted small mb-0">
+                  When enabled, the bot will respond to commands like <code>{twitchBotConfig.commandPrefix}helpa</code>, <code>{twitchBotConfig.commandPrefix}nmg</code>, etc.
+                </p>
+              </div>
+              <div className="ms-3">
+                <ConfigToggle
+                  id="commands-switch"
+                  checked={twitchBotConfig.commandsEnabled}
+                  onChange={(checked) => 
                     handleToggle(
-                      "allowModsToManagePracticeLists", 
-                      e.target.checked,
-                      e.target.checked ? "Mods can now manage practice lists!" : "Only you can manage practice lists now!"
+                      "commandsEnabled", 
+                      checked,
+                      checked ? "Bot commands enabled!" : "Bot commands disabled!"
                     )
                   }
                   disabled={updateConfigMutation.isPending}
                 />
-              </Col>
-            </Row>
-          )}
+              </div>
+            </div>
+          </Container>
+        </ListGroup.Item>
 
-          <hr />
+        <ListGroup.Item variant="primary">
+          <Container className="mt-2 py-4">
+            <h4 className="text-info-emphasis"># Practice Lists</h4>
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="flex-grow-1">
+                <p className="mb-2">
+                  Enable practice lists to track and randomize practice items in your channel.
+                </p>
+                <p className="text-muted small">
+                  Commands: <code>{twitchBotConfig.commandPrefix}pracadd</code>, <code>{twitchBotConfig.commandPrefix}pracrand</code>, <code>{twitchBotConfig.commandPrefix}praclist</code>, <code>{twitchBotConfig.commandPrefix}pracdel</code>, <code>{twitchBotConfig.commandPrefix}pracclear</code>
+                </p>
+              </div>
+              <div className="ms-3">
+                <ConfigToggle
+                  id="practice-lists-switch"
+                  checked={twitchBotConfig.practiceListsEnabled}
+                  onChange={(checked) => 
+                    handleToggle(
+                      "practiceListsEnabled", 
+                      checked,
+                      checked ? "Practice lists enabled!" : "Practice lists disabled!"
+                    )
+                  }
+                  disabled={updateConfigMutation.isPending}
+                />
+              </div>
+            </div>
 
-          <Row className="mb-3">
-            <Col md={8}>
-              <h5>Commands</h5>
-              <p className="text-muted">
-                Enable or disable all bot commands in your channel.
-              </p>
-            </Col>
-            <Col md={4} className="d-flex align-items-center justify-content-end">
-              <Form.Check
-                type="switch"
-                id="commands-switch"
-                label={twitchBotConfig.commandsEnabled ? "Enabled" : "Disabled"}
-                checked={twitchBotConfig.commandsEnabled}
-                onChange={(e) => 
-                  handleToggle(
-                    "commandsEnabled", 
-                    e.target.checked,
-                    e.target.checked ? "Bot commands enabled!" : "Bot commands disabled!"
-                  )
-                }
-                disabled={updateConfigMutation.isPending}
-              />
-            </Col>
-          </Row>
-
-          <Row className="mb-3">
-            <Col md={8}>
-              <h5>Weekly Race Alerts</h5>
-              <p className="text-muted">
-                Get notified in chat when the weekly ALttP race is about to start.
-              </p>
-            </Col>
-            <Col md={4} className="d-flex align-items-center justify-content-end">
-              <Form.Check
-                type="switch"
-                id="race-alerts-switch"
-                label={twitchBotConfig.weeklyRaceAlertEnabled ? "Enabled" : "Disabled"}
-                checked={twitchBotConfig.weeklyRaceAlertEnabled}
-                onChange={(e) => 
-                  handleToggle(
-                    "weeklyRaceAlertEnabled", 
-                    e.target.checked,
-                    e.target.checked ? "Weekly race alerts enabled!" : "Weekly race alerts disabled!"
-                  )
-                }
-                disabled={updateConfigMutation.isPending}
-              />
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+            {twitchBotConfig.practiceListsEnabled && (
+              <div className="mt-4 ps-4 border-start border-3 border-info">
+                <h5 className="text-info">&middot; Moderator Access</h5>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="flex-grow-1">
+                    <p className="mb-2">
+                      Allow moderators to manage practice lists.
+                    </p>
+                    <p className="text-muted small mb-0">
+                      When enabled, moderators can add, remove, and manage practice list entries.
+                      When disabled, only you can manage the practice lists.
+                    </p>
+                  </div>
+                  <div className="ms-3">
+                    <ConfigToggle
+                      id="mod-access-switch"
+                      checked={twitchBotConfig.allowModsToManagePracticeLists}
+                      onChange={(checked) => 
+                        handleToggle(
+                          "allowModsToManagePracticeLists", 
+                          checked,
+                          checked ? "Mods can now manage practice lists!" : "Only you can manage practice lists now!"
+                        )
+                      }
+                      disabled={updateConfigMutation.isPending}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </Container>
+        </ListGroup.Item>
+      </ListGroup>
 
       <ConfirmLeaveModal
         show={showLeaveModal}
