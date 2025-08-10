@@ -257,23 +257,24 @@ const TwitchUserBotManagement: React.FunctionComponent<
       <ListGroup className="mb-4">
         <ListGroup.Item variant="primary">
           <Container className="mt-2 py-4">
-            <h4 className="text-info-emphasis"># Command Prefix</h4>
+            <h4 className="text-info-emphasis mb-3"># Command Prefix</h4>
             <div className="d-flex justify-content-between align-items-start">
               <div className="flex-grow-1">
-                <p className="mb-2">
+                <p className="mb-2 fs-5">
                   Set the character that triggers bot commands in your channel.
                 </p>
-                <p className="text-muted small mb-0">
-                  Must be exactly one character. Current prefix: <code>{twitchBotConfig.commandPrefix}</code>
+                <p className="text-muted mb-0">
+                  Must be exactly one character from the allowed set.
                 </p>
               </div>
-              <div className="ms-3" style={{ minWidth: "200px" }}>
+              <div className="ms-3" style={{ minWidth: "250px" }}>
                 {!isEditingPrefix ? (
-                  <div className="d-flex align-items-center">
-                    <code className="fs-4 me-3">{twitchBotConfig.commandPrefix}</code>
+                  <div className="d-flex align-items-center justify-content-end">
+                    <div className="prefix-display me-3">
+                      <span className="prefix-char">{twitchBotConfig.commandPrefix}</span>
+                    </div>
                     <Button
                       variant="outline-info"
-                      size="sm"
                       onClick={() => setIsEditingPrefix(true)}
                       disabled={updateConfigMutation.isPending}
                     >
@@ -282,7 +283,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
                   </div>
                 ) : (
                   <div>
-                    <InputGroup size="sm">
+                    <InputGroup>
                       <Form.Control
                         type="text"
                         value={prefixInput}
@@ -290,22 +291,31 @@ const TwitchUserBotManagement: React.FunctionComponent<
                         maxLength={1}
                         isInvalid={!!prefixError}
                         placeholder="!"
-                        style={{ maxWidth: "60px", textAlign: "center", fontFamily: "monospace" }}
+                        style={{ 
+                          maxWidth: "80px", 
+                          textAlign: "center", 
+                          fontFamily: "monospace",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold"
+                        }}
                         disabled={updateConfigMutation.isPending}
+                        autoFocus
                       />
                       <Button
                         variant="success"
                         onClick={handlePrefixSave}
                         disabled={!!prefixError || updateConfigMutation.isPending}
+                        size="lg"
                       >
-                        <i className="fa-solid fa-check"></i>
+                        <i className="fa-solid fa-check"></i> Save
                       </Button>
                       <Button
                         variant="secondary"
                         onClick={handlePrefixCancel}
                         disabled={updateConfigMutation.isPending}
+                        size="lg"
                       >
-                        <i className="fa-solid fa-times"></i>
+                        <i className="fa-solid fa-times"></i> Cancel
                       </Button>
                     </InputGroup>
                     {prefixError && (
@@ -325,13 +335,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
 
         <ListGroup.Item variant="primary">
           <Container className="mt-2 py-4">
-            <h4 className="text-info-emphasis"># Commands</h4>
+            <h4 className="text-info-emphasis mb-3"># Commands</h4>
             <div className="d-flex justify-content-between align-items-center">
               <div className="flex-grow-1">
-                <p className="mb-2">
+                <p className="mb-2 fs-5">
                   Enable or disable all bot commands in your channel.
                 </p>
-                <p className="text-muted small mb-0">
+                <p className="text-muted mb-0">
                   When enabled, the bot will respond to commands like <code>{twitchBotConfig.commandPrefix}helpa</code>, <code>{twitchBotConfig.commandPrefix}nmg</code>, etc.
                 </p>
               </div>
@@ -355,13 +365,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
 
         <ListGroup.Item variant="primary">
           <Container className="mt-2 py-4">
-            <h4 className="text-info-emphasis"># Practice Lists</h4>
+            <h4 className="text-info-emphasis mb-3"># Practice Lists</h4>
             <div className="d-flex justify-content-between align-items-center">
               <div className="flex-grow-1">
-                <p className="mb-2">
+                <p className="mb-2 fs-5">
                   Enable practice lists to track and randomize practice items in your channel.
                 </p>
-                <p className="text-muted small">
+                <p className="text-muted">
                   Commands: <code>{twitchBotConfig.commandPrefix}pracadd</code>, <code>{twitchBotConfig.commandPrefix}pracrand</code>, <code>{twitchBotConfig.commandPrefix}praclist</code>, <code>{twitchBotConfig.commandPrefix}pracdel</code>, <code>{twitchBotConfig.commandPrefix}pracclear</code>
                 </p>
               </div>
@@ -383,13 +393,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
 
             {twitchBotConfig.practiceListsEnabled && (
               <div className="mt-4 ps-4 border-start border-3 border-info">
-                <h5 className="text-info">&middot; Moderator Access</h5>
+                <h5 className="text-info mb-2">&middot; Moderator Access</h5>
                 <div className="d-flex justify-content-between align-items-center">
                   <div className="flex-grow-1">
-                    <p className="mb-2">
+                    <p className="mb-2 fs-6">
                       Allow moderators to manage practice lists.
                     </p>
-                    <p className="text-muted small mb-0">
+                    <p className="text-muted mb-0">
                       When enabled, moderators can add, remove, and manage practice list entries.
                       When disabled, only you can manage the practice lists.
                     </p>

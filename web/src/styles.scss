@@ -16,6 +16,38 @@ $list-group-border-width: "1px";
 //   z-index: 9999 !important;
 // }
 
+// Custom prefix display styles
+.prefix-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  .prefix-char {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.2) 100%);
+    border: 2px solid rgba(13, 110, 253, 0.5);
+    border-radius: 0.5rem;
+    box-shadow: 
+      0 0 20px rgba(13, 110, 253, 0.2),
+      inset 0 0 20px rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    min-width: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 
+        0 0 30px rgba(13, 110, 253, 0.3),
+        inset 0 0 30px rgba(13, 110, 253, 0.15);
+      transform: scale(1.05);
+    }
+  }
+}
+
 // Custom toggle switch styles for better UX
 .config-toggle {
   .form-check {
