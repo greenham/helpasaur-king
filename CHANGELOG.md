@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.9.3
+
+_2025-08-10_
+
+### What's Changed
+
+#### Monitoring & Observability
+
+- feat: Implement comprehensive monitoring with Uptime Kuma by @greenham in https://github.com/greenham/helpasaur-king/pull/90
+  - Added Uptime Kuma service for monitoring all Helpasaur services
+  - Created modular monitoring configurations for different environments
+  - Implemented SSL certificate expiry monitoring for production domains
+  - Configured nginx reverse proxy for status.helpasaur.com subdomain
+  - Added comprehensive tag system for service organization (Critical, Important, Standard)
+  - Monitors 9 services via health endpoints with appropriate check intervals
+
+#### Infrastructure Improvements
+
+- feat: Add log rotation to all Docker services for better disk management by @greenham
+- fix: Force container recreation during production deployment for reliability by @greenham
+- fix: Update nginx healthcheck after web service migration by @greenham
+- chore: Consolidate Uptime Kuma into main docker-compose.yml for simpler deployment by @greenham
+- chore: Remove redundant nginx configuration files by @greenham
+
+#### Web Application
+
+- fix: Pass custom_domain to GitHub Pages deployment workflow by @greenham
+- fix: Remove web service from docker-compose.ghcr.yml after migration by @greenham
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.9.2...1.9.3
+
 ## 1.9.2
 
 _2025-08-09_
