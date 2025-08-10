@@ -197,7 +197,6 @@ services:
     networks:
       - int
       - ext
-      - helpasaur_monitoring
     extra_hosts:
       # This allows nginx to connect to the host machine on Linux
       - "host.docker.internal:host-gateway"
@@ -319,6 +318,3 @@ networks:
   int:
     driver: bridge
     internal: true
-  helpasaur_monitoring:
-    external: true
-    name: helpasaur_monitoring

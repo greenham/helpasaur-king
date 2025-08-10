@@ -1,4 +1,5 @@
 version: "3.9"
+name: "helpa-monitoring"
 
 services:
   uptime-kuma:
@@ -15,7 +16,7 @@ services:
     volumes:
       - uptime-kuma_data:/app/data
     networks:
-      - monitoring
+      - ext
     extra_hosts:
       # This allows uptime-kuma to connect to the host machine on Linux
       - "host.docker.internal:host-gateway"
@@ -31,6 +32,5 @@ volumes:
     name: uptime-kuma_data
 
 networks:
-  monitoring:
-    name: helpasaur_monitoring
+  ext:
     driver: bridge

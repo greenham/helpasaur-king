@@ -7,7 +7,7 @@ Helpasaur uses Uptime Kuma as a separate monitoring stack to ensure continuous m
 The monitoring stack runs independently from the main application stack:
 
 - **Separate Docker Compose**: `docker-compose.monitoring.yml`
-- **Dedicated Network**: `helpasaur_monitoring` network
+- **Dedicated Network**: `helpa-monitoring_ext` network
 - **Independent Lifecycle**: Can be started, stopped, and updated separately
 - **Data Persistence**: `uptime-kuma_data` Docker volume
 
@@ -24,7 +24,7 @@ The monitoring stack runs independently from the main application stack:
 
 ```bash
 # Using pnpm scripts
-pnpm monitoring:start
+pnpm monitor:start
 
 # Or directly with the script
 ./scripts/monitoring.sh start
@@ -37,8 +37,9 @@ Access Uptime Kuma at: http://localhost:3013
 1. Access dashboard at http://localhost:3013
 2. Create your admin account when prompted
 3. Go to **Settings** → **Backup** → **Import**
-4. Upload the configuration files from this directory:
-   - `docker-services.json` - All backend service monitors
+4. Choose the appropriate configuration file for your monitoring needs:
+   - `docker-services-internal.json` - Backend services via host.docker.internal (for local development)
+   - `docker-services-external.json` - Production services via external URLs
    - **Development**: `web-app-dev.json` (monitors localhost:3000)
    - **Production**: `web-app-prod.json` (monitors helpasaur.com)
    - **Production SSL**: `ssl-monitoring-prod.json` (certificate expiry)
@@ -49,19 +50,19 @@ Access Uptime Kuma at: http://localhost:3013
 
 ```bash
 # Stop monitoring
-pnpm monitoring:stop
+pnpm monitor:stop
 
 # Restart monitoring
-pnpm monitoring:restart
+pnpm monitor:restart
 
 # Check status
-pnpm monitoring:status
+pnpm monitor:status
 
 # View logs
-pnpm monitoring:logs
+pnpm monitor:logs
 
 # Backup data
-pnpm monitoring:backup
+pnpm monitor:backup
 
 # Restore from backup
 ./scripts/monitoring.sh restore <backup-file>
@@ -71,25 +72,43 @@ pnpm monitoring:backup
 
 ### Monitor Definitions
 
-- `docker-services.json` - Monitor definitions for all backend services (same across environments)
+Backend Service Monitoring:
+- `docker-services-internal.json` - Local development monitoring via host.docker.internal
+  - 🔌 API Server (port 3001)
+  - 💬 Discord Bot (port 3010)
+  - 📺 Twitch Bot (port 3011)
+  - 👁️ Runner Watcher (port 3002)
+  - 🏁 Race Bot (port 3012)
+  - 🔄 WebSocket Relay (port 3003)
+  - 🗄️ Mongo Express (port 8081)
+- `docker-services-external.json` - Production monitoring via external URLs
+  - 🌐 API Server (https://api.helpasaur.com)
+  - 🌐 Runner Watcher (https://rw.helpasaur.com)
+  - 🌐 Web App (https://helpasaur.com)
+
+Web App Monitoring:
 - `web-app-dev.json` - Web app monitor for local development (http://host.docker.internal:3000)
 - `web-app-prod.json` - Web app monitor for production (https://helpasaur.com) with SSL monitoring
+
+SSL Certificate Monitoring:
 - `ssl-monitoring-prod.json` - SSL certificate expiry monitoring for production endpoints:
   - `api.helpasaur.com` - API server
   - `rw.helpasaur.com` - Runner Watcher service
-  - `status.helpasaur.com` - Uptime Kuma dashboard
 
 ### Tags
 
 Tags help organize monitors:
 
-- `internal` - Docker network services
-- `external` - Public endpoints
-- `api` - API services
-- `bot` - Bot services
-- `database` - Database services
-- `frontend` - Web interfaces
-- `infrastructure` - Core services
+- `Backend` - Backend API services
+- `Frontend` - Web interfaces
+- `Infrastructure` - Core services (WebSocket relay)
+- `Bots` - Discord and Twitch bots
+- `Stream` - Stream monitoring services
+- `Database` - Database services
+- `Critical` - Critical services that need immediate attention
+- `Important` - Important but not critical services
+- `Standard` - Standard priority services
+- `Production` - Production environment monitors
 
 ## Production Deployment
 
@@ -101,13 +120,10 @@ The monitoring stack is automatically managed during production deployments:
 2. **Subsequent Deploys**: Monitoring stays running during app updates
 3. **Manual Control**: SSH to server and use `docker compose -f docker-compose.monitoring.yml` commands
 
-### Production URLs
-
-- Monitoring Dashboard: https://status.helpasaur.com
-
 ### SSL Certificate Monitoring
 
 SSL monitoring features:
+
 - `expiryNotification: true` enables certificate expiry alerts
 - Checks run hourly (`interval: 3600` seconds)
 - Alerts sent 7 days before certificate expiry (default)
@@ -115,16 +131,17 @@ SSL monitoring features:
 
 ## Network Configuration
 
-The monitoring stack uses a dedicated network that bridges with the main application:
+The monitoring stack runs completely independently:
 
-- **Network Name**: `helpasaur_monitoring`
-- **Type**: Bridge network
-- **Shared With**: Nginx (for reverse proxy)
+- **No shared networks** with the main application stack
+- **Port exposure**: Direct access via port 3013
+- **Host networking**: Uses `host.docker.internal` to monitor services
 
-This allows:
-- Nginx to proxy requests to Uptime Kuma
-- Monitoring to check internal services via host networking
-- Isolation from application's internal network
+This provides:
+
+- Complete isolation from application stack
+- No dependencies between stacks
+- Monitoring can check services via host machine networking
 
 ## Backup and Restore
 
@@ -147,8 +164,9 @@ pnpm monitoring:backup
 ## Testing
 
 1. Start services with monitoring:
+
    ```bash
-   pnpm monitoring:start
+   pnpm monitor:start
    pnpm start
    ```
 
@@ -157,6 +175,7 @@ pnpm monitoring:backup
 3. Import configuration files (see Initial Configuration)
 
 4. Test by stopping a service:
+
    ```bash
    docker stop helpa-api-server-1
    ```
@@ -169,17 +188,7 @@ pnpm monitoring:backup
 
 If monitoring can't reach application services:
 
-1. Ensure the monitoring network exists:
-   ```bash
-   docker network ls | grep monitoring
-   ```
-
-2. Check nginx has access to monitoring network:
-   ```bash
-   docker inspect nginx | grep -A 5 Networks
-   ```
-
-3. Verify host networking:
+1. Verify host networking:
    ```bash
    docker compose -f docker-compose.monitoring.yml exec uptime-kuma ping host.docker.internal
    ```
@@ -190,18 +199,20 @@ Default port is 3013. To change:
 
 ```bash
 export UPTIME_KUMA_PORT=3014
-pnpm monitoring:start
+pnpm monitor:start
 ```
 
 ### Monitoring Not Starting on Deploy
 
 Check deployment logs for monitoring section:
+
 ```
 Checking monitoring stack...
 Starting monitoring stack...
 ```
 
 If issues persist, SSH to server and manually start:
+
 ```bash
 cd /path/to/deployment
 docker compose -f docker-compose.monitoring.yml up -d
@@ -212,22 +223,26 @@ docker compose -f docker-compose.monitoring.yml up -d
 If you have an existing integrated Uptime Kuma setup:
 
 1. **Backup existing data**:
+
    ```bash
    docker run --rm -v helpasaur-king_uptime-kuma_data:/data -v $(pwd):/backup \
      alpine tar czf /backup/uptime-backup.tar.gz -C /data .
    ```
 
 2. **Stop main stack**:
+
    ```bash
    docker compose down
    ```
 
 3. **Start new monitoring stack**:
+
    ```bash
    docker compose -f docker-compose.monitoring.yml up -d
    ```
 
 4. **Restore data**:
+
    ```bash
    ./scripts/monitoring.sh restore ./uptime-backup.tar.gz
    ```
@@ -240,7 +255,6 @@ If you have an existing integrated Uptime Kuma setup:
 ## Security Considerations
 
 - Monitoring dashboard should be password protected (configured in Uptime Kuma)
-- SSL certificates required for production (handled by nginx)
-- Consider IP whitelisting for status.helpasaur.com if needed
+- Consider firewall rules to restrict access to port 3013 in production
 - Regular backups recommended for monitoring configuration
 - The service runs on internal port 3001, exposed on port 3013 (configurable via `UPTIME_KUMA_PORT`)

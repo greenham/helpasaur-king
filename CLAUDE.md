@@ -16,6 +16,7 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 - **Runner Watcher** (`/runnerwatcher/`): Stream monitoring via Twitch EventSub
 - **WebSocket Relay** (`/ws-relay/`): Socket.io hub for inter-service communication
 - **Shared Library** (`/lib/helpa-api-client/`): Common Axios-based API client
+- **Monitoring** (`/monitoring/`): Uptime Kuma monitoring stack (separate from main application)
 
 ## Essential Development Commands
 
@@ -31,6 +32,14 @@ pnpm build              # Build all Docker images
 pnpm logs               # View Docker service logs
 pnpm boom               # Full rebuild and restart
 pnpm version:bump       # Bump version in all package.json files
+
+# Monitoring Stack Commands (separate from main application)
+pnpm monitor:start      # Start Uptime Kuma monitoring
+pnpm monitor:stop       # Stop monitoring
+pnpm monitor:restart    # Restart monitoring
+pnpm monitor:status     # Check monitoring status
+pnpm monitor:logs       # View monitoring logs
+pnpm monitor:backup     # Backup monitoring data
 
 # Service-specific development (when working on individual services)
 cd api && npm run dev                    # API with nodemon
@@ -98,7 +107,10 @@ graph TD
 
 - **MongoDB 7**: Main database, accessed via Mongoose ODM
 - **Docker Compose**: Orchestrates all services with dev/prod configurations
+  - Main stack: `docker-compose.yml` for application services
+  - Monitoring stack: `docker-compose.monitoring.yml` for Uptime Kuma (separate)
 - **Nginx**: Reverse proxy for API/services (production), proxies to local web dev server (development)
+- **Uptime Kuma**: Service monitoring dashboard (runs independently on port 3013)
 - **Environment**: Services use `.env` files (not committed), see `.env.sample` files
 
 ## Key Development Patterns
@@ -155,8 +167,16 @@ graph TD
 1. React components in `/web/src/components/`
 2. API calls use TanStack Query hooks
 3. Bootstrap theme customization in `/web/src/scss/`
-4. Run locally with `pnpm web:dev` (not in Docker)
+4. Run locally with `pnpm start:web` (not in Docker)
 5. Deployed to GitHub Pages on production
+
+### Setting up monitoring
+1. Start monitoring stack: `pnpm monitor:start`
+2. Access Uptime Kuma at http://localhost:3013
+3. Import monitor configurations from `/monitoring/`:
+   - `docker-services-internal.json` for local dev monitoring
+   - `docker-services-external.json` for production URL monitoring
+4. Monitoring runs independently from main stack
 
 ## Environment Variables
 
