@@ -1,6 +1,6 @@
 {
   "name": "helpa-ws-relay",
-  "version": "1.9.3",
+  "version": "1.10.0",
   "main": "./src/index.js",
   "scripts": {
     "start": "node ./src/index.js",

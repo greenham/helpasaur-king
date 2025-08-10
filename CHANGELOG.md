@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.10.0
+
+_2025-08-10_
+
+### What's Changed
+
+#### Features
+
+- feat: Add comprehensive Twitch bot configuration UI by @greenham in https://github.com/greenham/helpasaur-king/pull/92
+  - Web interface for managing bot settings with real-time updates
+  - Toggle switches for enabling/disabling commands and practice lists
+  - Dynamic command prefix selector with visual feedback
+  - Moderator access controls for practice list management
+  - Configuration changes propagate via WebSocket to bot
+
+- feat: Add `!pracmods` command for toggling moderator access to practice lists by @greenham in https://github.com/greenham/helpasaur-king/pull/91
+  - Broadcasters can now control mod access via `!pracmods on/off`
+  - DRY refactoring of toggle commands using shared handler
+
+- feat: Create public API endpoint for configuration constants by @greenham
+  - Centralized source of truth for allowed command prefixes
+  - Future-proof structure for additional public configurations
+
+#### Bug Fixes
+
+- fix: Twitch bot now respects `commandsEnabled` setting when processing commands by @greenham
+- fix: Reduce Sass deprecation warnings by downgrading to version 1.79.6 by @greenham
+- fix: Update Uptime Kuma healthcheck to use Node.js instead of wget by @greenham
+
+#### Refactor
+
+- refactor: Add memoization and null checks for improved robustness by @greenham
+  - Optimized React component performance with useMemo
+  - Added comprehensive null safety checks
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.9.3...1.10.0
+
 ## 1.9.3
 
 _2025-08-10_
