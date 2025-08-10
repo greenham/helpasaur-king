@@ -16,6 +16,12 @@ export const getTwitchUrl = (username: string) => {
 };
 
 export const getTwitchLoginUrl = () => {
+  if (!process.env.TWITCH_APP_CLIENT_ID) {
+    throw new Error("TWITCH_APP_CLIENT_ID environment variable is not defined. Please set it during build time.");
+  }
+  if (!process.env.API_HOST) {
+    throw new Error("API_HOST environment variable is not defined. Please set it during build time.");
+  }
   const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID;
   const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
     String(process.env.API_HOST + "/auth/twitch")

@@ -9,8 +9,6 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - /etc/letsencrypt/live/helpasaur.com/fullchain.pem:/etc/nginx/certs/helpasaur.com/fullchain.pem
-      - /etc/letsencrypt/live/helpasaur.com/privkey.pem:/etc/nginx/certs/helpasaur.com/privkey.pem
       - /etc/letsencrypt/live/api.helpasaur.com/fullchain.pem:/etc/nginx/certs/api.helpasaur.com/fullchain.pem
       - /etc/letsencrypt/live/api.helpasaur.com/privkey.pem:/etc/nginx/certs/api.helpasaur.com/privkey.pem
       - /etc/letsencrypt/live/rw.helpasaur.com/fullchain.pem:/etc/nginx/certs/rw.helpasaur.com/fullchain.pem

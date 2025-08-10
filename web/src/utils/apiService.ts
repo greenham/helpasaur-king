@@ -1,5 +1,8 @@
 import { Command } from "../types/commands";
 
+if (!process.env.API_HOST) {
+  throw new Error("API_HOST environment variable is not defined. Please set it during build time.");
+}
 const API_URL = process.env.API_HOST + "/api";
 
 export const getCommands = async () => {

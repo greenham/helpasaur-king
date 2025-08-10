@@ -67,7 +67,7 @@ const popover = (
 
 function TopNav() {
   const { data: user } = useUser();
-  const logo = new URL("/src/img/logo.png", import.meta.url).toString();
+  const logo = new URL("../img/logo.png", import.meta.url).toString();
   const location = useLocation();
 
   return (

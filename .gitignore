@@ -10,3 +10,4 @@ web/build/
 web/.parcel-cache/
 backups/*
 .claude/settings.local.json
+.parcel-cache

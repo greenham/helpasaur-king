@@ -11,7 +11,7 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 - **API** (`/api/`): Express.js REST API with MongoDB, JWT auth, Socket.io, Twitch EventSub webhooks
 - **Discord Bot** (`/discord/`): Discord.js v14 bot for commands, go-live notifications, race announcements
 - **Twitch Bot** (`/twitch/`): tmi.js bot for Twitch chat commands
-- **Web App** (`/web/`): React 18 + TypeScript frontend with Parcel, Bootstrap 5, TanStack Query
+- **Web App** (`/web/`): React 18 + TypeScript frontend with Parcel, Bootstrap 5, TanStack Query (hosted on GitHub Pages)
 - **Race Bot** (`/racebot/`): TypeScript service for weekly racetime.gg race creation (Sundays 11:30 AM PT)
 - **Runner Watcher** (`/runnerwatcher/`): Stream monitoring via Twitch EventSub
 - **WebSocket Relay** (`/ws-relay/`): Socket.io hub for inter-service communication
@@ -23,11 +23,12 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 
 ```bash
 # Development (from root)
+pnpm start              # Start backend services and show instructions for web
+pnpm start:backend      # Start backend services in Docker (detached)
+pnpm start:web          # Start web dev server (run in separate terminal)
+pnpm stop               # Stop all Docker services
 pnpm build              # Build all Docker images
-pnpm start              # Start all services with hot reload
-pnpm stop               # Stop all services
-pnpm logs               # View service logs
-pnpm start:logs         # Start and immediately follow logs
+pnpm logs               # View Docker service logs
 pnpm boom               # Full rebuild and restart
 pnpm version:bump       # Bump version in all package.json files
 
@@ -39,6 +40,8 @@ cd web && npm run dev                    # React app with Parcel dev server
 cd racebot && npm run dev                # Race bot with ts-node-dev
 cd runnerwatcher && npm run dev          # Runner watcher with nodemon
 ```
+
+**Note**: Web app runs locally on your host machine (not in Docker). Start backend with `pnpm start:backend`, then run `pnpm start:web` in a separate terminal for the web dev server on port 3000.
 
 ## Service Dependency Graph
 
@@ -77,9 +80,9 @@ graph TD
     
     racebot -->|service_healthy| ws-relay
     
-    web -->|service_healthy| api
+    web -->|runs locally| host[Host Machine]
     
-    nginx -->|service_started| web
+    nginx -->|proxy to host:3000| web
     
     %% Styling
     classDef infrastructure fill:#d4a,stroke:#333,stroke-width:2px
@@ -95,7 +98,7 @@ graph TD
 
 - **MongoDB 7**: Main database, accessed via Mongoose ODM
 - **Docker Compose**: Orchestrates all services with dev/prod configurations
-- **Nginx**: Reverse proxy with SSL termination
+- **Nginx**: Reverse proxy for API/services (production), proxies to local web dev server (development)
 - **Environment**: Services use `.env` files (not committed), see `.env.sample` files
 
 ## Key Development Patterns
@@ -129,7 +132,7 @@ graph TD
 - GitHub Actions CI/CD pipeline:
   - Builds and pushes images to ghcr.io on release
   - Manual deployment trigger via workflow_dispatch
-- Production URLs: helpasaur.com, api.helpasaur.com, rw.helpasaur.com
+- Production URLs: helpasaur.com (GitHub Pages), api.helpasaur.com, rw.helpasaur.com
 
 ## Common Tasks
 
@@ -152,6 +155,8 @@ graph TD
 1. React components in `/web/src/components/`
 2. API calls use TanStack Query hooks
 3. Bootstrap theme customization in `/web/src/scss/`
+4. Run locally with `pnpm web:dev` (not in Docker)
+5. Deployed to GitHub Pages on production
 
 ## Environment Variables
 
@@ -161,3 +166,6 @@ Each service has a `.env.sample` file showing required variables. Key ones:
 - `MONGODB_URI`: MongoDB connection string
 - `JWT_SECRET`: API authentication secret
 - `RACETIME_TOKEN`: racetime.gg API token
+- `API_HOST`: API URL for web app (required at build time)
+- `TWITCH_APP_CLIENT_ID`: Twitch client ID for web app (required at build time)
+- Update @CLAUDE.md anytime modifications are made to the package.json scripts.

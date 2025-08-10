@@ -163,34 +163,6 @@ services:
       retries: 3
       start_period: 60s
 
-  web:
-    image: helpa-web:${VERSION:-${BUILD_TARGET}}
-    build:
-      context: .
-      dockerfile: ./web/Dockerfile
-      target: ${BUILD_TARGET}
-      args:
-        API_HOST: ${API_HOST}
-        TWITCH_APP_CLIENT_ID: ${TWITCH_APP_CLIENT_ID}
-        WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
-    restart: on-failure
-    logging:
-      driver: local
-    ports:
-      - ${WEB_PUBLIC_EXTERNAL_PORT}:3000
-    depends_on:
-      api-server:
-        condition: service_healthy
-    networks:
-      - int
-      - ext
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
-      interval: 20s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-
   nginx:
     image: nginx:1.21.6
     restart: always
@@ -202,11 +174,14 @@ services:
       - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/static:/srv/static
     depends_on:
-      web:
-        condition: service_started
+      api-server:
+        condition: service_healthy
     networks:
       - int
       - ext
+    extra_hosts:
+      # This allows nginx to connect to the host machine on Linux
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 10s
