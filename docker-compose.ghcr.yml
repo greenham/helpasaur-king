@@ -12,9 +12,6 @@ services:
   twitch-bot:
     image: ghcr.io/greenham/helpasaur-king/helpa-twitch:${VERSION:-latest}
 
-  web:
-    image: ghcr.io/greenham/helpasaur-king/helpa-web:${VERSION:-latest}
-
   runnerwatcher:
     image: ghcr.io/greenham/helpasaur-king/helpa-runnerwatcher:${VERSION:-latest}
 
