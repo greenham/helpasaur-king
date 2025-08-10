@@ -1,6 +1,6 @@
 {
   "name": "helpasaur-king",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "start": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",

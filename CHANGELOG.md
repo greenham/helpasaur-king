@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.11.0
+
+_2025-08-10_
+
+### What's Changed
+
+#### Infrastructure
+
+- feat: Separate monitoring stack for improved reliability by @greenham in https://github.com/greenham/helpasaur-king/pull/93
+  - Moved Uptime Kuma to independent `docker-compose.monitoring.yml` file
+  - Removed all dependencies between monitoring and application stacks
+  - Monitoring continues running during application deployments
+  - Each stack now has its own network with no cross-dependencies
+
+#### Features
+
+- feat: Add comprehensive monitoring management commands by @greenham
+  - New `pnpm monitor:*` commands for stack management
+  - Backup and restore functionality for monitoring data
+  - Shell script for monitoring operations (start, stop, restart, status, logs)
+  - Separate configuration files for internal and external monitoring
+
+#### Refactor
+
+- refactor: Improve monitoring configuration structure by @greenham
+  - Split monitoring configs into `docker-services-internal.json` and `docker-services-external.json`
+  - Added emoji icons to service names for better visual distinction
+  - Removed MongoDB from monitoring for security (not exposed to host)
+  - Updated documentation with complete setup and migration instructions
+
+#### Bug Fixes
+
+- fix: Deploy web app after backend to prevent version mismatches by @greenham
+  - Ensures backend is ready before frontend deployment
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.10.0...1.11.0
+
 ## 1.10.0
 
 _2025-08-10_
