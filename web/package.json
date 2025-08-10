@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "clean": "npx rimraf build",
-    "start": "parcel src/index.html -p 3000 --dist-dir build",
+    "start": "parcel src/index.html -p 3000 --dist-dir build --open",
     "build": "parcel build src/index.html --dist-dir build",
     "serve": "serve -l 3000 -s ./build"
   },
@@ -35,7 +35,7 @@
     "parcel": "^2.10.3",
     "prettier": "^3.0.3",
     "process": "^0.11.10",
-    "sass": "^1.69.5",
+    "sass": "1.79.6",
     "typescript": "^5.2.2"
   }
 }

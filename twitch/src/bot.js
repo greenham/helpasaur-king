@@ -428,6 +428,12 @@ class TwitchBot {
       }
     }
 
+    // Check if commands are enabled for this channel
+    if (!channelConfig.commandsEnabled) {
+      console.log(`[${channel}] Commands are disabled, ignoring: ${commandNoPrefix}`);
+      return;
+    }
+
     let command = false;
     let cachedCommand = this.cachedCommands.get(commandNoPrefix);
 
