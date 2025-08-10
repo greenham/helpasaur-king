@@ -309,8 +309,36 @@ services:
       retries: 3
       start_period: 30s
 
+  # Monitoring dashboard
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - ${UPTIME_KUMA_PORT:-3013}:3001
+    volumes:
+      - uptime-kuma_data:/app/data
+    networks:
+      - ext
+      - int
+    extra_hosts:
+      # This allows uptime-kuma to connect to the host machine on Linux
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "node", "extra/healthcheck"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 180s
+
 volumes:
   mongodb_data_container:
+  uptime-kuma_data:
 
 networks:
   ext:

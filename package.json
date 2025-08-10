@@ -3,8 +3,7 @@
   "version": "1.9.2",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
-    "start": "echo 'Starting backend services...' && pnpm start:backend && echo '\nBackend started! Now run \"pnpm start:web\" in another terminal for the web app.'",
-    "start:backend": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "start": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
     "start:web": "cd web && pnpm start",
     "stop": "docker compose down",
     "build": "DOCKER_BUILDKIT=1 docker compose build --force-rm",
