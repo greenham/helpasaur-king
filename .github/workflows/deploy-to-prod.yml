@@ -10,6 +10,10 @@ on:
         type: string
 
 jobs:
+  deploy-web:
+    uses: ./.github/workflows/deploy-gh-pages.yml
+    secrets: inherit
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -67,7 +71,7 @@ jobs:
 
             # Clean up old Docker images (keep last 3 versions of each service)
             echo "Cleaning up old Docker images..."
-            SERVICES="api discord twitch web runnerwatcher racebot ws-relay base"
+            SERVICES="api discord twitch runnerwatcher racebot ws-relay base"
             for SERVICE in $SERVICES; do
               IMAGE_NAME="ghcr.io/greenham/helpasaur-king/helpa-$SERVICE"
               echo "Cleaning $IMAGE_NAME images..."

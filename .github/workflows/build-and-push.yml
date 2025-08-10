@@ -108,23 +108,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push Web
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./web/Dockerfile
-          target: prod
-          push: true
-          build-args: |
-            API_HOST=${{ secrets.API_HOST }}
-            TWITCH_APP_CLIENT_ID=${{ secrets.TWITCH_APP_CLIENT_ID }}
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-web:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-web:latest
-          build-contexts: |
-            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Build and push Runner Watcher
         uses: docker/build-push-action@v5
