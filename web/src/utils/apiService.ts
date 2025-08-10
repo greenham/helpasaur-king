@@ -1,7 +1,9 @@
 import { Command } from "../types/commands";
 
 if (!process.env.API_HOST) {
-  throw new Error("API_HOST environment variable is not defined. Please set it during build time.");
+  throw new Error(
+    "API_HOST environment variable is not defined. Please set it during build time.",
+  );
 }
 const API_URL = process.env.API_HOST + "/api";
 
@@ -121,14 +123,16 @@ export const getPublicConstants = async () => {
   return response.json();
 };
 
-export const updateTwitchBotConfig = async (config: Partial<{
-  practiceListsEnabled: boolean;
-  allowModsToManagePracticeLists: boolean;
-  commandsEnabled: boolean;
-  commandPrefix: string;
-  textCommandCooldown: number;
-  weeklyRaceAlertEnabled: boolean;
-}>) => {
+export const updateTwitchBotConfig = async (
+  config: Partial<{
+    practiceListsEnabled: boolean;
+    allowModsToManagePracticeLists: boolean;
+    commandsEnabled: boolean;
+    commandPrefix: string;
+    textCommandCooldown: number;
+    weeklyRaceAlertEnabled: boolean;
+  }>,
+) => {
   const response = await fetch(`${API_URL}/twitch/config`, {
     method: "PATCH",
     credentials: "include",
@@ -222,7 +226,7 @@ export const removeChannelFromStreamAlerts = async (twitchUserId: string) => {
     {
       method: "DELETE",
       credentials: "include",
-    }
+    },
   );
   try {
     await handleApiResponse(response);

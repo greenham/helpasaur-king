@@ -1,6 +1,15 @@
 import * as React from "react";
-import { Alert, Button, Container, Modal, Spinner, Form, ListGroup, Dropdown } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import {
+  Alert,
+  Button,
+  Container,
+  Modal,
+  Spinner,
+  Form,
+  ListGroup,
+  Dropdown,
+} from "react-bootstrap";
+import { useEffect, useState, useMemo } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { IUser } from "../types/users";
 import {
@@ -28,7 +37,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
       queryKey: ["twitchBotConfig"],
       queryFn: getTwitchBotConfig,
       retry: 0,
-    }
+    },
   );
 
   if (userLoading || twitchBotConfigLoading)
@@ -97,9 +106,18 @@ interface ConfigToggleProps {
   label?: string;
 }
 
-const ConfigToggle: React.FC<ConfigToggleProps> = ({ id, checked, onChange, disabled, label }) => {
+const ConfigToggle: React.FC<ConfigToggleProps> = ({
+  id,
+  checked,
+  onChange,
+  disabled,
+  label,
+}) => {
   return (
-    <div className="config-toggle clickable-area" onClick={() => !disabled && onChange(!checked)}>
+    <div
+      className="config-toggle clickable-area"
+      onClick={() => !disabled && onChange(!checked)}
+    >
       <Form.Check
         type="switch"
         id={id}
@@ -116,7 +134,6 @@ const ConfigToggle: React.FC<ConfigToggleProps> = ({ id, checked, onChange, disa
   );
 };
 
-
 const TwitchUserBotManagement: React.FunctionComponent<
   TwitchUserBotManagementProps
 > = (props) => {
@@ -127,7 +144,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
   const [showLeaveModal, setShowLeaveModal] = React.useState(false);
   const handleShowLeaveModal = () => setShowLeaveModal(true);
   const handleCloseLeaveModal = () => setShowLeaveModal(false);
-  
+
   // State for command prefix editing
   const [showPrefixDropdown, setShowPrefixDropdown] = useState(false);
 
@@ -137,7 +154,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
     queryFn: getPublicConstants,
   });
 
-  const allowedPrefixes = publicConstants?.twitch?.commandPrefixes || [];
+  // Memoize allowed prefixes to avoid unnecessary recalculations
+  const allowedPrefixes = useMemo(() => {
+    if (!publicConstants?.twitch?.commandPrefixes) {
+      return [];
+    }
+    return publicConstants.twitch.commandPrefixes;
+  }, [publicConstants]);
 
   const handleJoinRequest = async () => {
     const joinResult = await joinTwitchChannel();
@@ -184,25 +207,33 @@ const TwitchUserBotManagement: React.FunctionComponent<
     },
   });
 
-  const handleToggle = async (field: string, value: boolean, successMessage: string) => {
+  const handleToggle = async (
+    field: string,
+    value: boolean,
+    successMessage: string,
+  ) => {
     try {
       await updateConfigMutation.mutateAsync({ [field]: value });
       toast.success(successMessage);
     } catch (error: any) {
-      toast.error(`Failed to update configuration: ${error?.message || 'Unknown error'}`);
+      toast.error(
+        `Failed to update configuration: ${error?.message || "Unknown error"}`,
+      );
     }
   };
 
   const handlePrefixChange = async (newPrefix: string) => {
-    if (newPrefix === twitchBotConfig.commandPrefix) {
-      return; // No change needed
+    if (!twitchBotConfig || newPrefix === twitchBotConfig.commandPrefix) {
+      return; // No change needed or config not loaded
     }
 
     try {
       await updateConfigMutation.mutateAsync({ commandPrefix: newPrefix });
       toast.success(`Command prefix changed to "${newPrefix}"`);
     } catch (error: any) {
-      toast.error(`Failed to update prefix: ${error?.message || 'Unknown error'}`);
+      toast.error(
+        `Failed to update prefix: ${error?.message || "Unknown error"}`,
+      );
     }
   };
 
@@ -222,7 +253,9 @@ const TwitchUserBotManagement: React.FunctionComponent<
         </Button>
       </Alert>
 
-      <h3><i className="fa-solid fa-sliders me-2"></i>Configuration</h3>
+      <h3>
+        <i className="fa-solid fa-sliders me-2"></i>Configuration
+      </h3>
       <ListGroup className="mb-4">
         <ListGroup.Item variant="primary">
           <Container className="mt-2 py-4">
@@ -233,18 +266,22 @@ const TwitchUserBotManagement: React.FunctionComponent<
                   Enable or disable all bot commands in your channel.
                 </p>
                 <p className="text-muted mb-0">
-                  When enabled, the bot will respond to commands like <code>{twitchBotConfig.commandPrefix}helpa</code>, <code>{twitchBotConfig.commandPrefix}nmg</code>, etc.
+                  When enabled, the bot will respond to commands like{" "}
+                  <code>{twitchBotConfig?.commandPrefix || "!"}helpa</code>,{" "}
+                  <code>{twitchBotConfig?.commandPrefix || "!"}nmg</code>, etc.
                 </p>
               </div>
               <div className="ms-3">
                 <ConfigToggle
                   id="commands-switch"
                   checked={twitchBotConfig.commandsEnabled}
-                  onChange={(checked) => 
+                  onChange={(checked) =>
                     handleToggle(
-                      "commandsEnabled", 
+                      "commandsEnabled",
                       checked,
-                      checked ? "Bot commands enabled!" : "Bot commands disabled!"
+                      checked
+                        ? "Bot commands enabled!"
+                        : "Bot commands disabled!",
                     )
                   }
                   disabled={updateConfigMutation.isPending}
@@ -264,20 +301,30 @@ const TwitchUserBotManagement: React.FunctionComponent<
                       Click the current prefix to change it.
                     </p>
                   </div>
-                  <div className="ms-3 d-flex align-items-center" style={{ minWidth: "100px" }}>
-                    <Dropdown show={showPrefixDropdown} onToggle={setShowPrefixDropdown}>
+                  <div
+                    className="ms-3 d-flex align-items-center"
+                    style={{ minWidth: "100px" }}
+                  >
+                    <Dropdown
+                      show={showPrefixDropdown}
+                      onToggle={setShowPrefixDropdown}
+                    >
                       <Dropdown.Toggle
                         as="div"
                         className="prefix-display clickable"
-                        onClick={() => setShowPrefixDropdown(!showPrefixDropdown)}
+                        onClick={() =>
+                          setShowPrefixDropdown(!showPrefixDropdown)
+                        }
                       >
-                        <span className="prefix-char">{twitchBotConfig.commandPrefix}</span>
+                        <span className="prefix-char">
+                          {twitchBotConfig?.commandPrefix || "!"}
+                        </span>
                       </Dropdown.Toggle>
                       <Dropdown.Menu align="end">
                         {allowedPrefixes.map((prefix: string) => (
                           <Dropdown.Item
                             key={prefix}
-                            active={prefix === twitchBotConfig.commandPrefix}
+                            active={prefix === twitchBotConfig?.commandPrefix}
                             onClick={() => {
                               handlePrefixChange(prefix);
                               setShowPrefixDropdown(false);
@@ -285,7 +332,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
                             style={{
                               fontFamily: "monospace",
                               fontSize: "1.2rem",
-                              fontWeight: "bold"
+                              fontWeight: "bold",
                             }}
                           >
                             {prefix}
@@ -306,21 +353,29 @@ const TwitchUserBotManagement: React.FunctionComponent<
             <div className="d-flex justify-content-between align-items-center">
               <div className="flex-grow-1">
                 <p className="mb-2 fs-5">
-                  Enable practice lists to track and randomize practice items in your channel.
+                  Enable practice lists to track and randomize practice items in
+                  your channel.
                 </p>
                 <p className="text-muted">
-                  Commands: <code>{twitchBotConfig.commandPrefix}pracadd</code>, <code>{twitchBotConfig.commandPrefix}pracrand</code>, <code>{twitchBotConfig.commandPrefix}praclist</code>, <code>{twitchBotConfig.commandPrefix}pracdel</code>, <code>{twitchBotConfig.commandPrefix}pracclear</code>
+                  Commands:{" "}
+                  <code>{twitchBotConfig?.commandPrefix || "!"}pracadd</code>,{" "}
+                  <code>{twitchBotConfig?.commandPrefix || "!"}pracrand</code>,{" "}
+                  <code>{twitchBotConfig?.commandPrefix || "!"}praclist</code>,{" "}
+                  <code>{twitchBotConfig?.commandPrefix || "!"}pracdel</code>,{" "}
+                  <code>{twitchBotConfig?.commandPrefix || "!"}pracclear</code>
                 </p>
               </div>
               <div className="ms-3">
                 <ConfigToggle
                   id="practice-lists-switch"
                   checked={twitchBotConfig.practiceListsEnabled}
-                  onChange={(checked) => 
+                  onChange={(checked) =>
                     handleToggle(
-                      "practiceListsEnabled", 
+                      "practiceListsEnabled",
                       checked,
-                      checked ? "Practice lists enabled!" : "Practice lists disabled!"
+                      checked
+                        ? "Practice lists enabled!"
+                        : "Practice lists disabled!",
                     )
                   }
                   disabled={updateConfigMutation.isPending}
@@ -337,19 +392,22 @@ const TwitchUserBotManagement: React.FunctionComponent<
                       Allow moderators to manage practice lists.
                     </p>
                     <p className="text-muted mb-0">
-                      When enabled, moderators can add, remove, and manage practice list entries.
-                      When disabled, only you can manage the practice lists.
+                      When enabled, moderators can add, remove, and manage
+                      practice list entries. When disabled, only you can manage
+                      the practice lists.
                     </p>
                   </div>
                   <div className="ms-3">
                     <ConfigToggle
                       id="mod-access-switch"
                       checked={twitchBotConfig.allowModsToManagePracticeLists}
-                      onChange={(checked) => 
+                      onChange={(checked) =>
                         handleToggle(
-                          "allowModsToManagePracticeLists", 
+                          "allowModsToManagePracticeLists",
                           checked,
-                          checked ? "Mods can now manage practice lists!" : "Only you can manage practice lists now!"
+                          checked
+                            ? "Mods can now manage practice lists!"
+                            : "Only you can manage practice lists now!",
                         )
                       }
                       disabled={updateConfigMutation.isPending}
