@@ -14,7 +14,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { IUser } from "../types/users";
 import {
   getTwitchBotConfig,
-  getPublicConstants,
+  getPublicConfigs,
   joinTwitchChannel,
   leaveTwitchChannel,
   updateTwitchBotConfig,
@@ -148,19 +148,19 @@ const TwitchUserBotManagement: React.FunctionComponent<
   // State for command prefix editing
   const [showPrefixDropdown, setShowPrefixDropdown] = useState(false);
 
-  // Fetch public constants from API
-  const { data: publicConstants } = useQuery({
-    queryKey: ["publicConstants"],
-    queryFn: getPublicConstants,
+  // Fetch public configs from API
+  const { data: publicConfigs } = useQuery({
+    queryKey: ["publicConfigs"],
+    queryFn: getPublicConfigs,
   });
 
   // Memoize allowed prefixes to avoid unnecessary recalculations
   const allowedPrefixes = useMemo(() => {
-    if (!publicConstants?.twitch?.commandPrefixes) {
+    if (!publicConfigs?.twitch?.commandPrefixes) {
       return [];
     }
-    return publicConstants.twitch.commandPrefixes;
-  }, [publicConstants]);
+    return publicConfigs.twitch.commandPrefixes;
+  }, [publicConfigs]);
 
   const handleJoinRequest = async () => {
     const joinResult = await joinTwitchChannel();

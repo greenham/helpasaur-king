@@ -113,7 +113,7 @@ export const leaveTwitchChannel = async (twitchUsername?: string) => {
   return response.json();
 };
 
-export const getPublicConstants = async () => {
+export const getPublicConfigs = async () => {
   const response = await fetch(`${API_URL}/public/configs`);
   try {
     await handleApiResponse(response);
