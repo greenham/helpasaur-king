@@ -23,9 +23,7 @@ jobs:
             docker-compose.prod.yml
             docker-compose.monitoring.yml
             nginx/
-            mongo-backup
-            renew-certs
-            scripts/monitoring.sh
+            scripts/
 
       - name: Copy files to production server
         uses: appleboy/scp-action@master
@@ -33,7 +31,7 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,docker-compose.monitoring.yml,nginx/,mongo-backup,renew-certs,scripts/monitoring.sh"
+          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,docker-compose.monitoring.yml,nginx/,scripts/"
           target: "${{ secrets.DEPLOY_PATH }}"
           overwrite: true
           rm: false
