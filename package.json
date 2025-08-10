@@ -1,6 +1,6 @@
 {
   "name": "helpasaur-king",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
     "start": "echo 'Starting backend services...' && pnpm start:backend && echo '\nBackend started! Now run \"pnpm start:web\" in another terminal for the web app.'",

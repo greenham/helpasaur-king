@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.2
+
+_2025-08-09_
+
+### What's Changed
+
+- feat: Migrate web app to GitHub Pages static hosting by @greenham in https://github.com/greenham/helpasaur-king/pull/89
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.9.1...1.9.2
+
 ## 1.9.1
 
 _2025-08-09_
@@ -7,28 +17,32 @@ _2025-08-09_
 ### What's Changed
 
 #### Major Infrastructure Updates
-* feat: Migrate from Yarn to pnpm for package management by @greenham in https://github.com/greenham/helpasaur-king/pull/87
-* feat: Implement GitHub Container Registry (ghcr.io) for Docker image distribution by @greenham
-* refactor: Optimize Docker base image and improve build efficiency by @greenham in https://github.com/greenham/helpasaur-king/pull/88
+
+- feat: Migrate from Yarn to pnpm for package management by @greenham in https://github.com/greenham/helpasaur-king/pull/87
+- feat: Implement GitHub Container Registry (ghcr.io) for Docker image distribution by @greenham
+- refactor: Optimize Docker base image and improve build efficiency by @greenham in https://github.com/greenham/helpasaur-king/pull/88
 
 #### Build & Deployment Improvements
-* feat: Separate build and deploy workflows for better control by @greenham
-* feat: Add manual deployment trigger with configurable version input by @greenham
-* feat: Implement proper multi-stage Docker builds for all services by @greenham
-* fix: Update deployment to use configurable DEPLOY_PATH secret by @greenham
-* fix: Include maintenance scripts (mongo-backup, renew-certs) in deployment by @greenham
+
+- feat: Separate build and deploy workflows for better control by @greenham
+- feat: Add manual deployment trigger with configurable version input by @greenham
+- feat: Implement proper multi-stage Docker builds for all services by @greenham
+- fix: Update deployment to use configurable DEPLOY_PATH secret by @greenham
+- fix: Include maintenance scripts (mongo-backup, renew-certs) in deployment by @greenham
 
 #### Docker Optimizations
-* feat: Pre-install pnpm@8 and nodemon in base image for faster builds by @greenham
-* feat: Implement single pnpm-lock.yaml at workspace root by @greenham
-* fix: Add missing source files to development Docker stages by @greenham
-* fix: Proper ARG/ENV handling for build-time variables in web service by @greenham
-* perf: Reduce production image sizes by separating build and runtime dependencies by @greenham
+
+- feat: Pre-install pnpm@8 and nodemon in base image for faster builds by @greenham
+- feat: Implement single pnpm-lock.yaml at workspace root by @greenham
+- fix: Add missing source files to development Docker stages by @greenham
+- fix: Proper ARG/ENV handling for build-time variables in web service by @greenham
+- perf: Reduce production image sizes by separating build and runtime dependencies by @greenham
 
 #### Developer Experience
-* feat: Add pnpm workspace configuration for monorepo management by @greenham
-* fix: Add build:base script for helpa-base image builds by @greenham
-* docs: Add comprehensive GitHub Container Registry setup documentation by @greenham
+
+- feat: Add pnpm workspace configuration for monorepo management by @greenham
+- fix: Add build:base script for helpa-base image builds by @greenham
+- docs: Add comprehensive GitHub Container Registry setup documentation by @greenham
 
 **Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.9.0...1.9.1
 
