@@ -23,23 +23,12 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 
 ```bash
 # Development (from root)
-pnpm start:dev          # Start all services with hot reload (uses docker-compose.dev.yml overlay)
-pnpm start:dev:logs     # Start and follow logs
-pnpm logs               # View service logs
-pnpm boom:dev           # Full rebuild and restart for development
+pnpm build              # Build all Docker images
+pnpm start              # Start all services with hot reload
 pnpm stop               # Stop all services
-
-# Building (from root)
-pnpm build              # Build all Docker images locally
-pnpm build:base         # Build only the helpa-base image
-
-# Testing with ghcr.io images (from root)
-pnpm pull:ghcr          # Pull latest images from GitHub Container Registry
-pnpm start:ghcr         # Start using ghcr.io images with dev overlay
-pnpm start:ghcr:logs    # Start with ghcr.io images and follow logs
-VERSION=1.9.1 pnpm start:ghcr  # Start specific version from ghcr.io
-
-# Version management
+pnpm logs               # View service logs
+pnpm start:logs         # Start and immediately follow logs
+pnpm boom               # Full rebuild and restart
 pnpm version:bump       # Bump version in all package.json files
 
 # Service-specific development (when working on individual services)
