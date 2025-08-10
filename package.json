@@ -9,7 +9,13 @@
     "build": "DOCKER_BUILDKIT=1 docker compose build --force-rm",
     "logs": "docker compose logs -f --tail 1000",
     "boom": "pnpm stop && pnpm build && pnpm start --force-recreate && pnpm logs",
-    "version:bump": "bash scripts/bump-version.sh"
+    "version:bump": "bash scripts/bump-version.sh",
+    "monitoring:start": "bash scripts/monitoring.sh start",
+    "monitoring:stop": "bash scripts/monitoring.sh stop",
+    "monitoring:restart": "bash scripts/monitoring.sh restart",
+    "monitoring:status": "bash scripts/monitoring.sh status",
+    "monitoring:logs": "bash scripts/monitoring.sh logs",
+    "monitoring:backup": "bash scripts/monitoring.sh backup"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
