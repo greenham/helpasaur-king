@@ -52,6 +52,19 @@ cd runnerwatcher && npm run dev          # Runner watcher with nodemon
 
 **Note**: Web app runs locally on your host machine (not in Docker). Start backend with `pnpm start:backend`, then run `pnpm start:web` in a separate terminal for the web dev server on port 3000.
 
+## Production Scripts
+
+Located in `/scripts/` directory (deployed to production server):
+
+```bash
+# Deployment and maintenance (run on production server only)
+bash ./scripts/deploy.sh [VERSION]       # Deploy specific version (default: latest)
+bash ./scripts/cleanup.sh [KEEP_COUNT]   # Clean old Docker images (default: keep 3)
+bash ./scripts/monitoring.sh [COMMAND]   # Manage monitoring stack (start|stop|status|logs)
+bash ./scripts/mongo-backup.sh           # Create MongoDB backup
+bash ./scripts/renew-certs.sh            # Renew SSL certificates
+```
+
 ## Service Dependency Graph
 
 ```mermaid

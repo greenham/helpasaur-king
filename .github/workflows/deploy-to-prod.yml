@@ -45,50 +45,17 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
 
-            # Use the version from workflow input
-            export VERSION="${{ github.event.inputs.version }}"
-            export VERSION="${VERSION#v}"  # Remove 'v' prefix if present
+            # Deploy the application with the specified version
+            VERSION="${{ github.event.inputs.version }}"
             echo "Deploying version: $VERSION"
-
-            # Ensure .env file exists
-            if [ ! -f .env ]; then
-              echo "ERROR: .env file not found in ${{ secrets.DEPLOY_PATH }}"
-              echo "Please ensure .env file with runtime variables is present on the server"
-              exit 1
-            fi
-
-            # Pull the new images from ghcr.io
-            echo "Pulling images from GitHub Container Registry..."
-            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml pull
-
-            # Start production services with version-tagged images
-            echo "Starting services with --force-recreate to ensure new images are used..."
-            VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d --force-recreate
+            bash ./scripts/deploy.sh "$VERSION"
             
-            # Ensure monitoring stack is running (independent of app version)
+            # Ensure monitoring stack is running
             echo "Checking monitoring stack..."
-            if ! docker compose -f docker-compose.monitoring.yml ps | grep -q "uptime-kuma.*Up"; then
-              echo "Starting monitoring stack..."
-              docker compose -f docker-compose.monitoring.yml up -d
-            else
-              echo "Monitoring stack is already running"
-            fi
+            bash ./scripts/monitoring.sh status || bash ./scripts/monitoring.sh start
 
-            # Clean up old Docker images (keep last 3 versions of each service)
-            echo "Cleaning up old Docker images..."
-            SERVICES="api discord twitch runnerwatcher racebot ws-relay base"
-            for SERVICE in $SERVICES; do
-              IMAGE_NAME="ghcr.io/greenham/helpasaur-king/helpa-$SERVICE"
-              echo "Cleaning $IMAGE_NAME images..."
-              docker images "$IMAGE_NAME" --format "{{.Tag}}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | head -n -3 | while read TAG; do
-                echo "Removing $IMAGE_NAME:$TAG"
-                docker rmi "$IMAGE_NAME:$TAG" || true
-              done
-            done
-
-            # Remove dangling images
-            docker image prune -f
-            echo "Docker cleanup complete"
+            # Clean up old Docker images
+            bash ./scripts/cleanup.sh 3
 
   deploy-web:
     needs: deploy  # Wait for backend deployment to complete successfully
