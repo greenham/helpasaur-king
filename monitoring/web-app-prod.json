@@ -24,7 +24,7 @@
             "resendInterval": 0,
             "keyword": null,
             "invertKeyword": false,
-            "expiryNotification": false,
+            "expiryNotification": true,
             "ignoreTls": false,
             "upsideDown": false,
             "packetSize": 56,
