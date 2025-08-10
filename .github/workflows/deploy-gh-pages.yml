@@ -2,7 +2,19 @@ name: Deploy to GitHub Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      custom_domain:
+        description: 'Custom domain for GitHub Pages (e.g., preview.helpasaur.com)'
+        required: false
+        type: string
+        default: ''
   workflow_call:  # Allow this workflow to be called by other workflows
+    inputs:
+      custom_domain:
+        description: 'Custom domain for GitHub Pages'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -51,7 +63,8 @@ jobs:
         working-directory: ./web
         run: pnpm install
 
-      - name: Build web app
+      - name: Build web app (with subdirectory)
+        if: ${{ !inputs.custom_domain }}
         working-directory: ./web
         env:
           API_HOST: ${{ secrets.API_HOST }}
@@ -60,9 +73,21 @@ jobs:
         run: |
           pnpm clean
           pnpm build --public-url /helpasaur-king/
+      
+      - name: Build web app (with custom domain)
+        if: ${{ inputs.custom_domain }}
+        working-directory: ./web
+        env:
+          API_HOST: ${{ secrets.API_HOST }}
+          TWITCH_APP_CLIENT_ID: ${{ secrets.TWITCH_APP_CLIENT_ID }}
+          PUBLIC_URL: /
+        run: |
+          pnpm clean
+          pnpm build
 
       - name: Add CNAME file
-        run: echo "helpasaur.com" > ./web/build/CNAME
+        if: ${{ inputs.custom_domain }}
+        run: echo "${{ inputs.custom_domain }}" > ./web/build/CNAME
 
       - name: Create 404.html for client-side routing
         run: cp ./web/build/index.html ./web/build/404.html

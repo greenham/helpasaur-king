@@ -5,6 +5,7 @@ This document outlines the complete migration process for moving the Helpasaur K
 ## Phase 1: Pre-Migration Preparation (Before PR Merge)
 
 ### 1.1 GitHub Repository Setup
+
 - [ ] **Enable GitHub Pages** in repository settings
   - Go to Settings → Pages
   - Source: Deploy from a branch
@@ -12,12 +13,14 @@ This document outlines the complete migration process for moving the Helpasaur K
   - Folder: `/` (root)
 
 ### 1.2 GitHub Secrets Configuration
+
 - [ ] **Add required secrets** to repository (Settings → Secrets and variables → Actions):
   - `API_HOST`: Set to `https://api.helpasaur.com`
   - `TWITCH_APP_CLIENT_ID`: Your Twitch app client ID
   - Verify `DROPLET_IP`, `DROPLET_USER`, `DROPLET_SSH_KEY`, `DEPLOY_PATH` exist for backend deployment
 
 ### 1.3 Initial GitHub Pages Deployment Test
+
 - [ ] **Merge the PR** to main branch
 - [ ] **Manually trigger** the GitHub Pages workflow:
   - Go to Actions → Deploy to GitHub Pages → Run workflow
@@ -30,23 +33,28 @@ This document outlines the complete migration process for moving the Helpasaur K
 ## Phase 2: DNS Pre-Configuration
 
 ### 2.1 Current DNS Setup Review
+
 - [ ] **Document current DNS records** for helpasaur.com:
   - A record pointing to your server IP
   - Any other records (MX, TXT, etc.)
 
+![alt text](dns.png)
+
 ### 2.2 Prepare DNS Changes
+
 - [ ] **Plan new DNS configuration**:
+
   ```
   helpasaur.com:
   - REMOVE: A record → Your server IP
   - ADD: CNAME record → greenham.github.io
-  
+
   api.helpasaur.com: (no change)
   - Keep: A record → Your server IP
-  
-  rw.helpasaur.com: (no change)  
+
+  rw.helpasaur.com: (no change)
   - Keep: A record → Your server IP
-  
+
   status.helpasaur.com: (if implementing monitoring)
   - Keep: A record → Your server IP
   ```
@@ -54,6 +62,7 @@ This document outlines the complete migration process for moving the Helpasaur K
 ## Phase 3: Migration Execution
 
 ### 3.1 Final Pre-Migration Checks
+
 - [ ] **Verify GitHub Pages is working** at github.io URL
 - [ ] **Test all critical paths**:
   - Command search
@@ -62,12 +71,14 @@ This document outlines the complete migration process for moving the Helpasaur K
   - Admin functions (if applicable)
 
 ### 3.2 DNS Cutover
+
 - [ ] **Update DNS records** at your registrar:
   1. Delete A record for helpasaur.com
   2. Add CNAME record: helpasaur.com → greenham.github.io
   3. Keep TTL low initially (300-600 seconds) for quick rollback if needed
 
 ### 3.3 Server-Side Cleanup
+
 - [ ] **Deploy backend changes** using production deployment workflow:
   ```bash
   # This will automatically:
@@ -84,11 +95,13 @@ This document outlines the complete migration process for moving the Helpasaur K
 ## Phase 4: Post-Migration Verification
 
 ### 4.1 DNS Propagation Monitoring
+
 - [ ] **Monitor DNS propagation**:
   - Use https://www.whatsmydns.net/#CNAME/helpasaur.com
   - Wait for global propagation (usually 1-4 hours with low TTL)
 
 ### 4.2 Functionality Testing
+
 - [ ] **Test from multiple locations/devices**:
   - Clear browser cache
   - Test all major features
@@ -96,6 +109,7 @@ This document outlines the complete migration process for moving the Helpasaur K
   - Check that old direct links still work
 
 ### 4.3 Performance Verification
+
 - [ ] **Compare performance metrics**:
   - Page load times (should be faster via CDN)
   - Time to First Byte (TTFB)
@@ -104,14 +118,17 @@ This document outlines the complete migration process for moving the Helpasaur K
 ## Phase 5: Finalization
 
 ### 5.1 TTL Adjustment
+
 - [ ] **After 24-48 hours of stable operation**:
   - Increase DNS TTL to normal values (3600-86400 seconds)
 
 ### 5.2 Documentation Updates
+
 - [ ] **Update any documentation** referencing the old setup
 - [ ] **Update README** if it mentions local web container
 
 ### 5.3 Cleanup
+
 - [ ] **Remove old SSL certificates** for helpasaur.com from server:
   ```bash
   # After confirming everything works
@@ -125,10 +142,12 @@ This document outlines the complete migration process for moving the Helpasaur K
 If issues arise, you can quickly rollback:
 
 ### Option 1: DNS Rollback (Fastest - 5-10 minutes with low TTL)
+
 - Change CNAME back to A record pointing to your server
 - Deploy old nginx configuration with web proxy
 
 ### Option 2: Full Rollback (Complete reversion)
+
 - Revert the PR changes
 - Rebuild and deploy web container
 - Restore nginx configuration
@@ -137,7 +156,7 @@ If issues arise, you can quickly rollback:
 ## Timeline Estimate
 
 - **Phase 1**: 30 minutes
-- **Phase 2**: 15 minutes  
+- **Phase 2**: 15 minutes
 - **Phase 3**: 1-2 hours (including DNS propagation wait)
 - **Phase 4**: 2-4 hours (monitoring period)
 - **Phase 5**: 15 minutes (after 24-48 hour stability period)
@@ -152,7 +171,7 @@ If issues arise, you can quickly rollback:
 ✅ Performance improved or maintained  
 ✅ No web container running on server  
 ✅ Backend services (API, bots) functioning normally  
-✅ SSL certificates automatically managed by GitHub  
+✅ SSL certificates automatically managed by GitHub
 
 ## Notes
 
