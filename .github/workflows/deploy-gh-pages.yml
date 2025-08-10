@@ -58,7 +58,7 @@ jobs:
           TWITCH_APP_CLIENT_ID: ${{ secrets.TWITCH_APP_CLIENT_ID }}
         run: |
           pnpm clean
-          pnpm build
+          pnpm build --public-url /helpasaur-king/
 
       - name: Add CNAME file
         run: echo "helpasaur.com" > ./web/build/CNAME
