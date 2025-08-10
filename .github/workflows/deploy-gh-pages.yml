@@ -56,6 +56,7 @@ jobs:
         env:
           API_HOST: ${{ secrets.API_HOST }}
           TWITCH_APP_CLIENT_ID: ${{ secrets.TWITCH_APP_CLIENT_ID }}
+          PUBLIC_URL: /helpasaur-king
         run: |
           pnpm clean
           pnpm build --public-url /helpasaur-king/

@@ -16,6 +16,8 @@ import DiscordBotPage from "./pages/DiscordBotPage";
 import AdminPage from "./pages/AdminPage";
 import "./styles.scss";
 
+const basename = process.env.PUBLIC_URL || "/";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -58,7 +60,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+], { basename });
 
 const container = document.getElementById("app");
 const root = createRoot(container!);
