@@ -183,7 +183,7 @@ services:
       # This allows nginx to connect to the host machine on Linux
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "nginx", "-t"]
       interval: 10s
       timeout: 5s
       retries: 3
