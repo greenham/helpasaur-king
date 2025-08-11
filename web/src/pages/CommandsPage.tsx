@@ -1,50 +1,50 @@
-import * as React from "react";
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Alert, Container, Spinner } from "react-bootstrap";
-import CommandsList from "../components/CommandsList";
-import { sortCommandsAlpha } from "../utils/utils";
+import * as React from "react"
+import { useEffect } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Alert, Container, Spinner } from "react-bootstrap"
+import CommandsList from "../components/CommandsList"
+import { sortCommandsAlpha } from "../utils/utils"
 import {
   getCommands,
   createCommand,
   updateCommand,
   deleteCommand,
-} from "../utils/apiService";
-import { Command } from "../types/commands";
-import { useUser } from "../hooks/useUser";
-import { useToast } from "../hooks/useToast";
+} from "../utils/apiService"
+import { Command } from "../types/commands"
+import { useUser } from "../hooks/useUser"
+import { useToast } from "../hooks/useToast"
 
 interface CommandsPageProps {}
 
 const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
   useEffect(() => {
-    document.title = "Commands | Helpasaur King";
-  }, []);
+    document.title = "Commands | Helpasaur King"
+  }, [])
 
-  const { data: user } = useUser();
-  const toast = useToast();
+  const { data: user } = useUser()
+  const toast = useToast()
 
   const commandsQuery = useQuery({
     queryKey: ["commands"],
     queryFn: getCommands,
-  });
+  })
   const {
     data: commands,
     isError: commandsError,
     isLoading: commandsLoading,
-  } = commandsQuery;
+  } = commandsQuery
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const handleUpdateCommand = (command: Command) => {
-    updateCommandMutation.mutate(command);
-  };
+    updateCommandMutation.mutate(command)
+  }
   const handleCreateCommand = (command: Command) => {
-    createCommandMutation.mutate(command);
-  };
+    createCommandMutation.mutate(command)
+  }
   const handleDeleteCommand = (command: Command) => {
-    deleteCommandMutation.mutate(command);
-  };
+    deleteCommandMutation.mutate(command)
+  }
 
   // Mutations
   // @TODO: DRY this out
@@ -54,21 +54,21 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
     onMutate: async (updatedCommand) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ["commands"] });
+      await queryClient.cancelQueries({ queryKey: ["commands"] })
 
       // Snapshot the previous value
-      const previousCommands = queryClient.getQueryData(["commands"]);
+      const previousCommands = queryClient.getQueryData(["commands"])
 
       // Optimistically update to the new value
       queryClient.setQueryData(["commands"], (old: Command[]) =>
         old.map((c) => (c._id !== updatedCommand._id ? c : updatedCommand))
-      );
+      )
 
       // Return a context object with the snapshotted value
-      return { previousCommands: previousCommands };
+      return { previousCommands: previousCommands }
     },
     onSuccess(data, variables, context) {
-      toast.success(`Command '${variables.command}' updated!`);
+      toast.success(`Command '${variables.command}' updated!`)
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
@@ -76,14 +76,14 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       queryClient.setQueryData(
         ["commands"],
         context ? context.previousCommands : []
-      );
-      toast.error(`Unable to update command: ${err.message}`);
+      )
+      toast.error(`Unable to update command: ${err.message}`)
     },
     // Always refetch after error or success:
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["commands"] });
+      queryClient.invalidateQueries({ queryKey: ["commands"] })
     },
-  });
+  })
 
   const createCommandMutation = useMutation({
     mutationFn: createCommand,
@@ -91,22 +91,22 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
     onMutate: async (newCommand) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ["commands"] });
+      await queryClient.cancelQueries({ queryKey: ["commands"] })
 
       // Snapshot the previous value
-      const previousCommands = queryClient.getQueryData(["commands"]);
+      const previousCommands = queryClient.getQueryData(["commands"])
 
       // Optimistically update to the new value
       queryClient.setQueryData(["commands"], (old: Command[]) => [
         ...old,
         newCommand,
-      ]);
+      ])
 
       // Return a context object with the snapshotted value
-      return { previousCommands: previousCommands };
+      return { previousCommands: previousCommands }
     },
     onSuccess(data, variables, context) {
-      toast.success(`Command '${variables.command}' created!`);
+      toast.success(`Command '${variables.command}' created!`)
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
@@ -114,14 +114,14 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       queryClient.setQueryData(
         ["commands"],
         context ? context.previousCommands : []
-      );
-      toast.error(`Unable to create command: ${err.message}`);
+      )
+      toast.error(`Unable to create command: ${err.message}`)
     },
     // Always refetch after error or success:
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["commands"] });
+      queryClient.invalidateQueries({ queryKey: ["commands"] })
     },
-  });
+  })
 
   const deleteCommandMutation = useMutation({
     mutationFn: deleteCommand,
@@ -129,21 +129,21 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
     onMutate: async (deletedCommand) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ["commands"] });
+      await queryClient.cancelQueries({ queryKey: ["commands"] })
 
       // Snapshot the previous value
-      const previousCommands = queryClient.getQueryData(["commands"]);
+      const previousCommands = queryClient.getQueryData(["commands"])
 
       // Optimistically update to the new value
       queryClient.setQueryData(["commands"], (old: Command[]) =>
         old.filter((c) => c._id !== deletedCommand._id)
-      );
+      )
 
       // Return a context object with the snapshotted value
-      return { previousCommands: previousCommands };
+      return { previousCommands: previousCommands }
     },
     onSuccess(data, variables, context) {
-      toast.success(`Command '${variables.command}' deleted!`);
+      toast.success(`Command '${variables.command}' deleted!`)
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
@@ -151,17 +151,17 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       queryClient.setQueryData(
         ["commands"],
         context ? context.previousCommands : []
-      );
-      toast.error(`Unable to delete command: ${err.message}`);
+      )
+      toast.error(`Unable to delete command: ${err.message}`)
     },
     // Always refetch after error or success:
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["commands"] });
+      queryClient.invalidateQueries({ queryKey: ["commands"] })
     },
-  });
+  })
 
   if (commandsError) {
-    return <Alert variant="danger">{commandsError}</Alert>;
+    return <Alert variant="danger">{commandsError}</Alert>
   }
 
   return (
@@ -192,7 +192,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
         />
       )}
     </Container>
-  );
-};
+  )
+}
 
-export default CommandsPage;
+export default CommandsPage

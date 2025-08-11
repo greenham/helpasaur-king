@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+.parcel-cache/
+*.min.js
+*.min.css
+
+# Docker
+docker-data/
+
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Package manager
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Documentation that might have specific formatting
+*.md
+
+# Generated files
+*.generated.*
+
+# Monitoring data
+monitoring/data/

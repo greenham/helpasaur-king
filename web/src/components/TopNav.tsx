@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 import {
   Button,
   Container,
@@ -8,11 +8,11 @@ import {
   NavDropdown,
   OverlayTrigger,
   Popover,
-} from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
-import { getTwitchLoginUrl } from "../utils/utils";
-import { useLocation } from "react-router-dom";
-import { useUser } from "../hooks/useUser";
+} from "react-bootstrap"
+import { LinkContainer } from "react-router-bootstrap"
+import { getTwitchLoginUrl } from "../utils/utils"
+import { useLocation } from "react-router-dom"
+import { useUser } from "../hooks/useUser"
 
 const RESOURCES = [
   {
@@ -53,7 +53,7 @@ const RESOURCES = [
     icon: "fa-brands fa-discord",
     text: "ALttP Discord",
   },
-];
+]
 
 const popover = (
   <Popover placement="bottom" id="helpa-popover">
@@ -63,12 +63,12 @@ const popover = (
       a banana! 🍌
     </Popover.Body>
   </Popover>
-);
+)
 
 function TopNav() {
-  const { data: user } = useUser();
-  const logo = new URL("../img/logo.png", import.meta.url).toString();
-  const location = useLocation();
+  const { data: user } = useUser()
+  const logo = new URL("../img/logo.png", import.meta.url).toString()
+  const location = useLocation()
 
   return (
     <>
@@ -186,7 +186,7 @@ function TopNav() {
         </Navbar.Collapse>
       </Navbar>
     </>
-  );
+  )
 }
 
-export default TopNav;
+export default TopNav

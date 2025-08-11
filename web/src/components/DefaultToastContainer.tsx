@@ -1,16 +1,16 @@
-import * as React from "react";
-import { ToastContainer } from "react-bootstrap";
-import DefaultToast from "./DefaultToast";
-import { IToast } from "../types/toasts";
+import * as React from "react"
+import { ToastContainer } from "react-bootstrap"
+import DefaultToast from "./DefaultToast"
+import { IToast } from "../types/toasts"
 
 interface DefaultToastContainerProps {
-  toasts: IToast[];
+  toasts: IToast[]
 }
 
 const DefaultToastContainer: React.FunctionComponent<
   DefaultToastContainerProps
 > = (props) => {
-  const { toasts } = props;
+  const { toasts } = props
   return (
     <ToastContainer position="bottom-start" className="position-fixed p-3">
       {toasts &&
@@ -23,7 +23,7 @@ const DefaultToastContainer: React.FunctionComponent<
           />
         ))}
     </ToastContainer>
-  );
-};
+  )
+}
 
-export default DefaultToastContainer;
+export default DefaultToastContainer

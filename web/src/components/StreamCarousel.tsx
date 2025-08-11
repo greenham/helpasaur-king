@@ -1,20 +1,20 @@
-import * as React from "react";
-import { useState } from "react";
-import Carousel from "react-bootstrap/Carousel";
-import { TwitchStream } from "../types/streams";
-import StreamCard from "./StreamCard";
+import * as React from "react"
+import { useState } from "react"
+import Carousel from "react-bootstrap/Carousel"
+import { TwitchStream } from "../types/streams"
+import StreamCard from "./StreamCard"
 
 interface StreamCarouselProps {
-  streams: TwitchStream[];
+  streams: TwitchStream[]
 }
 
 function StreamCarousel(props: StreamCarouselProps) {
-  const { streams } = props;
-  const [index, setIndex] = useState<number>(0);
+  const { streams } = props
+  const [index, setIndex] = useState<number>(0)
 
   const handleSelect = (selectedIndex: number) => {
-    setIndex(selectedIndex);
-  };
+    setIndex(selectedIndex)
+  }
 
   return (
     <Carousel activeIndex={index} onSelect={handleSelect}>
@@ -29,7 +29,7 @@ function StreamCarousel(props: StreamCarouselProps) {
         </Carousel.Item>
       ))}
     </Carousel>
-  );
+  )
 }
 
-export default StreamCarousel;
+export default StreamCarousel

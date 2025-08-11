@@ -15,11 +15,16 @@
     "monitor:restart": "docker compose -f docker-compose.monitoring.yml restart",
     "monitor:logs": "docker compose -f docker-compose.monitoring.yml logs -f",
     "monitor:generate": "node monitoring/generate-configs.js",
-    "monitor:import": "node monitoring/import-via-api.js"
+    "monitor:import": "node monitoring/import-via-api.js",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,html}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,html}\" --ignore-path .prettierignore"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
   "dependencies": {
     "helpa-api-client": "file:./lib/helpa-api-client"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
   }
 }

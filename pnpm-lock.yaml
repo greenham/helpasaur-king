@@ -11,6 +11,10 @@ importers:
       helpa-api-client:
         specifier: file:./lib/helpa-api-client
         version: file:lib/helpa-api-client
+    devDependencies:
+      prettier:
+        specifier: ^3.0.3
+        version: 3.6.2
 
   api:
     dependencies:
