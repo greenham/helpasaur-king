@@ -10,4 +10,4 @@ module.exports = {
     weeklyRaceAlertChannelId: null,
     weeklyRaceAlertRoleId: null,
   },
-};
+}

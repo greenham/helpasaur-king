@@ -1,11 +1,11 @@
-import { useRouteError } from "react-router-dom";
-import TopNav from "./components/TopNav";
-import Alert from "react-bootstrap/Alert";
-import Container from "react-bootstrap/Container";
+import { useRouteError } from "react-router-dom"
+import TopNav from "./components/TopNav"
+import Alert from "react-bootstrap/Alert"
+import Container from "react-bootstrap/Container"
 
 export default function ErrorPage() {
-  const error = useRouteError();
-  console.error(error);
+  const error = useRouteError()
+  console.error(error)
 
   return (
     <>
@@ -23,5 +23,5 @@ export default function ErrorPage() {
         </Alert>
       </Container>
     </>
-  );
+  )
 }

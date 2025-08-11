@@ -1,11 +1,11 @@
-import { v4 as uuidv4 } from "uuid";
-import schedule from "node-schedule";
-import { io } from "socket.io-client";
-import WebSocket from "ws";
-import express from "express";
-import RacetimeBot from "./lib/racetime";
-import * as Racetime from "./lib/racetime/types";
-import packageJson from "../package.json";
+import { v4 as uuidv4 } from "uuid"
+import schedule from "node-schedule"
+import { io } from "socket.io-client"
+import WebSocket from "ws"
+import express from "express"
+import RacetimeBot from "./lib/racetime"
+import * as Racetime from "./lib/racetime/types"
+import packageJson from "../package.json"
 
 const requiredEnvVariables = [
   "WEBSOCKET_RELAY_SERVER",
@@ -14,34 +14,34 @@ const requiredEnvVariables = [
   "RACETIME_BOT_CLIENT_ID",
   "RACETIME_BOT_CLIENT_SECRET",
   "RACETIME_GAME_CATEGORY_SLUG_Z3",
-];
+]
 
-const config: { [key: string]: any } = {};
+const config: { [key: string]: any } = {}
 
 // Extract values from process.env and check for existence
 requiredEnvVariables.forEach((variable) => {
   if (!process.env[variable]) {
-    console.error(`Required environment variable ${variable} is not set!`);
-    process.exit(1);
+    console.error(`Required environment variable ${variable} is not set!`)
+    process.exit(1)
   }
-  config[variable] = process.env[variable];
-});
+  config[variable] = process.env[variable]
+})
 
-const nmgGoal = "Any% NMG";
-const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern";
-const weeklyRaceInfoBot = "";
-const disconnectFromRaceRoomAfterHours = 4;
+const nmgGoal = "Any% NMG"
+const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern"
+const weeklyRaceInfoBot = ""
+const disconnectFromRaceRoomAfterHours = 4
 
 // Configure race room to open 30 minutes before the start time
-const weeklyRaceStartOffsetMinutes = 30;
-const weeklyRaceStartOffsetSeconds = weeklyRaceStartOffsetMinutes * 60;
+const weeklyRaceStartOffsetMinutes = 30
+const weeklyRaceStartOffsetSeconds = weeklyRaceStartOffsetMinutes * 60
 // Weekly starts at Noon Pacific on Sundays
 const timeToSchedule = {
   dayOfWeek: 0,
   hour: 11,
   minute: 30,
   tz: "America/Los_Angeles",
-};
+}
 // !!!!! DEBUG ONLY !!!!! //
 // timeToSchedule.dayOfWeek = 5;
 // timeToSchedule.hour = 13;
@@ -49,19 +49,19 @@ const timeToSchedule = {
 ////////////////////////////
 
 // Connect to websocket relay so we can forward events to other services and listen for commands
-const wsRelayServer = String(config.WEBSOCKET_RELAY_SERVER);
+const wsRelayServer = String(config.WEBSOCKET_RELAY_SERVER)
 const wsRelay = io(wsRelayServer, {
   query: { clientId: "racebot v1.0.0" },
-});
+})
 // { query: { clientId: `${packageJson.name} ${packageJson.version}` } }
-console.log(`Connecting to websocket relay server: ${wsRelayServer}...`);
+console.log(`Connecting to websocket relay server: ${wsRelayServer}...`)
 wsRelay.on("connect_error", (err) => {
-  console.log(`Connection error!`);
-  console.log(err);
-});
+  console.log(`Connection error!`)
+  console.log(err)
+})
 wsRelay.on("connect", () => {
-  console.log(`Connected! Socket ID: ${wsRelay.id}`);
-});
+  console.log(`Connected! Socket ID: ${wsRelay.id}`)
+})
 
 const weeklyRaceData: Racetime.NewRaceData = {
   goal: nmgGoal,
@@ -76,7 +76,7 @@ const weeklyRaceData: Racetime.NewRaceData = {
   allow_midrace_chat: true,
   allow_non_entrant_chat: true,
   chat_message_delay: 0,
-};
+}
 
 const createRaceRoom = (
   game: string,
@@ -90,11 +90,11 @@ const createRaceRoom = (
       .then((racebot) => racebot.startRace(game, raceData))
       .then(resolve)
       .catch((error: any) => {
-        console.error(`Unable to create race room!`);
-        reject(error);
-      });
-  });
-};
+        console.error(`Unable to create race room!`)
+        reject(error)
+      })
+  })
+}
 
 const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
   return new Promise((resolve, reject) => {
@@ -105,36 +105,38 @@ const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
       .then((racebot) => racebot.connectToRaceRoom(raceRoomSlug))
       .then(resolve)
       .catch((error) => {
-        console.log("Unable to connect to race room:");
-        reject(error);
-      });
-  });
-};
+        console.log("Unable to connect to race room:")
+        reject(error)
+      })
+  })
+}
 
 const scheduleWeeklyRace = () => {
   const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, () => {
     if (process.env.NODE_ENV !== "production") {
-      console.log(`[${new Date().toISOString()}] Weekly race job triggered - skipping race room creation in non-production environment`);
-      return;
+      console.log(
+        `[${new Date().toISOString()}] Weekly race job triggered - skipping race room creation in non-production environment`
+      )
+      return
     }
 
-    let weeklyRaceRoomSlug = "";
+    let weeklyRaceRoomSlug = ""
 
-    console.log(`Creating weekly race room...`);
+    console.log(`Creating weekly race room...`)
     createRaceRoom(config.RACETIME_GAME_CATEGORY_SLUG_Z3, weeklyRaceData)
       .then((slug) => {
-        weeklyRaceRoomSlug = slug;
+        weeklyRaceRoomSlug = slug
         // Assemble event data to push to the relay (for discord, etc.)
         const raceData = {
           raceRoomUrl: `${config.RACETIME_BASE_URL}${slug}`,
           startTimestamp: Math.floor(
             (Date.now() + weeklyRaceStartOffsetSeconds * 1000) / 1000
           ),
-        };
-        wsRelay.emit("weeklyRaceRoomCreated", raceData);
+        }
+        wsRelay.emit("weeklyRaceRoomCreated", raceData)
 
         // Connect to the race room so we can interact with it
-        return listenToRaceRoom(slug);
+        return listenToRaceRoom(slug)
       })
       .then((wsRaceRoom) => {
         const happyWeeklyMessage: Racetime.MessageAction = {
@@ -146,33 +148,33 @@ const scheduleWeeklyRace = () => {
             direct_to: null,
             guid: uuidv4(),
           },
-        };
+        }
         wsRaceRoom.send(JSON.stringify(happyWeeklyMessage), (err) => {
-          if (err) return console.error(err);
-          console.log(`Sent happy weekly message to race room!`);
-        });
+          if (err) return console.error(err)
+          console.log(`Sent happy weekly message to race room!`)
+        })
 
         wsRaceRoom.on("message", (data: string) => {
-          const raceRoomMessage: Racetime.IncomingMessage = JSON.parse(data);
+          const raceRoomMessage: Racetime.IncomingMessage = JSON.parse(data)
 
           switch (raceRoomMessage.type) {
             case Racetime.CHAT_MESSAGE_TYPE:
               // Type assertion to specify that raceRoomMessage is of type ChatMessageMessage
               const raceChatMessage =
-                raceRoomMessage as Racetime.ChatMessageMessage;
-              const { message: chatMessage } = raceChatMessage;
+                raceRoomMessage as Racetime.ChatMessageMessage
+              const { message: chatMessage } = raceChatMessage
 
               console.log(
                 `${weeklyRaceRoomSlug} | <${chatMessage.user?.name}>: ${chatMessage.message}`
-              );
+              )
 
               // @TODO: Respond to the usual prefixed commands
-              break;
+              break
 
             case Racetime.RACE_DATA_TYPE:
               // Type assertion to specify that raceRoomMessage is of type RaceDataMessage
               const raceDataMessage =
-                raceRoomMessage as Racetime.RaceDataMessage;
+                raceRoomMessage as Racetime.RaceDataMessage
 
               // if the race has ended, disconnect from the websocket
               if (
@@ -182,68 +184,67 @@ const scheduleWeeklyRace = () => {
               ) {
                 console.log(
                   `Race has finished (or been cancelled)! Closing websocket connection...`
-                );
-                wsRaceRoom.terminate();
+                )
+                wsRaceRoom.terminate()
               }
 
-              break;
+              break
           }
-        });
+        })
 
-        setTimeout(() => {
-          console.log(
-            `It's been ${disconnectFromRaceRoomAfterHours} hours, closing websocket connection...`
-          );
-          wsRaceRoom.terminate();
-        }, 1000 * 60 * 60 * disconnectFromRaceRoomAfterHours);
+        setTimeout(
+          () => {
+            console.log(
+              `It's been ${disconnectFromRaceRoomAfterHours} hours, closing websocket connection...`
+            )
+            wsRaceRoom.terminate()
+          },
+          1000 * 60 * 60 * disconnectFromRaceRoomAfterHours
+        )
       })
-      .catch(console.error);
-  });
-
+      .catch(console.error)
+  })
 
   weeklyRaceJob.on("scheduled", (date) => {
-    console.log(
-      `Weekly race room creation scheduled, next invocation: ${date}`
-    );
-  });
+    console.log(`Weekly race room creation scheduled, next invocation: ${date}`)
+  })
 
   console.log(
     `Weekly race room creation scheduled, next invocation: ${weeklyRaceJob.nextInvocation()}`
-  );
+  )
 
   // Start health check server
-  const healthApp = express();
-  const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012;
+  const healthApp = express()
+  const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012
 
   healthApp.get("/health", (_req, res) => {
     try {
-      res.status(200).json({ 
-        status: "healthy", 
+      res.status(200).json({
+        status: "healthy",
         service: "racebot",
         version: packageJson.version,
         wsRelayConnected: wsRelay.connected,
         environment: process.env.NODE_ENV,
         schedulerActive: weeklyRaceJob !== null,
         nextRace: weeklyRaceJob?.nextInvocation() || null,
-      });
+      })
     } catch (error) {
-      console.error("Health check error:", error);
+      console.error("Health check error:", error)
       res.status(503).json({
         status: "unhealthy",
         service: "racebot",
-        error: error instanceof Error ? error.message : String(error)
-      });
+        error: error instanceof Error ? error.message : String(error),
+      })
     }
-  });
+  })
 
   healthApp.listen(healthPort, () => {
-    console.log(`Health check endpoint available on port ${healthPort}`);
-  });
-};
+    console.log(`Health check endpoint available on port ${healthPort}`)
+  })
+}
 
-
-scheduleWeeklyRace();
+scheduleWeeklyRace()
 
 process.on("SIGINT", function () {
-  schedule.gracefulShutdown().then(() => process.exit(0));
-});
+  schedule.gracefulShutdown().then(() => process.exit(0))
+})

@@ -1,11 +1,11 @@
-import * as React from "react";
+import * as React from "react"
 
 const LinkifyText = ({ text }: { text: string }) => {
   // Regular expression to identify URLs in text
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const urlRegex = /(https?:\/\/[^\s]+)/g
 
   // Split the text into parts, where URLs are and where they are not
-  const parts = text.split(urlRegex);
+  const parts = text.split(urlRegex)
 
   // Map the parts to React elements, making URLs clickable
   const elements = parts.map((part, index) =>
@@ -16,9 +16,9 @@ const LinkifyText = ({ text }: { text: string }) => {
     ) : (
       <span key={index}>{part}</span>
     )
-  );
+  )
 
-  return <>{elements}</>;
-};
+  return <>{elements}</>
+}
 
-export default LinkifyText;
+export default LinkifyText

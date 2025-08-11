@@ -1,22 +1,22 @@
-import * as React from "react";
-import { TwitchStream } from "../types/streams";
-import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
-import Button from "react-bootstrap/Button";
-import Stack from "react-bootstrap/Stack";
-import TimeAgo from "react-timeago";
-import { sizeStreamThumbnail, getTwitchUrl } from "../utils/utils";
+import * as React from "react"
+import { TwitchStream } from "../types/streams"
+import Card from "react-bootstrap/Card"
+import Badge from "react-bootstrap/Badge"
+import Button from "react-bootstrap/Button"
+import Stack from "react-bootstrap/Stack"
+import TimeAgo from "react-timeago"
+import { sizeStreamThumbnail, getTwitchUrl } from "../utils/utils"
 
 interface StreamCardProps {
-  stream: TwitchStream;
-  thumbnailWidth?: number;
-  thumbnailHeight?: number;
+  stream: TwitchStream
+  thumbnailWidth?: number
+  thumbnailHeight?: number
 }
 
 function StreamCard(props: StreamCardProps) {
-  const { stream } = props;
-  const thumbnailWidth = props.thumbnailWidth || 320;
-  const thumbnailHeight = props.thumbnailHeight || 180;
+  const { stream } = props
+  const thumbnailWidth = props.thumbnailWidth || 320
+  const thumbnailHeight = props.thumbnailHeight || 180
   return (
     <Card
       className="rounded h-100"
@@ -82,7 +82,7 @@ function StreamCard(props: StreamCardProps) {
         </Stack>
       </Card.Footer>
     </Card>
-  );
+  )
 }
 
-export default StreamCard;
+export default StreamCard

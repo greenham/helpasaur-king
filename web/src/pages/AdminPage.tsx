@@ -1,17 +1,17 @@
-import * as React from "react";
-import { useEffect } from "react";
-import { Alert, Container, ListGroup, Spinner } from "react-bootstrap";
-import { useUser } from "../hooks/useUser";
-import ManageStreamAlerts from "../components/Admin/ManageStreamAlerts";
-import ManageTwitchBot from "../components/Admin/ManageTwitchBot";
+import * as React from "react"
+import { useEffect } from "react"
+import { Alert, Container, ListGroup, Spinner } from "react-bootstrap"
+import { useUser } from "../hooks/useUser"
+import ManageStreamAlerts from "../components/Admin/ManageStreamAlerts"
+import ManageTwitchBot from "../components/Admin/ManageTwitchBot"
 
 interface AdminPageProps {}
 const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
   useEffect(() => {
-    document.title = "Admin | Helpasaur King";
-  }, []);
+    document.title = "Admin | Helpasaur King"
+  }, [])
 
-  const { data: user, isLoading: userLoading } = useUser();
+  const { data: user, isLoading: userLoading } = useUser()
 
   if (userLoading)
     return (
@@ -20,7 +20,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
           <span className="visually-hidden">Loading...</span>
         </Spinner>
       </Container>
-    );
+    )
 
   if (!user || !user.permissions.includes("admin"))
     return (
@@ -29,7 +29,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
           You do not have permission to access this!
         </Alert>
       </Container>
-    );
+    )
 
   return (
     <Container className="mt-5">
@@ -47,7 +47,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
       </h2>
       <ManageTwitchBot />
     </Container>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage

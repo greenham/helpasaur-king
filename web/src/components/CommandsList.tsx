@@ -1,7 +1,7 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { useDebounce } from "use-debounce";
+import * as React from "react"
+import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
+import { useDebounce } from "use-debounce"
 import {
   Alert,
   Badge,
@@ -14,29 +14,29 @@ import {
   Row,
   Stack,
   Table,
-} from "react-bootstrap";
-import LinkifyText from "./LinkifyText";
-import { Command } from "../types/commands";
-import CommandFormModal from "./CommandFormModal";
+} from "react-bootstrap"
+import LinkifyText from "./LinkifyText"
+import { Command } from "../types/commands"
+import CommandFormModal from "./CommandFormModal"
 
 interface CommandsListProps {
-  commands: Command[];
-  userCanEdit: boolean;
-  updateCommand: (c: Command) => void;
-  createCommand: (c: Command) => void;
-  deleteCommand: (c: Command) => void;
+  commands: Command[]
+  userCanEdit: boolean
+  updateCommand: (c: Command) => void
+  createCommand: (c: Command) => void
+  deleteCommand: (c: Command) => void
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
-  const { commands, userCanEdit } = props;
+  const { commands, userCanEdit } = props
 
   // Set up searching
-  const { hash } = useLocation();
-  const [searchQuery, setSearchQuery] = useState(hash.replace("#", ""));
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-  const [searchResults, setSearchResults] = useState<Array<Command>>([]);
+  const { hash } = useLocation()
+  const [searchQuery, setSearchQuery] = useState(hash.replace("#", ""))
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500)
+  const [searchResults, setSearchResults] = useState<Array<Command>>([])
   const filterCommands = (commandsToFilter: Command[], query: string) => {
-    if (query.length === 0) return commandsToFilter;
+    if (query.length === 0) return commandsToFilter
 
     return commandsToFilter.filter(
       (c) =>
@@ -45,18 +45,18 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           alias.toLowerCase().includes(query.toLowerCase())
         ) ||
         c.response.toLowerCase().includes(query.toLowerCase())
-    );
-  };
+    )
+  }
 
   // Handle updates to the location hash
   useEffect(() => {
-    setSearchQuery(hash.replace("#", ""));
-  }, [hash]);
+    setSearchQuery(hash.replace("#", ""))
+  }, [hash])
 
   useEffect(() => {
-    setSearchResults(filterCommands(commands, debouncedSearchQuery));
-    window.location.replace("#" + debouncedSearchQuery);
-  }, [debouncedSearchQuery, commands]);
+    setSearchResults(filterCommands(commands, debouncedSearchQuery))
+    window.location.replace("#" + debouncedSearchQuery)
+  }, [debouncedSearchQuery, commands])
 
   const freshCommand = {
     _id: "",
@@ -66,38 +66,38 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     enabled: true,
     category: "",
     aliasesText: "",
-  };
-  const [editCommandModalActive, setEditCommandModalActive] = useState(false);
-  const hideEditCommandModal = () => setEditCommandModalActive(false);
-  const showEditCommandModal = () => setEditCommandModalActive(true);
-  const [commandToEdit, setCommandToEdit] = useState<Command>(freshCommand);
+  }
+  const [editCommandModalActive, setEditCommandModalActive] = useState(false)
+  const hideEditCommandModal = () => setEditCommandModalActive(false)
+  const showEditCommandModal = () => setEditCommandModalActive(true)
+  const [commandToEdit, setCommandToEdit] = useState<Command>(freshCommand)
 
   const [deleteCommandModalActive, setDeleteCommandModalActive] =
-    useState(false);
-  const hideDeleteCommandModal = () => setDeleteCommandModalActive(false);
-  const showDeleteCommandModal = () => setDeleteCommandModalActive(true);
-  const [commandToDelete, setCommandToDelete] = useState<Command>(freshCommand);
+    useState(false)
+  const hideDeleteCommandModal = () => setDeleteCommandModalActive(false)
+  const showDeleteCommandModal = () => setDeleteCommandModalActive(true)
+  const [commandToDelete, setCommandToDelete] = useState<Command>(freshCommand)
 
   const saveCommand = async (command: Command) => {
     if (command._id !== "") {
-      props.updateCommand(command);
+      props.updateCommand(command)
     } else {
-      props.createCommand(command);
+      props.createCommand(command)
     }
-    hideEditCommandModal();
-  };
+    hideEditCommandModal()
+  }
 
   const handleDeleteConfirm = async () => {
     if (commandToDelete._id !== "") {
-      props.deleteCommand(commandToDelete);
+      props.deleteCommand(commandToDelete)
     }
-    hideDeleteCommandModal();
-  };
+    hideDeleteCommandModal()
+  }
 
   const handleNewCommandClick = () => {
-    setCommandToEdit(freshCommand);
-    showEditCommandModal();
-  };
+    setCommandToEdit(freshCommand)
+    showEditCommandModal()
+  }
 
   return (
     <>
@@ -114,9 +114,9 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyUp={(e) => {
                 if (e.key === "Escape") {
-                  setSearchQuery("");
+                  setSearchQuery("")
                 } else if (e.key == "Enter") {
-                  e.currentTarget.blur();
+                  e.currentTarget.blur()
                 }
               }}
               size="lg"
@@ -178,8 +178,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                   <>
                     <Button
                       onClick={() => {
-                        setCommandToEdit(c);
-                        showEditCommandModal();
+                        setCommandToEdit(c)
+                        showEditCommandModal()
                       }}
                       className="ms-auto"
                       variant="dark"
@@ -189,8 +189,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                     <Button
                       variant="dark"
                       onClick={() => {
-                        setCommandToDelete(c);
-                        showDeleteCommandModal();
+                        setCommandToDelete(c)
+                        showDeleteCommandModal()
                       }}
                     >
                       <i className="fa-regular fa-trash-can"></i>
@@ -238,8 +238,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                       <Button
                         variant="dark"
                         onClick={() => {
-                          setCommandToEdit(c);
-                          showEditCommandModal();
+                          setCommandToEdit(c)
+                          showEditCommandModal()
                         }}
                       >
                         <i className="fa-regular fa-pen-to-square"></i>
@@ -247,8 +247,8 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                       <Button
                         variant="dark"
                         onClick={() => {
-                          setCommandToDelete(c);
-                          showDeleteCommandModal();
+                          setCommandToDelete(c)
+                          showDeleteCommandModal()
                         }}
                       >
                         <i className="fa-regular fa-trash-can"></i>
@@ -256,7 +256,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                     </td>
                   )}
                 </tr>
-              );
+              )
             })}
           </tbody>
         </Table>
@@ -296,11 +296,11 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Modal>
       )}
     </>
-  );
-};
+  )
+}
 
 export const CommandAliasesStack = (props: { aliases: string[] }) => {
-  const { aliases } = props;
+  const { aliases } = props
   return (
     <Stack
       direction="horizontal"
@@ -313,7 +313,7 @@ export const CommandAliasesStack = (props: { aliases: string[] }) => {
         </Badge>
       ))}
     </Stack>
-  );
-};
+  )
+}
 
-export default CommandsList;
+export default CommandsList

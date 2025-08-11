@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { Alert, Container } from "react-bootstrap";
+import { useEffect } from "react"
+import { Alert, Container } from "react-bootstrap"
 
 export default function PageNotFound() {
   useEffect(() => {
-    document.title = "Page Not Found | Helpasaur King";
-  }, []);
+    document.title = "Page Not Found | Helpasaur King"
+  }, [])
 
   return (
     <>
@@ -17,5 +17,5 @@ export default function PageNotFound() {
         </Alert>
       </Container>
     </>
-  );
+  )
 }

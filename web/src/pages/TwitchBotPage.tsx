@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 import {
   Alert,
   Button,
@@ -8,37 +8,37 @@ import {
   Form,
   ListGroup,
   Dropdown,
-} from "react-bootstrap";
-import { useEffect, useState, useMemo } from "react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { IUser } from "../types/users";
+} from "react-bootstrap"
+import { useEffect, useState, useMemo } from "react"
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
+import { IUser } from "../types/users"
 import {
   getTwitchBotConfig,
   getPublicConfigs,
   joinTwitchChannel,
   leaveTwitchChannel,
   updateTwitchBotConfig,
-} from "../utils/apiService";
-import { useToast } from "../hooks/useToast";
-import { getTwitchLoginUrl } from "../utils/utils";
-import { useUser } from "../hooks/useUser";
+} from "../utils/apiService"
+import { useToast } from "../hooks/useToast"
+import { getTwitchLoginUrl } from "../utils/utils"
+import { useUser } from "../hooks/useUser"
 
 interface TwitchBotPageProps {}
 
 const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
   useEffect(() => {
-    document.title = "Twitch Bot | Helpasaur King";
-  }, []);
+    document.title = "Twitch Bot | Helpasaur King"
+  }, [])
 
-  const { data: user, isPending: userLoading } = useUser();
+  const { data: user, isPending: userLoading } = useUser()
 
   const { data: twitchBotConfig, isPending: twitchBotConfigLoading } = useQuery(
     {
       queryKey: ["twitchBotConfig"],
       queryFn: getTwitchBotConfig,
       retry: 0,
-    },
-  );
+    }
+  )
 
   if (userLoading || twitchBotConfigLoading)
     return (
@@ -47,7 +47,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
           <span className="visually-hidden">Loading...</span>
         </Spinner>
       </Container>
-    );
+    )
 
   return (
     <Container id="twitch-bot-page" className="my-5">
@@ -78,32 +78,32 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
         />
       )}
     </Container>
-  );
-};
+  )
+}
 
 interface TwitchBotConfig {
-  active: boolean;
-  commandsEnabled: boolean;
-  commandPrefix: string;
-  textCommandCooldown: number;
-  practiceListsEnabled: boolean;
-  allowModsToManagePracticeLists: boolean;
-  weeklyRaceAlertEnabled: boolean;
-  createdAt: Date;
-  lastUpdated: Date;
+  active: boolean
+  commandsEnabled: boolean
+  commandPrefix: string
+  textCommandCooldown: number
+  practiceListsEnabled: boolean
+  allowModsToManagePracticeLists: boolean
+  weeklyRaceAlertEnabled: boolean
+  createdAt: Date
+  lastUpdated: Date
 }
 
 interface TwitchUserBotManagementProps {
-  user: IUser;
-  twitchBotConfig: TwitchBotConfig;
+  user: IUser
+  twitchBotConfig: TwitchBotConfig
 }
 // Custom toggle component for better UX
 interface ConfigToggleProps {
-  id: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
-  label?: string;
+  id: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+  label?: string
 }
 
 const ConfigToggle: React.FC<ConfigToggleProps> = ({
@@ -131,57 +131,57 @@ const ConfigToggle: React.FC<ConfigToggleProps> = ({
         }
       />
     </div>
-  );
-};
+  )
+}
 
 const TwitchUserBotManagement: React.FunctionComponent<
   TwitchUserBotManagementProps
 > = (props) => {
-  const { user, twitchBotConfig } = props;
+  const { user, twitchBotConfig } = props
 
-  const queryClient = useQueryClient();
-  const toast = useToast();
-  const [showLeaveModal, setShowLeaveModal] = React.useState(false);
-  const handleShowLeaveModal = () => setShowLeaveModal(true);
-  const handleCloseLeaveModal = () => setShowLeaveModal(false);
+  const queryClient = useQueryClient()
+  const toast = useToast()
+  const [showLeaveModal, setShowLeaveModal] = React.useState(false)
+  const handleShowLeaveModal = () => setShowLeaveModal(true)
+  const handleCloseLeaveModal = () => setShowLeaveModal(false)
 
   // State for command prefix editing
-  const [showPrefixDropdown, setShowPrefixDropdown] = useState(false);
+  const [showPrefixDropdown, setShowPrefixDropdown] = useState(false)
 
   // Fetch public configs from API
   const { data: publicConfigs } = useQuery({
     queryKey: ["publicConfigs"],
     queryFn: getPublicConfigs,
-  });
+  })
 
   // Memoize allowed prefixes to avoid unnecessary recalculations
   const allowedPrefixes = useMemo(() => {
     if (!publicConfigs?.twitch?.commandPrefixes) {
-      return [];
+      return []
     }
-    return publicConfigs.twitch.commandPrefixes;
-  }, [publicConfigs]);
+    return publicConfigs.twitch.commandPrefixes
+  }, [publicConfigs])
 
   const handleJoinRequest = async () => {
-    const joinResult = await joinTwitchChannel();
+    const joinResult = await joinTwitchChannel()
     if (joinResult.result === "success") {
-      toast.success("Successfully joined your channel!");
-      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+      toast.success("Successfully joined your channel!")
+      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
     } else {
-      toast.warning("Unable to join your channel!");
+      toast.warning("Unable to join your channel!")
     }
-  };
+  }
 
   const handleLeaveRequest = async () => {
-    const leaveResult = await leaveTwitchChannel();
+    const leaveResult = await leaveTwitchChannel()
     if (leaveResult.result === "success") {
-      toast.success("Successfully left your channel!");
-      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+      toast.success("Successfully left your channel!")
+      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
     } else {
-      toast.warning("Unable to leave your channel!");
+      toast.warning("Unable to leave your channel!")
     }
-    handleCloseLeaveModal();
-  };
+    handleCloseLeaveModal()
+  }
 
   if (!twitchBotConfig?.active) {
     return (
@@ -197,45 +197,45 @@ const TwitchUserBotManagement: React.FunctionComponent<
           channel
         </Button>
       </Alert>
-    );
+    )
   }
 
   const updateConfigMutation = useMutation({
     mutationFn: updateTwitchBotConfig,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] });
+      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
     },
-  });
+  })
 
   const handleToggle = async (
     field: string,
     value: boolean,
-    successMessage: string,
+    successMessage: string
   ) => {
     try {
-      await updateConfigMutation.mutateAsync({ [field]: value });
-      toast.success(successMessage);
+      await updateConfigMutation.mutateAsync({ [field]: value })
+      toast.success(successMessage)
     } catch (error: any) {
       toast.error(
-        `Failed to update configuration: ${error?.message || "Unknown error"}`,
-      );
+        `Failed to update configuration: ${error?.message || "Unknown error"}`
+      )
     }
-  };
+  }
 
   const handlePrefixChange = async (newPrefix: string) => {
     if (!twitchBotConfig || newPrefix === twitchBotConfig.commandPrefix) {
-      return; // No change needed or config not loaded
+      return // No change needed or config not loaded
     }
 
     try {
-      await updateConfigMutation.mutateAsync({ commandPrefix: newPrefix });
-      toast.success(`Command prefix changed to "${newPrefix}"`);
+      await updateConfigMutation.mutateAsync({ commandPrefix: newPrefix })
+      toast.success(`Command prefix changed to "${newPrefix}"`)
     } catch (error: any) {
       toast.error(
-        `Failed to update prefix: ${error?.message || "Unknown error"}`,
-      );
+        `Failed to update prefix: ${error?.message || "Unknown error"}`
+      )
     }
-  };
+  }
 
   return (
     <>
@@ -281,7 +281,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
                       checked,
                       checked
                         ? "Bot commands enabled!"
-                        : "Bot commands disabled!",
+                        : "Bot commands disabled!"
                     )
                   }
                   disabled={updateConfigMutation.isPending}
@@ -326,8 +326,8 @@ const TwitchUserBotManagement: React.FunctionComponent<
                             key={prefix}
                             active={prefix === twitchBotConfig?.commandPrefix}
                             onClick={() => {
-                              handlePrefixChange(prefix);
-                              setShowPrefixDropdown(false);
+                              handlePrefixChange(prefix)
+                              setShowPrefixDropdown(false)
                             }}
                             style={{
                               fontFamily: "monospace",
@@ -375,7 +375,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
                       checked,
                       checked
                         ? "Practice lists enabled!"
-                        : "Practice lists disabled!",
+                        : "Practice lists disabled!"
                     )
                   }
                   disabled={updateConfigMutation.isPending}
@@ -407,7 +407,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
                           checked,
                           checked
                             ? "Mods can now manage practice lists!"
-                            : "Only you can manage practice lists now!",
+                            : "Only you can manage practice lists now!"
                         )
                       }
                       disabled={updateConfigMutation.isPending}
@@ -426,13 +426,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
         handleConfirm={handleLeaveRequest}
       />
     </>
-  );
-};
+  )
+}
 
 const ConfirmLeaveModal: React.FunctionComponent<{
-  show: boolean;
-  handleClose: () => void;
-  handleConfirm: () => void;
+  show: boolean
+  handleClose: () => void
+  handleConfirm: () => void
 }> = ({ show, handleClose, handleConfirm }) => {
   return (
     <Modal show={show} onHide={handleClose}>
@@ -455,7 +455,7 @@ const ConfirmLeaveModal: React.FunctionComponent<{
         </Button>
       </Modal.Footer>
     </Modal>
-  );
-};
+  )
+}
 
-export default TwitchBotPage;
+export default TwitchBotPage

@@ -1,151 +1,151 @@
-import { Command } from "../types/commands";
+import { Command } from "../types/commands"
 
 if (!process.env.API_HOST) {
   throw new Error(
-    "API_HOST environment variable is not defined. Please set it during build time.",
-  );
+    "API_HOST environment variable is not defined. Please set it during build time."
+  )
 }
-const API_URL = process.env.API_HOST + "/api";
+const API_URL = process.env.API_HOST + "/api"
 
 export const getCommands = async () => {
-  const response = await fetch(`${API_URL}/commands`);
+  const response = await fetch(`${API_URL}/commands`)
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getLivestreams = async () => {
-  const response = await fetch(`${API_URL}/streams/live`);
+  const response = await fetch(`${API_URL}/streams/live`)
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getConfig = async () => {
-  const response = await fetch(`${API_URL}/web/config`);
+  const response = await fetch(`${API_URL}/web/config`)
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getDiscordJoinUrl = async () => {
-  const response = await fetch(`${API_URL}/discord/joinUrl`);
+  const response = await fetch(`${API_URL}/discord/joinUrl`)
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getCurrentUser = async () => {
-  const response = await fetch(`${API_URL}/me`, { credentials: "include" });
+  const response = await fetch(`${API_URL}/me`, { credentials: "include" })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getTwitchBotConfig = async () => {
   const response = await fetch(`${API_URL}/me/twitch`, {
     credentials: "include",
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getTwitchBotChannels = async () => {
   const response = await fetch(`${API_URL}/twitch/channels`, {
     credentials: "include",
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const joinTwitchChannel = async (twitchUsername?: string) => {
-  const body = twitchUsername ? { channel: twitchUsername } : {};
+  const body = twitchUsername ? { channel: twitchUsername } : {}
   const response = await fetch(`${API_URL}/twitch/join`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const leaveTwitchChannel = async (twitchUsername?: string) => {
-  const body = twitchUsername ? { channel: twitchUsername } : {};
+  const body = twitchUsername ? { channel: twitchUsername } : {}
   const response = await fetch(`${API_URL}/twitch/leave`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getPublicConfigs = async () => {
-  const response = await fetch(`${API_URL}/public/configs`);
+  const response = await fetch(`${API_URL}/public/configs`)
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const updateTwitchBotConfig = async (
   config: Partial<{
-    practiceListsEnabled: boolean;
-    allowModsToManagePracticeLists: boolean;
-    commandsEnabled: boolean;
-    commandPrefix: string;
-    textCommandCooldown: number;
-    weeklyRaceAlertEnabled: boolean;
-  }>,
+    practiceListsEnabled: boolean
+    allowModsToManagePracticeLists: boolean
+    commandsEnabled: boolean
+    commandPrefix: string
+    textCommandCooldown: number
+    weeklyRaceAlertEnabled: boolean
+  }>
 ) => {
   const response = await fetch(`${API_URL}/twitch/config`, {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(config),
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const createCommand = async (command: Command) => {
   const response = await fetch(`${API_URL}/commands`, {
@@ -153,14 +153,14 @@ export const createCommand = async (command: Command) => {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const updateCommand = async (command: Command) => {
   const response = await fetch(`${API_URL}/commands/${command._id}`, {
@@ -168,14 +168,14 @@ export const updateCommand = async (command: Command) => {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const deleteCommand = async (command: Command) => {
   const response = await fetch(`${API_URL}/commands/${command._id}`, {
@@ -183,26 +183,26 @@ export const deleteCommand = async (command: Command) => {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(command),
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const getStreamAlertsChannels = async () => {
   const response = await fetch(`${API_URL}/streamAlerts/channels`, {
     credentials: "include",
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
-  return response.json();
-};
+  return response.json()
+}
 
 export const addChannelToStreamAlerts = async (twitchUsername: string) => {
   const response = await fetch(`${API_URL}/streamAlerts/channels`, {
@@ -210,15 +210,15 @@ export const addChannelToStreamAlerts = async (twitchUsername: string) => {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ channels: [twitchUsername] }),
-  });
+  })
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
 
-  return response.json();
-};
+  return response.json()
+}
 
 export const removeChannelFromStreamAlerts = async (twitchUserId: string) => {
   const response = await fetch(
@@ -226,21 +226,21 @@ export const removeChannelFromStreamAlerts = async (twitchUserId: string) => {
     {
       method: "DELETE",
       credentials: "include",
-    },
-  );
+    }
+  )
   try {
-    await handleApiResponse(response);
+    await handleApiResponse(response)
   } catch (e) {
-    throw e;
+    throw e
   }
 
-  return response.json();
-};
+  return response.json()
+}
 
 async function handleApiResponse(response: Response) {
   if (!response.ok) {
-    const responseJson = await response.json();
-    const message = responseJson.message || "API returned an error";
-    throw new Error(message);
+    const responseJson = await response.json()
+    const message = responseJson.message || "API returned an error"
+    throw new Error(message)
   }
 }

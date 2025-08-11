@@ -1,23 +1,23 @@
-const { io } = require("socket.io-client");
-const tmi = require("tmi.js");
-const crypto = require("crypto");
-const packageJson = require("../package.json");
-const { WEBSOCKET_RELAY_SERVER } = process.env;
+const { io } = require("socket.io-client")
+const tmi = require("tmi.js")
+const crypto = require("crypto")
+const packageJson = require("../package.json")
+const { WEBSOCKET_RELAY_SERVER } = process.env
 
 class TwitchBot {
   constructor(config, helpaApi) {
-    this.config = config;
-    this.helpaApi = helpaApi;
-    this.cooldowns = new Map();
-    this.cachedCommands = new Map();
-    this.bot = null;
-    this.wsRelay = null;
+    this.config = config
+    this.helpaApi = helpaApi
+    this.cooldowns = new Map()
+    this.cachedCommands = new Map()
+    this.bot = null
+    this.wsRelay = null
     // @TODO: Replace HelpasaurKing with this.config.botDisplayName
     this.messages = {
       onJoin: `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Commands: https://helpasaur.com/commands | Manage: https://helpasaur.com/twitch`,
       onLeave: `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`,
-    };
-    this.lastRandomRoomMap = new Map();
+    }
+    this.lastRandomRoomMap = new Map()
   }
 
   // {
@@ -33,7 +33,7 @@ class TwitchBot {
   //    lastUpdated: ISODate('2024-01-21T22:47:24.975Z')
   // }
   start(channels) {
-    this.setActiveChannels(channels);
+    this.setActiveChannels(channels)
     this.bot = new tmi.Client({
       options: { debug: false },
       identity: {
@@ -42,59 +42,59 @@ class TwitchBot {
       },
       channels: [...this.channelList],
       skipMembership: true,
-    });
+    })
 
-    this.bot.connect().catch(console.error);
+    this.bot.connect().catch(console.error)
 
-    this.bot.on("message", this.handleMessage.bind(this));
+    this.bot.on("message", this.handleMessage.bind(this))
 
     this.wsRelay = io(WEBSOCKET_RELAY_SERVER, {
       query: { clientId: `${packageJson.name} v${packageJson.version}` },
-    });
+    })
 
     console.log(
       `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
-    );
+    )
 
     this.wsRelay.on("connect_error", (err) => {
-      console.log(`Connection error!`);
-      console.log(err);
-    });
+      console.log(`Connection error!`)
+      console.log(err)
+    })
 
     this.wsRelay.on("connect", () => {
-      console.log(`✅ Connected! Socket ID: ${this.wsRelay.id}`);
-    });
+      console.log(`✅ Connected! Socket ID: ${this.wsRelay.id}`)
+    })
 
-    this.wsRelay.on("joinChannel", this.handleJoinChannel.bind(this));
-    this.wsRelay.on("leaveChannel", this.handleLeaveChannel.bind(this));
-    this.wsRelay.on("configUpdate", this.handleConfigUpdate.bind(this));
+    this.wsRelay.on("joinChannel", this.handleJoinChannel.bind(this))
+    this.wsRelay.on("leaveChannel", this.handleLeaveChannel.bind(this))
+    this.wsRelay.on("configUpdate", this.handleConfigUpdate.bind(this))
 
     // Update active channels list every minute so we pick up config changes quickly
     setInterval(() => {
-      this.refreshActiveChannels();
-    }, 60000);
+      this.refreshActiveChannels()
+    }, 60000)
   }
 
   async handleMessage(channel, tags, message, self) {
-    if (self) return;
+    if (self) return
 
     // Handle commands in the bot's channel (using the global default command prefix)
     // - join, leave
     if (channel === `#${this.config.username}`) {
-      if (!message.startsWith(this.config.cmdPrefix)) return;
-      const args = message.slice(1).split(" ");
-      const commandNoPrefix = args.shift().toLowerCase();
+      if (!message.startsWith(this.config.cmdPrefix)) return
+      const args = message.slice(1).split(" ")
+      const commandNoPrefix = args.shift().toLowerCase()
       switch (commandNoPrefix) {
         case "join":
-          let channelToJoin = tags.username;
+          let channelToJoin = tags.username
 
           if (args[0] && tags.mod) {
-            channelToJoin = args[0].toLowerCase();
+            channelToJoin = args[0].toLowerCase()
           }
 
           console.log(
             `Received request from ${tags.username} to join ${channelToJoin}`
-          );
+          )
 
           if (this.channelList.includes(channelToJoin)) {
             return this.bot
@@ -102,7 +102,7 @@ class TwitchBot {
                 channel,
                 `@${tags["display-name"]} >> I am already in ${channelToJoin}!`
               )
-              .catch(console.error);
+              .catch(console.error)
           }
 
           this.bot
@@ -110,42 +110,42 @@ class TwitchBot {
               channel,
               `@${tags["display-name"]} >> Joining ${channelToJoin}... please mod ${this.config.username} to avoid accidental timeouts or bans!`
             )
-            .catch(console.error);
+            .catch(console.error)
 
-          this.bot.join(channelToJoin);
-          this.channelList.push(channelToJoin);
+          this.bot.join(channelToJoin)
+          this.channelList.push(channelToJoin)
 
           try {
             const result = await this.helpaApi.api.post(`/api/twitch/join`, {
               channel: channelToJoin,
-            });
+            })
 
             if (result.data.result === "success") {
               // update the local map with the new channel config
               this.channelMap.set(
                 result.data.twitchBotConfig.roomId,
                 result.data.twitchBotConfig
-              );
+              )
             }
 
             console.log(
               `Result of /api/twitch/join: ${JSON.stringify(result.data)}`
-            );
+            )
           } catch (err) {
-            console.error(`Error calling /api/twitch/join: ${err.message}`);
+            console.error(`Error calling /api/twitch/join: ${err.message}`)
           }
-          break;
+          break
 
         case "leave":
-          let channelToLeave = tags.username;
+          let channelToLeave = tags.username
 
           if (args[0] && tags.mod) {
-            channelToLeave = args[0].toLowerCase();
+            channelToLeave = args[0].toLowerCase()
           }
 
           console.log(
             `Received request from ${tags.username} to leave ${channelToLeave}`
-          );
+          )
 
           if (!this.channelList.includes(channelToLeave)) {
             return this.bot
@@ -153,7 +153,7 @@ class TwitchBot {
                 channel,
                 `@${tags["display-name"]} >> I am not in ${channelToLeave}!`
               )
-              .catch(console.error);
+              .catch(console.error)
           }
 
           this.bot
@@ -161,74 +161,78 @@ class TwitchBot {
               channel,
               `@${tags["display-name"]} >> Leaving ${channelToLeave}... use ${this.config.cmdPrefix}join in this channel to re-join at any time!`
             )
-            .catch(console.error);
+            .catch(console.error)
 
-          this.bot.part(channelToLeave);
+          this.bot.part(channelToLeave)
 
           this.channelList = this.channelList.filter(
             (c) => c !== channelToLeave
-          );
-          this.channelMap.delete(tags["room-id"]);
+          )
+          this.channelMap.delete(tags["room-id"])
 
           try {
             const result = await this.helpaApi.api.post(`/api/twitch/leave`, {
               channel: channelToLeave,
-            });
+            })
 
             console.log(
               `Result of /api/twitch/leave: ${JSON.stringify(result.data)}`
-            );
+            )
           } catch (err) {
-            console.error(`Error calling /api/twitch/leave: ${err.message}`);
+            console.error(`Error calling /api/twitch/leave: ${err.message}`)
           }
-          break;
+          break
       }
 
-      return;
+      return
     }
 
     // Look up the config for this channel in the local cache
-    const channelConfig = this.channelMap.get(tags["room-id"]);
-    if (!channelConfig) return;
+    const channelConfig = this.channelMap.get(tags["room-id"])
+    if (!channelConfig) return
 
-    if (!message.startsWith(channelConfig.commandPrefix)) return;
+    if (!message.startsWith(channelConfig.commandPrefix)) return
 
     if (this.config.blacklistedUsers.includes(tags.username)) {
       console.log(
         `Received command from blacklisted user ${tags.username} (${tags["user-id"]}) in ${channel}`
-      );
-      return;
+      )
+      return
     }
 
-    const args = message.slice(1).split(" ");
-    const commandNoPrefix = args.shift().toLowerCase();
+    const args = message.slice(1).split(" ")
+    const commandNoPrefix = args.shift().toLowerCase()
 
     // Define toggle command configurations
     const toggleCommands = {
       praclists: {
-        configField: 'practiceListsEnabled',
-        featureName: 'Practice lists',
+        configField: "practiceListsEnabled",
+        featureName: "Practice lists",
         statusMessages: {
-          enabled: () => ` Commands: ${channelConfig.commandPrefix}pracadd, ${channelConfig.commandPrefix}pracrand, ${channelConfig.commandPrefix}praclist, ${channelConfig.commandPrefix}pracdel, ${channelConfig.commandPrefix}pracclear`,
-          disabled: () => '',
+          enabled: () =>
+            ` Commands: ${channelConfig.commandPrefix}pracadd, ${channelConfig.commandPrefix}pracrand, ${channelConfig.commandPrefix}praclist, ${channelConfig.commandPrefix}pracdel, ${channelConfig.commandPrefix}pracclear`,
+          disabled: () => "",
         },
-        enabledMessage: () => `Practice lists enabled! Commands: ${channelConfig.commandPrefix}pracadd <entry>, ${channelConfig.commandPrefix}pracrand, ${channelConfig.commandPrefix}praclist, ${channelConfig.commandPrefix}pracdel <#>, ${channelConfig.commandPrefix}pracclear`,
-        disabledMessage: () => 'Practice lists disabled.',
+        enabledMessage: () =>
+          `Practice lists enabled! Commands: ${channelConfig.commandPrefix}pracadd <entry>, ${channelConfig.commandPrefix}pracrand, ${channelConfig.commandPrefix}praclist, ${channelConfig.commandPrefix}pracdel <#>, ${channelConfig.commandPrefix}pracclear`,
+        disabledMessage: () => "Practice lists disabled.",
       },
       pracmods: {
-        configField: 'allowModsToManagePracticeLists',
-        featureName: 'Mod access for practice lists',
+        configField: "allowModsToManagePracticeLists",
+        featureName: "Mod access for practice lists",
         statusMessages: {
-          enabled: () => ' Mods can manage practice lists.',
-          disabled: () => ' Only you can manage practice lists.',
+          enabled: () => " Mods can manage practice lists.",
+          disabled: () => " Only you can manage practice lists.",
         },
-        enabledMessage: () => 'Mod access for practice lists enabled! Mods can now use practice list commands.',
-        disabledMessage: () => 'Mod access for practice lists disabled. Only you can manage practice lists now.',
+        enabledMessage: () =>
+          "Mod access for practice lists enabled! Mods can now use practice list commands.",
+        disabledMessage: () =>
+          "Mod access for practice lists disabled. Only you can manage practice lists now.",
       },
-    };
+    }
 
     // Handle toggle commands - only broadcaster can toggle these settings
-    const toggleConfig = toggleCommands[commandNoPrefix];
+    const toggleConfig = toggleCommands[commandNoPrefix]
     if (toggleConfig && channelConfig.roomId === tags["user-id"]) {
       await this.handleToggleCommand(
         channel,
@@ -237,8 +241,8 @@ class TwitchBot {
         channelConfig,
         commandNoPrefix,
         toggleConfig
-      );
-      return;
+      )
+      return
     }
 
     // Handle practice list commands if they're enabled for this channel
@@ -250,8 +254,8 @@ class TwitchBot {
       (channelConfig.roomId === tags["user-id"] ||
         (channelConfig.allowModsToManagePracticeLists && tags.mod === true))
     ) {
-      const targetUser = tags["room-id"];
-      const listName = "default";
+      const targetUser = tags["room-id"]
+      const listName = "default"
 
       switch (commandNoPrefix) {
         case "pracadd":
@@ -261,14 +265,14 @@ class TwitchBot {
                 channel,
                 `@${tags["display-name"]} >> You must specify an entry name! e.g. ${channelConfig.commandPrefix}pracadd gtower mimics`
               )
-              .catch(console.error);
-            return;
+              .catch(console.error)
+            return
           }
 
-          const entryName = args.join(" ");
+          const entryName = args.join(" ")
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry: ${entryName}`
-          );
+          )
 
           try {
             const response = await this.helpaApi.api.post(
@@ -276,44 +280,44 @@ class TwitchBot {
               {
                 entry: entryName,
               }
-            );
-            console.log(response.data.message);
-            this.bot.say(channel, response.data.message).catch(console.error);
-            return;
+            )
+            console.log(response.data.message)
+            this.bot.say(channel, response.data.message).catch(console.error)
+            return
           } catch (err) {
             this.handleApiError(
               err,
               "Error adding entry to practice list",
               channel,
               tags
-            );
-            return;
+            )
+            return
           }
         case "pracrand":
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
-          );
+          )
 
           try {
             // get their list
             const response = await this.helpaApi.api(
               `/api/prac/${targetUser}/lists/${listName}`
-            );
-            const entries = response.data.entries;
+            )
+            const entries = response.data.entries
 
             // choose a random entry
-            let randomIndex = Math.floor(Math.random() * entries.length);
-            let randomEntry = entries[randomIndex];
+            let randomIndex = Math.floor(Math.random() * entries.length)
+            let randomEntry = entries[randomIndex]
 
             // if they have more than 2 entries, make sure we don't get the same one twice in a row
             if (entries.length > 2) {
-              let lastRandomEntry = this.lastRandomRoomMap.get(channel);
+              let lastRandomEntry = this.lastRandomRoomMap.get(channel)
               while (
                 crypto.createHash("md5").update(randomEntry).digest("hex") ===
                 lastRandomEntry
               ) {
-                randomIndex = Math.floor(Math.random() * entries.length);
-                randomEntry = entries[randomIndex];
+                randomIndex = Math.floor(Math.random() * entries.length)
+                randomEntry = entries[randomIndex]
               }
             }
 
@@ -322,14 +326,14 @@ class TwitchBot {
                 channel,
                 `Practice this: ${randomEntry} [${randomIndex + 1}]`
               )
-              .catch(console.error);
+              .catch(console.error)
 
             // remember the last random entry we gave them
             this.lastRandomRoomMap.set(
               channel,
               crypto.createHash("md5").update(randomEntry).digest("hex")
-            );
-            return;
+            )
+            return
           } catch (err) {
             this.handleApiError(
               err,
@@ -339,38 +343,38 @@ class TwitchBot {
               {
                 404: `No entries found in practice list! Add one using ${channelConfig.commandPrefix}pracadd <entry name>`,
               }
-            );
-            return;
+            )
+            return
           }
         case "pracdel":
-          const entryId = parseInt(args[0]);
+          const entryId = parseInt(args[0])
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry ID: ${entryId}`
-          );
+          )
           try {
             const response = await this.helpaApi.api.delete(
               `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
-            );
-            console.log(response.data.message);
-            this.bot.say(channel, response.data.message).catch(console.error);
-            return;
+            )
+            console.log(response.data.message)
+            this.bot.say(channel, response.data.message).catch(console.error)
+            return
           } catch (err) {
             this.handleApiError(
               err,
               `Error removing entry #${entryId} from practice list`,
               channel,
               tags
-            );
-            return;
+            )
+            return
           }
         case "praclist":
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
-          );
+          )
           try {
             const response = await this.helpaApi.api(
               `/api/prac/${targetUser}/lists/${listName}`
-            );
+            )
             this.bot
               .say(
                 channel,
@@ -378,8 +382,8 @@ class TwitchBot {
                   .map((e, idx) => `[${idx + 1}] ${e}`)
                   .join(" | ")
               )
-              .catch(console.error);
-            return;
+              .catch(console.error)
+            return
           } catch (err) {
             this.handleApiError(
               err,
@@ -389,8 +393,8 @@ class TwitchBot {
               {
                 404: `No entries found in practice list! Add one using ${channelConfig.commandPrefix}pracadd <entry name>`,
               }
-            );
-            return;
+            )
+            return
           }
         case "pracclear":
           if (targetUser !== tags["user-id"]) {
@@ -399,20 +403,20 @@ class TwitchBot {
                 channel,
                 `@${tags["display-name"]} >> Only the broadcaster can clear their practice list!`
               )
-              .catch(console.error);
-            return;
+              .catch(console.error)
+            return
           }
 
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
-          );
+          )
 
           try {
             const response = await this.helpaApi.api.delete(
               `/api/prac/${targetUser}/lists/${listName}`
-            );
-            this.bot.say(channel, response.data.message).catch(console.error);
-            return;
+            )
+            this.bot.say(channel, response.data.message).catch(console.error)
+            return
           } catch (err) {
             this.handleApiError(
               err,
@@ -422,81 +426,83 @@ class TwitchBot {
               {
                 404: `Nothing to clear!`,
               }
-            );
-            return;
+            )
+            return
           }
       }
     }
 
     // Check if commands are enabled for this channel
     if (!channelConfig.commandsEnabled) {
-      console.log(`[${channel}] Commands are disabled, ignoring: ${commandNoPrefix}`);
-      return;
+      console.log(
+        `[${channel}] Commands are disabled, ignoring: ${commandNoPrefix}`
+      )
+      return
     }
 
-    let command = false;
-    let cachedCommand = this.cachedCommands.get(commandNoPrefix);
+    let command = false
+    let cachedCommand = this.cachedCommands.get(commandNoPrefix)
 
     if (cachedCommand && Date.now() > cachedCommand.staleAfter) {
-      cachedCommand = false;
+      cachedCommand = false
     }
 
-    console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`);
+    console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`)
 
     if (!cachedCommand) {
       try {
         const response = await this.helpaApi.api.post(`/api/commands/find`, {
           command: commandNoPrefix,
-        });
+        })
 
         if (response.status === 200) {
-          command = response.data;
+          command = response.data
 
           if (command) {
-            command.staleAfter = Date.now() + 10 * 60 * 1000;
-            this.cachedCommands.set(commandNoPrefix, command);
+            command.staleAfter = Date.now() + 10 * 60 * 1000
+            this.cachedCommands.set(commandNoPrefix, command)
           }
         }
       } catch (err) {
-        console.error(`Error while fetching command: ${err}`);
-        return;
+        console.error(`Error while fetching command: ${err}`)
+        return
       }
     } else {
-      command = cachedCommand;
+      command = cachedCommand
     }
 
-    if (!command) return;
+    if (!command) return
 
-    let onCooldown = false;
-    let cooldownKey = command.command + channel;
-    let timeUsed = this.cooldowns.get(cooldownKey);
+    let onCooldown = false
+    let cooldownKey = command.command + channel
+    let timeUsed = this.cooldowns.get(cooldownKey)
     if (timeUsed) {
-      let now = Date.now();
+      let now = Date.now()
       if (now - timeUsed <= channelConfig.textCommandCooldown * 1000) {
         onCooldown =
-          (channelConfig.textCommandCooldown * 1000 - (now - timeUsed)) / 1000;
+          (channelConfig.textCommandCooldown * 1000 - (now - timeUsed)) / 1000
       }
     }
 
     if (onCooldown !== false) {
-      return;
+      return
     }
 
     if (command === false) {
-      return;
+      return
     }
 
-    this.bot.say(channel, command.response).catch(console.error);
+    this.bot.say(channel, command.response).catch(console.error)
 
-    this.cooldowns.set(cooldownKey, Date.now());
+    this.cooldowns.set(cooldownKey, Date.now())
 
-    let aliasUsed = "";
+    let aliasUsed = ""
     if (
       command.aliases &&
       command.aliases.length > 0 &&
       command.aliases.includes(commandNoPrefix)
     ) {
-      aliasUsed = commandNoPrefix;
+      aliasUsed = commandNoPrefix
     }
 
     try {
@@ -509,74 +515,81 @@ class TwitchBot {
           channel,
           tags,
         },
-      });
+      })
     } catch (err) {
-      console.error(`Error while logging command: ${err}`);
+      console.error(`Error while logging command: ${err}`)
     }
   }
 
   handleJoinChannel({ payload }) {
-    const { channel } = payload;
-    console.log(`Received joinChannel event for: ${channel}`);
+    const { channel } = payload
+    console.log(`Received joinChannel event for: ${channel}`)
     if (this.channelList.includes(channel)) {
-      console.log(`Already in #${channel}`);
-      return;
+      console.log(`Already in #${channel}`)
+      return
     }
 
-    this.bot.join(channel).catch(console.error);
-    this.bot.say(channel, this.messages.onJoin).catch(console.error);
+    this.bot.join(channel).catch(console.error)
+    this.bot.say(channel, this.messages.onJoin).catch(console.error)
 
     // update local configs
-    this.refreshActiveChannels();
+    this.refreshActiveChannels()
 
-    console.log(`Joined #${channel}`);
+    console.log(`Joined #${channel}`)
   }
 
   handleLeaveChannel({ payload: channel }) {
-    console.log(`Received leaveChannel event for ${channel}`);
+    console.log(`Received leaveChannel event for ${channel}`)
     if (!this.channelList.includes(channel)) {
-      console.log(`Not in #${channel}`);
-      return;
+      console.log(`Not in #${channel}`)
+      return
     }
 
     // say our goodbyes o/
-    this.bot.say(channel, this.messages.onLeave).catch(console.error);
-    this.bot.part(channel).catch(console.error);
+    this.bot.say(channel, this.messages.onLeave).catch(console.error)
+    this.bot.part(channel).catch(console.error)
 
     // update local configs
-    this.refreshActiveChannels();
+    this.refreshActiveChannels()
 
-    console.log(`Left #${channel}`);
+    console.log(`Left #${channel}`)
   }
 
   handleConfigUpdate({ payload }) {
-    console.log(`Received configUpdate event for: ${payload.channelName}`);
-    
+    console.log(`Received configUpdate event for: ${payload.channelName}`)
+
     // Update the local channel configuration
     if (this.channelMap.has(payload.roomId)) {
-      this.channelMap.set(payload.roomId, payload);
-      console.log(`Updated configuration for #${payload.channelName}`);
+      this.channelMap.set(payload.roomId, payload)
+      console.log(`Updated configuration for #${payload.channelName}`)
     }
   }
 
-  async handleToggleCommand(channel, tags, args, channelConfig, commandName, toggleConfig) {
-    const subCommand = args[0]?.toLowerCase();
-    const currentValue = channelConfig[toggleConfig.configField];
-    
+  async handleToggleCommand(
+    channel,
+    tags,
+    args,
+    channelConfig,
+    commandName,
+    toggleConfig
+  ) {
+    const subCommand = args[0]?.toLowerCase()
+    const currentValue = channelConfig[toggleConfig.configField]
+
     if (!subCommand) {
       // Show current status and help
-      const status = currentValue ? "enabled" : "disabled";
-      const additionalInfo = currentValue 
+      const status = currentValue ? "enabled" : "disabled"
+      const additionalInfo = currentValue
         ? toggleConfig.statusMessages.enabled()
-        : toggleConfig.statusMessages.disabled();
-      
+        : toggleConfig.statusMessages.disabled()
+
       this.bot
         .say(
           channel,
           `@${tags["display-name"]} >> ${toggleConfig.featureName} ${status === "enabled" ? "are" : "is"} currently ${status}.${additionalInfo} | Toggle: ${channelConfig.commandPrefix}${commandName} on/off`
         )
-        .catch(console.error);
-      return;
+        .catch(console.error)
+      return
     }
 
     if (subCommand === "on") {
@@ -586,29 +599,29 @@ class TwitchBot {
             channel,
             `@${tags["display-name"]} >> ${toggleConfig.featureName} ${currentValue ? "are" : "is"} already enabled!`
           )
-          .catch(console.error);
-        return;
+          .catch(console.error)
+        return
       }
 
-      console.log(`[${channel}] Enabling ${toggleConfig.featureName}...`);
-      
+      console.log(`[${channel}] Enabling ${toggleConfig.featureName}...`)
+
       try {
         const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
           channel: tags.username,
           [toggleConfig.configField]: true,
-        });
+        })
 
         if (result.data.result === "success") {
           // Update local config
-          channelConfig[toggleConfig.configField] = true;
-          this.channelMap.set(tags["room-id"], channelConfig);
-          
+          channelConfig[toggleConfig.configField] = true
+          this.channelMap.set(tags["room-id"], channelConfig)
+
           this.bot
             .say(
               channel,
               `@${tags["display-name"]} >> ${toggleConfig.enabledMessage()}`
             )
-            .catch(console.error);
+            .catch(console.error)
         }
       } catch (err) {
         this.handleApiError(
@@ -616,9 +629,9 @@ class TwitchBot {
           `Error enabling ${toggleConfig.featureName}`,
           channel,
           tags
-        );
+        )
       }
-      return;
+      return
     }
 
     if (subCommand === "off") {
@@ -628,29 +641,29 @@ class TwitchBot {
             channel,
             `@${tags["display-name"]} >> ${toggleConfig.featureName} ${currentValue ? "are" : "is"} already disabled!`
           )
-          .catch(console.error);
-        return;
+          .catch(console.error)
+        return
       }
 
-      console.log(`[${channel}] Disabling ${toggleConfig.featureName}...`);
-      
+      console.log(`[${channel}] Disabling ${toggleConfig.featureName}...`)
+
       try {
         const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
           channel: tags.username,
           [toggleConfig.configField]: false,
-        });
+        })
 
         if (result.data.result === "success") {
           // Update local config
-          channelConfig[toggleConfig.configField] = false;
-          this.channelMap.set(tags["room-id"], channelConfig);
-          
+          channelConfig[toggleConfig.configField] = false
+          this.channelMap.set(tags["room-id"], channelConfig)
+
           this.bot
             .say(
               channel,
               `@${tags["display-name"]} >> ${toggleConfig.disabledMessage()}`
             )
-            .catch(console.error);
+            .catch(console.error)
         }
       } catch (err) {
         this.handleApiError(
@@ -658,9 +671,9 @@ class TwitchBot {
           `Error disabling ${toggleConfig.featureName}`,
           channel,
           tags
-        );
+        )
       }
-      return;
+      return
     }
 
     // Invalid subcommand
@@ -669,15 +682,15 @@ class TwitchBot {
         channel,
         `@${tags["display-name"]} >> Invalid command. Use ${channelConfig.commandPrefix}${commandName} on/off to toggle ${toggleConfig.featureName.toLowerCase()}.`
       )
-      .catch(console.error);
+      .catch(console.error)
   }
 
   handleApiError(err, errorMessageBase, channel, tags, statusErrors = null) {
-    console.error(errorMessageBase);
+    console.error(errorMessageBase)
     if (err.response) {
       console.error(
         `${err.response.status} Error: ${err.response.data.message}`
-      );
+      )
 
       if (statusErrors && statusErrors[err.response.status]) {
         this.bot
@@ -685,31 +698,31 @@ class TwitchBot {
             channel,
             `@${tags["display-name"]} >> ${statusErrors[err.response.status]}`
           )
-          .catch(console.error);
+          .catch(console.error)
       } else {
         this.bot
           .say(
             channel,
             `@${tags["display-name"]} >> ${err.response.status} ${errorMessageBase}: ${err.response.data.message}`
           )
-          .catch(console.error);
+          .catch(console.error)
       }
     } else if (err.request) {
-      console.error("No response received from API!");
+      console.error("No response received from API!")
       this.bot
         .say(
           channel,
           `@${tags["display-name"]} >> ${errorMessageBase}: Helpa might be asleep. ResidentSleeper`
         )
-        .catch(console.error);
+        .catch(console.error)
     } else {
-      console.error(`Error during request setup: ${err.message}`);
+      console.error(`Error during request setup: ${err.message}`)
       this.bot
         .say(
           channel,
           `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
         )
-        .catch(console.error);
+        .catch(console.error)
     }
   }
 
@@ -718,27 +731,27 @@ class TwitchBot {
       .api("/api/configs/twitch/activeChannels")
       .then((response) => {
         if (!response) {
-          throw new Error(`Unable to refresh active channel list from API!`);
+          throw new Error(`Unable to refresh active channel list from API!`)
         }
 
-        this.setActiveChannels(response.data);
+        this.setActiveChannels(response.data)
       })
       .catch((error) => {
-        console.error("🛑 Error refreshing active channel list:", error);
-      });
+        console.error("🛑 Error refreshing active channel list:", error)
+      })
   }
 
   setActiveChannels(channels) {
     this.channelList = [
       this.config.username,
       ...channels.map((c) => c.channelName),
-    ];
-    this.channelMap = new Map();
+    ]
+    this.channelMap = new Map()
     // map roomId => config
     channels.forEach((c) => {
-      this.channelMap.set(c.roomId, c);
-    });
+      this.channelMap.set(c.roomId, c)
+    })
   }
 }
 
-exports.TwitchBot = TwitchBot;
+exports.TwitchBot = TwitchBot

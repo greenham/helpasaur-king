@@ -1,17 +1,17 @@
-import * as React from "react";
-import { Toast } from "react-bootstrap";
-import { IToast } from "../types/toasts";
-import { useToast } from "../hooks/useToast";
+import * as React from "react"
+import { Toast } from "react-bootstrap"
+import { IToast } from "../types/toasts"
+import { useToast } from "../hooks/useToast"
 
 export interface ToastVariant {
-  icon: React.ReactNode;
-  bgClass: string;
-  title: string;
-  textClass?: string;
+  icon: React.ReactNode
+  bgClass: string
+  title: string
+  textClass?: string
 }
 
 export interface ToastVariants {
-  [key: string]: ToastVariant;
+  [key: string]: ToastVariant
 }
 
 const toastVariants: ToastVariants = {
@@ -39,21 +39,21 @@ const toastVariants: ToastVariants = {
     title: "Error!",
     textClass: "text-body-emphasis",
   },
-};
+}
 
 const DefaultToast: React.FunctionComponent<IToast> = (props) => {
-  const { variant, message, id } = props;
-  const toastVariant = toastVariants[variant];
-  const [show, setShow] = React.useState(true);
-  const toast = useToast();
+  const { variant, message, id } = props
+  const toastVariant = toastVariants[variant]
+  const [show, setShow] = React.useState(true)
+  const toast = useToast()
   return (
     <Toast
       bg={toastVariant.bgClass}
       onClose={() => {
-        setShow(false);
+        setShow(false)
       }}
       onExited={() => {
-        toast.remove(id);
+        toast.remove(id)
       }}
       show={show}
       delay={5000}
@@ -69,7 +69,7 @@ const DefaultToast: React.FunctionComponent<IToast> = (props) => {
         </p>
       </Toast.Body>
     </Toast>
-  );
-};
+  )
+}
 
-export default DefaultToast;
+export default DefaultToast

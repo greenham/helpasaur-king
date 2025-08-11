@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ChannelType, inlineCode } = require("discord.js");
+const { SlashCommandBuilder, ChannelType, inlineCode } = require("discord.js")
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -116,19 +116,19 @@ module.exports = {
     .setDefaultMemberPermissions(0),
 
   async execute(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true })
     const currentGuildConfig = interaction.client.config.guilds.find(
       (g) => g.id === interaction.guildId
-    );
+    )
     if (!currentGuildConfig) {
       await interaction.editReply({
         content: "This guild is not configured!",
         ephemeral: true,
-      });
-      return;
+      })
+      return
     }
 
-    const subcommand = interaction.options.getSubcommand();
+    const subcommand = interaction.options.getSubcommand()
     const subcommandMap = new Map([
       [
         "cooldown",
@@ -194,44 +194,44 @@ module.exports = {
           valueOnNull: null,
         },
       ],
-    ]);
+    ])
 
-    let guildUpdate = {};
-    const commandConfig = subcommandMap.get(subcommand);
+    let guildUpdate = {}
+    const commandConfig = subcommandMap.get(subcommand)
     if (!commandConfig) {
       await interaction.editReply({
         content: "That's not a valid subcommand!",
         ephemeral: true,
-      });
-      return;
+      })
+      return
     }
 
-    const { typeFn, key, guildConfigKey } = commandConfig;
-    let newValue = interaction.options[typeFn](key);
+    const { typeFn, key, guildConfigKey } = commandConfig
+    let newValue = interaction.options[typeFn](key)
     if (newValue === null && commandConfig.valueOnNull !== undefined) {
-      newValue = commandConfig.valueOnNull;
+      newValue = commandConfig.valueOnNull
     }
     if (newValue !== null && commandConfig.valueProperty) {
-      newValue = newValue[commandConfig.valueProperty];
+      newValue = newValue[commandConfig.valueProperty]
     }
     if (currentGuildConfig[guildConfigKey] === newValue) {
       await interaction.editReply({
         content: "That's already the value!",
         ephemeral: true,
-      });
-      return;
+      })
+      return
     }
 
-    guildUpdate[guildConfigKey] = newValue;
-    currentGuildConfig[guildConfigKey] = newValue;
+    guildUpdate[guildConfigKey] = newValue
+    currentGuildConfig[guildConfigKey] = newValue
 
     await this.helpaApi.api.patch(
       `/api/discord/guild/${interaction.guildId}`,
       guildUpdate
-    );
+    )
     await interaction.editReply({
       content: `Updated ${inlineCode(subcommand)} to ${inlineCode(newValue)}!`,
       ephemeral: true,
-    });
+    })
   },
-};
+}

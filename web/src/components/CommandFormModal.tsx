@@ -1,45 +1,45 @@
-import * as React from "react";
-import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
-import { Command } from "../types/commands";
-type CommandFormModel = Command & { aliasesText?: string };
+import * as React from "react"
+import { Button, FloatingLabel, Form, Modal } from "react-bootstrap"
+import { Command } from "../types/commands"
+type CommandFormModel = Command & { aliasesText?: string }
 
 interface CommandFormModalProps {
-  command: CommandFormModel;
-  show: boolean;
-  onHide: () => void;
-  onSubmit: (command: Command) => void;
+  command: CommandFormModel
+  show: boolean
+  onHide: () => void
+  onSubmit: (command: Command) => void
 }
 
 const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
   props
 ) => {
-  const [command, setCommand] = React.useState({ ...props.command });
-  const { show, onHide, onSubmit } = props;
+  const [command, setCommand] = React.useState({ ...props.command })
+  const { show, onHide, onSubmit } = props
 
   React.useEffect(() => {
     setCommand((prev) => ({
       ...prev,
       aliasesText: command.aliases.join(", "),
-    }));
-  }, []);
+    }))
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const key = e.target.name;
-    const value = e.target.value;
+    const key = e.target.name
+    const value = e.target.value
 
     setCommand((prev) => ({
       ...prev,
       [key]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = () => {
     // translate aliasesText to aliases
     command.aliases = command.aliasesText
       ? command.aliasesText.replace(/\s+/g, "").split(",")
-      : [];
-    onSubmit(command);
-  };
+      : []
+    onSubmit(command)
+  }
 
   return (
     <Modal show={show} onHide={onHide} centered={true}>
@@ -99,7 +99,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
         </Button>
       </Modal.Footer>
     </Modal>
-  );
-};
+  )
+}
 
-export default CommandFormModal;
+export default CommandFormModal

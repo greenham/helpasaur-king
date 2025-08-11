@@ -14,8 +14,8 @@ const ALLOWED_COMMAND_PREFIXES = [
   "=",
   "?",
   "~",
-];
+]
 
 module.exports = {
   ALLOWED_COMMAND_PREFIXES,
-};
+}

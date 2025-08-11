@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 
 const CommandLog = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
@@ -7,6 +7,6 @@ const CommandLog = new mongoose.Schema({
   source: String,
   username: String,
   metadata: {},
-});
+})
 
-module.exports = mongoose.model("CommandLog", CommandLog);
+module.exports = mongoose.model("CommandLog", CommandLog)

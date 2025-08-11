@@ -1,18 +1,18 @@
-import * as React from "react";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import StreamCard from "./StreamCard";
-import { TwitchStream } from "../types/streams";
-import { Alert } from "react-bootstrap";
+import * as React from "react"
+import Row from "react-bootstrap/Row"
+import Col from "react-bootstrap/Col"
+import StreamCard from "./StreamCard"
+import { TwitchStream } from "../types/streams"
+import { Alert } from "react-bootstrap"
 
 interface LivestreamsListProps {
-  streams: TwitchStream[];
+  streams: TwitchStream[]
 }
 
 const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = (
   props
 ) => {
-  const { streams } = props;
+  const { streams } = props
 
   if (streams.length === 0) {
     return (
@@ -20,7 +20,7 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = (
         <i className="fa-solid fa-triangle-exclamation px-1"></i> Someone needs
         to fire it up!
       </Alert>
-    );
+    )
   }
 
   return (
@@ -35,10 +35,10 @@ const LivestreamsList: React.FunctionComponent<LivestreamsListProps> = (
               thumbnailHeight={360}
             />
           </Col>
-        );
+        )
       })}
     </Row>
-  );
-};
+  )
+}
 
-export default LivestreamsList;
+export default LivestreamsList

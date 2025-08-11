@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 import {
   Alert,
   Badge,
@@ -8,10 +8,10 @@ import {
   ListGroup,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { getDiscordJoinUrl } from "../utils/apiService";
+} from "react-bootstrap"
+import { useEffect } from "react"
+import { Link } from "react-router-dom"
+import { getDiscordJoinUrl } from "../utils/apiService"
 
 const commandGroups = [
   {
@@ -101,21 +101,21 @@ const commandGroups = [
       },
     ],
   },
-];
+]
 
 interface DiscordBotPageProps {}
 
 const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
-  const [joinUrl, setJoinUrl] = React.useState<string>("");
+  const [joinUrl, setJoinUrl] = React.useState<string>("")
 
   useEffect(() => {
-    document.title = "Discord Bot | Helpasaur King";
+    document.title = "Discord Bot | Helpasaur King"
     getDiscordJoinUrl().then((response) => {
       if (response.result === "success") {
-        setJoinUrl(response.url);
+        setJoinUrl(response.url)
       }
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <Container id="discord-bot-page" className="my-5">
@@ -189,9 +189,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
               {group.commands.map((command, cmdIndex) => (
                 <div key={cmdIndex}>
                   {command.title && <h5>&middot; {command.title}</h5>}
-                  <p
-                    className="p-3 border border-1 border-info rounded-3"
-                  >
+                  <p className="p-3 border border-1 border-info rounded-3">
                     <i className="fa-solid fa-terminal pe-1"></i>
                     <code className="fw-bold">{command.command}</code>&nbsp;
                     <Badge>{command.subcommand}</Badge>&nbsp;
@@ -212,7 +210,7 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         ))}
       </ListGroup>
     </Container>
-  );
-};
+  )
+}
 
-export default DiscordBotPage;
+export default DiscordBotPage
