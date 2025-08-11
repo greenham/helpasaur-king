@@ -40,7 +40,7 @@
     ],
     "monitorList": [
         {
-            "name": "🌐 API Server (External)",
+            "name": "🌐 API Server",
             "type": "http",
             "url": "https://api.helpasaur.com/health",
             "method": "GET",
@@ -90,7 +90,7 @@
             "description": "Express API server via external production URL"
         },
         {
-            "name": "🌐 Runner Watcher (External)",
+            "name": "🌐 Runner Watcher",
             "type": "http",
             "url": "https://rw.helpasaur.com/health",
             "method": "GET",
@@ -140,7 +140,7 @@
             "description": "Runner watcher service via external production URL"
         },
         {
-            "name": "🌐 Web App (External)",
+            "name": "🌐 Web App",
             "type": "http",
             "url": "https://helpasaur.com",
             "method": "GET",
@@ -190,7 +190,7 @@
             "description": "React web application via GitHub Pages"
         },
         {
-            "name": "💬 Discord Bot (External)",
+            "name": "💬 Discord Bot",
             "type": "http",
             "url": "http://discord.helpasaur.com:3010/health",
             "method": "GET",
@@ -240,7 +240,7 @@
             "description": "Discord bot health check via external port"
         },
         {
-            "name": "📺 Twitch Bot (External)",
+            "name": "📺 Twitch Bot",
             "type": "http",
             "url": "http://twitch.helpasaur.com:3011/health",
             "method": "GET",
@@ -290,7 +290,7 @@
             "description": "Twitch bot health check via external port"
         },
         {
-            "name": "🏁 Race Bot (External)",
+            "name": "🏁 Race Bot",
             "type": "http",
             "url": "http://racebot.helpasaur.com:3012/health",
             "method": "GET",
@@ -340,7 +340,7 @@
             "description": "Race bot health check via external port"
         },
         {
-            "name": "🔄 WebSocket Relay (External)",
+            "name": "🔄 WebSocket Relay",
             "type": "http",
             "url": "http://ws.helpasaur.com:3003/health",
             "method": "GET",
@@ -390,7 +390,7 @@
             "description": "WebSocket relay health check via external port"
         },
         {
-            "name": "🗄️ Mongo Express (External)",
+            "name": "🗄️ Mongo Express",
             "type": "http",
             "url": "http://db.helpasaur.com:8081",
             "method": "GET",
