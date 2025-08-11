@@ -9,3 +9,5 @@ packages:
   - 'ws-relay'
   # Shared library
   - 'lib/helpa-api-client'
+  # Monitoring utilities
+  - 'monitoring'

@@ -15,7 +15,9 @@
     "monitor:restart": "bash scripts/monitoring.sh restart",
     "monitor:status": "bash scripts/monitoring.sh status",
     "monitor:logs": "bash scripts/monitoring.sh logs",
-    "monitor:backup": "bash scripts/monitoring.sh backup"
+    "monitor:backup": "bash scripts/monitoring.sh backup",
+    "monitor:generate": "node monitoring/generate-configs.js",
+    "monitor:import": "node monitoring/import-via-api.js"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",

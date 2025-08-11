@@ -30,11 +30,11 @@ pnpm monitor:start
 ./scripts/monitoring.sh start
 ```
 
-Access Uptime Kuma at: http://localhost:3013
+Access Uptime Kuma at: http://localhost:3333
 
 ### Initial Configuration
 
-1. Access dashboard at http://localhost:3013
+1. Access dashboard at http://localhost:3333
 2. Create your admin account when prompted
 3. Go to **Settings** → **Backup** → **Import**
 4. Choose the appropriate configuration file for your monitoring needs:
@@ -67,10 +67,34 @@ pnpm monitor:backup
 
 ## Configuration Files
 
+### Configuration Generator
+
+To maintain consistency between development and production monitoring configurations, use the generator script:
+
+```bash
+# Generate both dev and prod configurations
+node monitoring/generate-configs.js
+```
+
+This creates:
+
+- `app-services.dev.json` - Development configuration (host.docker.internal)
+- `app-services.prod.json` - Production configuration (external URLs with SSL monitoring)
+
+The generator uses a common template defined in `generate-configs.js` to ensure:
+
+- Consistent service definitions across environments
+- Proper JSON-query type for health endpoints
+- Environment-specific URLs and settings
+- Automatic SSL monitoring for HTTPS endpoints in production
+
+To modify monitored services, edit the `SERVICES` array in `generate-configs.js` and regenerate.
+
 ### Monitor Definitions
 
 **Development Monitoring (`app-services.dev.json`):**
 All services monitored via host.docker.internal:
+
 - 🔌 API Server (port 3001)
 - 💬 Discord Bot (port 3010)
 - 📺 Twitch Bot (port 3011)
@@ -81,7 +105,8 @@ All services monitored via host.docker.internal:
 - 🌐 Web App (port 3000)
 
 **Production Monitoring (`app-services.prod.json`):**
-All services via external URLs (using wildcard *.helpasaur.com DNS):
+All services via external URLs (using wildcard \*.helpasaur.com DNS):
+
 - 🌐 API Server (https://api.helpasaur.com) - Health check + SSL expiry
 - 🌐 Runner Watcher (https://rw.helpasaur.com) - Health check + SSL expiry
 - 🌐 Web App (https://helpasaur.com) - Availability + SSL expiry
@@ -130,7 +155,7 @@ SSL monitoring features:
 The monitoring stack runs completely independently:
 
 - **No shared networks** with the main application stack
-- **Port exposure**: Direct access via port 3013
+- **Port exposure**: Direct access via port 3333
 - **Host networking**: Uses `host.docker.internal` to monitor services
 
 This provides:
@@ -166,7 +191,7 @@ pnpm monitoring:backup
    pnpm start
    ```
 
-2. Access Uptime Kuma at http://localhost:3013
+2. Access Uptime Kuma at http://localhost:3333
 
 3. Import configuration files (see Initial Configuration)
 
@@ -191,10 +216,10 @@ If monitoring can't reach application services:
 
 ### Port Conflicts
 
-Default port is 3013. To change:
+Default port is 3333. To change:
 
 ```bash
-export UPTIME_KUMA_PORT=3014
+export UPTIME_KUMA_PORT=3334
 pnpm monitor:start
 ```
 
@@ -251,6 +276,6 @@ If you have an existing integrated Uptime Kuma setup:
 ## Security Considerations
 
 - Monitoring dashboard should be password protected (configured in Uptime Kuma)
-- Consider firewall rules to restrict access to port 3013 in production
+- Consider firewall rules to restrict access to port 3333 in production
 - Regular backups recommended for monitoring configuration
-- The service runs on internal port 3001, exposed on port 3013 (configurable via `UPTIME_KUMA_PORT`)
+- The service runs on internal port 3001, exposed on port 3333 (configurable via `UPTIME_KUMA_PORT`)

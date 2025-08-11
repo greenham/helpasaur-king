@@ -17,5 +17,8 @@ services:
       - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf
 
   ws-relay:
+    ports:
+      # Only expose the health check port, not the WebSocket service port
+      - ${WS_RELAY_HEALTH_PORT}:${WS_RELAY_HEALTH_PORT}
     networks:
       - int

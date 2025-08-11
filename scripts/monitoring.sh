@@ -30,7 +30,7 @@ case "$1" in
         echo -e "${YELLOW}⚡ Starting services...${NC}"
         if docker compose -f "$COMPOSE_FILE" up -d; then
             echo -e "${GREEN}✅ Monitoring stack started successfully!${NC}"
-            echo -e "\n${CYAN}📊 Access Uptime Kuma at: ${BOLD}http://localhost:${UPTIME_KUMA_PORT:-3013}${NC}\n"
+            echo -e "\n${CYAN}📊 Access Uptime Kuma at: ${BOLD}http://localhost:${UPTIME_KUMA_PORT:-3333}${NC}\n"
         else
             echo -e "${RED}❌ Failed to start monitoring stack${NC}"
             exit 1

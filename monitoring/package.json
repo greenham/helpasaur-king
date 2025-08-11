@@ -1,0 +1,16 @@
+{
+  "name": "monitoring",
+  "version": "1.0.0",
+  "description": "Helpasaur uses Uptime Kuma as a separate monitoring stack to ensure continuous monitoring even during application deployments.",
+  "main": "generate-configs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "socket.io-client": "^4.8.1"
+  }
+}
