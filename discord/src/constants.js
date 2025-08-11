@@ -1,13 +1,3 @@
-module.exports = {
-  defaultGuildConfig: {
-    active: true,
-    cmdPrefix: "!",
-    textCmdCooldown: 10,
-    enableStreamAlerts: false,
-    streamAlertsChannelId: null,
-    enableWeeklyRaceAlert: false,
-    enableWeeklyRaceRoomAlert: false,
-    weeklyRaceAlertChannelId: null,
-    weeklyRaceAlertRoleId: null,
-  },
-}
+// This file exists for backward compatibility
+// The actual implementation is in constants.ts
+module.exports = require("../dist/constants")

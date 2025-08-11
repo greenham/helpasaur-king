@@ -1,11 +1,13 @@
 {
   "name": "helpa-api",
   "version": "1.12.0",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node ./src/index",
-    "start:dev": "nodemon ./src"
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "start:dev": "nodemon --watch src --ext ts --exec 'npm run build && node ./dist/index.js'",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/index.ts"
   },
   "dependencies": {
     "axios": "^1.8.2",
@@ -23,6 +25,15 @@
     "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/ms": "^2.1.0",
+    "@types/node": "^24.2.1",
+    "nodemon": "^3.0.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
   }
 }
