@@ -38,11 +38,8 @@ Access Uptime Kuma at: http://localhost:3013
 2. Create your admin account when prompted
 3. Go to **Settings** → **Backup** → **Import**
 4. Choose the appropriate configuration file for your monitoring needs:
-   - `docker-services-internal.json` - Backend services via host.docker.internal (for local development)
-   - `docker-services-external.json` - Production services via external URLs
-   - **Development**: `web-app-dev.json` (monitors localhost:3000)
-   - **Production**: `web-app-prod.json` (monitors helpasaur.com)
-   - **Production SSL**: `ssl-monitoring-prod.json` (certificate expiry)
+   - `app-services.dev.json` - All services via host.docker.internal (for local development)
+   - `app-services.prod.json` - Production services via external URLs (includes SSL monitoring)
 
 ## Managing the Stack
 
@@ -72,28 +69,27 @@ pnpm monitor:backup
 
 ### Monitor Definitions
 
-Backend Service Monitoring:
-- `docker-services-internal.json` - Local development monitoring via host.docker.internal
-  - 🔌 API Server (port 3001)
-  - 💬 Discord Bot (port 3010)
-  - 📺 Twitch Bot (port 3011)
-  - 👁️ Runner Watcher (port 3002)
-  - 🏁 Race Bot (port 3012)
-  - 🔄 WebSocket Relay (port 3003)
-  - 🗄️ Mongo Express (port 8081)
-- `docker-services-external.json` - Production monitoring via external URLs
-  - 🌐 API Server (https://api.helpasaur.com)
-  - 🌐 Runner Watcher (https://rw.helpasaur.com)
-  - 🌐 Web App (https://helpasaur.com)
+**Development Monitoring (`app-services.dev.json`):**
+All services monitored via host.docker.internal:
+- 🔌 API Server (port 3001)
+- 💬 Discord Bot (port 3010)
+- 📺 Twitch Bot (port 3011)
+- 👁️ Runner Watcher (port 3002)
+- 🏁 Race Bot (port 3012)
+- 🔄 WebSocket Relay (port 3003)
+- 🗄️ Mongo Express (port 8081)
+- 🌐 Web App (port 3000)
 
-Web App Monitoring:
-- `web-app-dev.json` - Web app monitor for local development (http://host.docker.internal:3000)
-- `web-app-prod.json` - Web app monitor for production (https://helpasaur.com) with SSL monitoring
-
-SSL Certificate Monitoring:
-- `ssl-monitoring-prod.json` - SSL certificate expiry monitoring for production endpoints:
-  - `api.helpasaur.com` - API server
-  - `rw.helpasaur.com` - Runner Watcher service
+**Production Monitoring (`app-services.prod.json`):**
+All services via external URLs (using wildcard *.helpasaur.com DNS):
+- 🌐 API Server (https://api.helpasaur.com) - Health check + SSL expiry
+- 🌐 Runner Watcher (https://rw.helpasaur.com) - Health check + SSL expiry
+- 🌐 Web App (https://helpasaur.com) - Availability + SSL expiry
+- 💬 Discord Bot (http://discord.helpasaur.com:3010/health)
+- 📺 Twitch Bot (http://twitch.helpasaur.com:3011/health)
+- 🏁 Race Bot (http://racebot.helpasaur.com:3012/health)
+- 🔄 WebSocket Relay (http://ws.helpasaur.com:3003/health)
+- 🗄️ Mongo Express (http://db.helpasaur.com:8081)
 
 ### Tags
 
