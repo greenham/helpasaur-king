@@ -11,24 +11,24 @@ const path = require("path");
 const dotenv = require("dotenv");
 
 // Load environment variables from root .env file
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 // Production server configuration
 // This should be the actual server IP/hostname where services are running,
 // not the GitHub Pages domain
-const PROD_SERVER = "146.190.132.20";  // DigitalOcean droplet IP
+const PROD_SERVER = "146.190.132.20"; // DigitalOcean droplet IP
 
 // Get ports from env with defaults matching .env.sample
 const PORTS = {
-  API: process.env.API_SERVER_EXTERNAL_PORT || '3001',
-  DISCORD: process.env.DISCORD_HEALTH_PORT || '3010',
-  TWITCH: process.env.TWITCH_HEALTH_PORT || '3011',
-  RACEBOT: process.env.RACEBOT_HEALTH_PORT || '3012',
-  WS_RELAY: process.env.WEBSOCKET_RELAY_SERVER_PORT || '3003',
-  WS_RELAY_HEALTH: process.env.WS_RELAY_HEALTH_PORT || '3013',
-  RUNNER_WATCHER: process.env.TWITCH_WEBHOOK_LISTENER_PORT || '3002',
-  MONGO_EXPRESS: '8081', // This doesn't seem to be in .env.sample
-  WEB_APP: process.env.WEB_PUBLIC_EXTERNAL_PORT || '3000',
+  API: process.env.API_SERVER_EXTERNAL_PORT || "3001",
+  DISCORD: process.env.DISCORD_HEALTH_PORT || "3010",
+  TWITCH: process.env.TWITCH_HEALTH_PORT || "3011",
+  RACEBOT: process.env.RACEBOT_HEALTH_PORT || "3012",
+  WS_RELAY: process.env.WEBSOCKET_RELAY_SERVER_PORT || "3003",
+  WS_RELAY_HEALTH: process.env.WS_RELAY_HEALTH_PORT || "3013",
+  RUNNER_WATCHER: process.env.TWITCH_WEBHOOK_LISTENER_PORT || "3002",
+  MONGO_EXPRESS: process.env.MONGO_EXPRESS_PORT || "8081",
+  WEB_APP: process.env.WEB_PUBLIC_EXTERNAL_PORT || "3000",
 };
 
 // Service definitions with environment-specific configurations
@@ -156,7 +156,7 @@ function createMonitor(service, env) {
 
   // Use service-level URL if no environment-specific URL is provided
   const url = envConfig.url || service.url;
-  
+
   // Merge service-level defaults with environment-specific overrides
   const monitor = {
     name: `${service.icon} ${envConfig.displayName || service.name}`,

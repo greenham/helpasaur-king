@@ -43,7 +43,7 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      - 8081:8081
+      - ${MONGO_EXPRESS_PORT:-8081}:8081
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -58,7 +58,11 @@ services:
       - int
       - ext
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --spider http://localhost:8081 2>&1 | grep -q '401 Unauthorized' && exit 0 || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --spider http://localhost:8081 2>&1 | grep -q '401 Unauthorized' && exit 0 || exit 1",
+        ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -102,7 +106,15 @@ services:
       - int
       - ext
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${API_SERVER_EXTERNAL_PORT}/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${API_SERVER_EXTERNAL_PORT}/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -137,7 +149,15 @@ services:
       - int
       - ext
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${DISCORD_HEALTH_PORT}/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${DISCORD_HEALTH_PORT}/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -172,7 +192,15 @@ services:
       - int
       - ext
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${TWITCH_HEALTH_PORT}/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${TWITCH_HEALTH_PORT}/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -240,7 +268,15 @@ services:
       - int
       - ext
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${TWITCH_WEBHOOK_LISTENER_PORT}/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${TWITCH_WEBHOOK_LISTENER_PORT}/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -277,7 +313,15 @@ services:
       - int
       - ext
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${RACEBOT_HEALTH_PORT}/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${RACEBOT_HEALTH_PORT}/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -305,7 +349,15 @@ services:
     networks:
       - int
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${WS_RELAY_HEALTH_PORT:-${WEBSOCKET_RELAY_SERVER_PORT}}/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${WS_RELAY_HEALTH_PORT:-${WEBSOCKET_RELAY_SERVER_PORT}}/health",
+        ]
       interval: 10s
       timeout: 5s
       retries: 3

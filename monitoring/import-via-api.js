@@ -41,7 +41,7 @@ async function main() {
 
   const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
   console.log(
-    `\n📁 Loaded configuration with ${config.monitorList.length} monitors`
+    `\n📁 Loaded configuration with ${config.monitorList.length} monitors`,
   );
 
   // Get credentials
@@ -90,7 +90,7 @@ async function main() {
           console.error("❌ Authentication failed:", response.msg);
           reject(new Error(response.msg));
         }
-      }
+      },
     );
   });
 

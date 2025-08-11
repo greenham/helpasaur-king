@@ -53,7 +53,7 @@ jobs:
             bash ./scripts/cleanup.sh 3
 
   deploy-web:
-    needs: deploy  # Wait for backend deployment to complete successfully
+    needs: deploy # Wait for backend deployment to complete successfully
     uses: ./.github/workflows/deploy-gh-pages.yml
     with:
       custom_domain: helpasaur.com
