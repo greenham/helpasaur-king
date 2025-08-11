@@ -59,7 +59,7 @@ const SERVICES = [
       url: `http://host.docker.internal:${PORTS.DISCORD}/health`,
     },
     prod: {
-      url: `http://${PROD_SERVER}:3010/health`,
+      url: `http://${PROD_SERVER}:${PORTS.DISCORD}/health`,
     },
   },
   {
@@ -73,7 +73,7 @@ const SERVICES = [
       url: `http://host.docker.internal:${PORTS.TWITCH}/health`,
     },
     prod: {
-      url: `http://${PROD_SERVER}:3011/health`,
+      url: `http://${PROD_SERVER}:${PORTS.TWITCH}/health`,
     },
   },
   {
@@ -102,7 +102,7 @@ const SERVICES = [
       url: `http://host.docker.internal:${PORTS.RACEBOT}/health`,
     },
     prod: {
-      url: `http://${PROD_SERVER}:3012/health`,
+      url: `http://${PROD_SERVER}:${PORTS.RACEBOT}/health`,
     },
   },
   {
@@ -129,7 +129,7 @@ const SERVICES = [
       url: `http://host.docker.internal:${PORTS.MONGO_EXPRESS}`,
     },
     prod: {
-      url: `http://${PROD_SERVER}:8081`,
+      url: `http://${PROD_SERVER}:${PORTS.MONGO_EXPRESS}`,
     },
   },
   {
