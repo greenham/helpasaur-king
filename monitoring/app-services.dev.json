@@ -406,7 +406,7 @@
         {
             "name": "🔄 WebSocket Relay",
             "type": "json-query",
-            "url": "http://host.docker.internal:3013/health",
+            "url": "http://host.docker.internal:3003/health",
             "method": "GET",
             "hostname": null,
             "port": null,

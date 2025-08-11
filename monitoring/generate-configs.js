@@ -25,7 +25,6 @@ const PORTS = {
   TWITCH: process.env.TWITCH_HEALTH_PORT || "3011",
   RACEBOT: process.env.RACEBOT_HEALTH_PORT || "3012",
   WS_RELAY: process.env.WEBSOCKET_RELAY_SERVER_PORT || "3003",
-  WS_RELAY_HEALTH: process.env.WS_RELAY_HEALTH_PORT || "3013",
   RUNNER_WATCHER: process.env.TWITCH_WEBHOOK_LISTENER_PORT || "3002",
   MONGO_EXPRESS: process.env.MONGO_EXPRESS_PORT || "8081",
   WEB_APP: process.env.WEB_PUBLIC_EXTERNAL_PORT || "3000",
@@ -113,10 +112,10 @@ const SERVICES = [
     jsonPath: "status",
     expectedValue: "healthy",
     dev: {
-      url: `http://host.docker.internal:${PORTS.WS_RELAY_HEALTH}/health`,
+      url: `http://host.docker.internal:${PORTS.WS_RELAY}/health`,
     },
     prod: {
-      url: `http://${PROD_SERVER}:${PORTS.WS_RELAY_HEALTH}/health`,
+      url: `http://${PROD_SERVER}:${PORTS.WS_RELAY}/health`,
     },
   },
   {

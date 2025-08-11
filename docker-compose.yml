@@ -341,11 +341,9 @@ services:
         max-file: "3"
     ports:
       - ${WEBSOCKET_RELAY_SERVER_PORT}:${WEBSOCKET_RELAY_SERVER_PORT}
-      - ${WS_RELAY_HEALTH_PORT}:${WS_RELAY_HEALTH_PORT}
     environment:
       SERVICE_NAME: ws-relay
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
-      WS_RELAY_HEALTH_PORT: ${WS_RELAY_HEALTH_PORT}
     networks:
       - int
     healthcheck:
@@ -356,7 +354,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:${WS_RELAY_HEALTH_PORT:-${WEBSOCKET_RELAY_SERVER_PORT}}/health",
+          "http://localhost:${WEBSOCKET_RELAY_SERVER_PORT}/health",
         ]
       interval: 10s
       timeout: 5s
