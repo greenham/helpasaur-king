@@ -211,3 +211,5 @@ Each service has a `.env.sample` file showing required variables. Key ones:
 - `API_HOST`: API URL for web app (required at build time)
 - `TWITCH_APP_CLIENT_ID`: Twitch client ID for web app (required at build time)
 - Update @CLAUDE.md anytime modifications are made to the package.json scripts.
+
+- Use pnpm for all package operations

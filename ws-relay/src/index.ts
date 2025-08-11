@@ -1,0 +1,144 @@
+import { Server, Socket } from "socket.io"
+import { createServer, IncomingMessage, ServerResponse } from "http"
+import ms from "ms"
+import * as packageJson from "../package.json"
+
+const { WEBSOCKET_RELAY_SERVER_PORT } = process.env
+
+interface SocketData {
+  clientId: string
+}
+
+interface RelayData {
+  payload: any
+  source: string
+}
+
+interface HealthResponse {
+  status: string
+  service: string
+  version: string
+  uptime: string
+  uptimeMs: number
+  connections: {
+    current: number
+    total: number
+    clients: number
+  }
+  messages: {
+    total: number
+    byEvent: Record<string, number>
+    rate: string
+  }
+  port: string | undefined
+  environment: string
+}
+
+// Track relay stats
+const startTime = Date.now()
+let totalConnections = 0
+let currentConnections = 0
+let messagesRelayed = 0
+const eventCounts: Record<string, number> = {}
+
+// Create main WebSocket server with health endpoint
+const httpServer = createServer(
+  (req: IncomingMessage, res: ServerResponse) => {
+    // Serve health endpoint on main port
+    if (
+      req.url === "/health" &&
+      (req.method === "GET" || req.method === "HEAD")
+    ) {
+      const uptimeMs = Date.now() - startTime
+
+      // Get connected clients count
+      let clientCount = 0
+      if (wss) {
+        clientCount = wss.sockets.sockets.size || 0
+      }
+
+      res.writeHead(200, { "Content-Type": "application/json" })
+
+      // For HEAD requests, just send headers without body
+      if (req.method === "HEAD") {
+        res.end()
+      } else {
+        const healthData: HealthResponse = {
+          status: "healthy",
+          service: "ws-relay",
+          version: packageJson.version,
+          uptime: ms(uptimeMs, { long: true }),
+          uptimeMs: uptimeMs,
+          connections: {
+            current: currentConnections,
+            total: totalConnections,
+            clients: clientCount,
+          },
+          messages: {
+            total: messagesRelayed,
+            byEvent: eventCounts,
+            rate:
+              uptimeMs > 0
+                ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(
+                    2
+                  )}/min`
+                : "0/min",
+          },
+          port: WEBSOCKET_RELAY_SERVER_PORT,
+          environment: process.env.NODE_ENV || "development",
+        }
+        res.end(JSON.stringify(healthData))
+      }
+    } else {
+      // Let Socket.io handle other requests
+      res.writeHead(404)
+      res.end()
+    }
+  }
+)
+
+const wss = new Server<any, any, any, SocketData>(httpServer)
+
+const relayEvents = [
+  "streamAlert",
+  "weeklyRaceRoomCreated",
+  "joinChannel",
+  "leaveChannel",
+] as const
+
+type RelayEvent = (typeof relayEvents)[number]
+
+wss.on("connection", (socket: Socket<any, any, any, SocketData>) => {
+  const clientId =
+    (socket.handshake.query.clientId as string) || "Unknown"
+  socket.data.clientId = clientId
+  totalConnections++
+  currentConnections++
+  console.log(`Client connected: ${socket.id} (${clientId})`)
+
+  socket.on("disconnect", () => {
+    currentConnections--
+    console.log(
+      `Client disconnected: ${socket.id} (${socket.data.clientId})`
+    )
+  })
+
+  relayEvents.forEach((event: RelayEvent) => {
+    socket.on(event, (data: any) => {
+      console.log(`Received ${event} event:`, data)
+      messagesRelayed++
+      eventCounts[event] = (eventCounts[event] || 0) + 1
+      const relayData: RelayData = {
+        payload: data,
+        source: socket.data.clientId,
+      }
+      if (wss.emit(event, relayData)) console.log(`✅ Relayed!`)
+    })
+  })
+})
+
+httpServer.listen(Number(WEBSOCKET_RELAY_SERVER_PORT) || 3001)
+
+console.log(
+  `Websocket relay server listening on port ${WEBSOCKET_RELAY_SERVER_PORT}`
+)
