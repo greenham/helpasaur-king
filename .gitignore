@@ -11,3 +11,11 @@ web/.parcel-cache/
 backups/*
 .claude/settings.local.json
 .parcel-cache
+
+# TypeScript build outputs
+dist/
+*/dist/
+*.tsbuildinfo
+
+# Package manager lock files (if using npm in individual services)
+*/package-lock.json
