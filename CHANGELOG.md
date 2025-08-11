@@ -1,5 +1,44 @@
 # Changelog
 
+## 1.12.0
+
+_2025-08-11_
+
+### What's Changed
+
+#### Features
+
+- feat: Enhanced monitoring configuration and management by @greenham in https://github.com/greenham/helpasaur-king/pull/94
+  - Created configuration generator script to maintain dev/prod configs from single template
+  - Implemented API-based monitor import using Socket.io to bypass deprecated backup/restore
+  - Added dedicated health check ports for all services (3010-3013)
+  - Standardized port assignments: services (3000-3003), health checks (3010-3013), Uptime Kuma (3333)
+  - WebSocket Relay now runs dual-port operation (main service + health check)
+
+#### Infrastructure
+
+- refactor: Move monitoring to local-only deployment by @greenham
+  - Removed monitoring stack from production server deployment
+  - Simplified package.json scripts for local monitoring management
+  - Monitoring now runs independently on developer machines only
+  - Removed production monitoring shell script (no longer needed)
+
+#### Improvements
+
+- fix: Add JSON path monitoring for health endpoints in both dev and prod by @greenham
+- refactor: Consolidate and improve monitoring configurations by @greenham
+  - Unified service descriptions and icons across environments
+  - Removed redundant tags and simplified monitor names
+  - Generated configs now use environment variables for port configuration
+
+#### Bug Fixes
+
+- fix: Resolved Uptime Kuma import issues with json-query monitors by @greenham
+  - Discovered backup/restore doesn't properly handle jsonPath/expectedValue fields
+  - Created API-based solution to programmatically create monitors with all fields
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.11.0...1.12.0
+
 ## 1.11.0
 
 _2025-08-10_
