@@ -346,6 +346,7 @@ services:
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
     networks:
       - int
+      - ext
     healthcheck:
       test:
         [
