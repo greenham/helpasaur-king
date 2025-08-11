@@ -33,13 +33,13 @@ pnpm logs               # View Docker service logs
 pnpm boom               # Full rebuild and restart
 pnpm version:bump       # Bump version in all package.json files
 
-# Monitoring Stack Commands (separate from main application)
-pnpm monitor:start      # Start Uptime Kuma monitoring
+# Monitoring Stack Commands (local development only)
+pnpm monitor:start      # Start Uptime Kuma monitoring locally
 pnpm monitor:stop       # Stop monitoring
 pnpm monitor:restart    # Restart monitoring
-pnpm monitor:status     # Check monitoring status
 pnpm monitor:logs       # View monitoring logs
-pnpm monitor:backup     # Backup monitoring data
+pnpm monitor:generate   # Generate monitoring configs from template
+pnpm monitor:import     # Import configs to Uptime Kuma via API
 
 # Service-specific development (when working on individual services)
 cd api && npm run dev                    # API with nodemon
@@ -60,7 +60,6 @@ Located in `/scripts/` directory (deployed to production server):
 # Deployment and maintenance (run on production server only)
 bash ./scripts/deploy.sh [VERSION]       # Deploy specific version (default: latest)
 bash ./scripts/cleanup.sh [KEEP_COUNT]   # Clean old Docker images (default: keep 3)
-bash ./scripts/monitoring.sh [COMMAND]   # Manage monitoring stack (start|stop|status|logs)
 bash ./scripts/mongo-backup.sh           # Create MongoDB backup
 bash ./scripts/renew-certs.sh            # Renew SSL certificates
 ```
@@ -121,9 +120,9 @@ graph TD
 - **MongoDB 7**: Main database, accessed via Mongoose ODM
 - **Docker Compose**: Orchestrates all services with dev/prod configurations
   - Main stack: `docker-compose.yml` for application services
-  - Monitoring stack: `docker-compose.monitoring.yml` for Uptime Kuma (separate)
+  - Monitoring stack: `docker-compose.monitoring.yml` for Uptime Kuma (local development only)
 - **Nginx**: Reverse proxy for API/services (production), proxies to local web dev server (development)
-- **Uptime Kuma**: Service monitoring dashboard (runs independently on port 3333)
+- **Uptime Kuma**: Service monitoring dashboard (local only, port 3333) - monitors production services externally
 - **Environment**: Services use `.env` files (not committed), see `.env.sample` files
 
 ## Key Development Patterns
@@ -191,14 +190,14 @@ graph TD
 4. Run locally with `pnpm start:web` (not in Docker)
 5. Deployed to GitHub Pages on production
 
-### Setting up monitoring
+### Setting up monitoring (local only)
 
-1. Start monitoring stack: `pnpm monitor:start`
+1. Start monitoring stack locally: `pnpm monitor:start`
 2. Access Uptime Kuma at http://localhost:3333
-3. Import monitor configurations from `/monitoring/`:
-   - `docker-services-internal.json` for local dev monitoring
-   - `docker-services-external.json` for production URL monitoring
-4. Monitoring runs independently from main stack
+3. Generate configs: `pnpm monitor:generate`
+4. Import configs via API: `pnpm monitor:import app-services.dev.json` or `app-services.prod.json`
+5. Monitoring runs locally, separate from production deployment
+6. Production monitoring uses external URLs to monitor services remotely
 
 ## Environment Variables
 

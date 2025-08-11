@@ -1,33 +1,30 @@
-# Monitoring Setup
+# Monitoring Setup (Local Development)
 
-Helpasaur uses Uptime Kuma as a separate monitoring stack to ensure continuous monitoring even during application deployments.
+Helpasaur uses Uptime Kuma for monitoring, running locally on your development machine to monitor production services externally.
 
 ## Architecture
 
-The monitoring stack runs independently from the main application stack:
+The monitoring stack runs locally, separate from production:
 
-- **Separate Docker Compose**: `docker-compose.monitoring.yml`
-- **Dedicated Network**: `helpa-monitoring_ext` network
-- **Independent Lifecycle**: Can be started, stopped, and updated separately
+- **Local Docker Compose**: `docker-compose.monitoring.yml`
+- **External Monitoring**: Monitors production via public URLs and health endpoints
+- **Port**: Runs on port 3333 locally
 - **Data Persistence**: `uptime-kuma_data` Docker volume
 
-## Benefits of Separation
+## Benefits of Local Monitoring
 
-1. **Continuous Monitoring**: Monitoring stays up during app deployments
-2. **Resource Isolation**: Doesn't compete with app services for resources
-3. **Independent Updates**: Can update monitoring without touching the app
-4. **Better Reliability**: Monitoring can alert on deployment issues
+1. **No Production Resources**: Doesn't consume production server resources
+2. **True External Monitoring**: Tests services as external users would access them
+3. **Independent from Deployment**: Not affected by production deployments
+4. **Easy Management**: Run and configure from your local development environment
 
 ## Quick Start
 
 ### Starting the Monitoring Stack
 
 ```bash
-# Using pnpm scripts
+# Start monitoring locally
 pnpm monitor:start
-
-# Or directly with the script
-./scripts/monitoring.sh start
 ```
 
 Access Uptime Kuma at: http://localhost:3333
