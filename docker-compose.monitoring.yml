@@ -12,7 +12,7 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      - ${UPTIME_KUMA_PORT:-3013}:3001
+      - ${UPTIME_KUMA_PORT:-3333}:3001
     volumes:
       - uptime-kuma_data:/app/data
     networks:
@@ -21,7 +21,11 @@ services:
       # This allows uptime-kuma to connect to the host machine on Linux
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3001/', (res) => { process.exit(res.statusCode === 200 || res.statusCode === 302 ? 0 : 1); }).on('error', () => { process.exit(1); });\""]
+      test:
+        [
+          "CMD-SHELL",
+          'node -e "require(''http'').get(''http://localhost:3001/'', (res) => { process.exit(res.statusCode === 200 || res.statusCode === 302 ? 0 : 1); }).on(''error'', () => { process.exit(1); });"',
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

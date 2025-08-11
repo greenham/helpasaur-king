@@ -21,7 +21,6 @@ jobs:
             docker-compose.yml
             docker-compose.ghcr.yml
             docker-compose.prod.yml
-            docker-compose.monitoring.yml
             nginx/
             scripts/
 
@@ -31,7 +30,7 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,docker-compose.monitoring.yml,nginx/,scripts/"
+          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,nginx/,scripts/"
           target: "${{ secrets.DEPLOY_PATH }}"
           overwrite: true
           rm: false
@@ -49,16 +48,12 @@ jobs:
             VERSION="${{ github.event.inputs.version }}"
             echo "Deploying version: $VERSION"
             bash ./scripts/deploy.sh "$VERSION"
-            
-            # Ensure monitoring stack is running
-            echo "Checking monitoring stack..."
-            bash ./scripts/monitoring.sh status || bash ./scripts/monitoring.sh start
 
             # Clean up old Docker images
             bash ./scripts/cleanup.sh 3
 
   deploy-web:
-    needs: deploy  # Wait for backend deployment to complete successfully
+    needs: deploy # Wait for backend deployment to complete successfully
     uses: ./.github/workflows/deploy-gh-pages.yml
     with:
       custom_domain: helpasaur.com

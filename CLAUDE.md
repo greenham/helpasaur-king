@@ -33,17 +33,17 @@ pnpm logs               # View Docker service logs
 pnpm boom               # Full rebuild and restart
 pnpm version:bump       # Bump version in all package.json files
 
-# Monitoring Stack Commands (separate from main application)
-pnpm monitor:start      # Start Uptime Kuma monitoring
+# Monitoring Stack Commands (local development only)
+pnpm monitor:start      # Start Uptime Kuma monitoring locally
 pnpm monitor:stop       # Stop monitoring
 pnpm monitor:restart    # Restart monitoring
-pnpm monitor:status     # Check monitoring status
 pnpm monitor:logs       # View monitoring logs
-pnpm monitor:backup     # Backup monitoring data
+pnpm monitor:generate   # Generate monitoring configs from template
+pnpm monitor:import     # Import configs to Uptime Kuma via API
 
 # Service-specific development (when working on individual services)
 cd api && npm run dev                    # API with nodemon
-cd discord && npm run dev                # Discord bot with nodemon  
+cd discord && npm run dev                # Discord bot with nodemon
 cd twitch && npm run dev                 # Twitch bot with nodemon
 cd web && npm run dev                    # React app with Parcel dev server
 cd racebot && npm run dev                # Race bot with ts-node-dev
@@ -60,7 +60,6 @@ Located in `/scripts/` directory (deployed to production server):
 # Deployment and maintenance (run on production server only)
 bash ./scripts/deploy.sh [VERSION]       # Deploy specific version (default: latest)
 bash ./scripts/cleanup.sh [KEEP_COUNT]   # Clean old Docker images (default: keep 3)
-bash ./scripts/monitoring.sh [COMMAND]   # Manage monitoring stack (start|stop|status|logs)
 bash ./scripts/mongo-backup.sh           # Create MongoDB backup
 bash ./scripts/renew-certs.sh            # Renew SSL certificates
 ```
@@ -74,7 +73,7 @@ graph TD
     mongo-express[Mongo Express]
     ws-relay[WebSocket Relay]
     helpa-base[Helpa Base Library]
-    
+
     %% Services
     api[API Server]
     discord[Discord Bot]
@@ -83,34 +82,34 @@ graph TD
     nginx[Nginx]
     runnerwatcher[Runner Watcher]
     racebot[Race Bot]
-    
+
     %% Dependencies
     mongo-express -->|service_healthy| mongo
-    
+
     api -->|service_healthy| mongo
     api -->|service_healthy| ws-relay
-    
+
     discord -->|service_healthy| api
     discord -->|service_completed| helpa-base
-    
+
     twitch -->|service_healthy| api
     twitch -->|service_completed| helpa-base
-    
+
     runnerwatcher -->|service_healthy| api
     runnerwatcher -->|service_healthy| ws-relay
     runnerwatcher -->|service_completed| helpa-base
-    
+
     racebot -->|service_healthy| ws-relay
-    
+
     web -->|runs locally| host[Host Machine]
-    
+
     nginx -->|proxy to host:3000| web
-    
+
     %% Styling
     classDef infrastructure fill:#d4a,stroke:#333,stroke-width:2px
     classDef service fill:#89c,stroke:#333,stroke-width:2px
     classDef frontend fill:#8b8,stroke:#333,stroke-width:2px
-    
+
     class mongo,mongo-express,ws-relay,helpa-base infrastructure
     class api,discord,twitch,runnerwatcher,racebot service
     class web,nginx frontend
@@ -121,19 +120,21 @@ graph TD
 - **MongoDB 7**: Main database, accessed via Mongoose ODM
 - **Docker Compose**: Orchestrates all services with dev/prod configurations
   - Main stack: `docker-compose.yml` for application services
-  - Monitoring stack: `docker-compose.monitoring.yml` for Uptime Kuma (separate)
+  - Monitoring stack: `docker-compose.monitoring.yml` for Uptime Kuma (local development only)
 - **Nginx**: Reverse proxy for API/services (production), proxies to local web dev server (development)
-- **Uptime Kuma**: Service monitoring dashboard (runs independently on port 3013)
+- **Uptime Kuma**: Service monitoring dashboard (local only, port 3333) - monitors production services externally
 - **Environment**: Services use `.env` files (not committed), see `.env.sample` files
 
 ## Key Development Patterns
 
 ### API Communication
+
 - Services communicate via the shared `helpa-api-client` library
 - WebSocket relay broadcasts real-time events between services
 - API uses JWT tokens for authentication (Twitch OAuth integration)
 
 ### MongoDB Models (in `/api/models/`)
+
 - `Command`: Bot commands for Discord/Twitch
 - `Stream`: Twitch stream tracking
 - `Configuration`: Service configuration storage
@@ -141,12 +142,14 @@ graph TD
 - `User`: User authentication and preferences
 
 ### Frontend Routing (in `/web/src/`)
+
 - `/commands`: Command directory
-- `/streams`: ALttP stream directory  
+- `/streams`: ALttP stream directory
 - `/twitch`: Twitch bot management
 - `/admin`: Admin panel (requires auth)
 
 ### Real-time Features
+
 - Socket.io connections in API, web app, and ws-relay
 - Twitch EventSub webhooks for stream events
 - racetime.gg WebSocket for race room interaction
@@ -162,38 +165,44 @@ graph TD
 ## Common Tasks
 
 ### Adding a new bot command
+
 1. Create command in MongoDB via API or admin panel
 2. Commands are fetched dynamically by Discord/Twitch bots
 3. Use `type: 'basic'` for simple text responses
 
 ### Modifying stream detection
+
 1. Runner watcher service handles Twitch EventSub webhooks
-2. Stream alerts are managed in `/runnerwatcher/src/` 
+2. Stream alerts are managed in `/runnerwatcher/src/`
 3. ALttP game detection uses Twitch game ID filtering
 
 ### Working with weekly races
+
 1. Race bot creates races Sunday 11:30 AM PT
 2. Configuration in `/racebot/src/config.ts`
 3. Race announcements go through Discord bot
 
 ### Frontend development
+
 1. React components in `/web/src/components/`
 2. API calls use TanStack Query hooks
 3. Bootstrap theme customization in `/web/src/scss/`
 4. Run locally with `pnpm start:web` (not in Docker)
 5. Deployed to GitHub Pages on production
 
-### Setting up monitoring
-1. Start monitoring stack: `pnpm monitor:start`
-2. Access Uptime Kuma at http://localhost:3013
-3. Import monitor configurations from `/monitoring/`:
-   - `docker-services-internal.json` for local dev monitoring
-   - `docker-services-external.json` for production URL monitoring
-4. Monitoring runs independently from main stack
+### Setting up monitoring (local only)
+
+1. Start monitoring stack locally: `pnpm monitor:start`
+2. Access Uptime Kuma at http://localhost:3333
+3. Generate configs: `pnpm monitor:generate`
+4. Import configs via API: `pnpm monitor:import app-services.dev.json` or `app-services.prod.json`
+5. Monitoring runs locally, separate from production deployment
+6. Production monitoring uses external URLs to monitor services remotely
 
 ## Environment Variables
 
 Each service has a `.env.sample` file showing required variables. Key ones:
+
 - `TWITCH_CLIENT_ID/SECRET`: Twitch app credentials
 - `DISCORD_TOKEN`: Discord bot token
 - `MONGODB_URI`: MongoDB connection string

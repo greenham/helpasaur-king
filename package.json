@@ -10,12 +10,12 @@
     "logs": "docker compose logs -f --tail 1000",
     "boom": "pnpm stop && pnpm build && pnpm start --force-recreate && pnpm logs",
     "version:bump": "bash scripts/bump-version.sh",
-    "monitor:start": "bash scripts/monitoring.sh start",
-    "monitor:stop": "bash scripts/monitoring.sh stop",
-    "monitor:restart": "bash scripts/monitoring.sh restart",
-    "monitor:status": "bash scripts/monitoring.sh status",
-    "monitor:logs": "bash scripts/monitoring.sh logs",
-    "monitor:backup": "bash scripts/monitoring.sh backup"
+    "monitor:start": "docker compose -f docker-compose.monitoring.yml up -d",
+    "monitor:stop": "docker compose -f docker-compose.monitoring.yml down",
+    "monitor:restart": "docker compose -f docker-compose.monitoring.yml restart",
+    "monitor:logs": "docker compose -f docker-compose.monitoring.yml logs -f",
+    "monitor:generate": "node monitoring/generate-configs.js",
+    "monitor:import": "node monitoring/import-via-api.js"
   },
   "author": "https://github.com/greenham",
   "license": "MIT",

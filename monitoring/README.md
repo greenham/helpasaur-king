@@ -1,40 +1,37 @@
-# Monitoring Setup
+# Monitoring Setup (Local Development)
 
-Helpasaur uses Uptime Kuma as a separate monitoring stack to ensure continuous monitoring even during application deployments.
+Helpasaur uses Uptime Kuma for monitoring, running locally on your development machine to monitor production services externally.
 
 ## Architecture
 
-The monitoring stack runs independently from the main application stack:
+The monitoring stack runs locally, separate from production:
 
-- **Separate Docker Compose**: `docker-compose.monitoring.yml`
-- **Dedicated Network**: `helpa-monitoring_ext` network
-- **Independent Lifecycle**: Can be started, stopped, and updated separately
+- **Local Docker Compose**: `docker-compose.monitoring.yml`
+- **External Monitoring**: Monitors production via public URLs and health endpoints
+- **Port**: Runs on port 3333 locally
 - **Data Persistence**: `uptime-kuma_data` Docker volume
 
-## Benefits of Separation
+## Benefits of Local Monitoring
 
-1. **Continuous Monitoring**: Monitoring stays up during app deployments
-2. **Resource Isolation**: Doesn't compete with app services for resources
-3. **Independent Updates**: Can update monitoring without touching the app
-4. **Better Reliability**: Monitoring can alert on deployment issues
+1. **No Production Resources**: Doesn't consume production server resources
+2. **True External Monitoring**: Tests services as external users would access them
+3. **Independent from Deployment**: Not affected by production deployments
+4. **Easy Management**: Run and configure from your local development environment
 
 ## Quick Start
 
 ### Starting the Monitoring Stack
 
 ```bash
-# Using pnpm scripts
+# Start monitoring locally
 pnpm monitor:start
-
-# Or directly with the script
-./scripts/monitoring.sh start
 ```
 
-Access Uptime Kuma at: http://localhost:3013
+Access Uptime Kuma at: http://localhost:3333
 
 ### Initial Configuration
 
-1. Access dashboard at http://localhost:3013
+1. Access dashboard at http://localhost:3333
 2. Create your admin account when prompted
 3. Go to **Settings** → **Backup** → **Import**
 4. Choose the appropriate configuration file for your monitoring needs:
@@ -67,10 +64,34 @@ pnpm monitor:backup
 
 ## Configuration Files
 
+### Configuration Generator
+
+To maintain consistency between development and production monitoring configurations, use the generator script:
+
+```bash
+# Generate both dev and prod configurations
+node monitoring/generate-configs.js
+```
+
+This creates:
+
+- `app-services.dev.json` - Development configuration (host.docker.internal)
+- `app-services.prod.json` - Production configuration (external URLs with SSL monitoring)
+
+The generator uses a common template defined in `generate-configs.js` to ensure:
+
+- Consistent service definitions across environments
+- Proper JSON-query type for health endpoints
+- Environment-specific URLs and settings
+- Automatic SSL monitoring for HTTPS endpoints in production
+
+To modify monitored services, edit the `SERVICES` array in `generate-configs.js` and regenerate.
+
 ### Monitor Definitions
 
 **Development Monitoring (`app-services.dev.json`):**
 All services monitored via host.docker.internal:
+
 - 🔌 API Server (port 3001)
 - 💬 Discord Bot (port 3010)
 - 📺 Twitch Bot (port 3011)
@@ -81,7 +102,8 @@ All services monitored via host.docker.internal:
 - 🌐 Web App (port 3000)
 
 **Production Monitoring (`app-services.prod.json`):**
-All services via external URLs (using wildcard *.helpasaur.com DNS):
+All services via external URLs (using wildcard \*.helpasaur.com DNS):
+
 - 🌐 API Server (https://api.helpasaur.com) - Health check + SSL expiry
 - 🌐 Runner Watcher (https://rw.helpasaur.com) - Health check + SSL expiry
 - 🌐 Web App (https://helpasaur.com) - Availability + SSL expiry
@@ -130,7 +152,7 @@ SSL monitoring features:
 The monitoring stack runs completely independently:
 
 - **No shared networks** with the main application stack
-- **Port exposure**: Direct access via port 3013
+- **Port exposure**: Direct access via port 3333
 - **Host networking**: Uses `host.docker.internal` to monitor services
 
 This provides:
@@ -166,7 +188,7 @@ pnpm monitoring:backup
    pnpm start
    ```
 
-2. Access Uptime Kuma at http://localhost:3013
+2. Access Uptime Kuma at http://localhost:3333
 
 3. Import configuration files (see Initial Configuration)
 
@@ -191,10 +213,10 @@ If monitoring can't reach application services:
 
 ### Port Conflicts
 
-Default port is 3013. To change:
+Default port is 3333. To change:
 
 ```bash
-export UPTIME_KUMA_PORT=3014
+export UPTIME_KUMA_PORT=3334
 pnpm monitor:start
 ```
 
@@ -251,6 +273,6 @@ If you have an existing integrated Uptime Kuma setup:
 ## Security Considerations
 
 - Monitoring dashboard should be password protected (configured in Uptime Kuma)
-- Consider firewall rules to restrict access to port 3013 in production
+- Consider firewall rules to restrict access to port 3333 in production
 - Regular backups recommended for monitoring configuration
-- The service runs on internal port 3001, exposed on port 3013 (configurable via `UPTIME_KUMA_PORT`)
+- The service runs on internal port 3001, exposed on port 3333 (configurable via `UPTIME_KUMA_PORT`)
