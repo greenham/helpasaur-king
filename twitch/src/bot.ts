@@ -244,10 +244,14 @@ export class TwitchBot {
     let command = this.cachedCommands.get(commandName)
     if (!command) {
       try {
-        const response = await this.helpaApi.getAxiosInstance().get(`/api/commands/${commandName}`)
-        command = response.data
-        if (command) {
-          this.cachedCommands.set(commandName, command)
+        const response = await this.helpaApi.getAxiosInstance().post(`/api/commands/find`, {
+          command: commandName
+        })
+        if (response.status === 200) {
+          command = response.data
+          if (command) {
+            this.cachedCommands.set(commandName, command)
+          }
         }
       } catch (error) {
         // Command not found

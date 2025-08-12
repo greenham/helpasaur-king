@@ -75,8 +75,10 @@ const app = express()
 const originWhitelist = (API_CORS_ORIGINS_WHITELIST || "").split(",")
 app.use(cors({ origin: originWhitelist, credentials: true }))
 
-// Set up logging
-app.use(logger("short"))
+// Set up logging - use 'dev' for colored output with more details
+// Options: 'combined', 'common', 'dev', 'short', 'tiny'
+const logFormat = process.env.LOG_FORMAT || (process.env.NODE_ENV === 'production' ? 'short' : 'dev')
+app.use(logger(logFormat))
 
 // Track requests
 app.use(trackRequests)
@@ -86,6 +88,10 @@ app.wsRelay = wsRelay
 
 // Use cookie-parser
 app.use(cookieParser())
+
+// Parse JSON bodies (built-in Express middleware)
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Health check endpoint
 app.get("/health", async (_req: Request, res: Response) => {
@@ -133,6 +139,14 @@ app.use(function (
   res: Response,
   next: NextFunction
 ) {
+  // Log all errors with full details
+  console.error('API Error:', {
+    name: err.name,
+    message: err.message,
+    code: err.code,
+    stack: err.stack
+  })
+  
   if (err.name === "UnauthorizedError") {
     res.status(401).json({ error: err.name + ": " + err.message })
   } else if (err.code === "permission_denied") {

@@ -48,7 +48,7 @@ export class HelpaApi {
     })
 
     axiosRetry(this.api, {
-      retries: 1000,
+      retries: 1000, // @TODO: Make this configurable and overridable per-call
       retryDelay: () => 10000,
       onRetry: (retryCount, error, requestConfig) => {
         console.log(`🔴 API Request Error:`, error.toString())
