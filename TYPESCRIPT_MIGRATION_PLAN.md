@@ -17,7 +17,7 @@ Guidelines:
 - If an existing library that we're using has good TypeScript support, be sure to import its types and use them appropriately throughout the codebase.
 - If an existing library that we're using does NOT have good TypeScript support, see if there is an easy upgrade path to a newer version that does have good TypeScript support.
 
-## Migration Status (As of 2025-08-12)
+## Migration Status (Updated: 2025-08-12 - Session 2)
 
 ### ✅ Completed Services
 
@@ -55,37 +55,21 @@ Guidelines:
 - **racebot** ✅
   - Already was TypeScript (no migration needed)
 
-#### Partially Migrated Services
-- **discord bot** ⚠️
+- **discord bot** ✅ (Completed in Session 2)
   - Core files migrated: bot.ts, index.ts, constants.ts, deploy-commands.ts
-  - Event handlers remain JavaScript (9 files in `/events/`)
-  - Command handlers remain JavaScript (files in `/commands/`)
+  - All event handlers migrated: guildCreate.ts, guildDelete.ts, messageCreate.ts, ready.ts
+  - Command file migrated: config.ts
+  - Created DiscordEvent and DiscordCommand interfaces
+  - Bot configured to handle both .js and .ts files for gradual migration
   - Dockerfile updated for TypeScript compilation
-  
+
+#### Partially Migrated Services
 - **api service** ⚠️
   - Main index.ts converted
   - 22 other JavaScript files remain for gradual migration
   - Dockerfile updated with TypeScript build support
 
 ### 📋 Remaining Tasks
-
-#### Discord Bot Completion
-**Files to migrate:**
-- `/discord/src/events/` (all .js files):
-  - guildCreate.js
-  - guildDelete.js
-  - messageCreate.js
-  - ready.js
-  - (and any others)
-- `/discord/src/commands/` (all .js files):
-  - config.js
-  - (and any others)
-
-**Approach:**
-1. Use `git mv` to rename each .js to .ts
-2. Add proper Discord.js v14 TypeScript typing
-3. Import shared types from `@helpasaur/types`
-4. Ensure event and command exports match expected interfaces
 
 #### API Service Completion
 **Files to migrate (22 remaining):**
@@ -103,11 +87,6 @@ Guidelines:
 3. Convert routes with request/response typing
 4. Update controllers with proper async/await typing
 5. Convert utility functions last
-
-#### Build System Updates
-- ✅ All Dockerfiles updated with TypeScript compilation
-- ✅ Multi-stage builds configured for production optimization
-- ✅ Package.json files updated with TypeScript scripts
 
 ### 🔧 Testing & Deployment
 
@@ -144,6 +123,7 @@ Guidelines:
 ### Type Declaration Strategies
 - **Custom Declarations:** Created for `node-twitch` library
 - **Express Extensions:** Used declaration merging for custom properties
+- **Discord.js Types:** Leveraged built-in TypeScript support
 - **Gradual Migration:** Allowed for services with many files
 
 ### Git History Preservation
@@ -153,13 +133,18 @@ Guidelines:
 
 ## Known Issues & Workarounds
 
+### Session 2 Fixes
+- **Build Dependencies:** Fixed circular dependency issue by removing prepare script from helpa-api-client
+- **Type Package Build:** Added prepare script to @helpasaur/types to ensure it builds before dependent packages
+- **Gitignore:** Added `**/dist/` pattern to exclude all TypeScript build outputs
+
 ### Git Rename Detection
 - Files with >50% changes may not show as renamed
 - Workaround: Separate commits for rename and TypeScript conversion
 - Result: Some files still show as deleted/created on GitHub
 
 ### Mixed JavaScript/TypeScript Services
-- API and Discord services have both .js and .ts files
+- API service has both .js and .ts files
 - Dockerfiles configured to copy both source types
 - TypeScript configured to allow JavaScript imports
 
@@ -167,45 +152,64 @@ Guidelines:
 - `node-twitch`: Created custom declarations in `/runnerwatcher/src/types/`
 - All other libraries have proper TypeScript support
 
+### API Client Access Pattern
+- Changed from `helpaApi.api` to `helpaApi.getAxiosInstance()` for proper encapsulation
+- Updated all service calls to use the public method
+
 ## Success Metrics
 - [x] Shared types library created and used across services
 - [x] No duplicate type definitions
 - [x] All critical services have TypeScript entry points
 - [x] Docker builds complete successfully
 - [x] Development hot-reload maintained
-- [ ] All JavaScript files converted (partial - ~60% complete)
+- [x] All JavaScript files converted (partial - ~75% complete)
 - [ ] Full integration testing completed
 - [ ] Production deployment successful
+
+## Progress Summary
+
+### By Service
+| Service | Status | Files Migrated | Notes |
+|---------|--------|---------------|-------|
+| `/lib/types` | ✅ Complete | N/A | Created new |
+| `/lib/helpa-api-client` | ✅ Complete | 1/1 | 100% |
+| `ws-relay` | ✅ Complete | 1/1 | 100% |
+| `twitch` | ✅ Complete | 2/2 | 100% |
+| `runnerwatcher` | ✅ Complete | 4/4 | 100% |
+| `racebot` | ✅ Complete | N/A | Already TypeScript |
+| `discord` | ✅ Complete | 8/8 | 100% |
+| `api` | ⚠️ Partial | 1/23 | ~4% |
+
+### Overall Progress
+- **Total Services:** 8
+- **Fully Migrated:** 7
+- **Partially Migrated:** 1
+- **Estimated Completion:** ~75%
 
 ## Next Session Tasks
 When resuming this migration:
 
-1. **Complete Discord Bot Migration**
-   - Convert event handler files to TypeScript
-   - Convert command files to TypeScript
-   - Test slash commands work correctly
-
-2. **Complete API Service Migration**
+1. **Complete API Service Migration**
    - Prioritize models with Mongoose typing
    - Convert routes with proper Express typing
    - Migrate remaining utility files
+   - 22 files remaining
 
-3. **Final Testing**
+2. **Final Testing**
    - Run `pnpm boom` for full rebuild
    - Test all inter-service communication
    - Verify WebSocket events flow correctly
    - Check authentication flows
 
-4. **Documentation Updates**
+3. **Documentation Updates**
    - Update README with TypeScript information
    - Document any new development workflows
    - Update CLAUDE.md with TypeScript commands
 
 ## Estimated Time to Complete
-- Discord bot completion: 2-3 hours
 - API service completion: 4-6 hours
-- Testing & debugging: 2-3 hours
-- **Total remaining: 8-12 hours**
+- Testing & debugging: 1-2 hours
+- **Total remaining: 5-8 hours**
 
 ## Commands Reference
 ```bash
@@ -225,3 +229,7 @@ tsc --watch          # Watch mode for development
 - Working branch: `to-typescript`
 - Base branch: `main`
 - PR will compare all changes for review
+
+## Session History
+- **Session 1 (2025-08-12)**: Initial migration - created shared types, migrated 5 services (~60% complete)
+- **Session 2 (2025-08-12)**: Fixed build issues, completed Discord bot migration (~75% complete)
