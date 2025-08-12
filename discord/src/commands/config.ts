@@ -1,6 +1,20 @@
-const { SlashCommandBuilder, ChannelType, inlineCode } = require("discord.js")
+import {
+  SlashCommandBuilder,
+  ChannelType,
+  inlineCode,
+  ChatInputCommandInteraction,
+} from "discord.js"
+import { DiscordCommand } from "../types/events"
 
-module.exports = {
+interface CommandConfig {
+  typeFn: string
+  key: string
+  valueProperty?: string
+  guildConfigKey: string
+  valueOnNull?: any
+}
+
+const configCommand: DiscordCommand = {
   data: new SlashCommandBuilder()
     .setName("helpa-config")
     .setDescription("Configure bot settings")
@@ -79,7 +93,7 @@ module.exports = {
       subcommand
         .setName("weekly-race-room-alert")
         .setDescription(
-          "Enable/disable message with a link to the weekly race room upon creation"
+          "Enable/disable weekly race room creation notifications"
         )
         .addBooleanOption((option) =>
           option
@@ -109,27 +123,40 @@ module.exports = {
         .addRoleOption((option) =>
           option
             .setName("role")
-            .setDescription("The role to ping when sending alerts (optional)")
+            .setDescription(
+              "The role to ping (or leave blank to not ping any role)"
+            )
             .setRequired(false)
         )
-    )
-    .setDefaultMemberPermissions(0),
-
-  async execute(interaction) {
+    ),
+  async execute(interaction: ChatInputCommandInteraction) {
+    // Defer reply while fetching current config
     await interaction.deferReply({ ephemeral: true })
-    const currentGuildConfig = interaction.client.config.guilds.find(
-      (g) => g.id === interaction.guildId
+
+    const subcommand = interaction.options.getSubcommand()
+    const { guildId, client } = interaction as any
+
+    // See if there's an internal configuration for this guild
+    let currentGuildConfig = client.config.guilds.find(
+      (g: any) => g.id === guildId
     )
     if (!currentGuildConfig) {
       await interaction.editReply({
-        content: "This guild is not configured!",
+        content: "Unable to find a configuration for this guild!",
         ephemeral: true,
       })
       return
     }
 
-    const subcommand = interaction.options.getSubcommand()
-    const subcommandMap = new Map([
+    const subcommandMap = new Map<string, CommandConfig>([
+      [
+        "prefix",
+        {
+          typeFn: "getString",
+          key: "character",
+          guildConfigKey: "cmdPrefix",
+        },
+      ],
       [
         "cooldown",
         {
@@ -137,10 +164,6 @@ module.exports = {
           key: "seconds",
           guildConfigKey: "textCmdCooldown",
         },
-      ],
-      [
-        "prefix",
-        { typeFn: "getString", key: "character", guildConfigKey: "cmdPrefix" },
       ],
       [
         "stream-alerts",
@@ -196,7 +219,7 @@ module.exports = {
       ],
     ])
 
-    let guildUpdate = {}
+    let guildUpdate: any = {}
     const commandConfig = subcommandMap.get(subcommand)
     if (!commandConfig) {
       await interaction.editReply({
@@ -207,7 +230,7 @@ module.exports = {
     }
 
     const { typeFn, key, guildConfigKey } = commandConfig
-    let newValue = interaction.options[typeFn](key)
+    let newValue: any = (interaction.options as any)[typeFn](key)
     if (newValue === null && commandConfig.valueOnNull !== undefined) {
       newValue = commandConfig.valueOnNull
     }
@@ -225,13 +248,14 @@ module.exports = {
     guildUpdate[guildConfigKey] = newValue
     currentGuildConfig[guildConfigKey] = newValue
 
-    await this.helpaApi.api.patch(
-      `/api/discord/guild/${interaction.guildId}`,
-      guildUpdate
-    )
+    await this.helpaApi
+      ?.getAxiosInstance()
+      .patch(`/api/discord/guild/${interaction.guildId}`, guildUpdate)
     await interaction.editReply({
-      content: `Updated ${inlineCode(subcommand)} to ${inlineCode(newValue)}!`,
+      content: `Updated ${inlineCode(subcommand)} to ${inlineCode(String(newValue))}!`,
       ephemeral: true,
     })
   },
 }
+
+module.exports = configCommand

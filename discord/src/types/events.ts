@@ -1,4 +1,10 @@
-import { Client, Guild, Message } from "discord.js"
+import {
+  Client,
+  Guild,
+  Message,
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
+} from "discord.js"
 import { HelpaApi } from "helpa-api-client"
 
 export interface DiscordEvent {
@@ -6,4 +12,10 @@ export interface DiscordEvent {
   once?: boolean
   helpaApi?: HelpaApi
   execute: (...args: any[]) => Promise<void> | void
+}
+
+export interface DiscordCommand {
+  data: SlashCommandBuilder | any
+  execute: (interaction: ChatInputCommandInteraction) => Promise<void>
+  helpaApi?: HelpaApi
 }
