@@ -1,13 +1,15 @@
 {
   "name": "helpa-api",
   "version": "1.12.0",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node ./src/index",
-    "start:dev": "nodemon ./src"
+    "build": "tsc",
+    "start": "node ./dist/index",
+    "start:dev": "nodemon ./src/index.ts"
   },
   "dependencies": {
+    "@helpasaur/types": "file:../lib/types",
     "axios": "^1.8.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -23,6 +25,15 @@
     "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/morgan": "^1.9.9",
+    "@types/ms": "^0.7.34",
+    "@types/node": "^20.10.5",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }
