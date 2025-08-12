@@ -1,14 +1,17 @@
-module.exports = {
+import { Guild } from "discord.js"
+import { DiscordEvent } from "../types/events"
+
+const guildDeleteEvent: DiscordEvent = {
   name: "guildDelete",
-  async execute(guild) {
+  async execute(guild: Guild) {
     console.log(
       `Guild ${guild.name} (${guild.id}) kicked us or the guild was deleted`
     )
-    const { client } = guild
+    const { client } = guild as any // TODO: Type the extended client properly
 
     // See if there's an existing configuration for this guild
     let guildConfigIndex = client.config.guilds.findIndex(
-      (g) => g.id === guild.id
+      (g: any) => g.id === guild.id
     )
     if (guildConfigIndex === -1) {
       console.log(`Guild ${guild.name} (${guild.id}) does not exist!`)
@@ -19,16 +22,20 @@ module.exports = {
 
     // De-activate this guild via the API
     try {
-      await this.helpaApi.api.patch(`/api/discord/guild/${guild.id}`, {
-        active: false,
-      })
+      await this.helpaApi
+        ?.getAxiosInstance()
+        .patch(`/api/discord/guild/${guild.id}`, {
+          active: false,
+        })
 
       // Update the local config
       client.config.guilds[guildConfigIndex].active = false
-    } catch (err) {
+    } catch (err: any) {
       console.error(
         `Error deleting guild ${guild.name} (${guild.id}) via API: ${err.message}`
       )
     }
   },
 }
+
+module.exports = guildDeleteEvent

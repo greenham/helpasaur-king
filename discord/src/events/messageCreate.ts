@@ -1,16 +1,18 @@
-const { EmbedBuilder, Collection } = require("discord.js")
-const { defaultGuildConfig } = require("../constants")
-let aliasList
-let cachedCommands = new Collection()
-let cooldowns = new Collection()
+import { EmbedBuilder, Collection, Message } from "discord.js"
+import { defaultGuildConfig } from "../constants"
+import { DiscordEvent } from "../types/events"
 
-module.exports = {
+let aliasList: string[] | undefined
+let cachedCommands = new Collection<string, any>()
+let cooldowns = new Collection<string, number>()
+
+const messageCreateEvent: DiscordEvent = {
   name: "messageCreate",
-  async execute(interaction) {
-    const { author, content, guildId, client } = interaction
+  async execute(interaction: Message) {
+    const { author, content, guildId, client } = interaction as any
 
     //  See if there's an internal configuration for this guild
-    let guildConfig = client.config.guilds.find((g) => g.id === guildId)
+    let guildConfig = client.config.guilds.find((g: any) => g.id === guildId)
     if (!guildConfig) {
       guildConfig = Object.assign({}, defaultGuildConfig)
     }
@@ -33,7 +35,7 @@ module.exports = {
           client.config.oauth.permissions
         }&scope=${client.config.oauth.scopes.join("%20")}`,
         ephemeral: true,
-      })
+      } as any)
       return
     }
 
@@ -45,15 +47,17 @@ module.exports = {
       cachedCommand = false
     }
 
-    let command = false
+    let command: any = false
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
-        const response = await this.helpaApi.api.post(`/api/commands/find`, {
-          command: commandNoPrefix,
-        })
+        const response = await this.helpaApi
+          ?.getAxiosInstance()
+          .post(`/api/commands/find`, {
+            command: commandNoPrefix,
+          })
 
-        if (response.status === 200) {
+        if (response?.status === 200) {
           command = response.data
 
           if (command) {
@@ -77,7 +81,7 @@ module.exports = {
     // @TODO: Make sure the user is permitted to use commands
 
     // Make sure the command isn't on cooldown in this guild
-    let onCooldown = false
+    let onCooldown: number | false = false
     let cooldownKey = command.command + guildId
     let timeUsed = cooldowns.get(cooldownKey)
     if (timeUsed) {
@@ -110,7 +114,7 @@ module.exports = {
       // Determine if the original command or an alias was used
       if (command.aliases.includes(commandNoPrefix)) {
         // Alias was used, remove it from the list, and add the original command
-        aliasList = aliasList.filter((a) => a != commandNoPrefix)
+        aliasList = aliasList.filter((a: string) => a != commandNoPrefix)
         aliasList.push(command.command)
         aliasUsed = commandNoPrefix
       }
@@ -129,7 +133,7 @@ module.exports = {
     cooldowns.set(cooldownKey, Date.now())
 
     // Log command use
-    await this.helpaApi.api.post(`/api/commands/logs`, {
+    await this.helpaApi?.getAxiosInstance().post(`/api/commands/logs`, {
       command: command.command,
       alias: aliasUsed,
       source: "discord",
@@ -141,3 +145,5 @@ module.exports = {
     })
   },
 }
+
+module.exports = messageCreateEvent

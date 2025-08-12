@@ -1,14 +1,16 @@
-const { defaultGuildConfig } = require("../constants")
+import { Guild } from "discord.js"
+import { defaultGuildConfig } from "../constants"
+import { DiscordEvent } from "../types/events"
 
-module.exports = {
+const guildCreateEvent: DiscordEvent = {
   name: "guildCreate",
-  async execute(guild) {
+  async execute(guild: Guild) {
     console.log(`Joined guild ${guild.name} (${guild.id})`)
-    const { client } = guild
+    const { client } = guild as any // TODO: Type the extended client properly
 
     // See if there's an existing configuration for this guild
     const guildConfigIndex = client.config.guilds.findIndex(
-      (g) => g.id === guild.id
+      (g: any) => g.id === guild.id
     )
     if (guildConfigIndex !== -1) {
       console.log(`Guild ${guild.name} (${guild.id}) is already configured`)
@@ -16,14 +18,16 @@ module.exports = {
       if (!client.config.guilds[guildConfigIndex].active) {
         console.log(`Re-activating guild ${guild.name} (${guild.id})`)
         try {
-          await this.helpaApi.api.patch(`/api/discord/guild/${guild.id}`, {
-            active: true,
-          })
+          await this.helpaApi
+            ?.getAxiosInstance()
+            .patch(`/api/discord/guild/${guild.id}`, {
+              active: true,
+            })
           console.log(`Re-activated guild ${guild.name} (${guild.id})`)
 
           // Update the local config
           client.config.guilds[guildConfigIndex].active = true
-        } catch (err) {
+        } catch (err: any) {
           console.error(
             `Error re-activating guild ${guild.name} (${guild.id}): ${err.message}`
           )
@@ -45,11 +49,13 @@ module.exports = {
 
     // Create this guild via the API
     try {
-      await this.helpaApi.api.post(`/api/discord/guild`, guildConfig)
+      await this.helpaApi
+        ?.getAxiosInstance()
+        .post(`/api/discord/guild`, guildConfig)
 
       // Update the local config
       client.config.guilds.push(guildConfig)
-    } catch (err) {
+    } catch (err: any) {
       console.error(
         `Error creating guild ${guild.name} (${guild.id}) via API: ${err.message}`
       )
@@ -57,3 +63,5 @@ module.exports = {
     }
   },
 }
+
+module.exports = guildCreateEvent

@@ -1,6 +1,8 @@
-const { EmbedBuilder } = require("discord.js")
-const schedule = require("node-schedule")
-const { io } = require("socket.io-client")
+import { EmbedBuilder, Client, TextChannel } from "discord.js"
+import * as schedule from "node-schedule"
+import { io, Socket } from "socket.io-client"
+import { DiscordEvent } from "../types/events"
+
 const { WEBSOCKET_RELAY_SERVER } = process.env
 const STREAM_ONLINE_EVENT = "stream.online"
 const CHANNEL_UPDATE_EVENT = "channel.update"
@@ -14,20 +16,20 @@ const WEEKLY_ALERT_OFFSET_MINUTES = 60
 const WEEKLY_ALERT_MESSAGE =
   "The weekly Any% NMG Race is starting #startsIn# on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>"
 
-module.exports = {
+const readyEvent: DiscordEvent = {
   name: "ready",
   once: true,
-  execute(client) {
-    console.log(`✅ Success! Logged in as ${client.user.tag}`)
+  execute(client: Client) {
+    console.log(`✅ Success! Logged in as ${client.user?.tag}`)
 
     // Connect to websocket relay to listen for events like stream alerts and race rooms
-    const wsRelay = io(WEBSOCKET_RELAY_SERVER, {
+    const wsRelay: Socket = io(WEBSOCKET_RELAY_SERVER!, {
       query: { clientId: `${packageJson.name} v${packageJson.version}` },
     })
     console.log(
       `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
     )
-    wsRelay.on("connect_error", (err) => {
+    wsRelay.on("connect_error", (err: Error) => {
       console.log(`Connection error!`)
       console.log(err)
     })
@@ -53,20 +55,20 @@ module.exports = {
       console.log(`Sending weekly alerts!`)
 
       // Look up which guilds/channels/roles should be alerted
-      let alerts = client.config.guilds
+      let alerts = (client as any).config.guilds
         .filter(
-          (g) =>
+          (g: any) =>
             g.active && g.enableWeeklyRaceAlert && g.weeklyRaceAlertChannelId
         )
-        .map((g) => {
+        .map((g: any) => {
           return {
             channelId: g.weeklyRaceAlertChannelId,
             roleId: g.weeklyRaceAlertRoleId,
           }
         })
 
-      alerts.forEach((a) => {
-        let channel = client.channels.cache.get(a.channelId)
+      alerts.forEach((a: any) => {
+        let channel = client.channels.cache.get(a.channelId) as TextChannel
         if (!channel) return
 
         console.log(
@@ -105,9 +107,9 @@ module.exports = {
     ///////////////////////////////////////////////////////////////////////////
 
     // 2. Rotate activity
-    client.setRandomActivity()
+    ;(client as any).setRandomActivity()
     const activityRotateJob = schedule.scheduleJob({ minute: 0 }, () => {
-      client.setRandomActivity()
+      ;(client as any).setRandomActivity()
     })
     console.log(
       `Activity rotation scheduled for: ${activityRotateJob.nextInvocation()}`
@@ -115,7 +117,7 @@ module.exports = {
     ///////////////////////////////////////////////////////////////////////////
 
     // 3. Listen for stream alerts
-    wsRelay.on("streamAlert", ({ payload: stream, source }) => {
+    wsRelay.on("streamAlert", ({ payload: stream, source }: any) => {
       if (
         ![STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT].includes(stream.eventType)
       ) {
@@ -125,19 +127,20 @@ module.exports = {
       console.log("Received stream alert:", stream.eventType)
 
       // Get a list of guilds that have stream alerts enabled
-      let alerts = client.config.guilds
+      let alerts = (client as any).config.guilds
         .filter(
-          (g) => g.active && g.enableStreamAlerts && g.streamAlertsChannelId
+          (g: any) =>
+            g.active && g.enableStreamAlerts && g.streamAlertsChannelId
         )
-        .map((g) => {
+        .map((g: any) => {
           return { channelId: g.streamAlertsChannelId }
         })
 
       console.log(`Found ${alerts.length} guilds to alert`)
 
       // Post a message to the configured channels with the stream event
-      alerts.forEach((a) => {
-        let channel = client.channels.cache.get(a.channelId)
+      alerts.forEach((a: any) => {
+        let channel = client.channels.cache.get(a.channelId) as TextChannel
         if (!channel) return
 
         console.log(
@@ -164,8 +167,8 @@ module.exports = {
         if (stream.eventType === STREAM_ONLINE_EVENT) {
           streamAlertEmbed.setImage(
             stream.thumbnail_url
-              .replace("{width}", 1280)
-              .replace("{height}", 720)
+              .replace("{width}", "1280")
+              .replace("{height}", "720")
           )
         }
 
@@ -183,69 +186,74 @@ module.exports = {
     })
 
     // 4. Listen for weekly race room creation
-    wsRelay.on("weeklyRaceRoomCreated", ({ payload: raceData, source }) => {
-      console.log("Received weekly race room event:", raceData)
+    wsRelay.on(
+      "weeklyRaceRoomCreated",
+      ({ payload: raceData, source }: any) => {
+        console.log("Received weekly race room event:", raceData)
 
-      // Get a list of guilds that have race room alerts enabled
-      let alerts = client.config.guilds
-        .filter(
-          (g) =>
-            g.active &&
-            g.enableWeeklyRaceRoomAlert &&
-            g.weeklyRaceAlertChannelId
-        )
-        .map((g) => {
-          return {
-            channelId: g.weeklyRaceAlertChannelId,
-            roleId: g.weeklyRaceAlertRoleId,
-          }
+        // Get a list of guilds that have race room alerts enabled
+        let alerts = (client as any).config.guilds
+          .filter(
+            (g: any) =>
+              g.active &&
+              g.enableWeeklyRaceRoomAlert &&
+              g.weeklyRaceAlertChannelId
+          )
+          .map((g: any) => {
+            return {
+              channelId: g.weeklyRaceAlertChannelId,
+              roleId: g.weeklyRaceAlertRoleId,
+            }
+          })
+
+        console.log(`Found ${alerts.length} guilds to alert`)
+
+        // Post a message to the configured channels with the race details
+        alerts.forEach((a: any) => {
+          let channel = client.channels.cache.get(a.channelId) as TextChannel
+          if (!channel) return
+
+          console.log(
+            `Sending weekly race room alert to ${channel.guild.name} (#${channel.name})`
+          )
+
+          let notify = a.roleId ? `<@&${a.roleId}> ` : ""
+          let startsIn = `<t:${raceData.startTimestamp}:R>`
+          let raceRoomUrl = raceData.raceRoomUrl
+
+          let weeklyRaceAlertEmbed = new EmbedBuilder()
+            .setColor(0x379c6f)
+            .setTitle(`Weekly race room has been created!`)
+            .setDescription(`Starts ${startsIn}`)
+            .setURL(raceRoomUrl)
+            .setAuthor({
+              name: "hap e weekly",
+              iconURL: "https://helpasaur.com/img/ljsmile.png",
+              url: raceRoomUrl,
+            })
+            .addFields(
+              { name: "Race room", value: raceRoomUrl },
+              { name: "Goal", value: "Any% NMG" }
+            )
+            .setImage(
+              "https://racetime.gg/media/The_Legend_of_Zelda__A_Link_to_the_Past-285x380_kyx6ga0.jpg"
+            )
+            .setTimestamp()
+            .setFooter({
+              text: source,
+              iconURL: "https://helpasaur.com/img/ljsmile.png",
+            })
+
+          channel
+            .send({ content: notify, embeds: [weeklyRaceAlertEmbed] })
+            .then(() => {
+              console.log(`-> Sent!`)
+            })
+            .catch(console.error)
         })
-
-      console.log(`Found ${alerts.length} guilds to alert`)
-
-      // Post a message to the configured channels with the race details
-      alerts.forEach((a) => {
-        let channel = client.channels.cache.get(a.channelId)
-        if (!channel) return
-
-        console.log(
-          `Sending weekly race room alert to ${channel.guild.name} (#${channel.name})`
-        )
-
-        let notify = a.roleId ? `<@&${a.roleId}> ` : ""
-        let startsIn = `<t:${raceData.startTimestamp}:R>`
-        let raceRoomUrl = raceData.raceRoomUrl
-
-        let weeklyRaceAlertEmbed = new EmbedBuilder()
-          .setColor(0x379c6f)
-          .setTitle(`Weekly race room has been created!`)
-          .setDescription(`Starts ${startsIn}`)
-          .setURL(raceRoomUrl)
-          .setAuthor({
-            name: "hap e weekly",
-            iconURL: "https://helpasaur.com/img/ljsmile.png",
-            url: raceRoomUrl,
-          })
-          .addFields(
-            { name: "Race room", value: raceRoomUrl },
-            { name: "Goal", value: "Any% NMG" }
-          )
-          .setImage(
-            "https://racetime.gg/media/The_Legend_of_Zelda__A_Link_to_the_Past-285x380_kyx6ga0.jpg"
-          )
-          .setTimestamp()
-          .setFooter({
-            text: source,
-            iconURL: "https://helpasaur.com/img/ljsmile.png",
-          })
-
-        channel
-          .send({ content: notify, embeds: [weeklyRaceAlertEmbed] })
-          .then(() => {
-            console.log(`-> Sent!`)
-          })
-          .catch(console.error)
-      })
-    })
+      }
+    )
   },
 }
+
+module.exports = readyEvent
