@@ -10,3 +10,6 @@ web/build/
 web/.parcel-cache/
 backups/*
 .parcel-cache
+
+# TypeScript build outputs
+**/dist/

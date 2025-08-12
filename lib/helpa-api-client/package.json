@@ -5,8 +5,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc --watch",
-    "prepare": "npm run build"
+    "build:watch": "tsc --watch"
   },
   "license": "MIT",
   "dependencies": {
