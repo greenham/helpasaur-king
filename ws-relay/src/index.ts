@@ -42,60 +42,56 @@ let messagesRelayed = 0
 const eventCounts: Record<string, number> = {}
 
 // Create main WebSocket server with health endpoint
-const httpServer = createServer(
-  (req: IncomingMessage, res: ServerResponse) => {
-    // Serve health endpoint on main port
-    if (
-      req.url === "/health" &&
-      (req.method === "GET" || req.method === "HEAD")
-    ) {
-      const uptimeMs = Date.now() - startTime
+const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
+  // Serve health endpoint on main port
+  if (
+    req.url === "/health" &&
+    (req.method === "GET" || req.method === "HEAD")
+  ) {
+    const uptimeMs = Date.now() - startTime
 
-      // Get connected clients count
-      let clientCount = 0
-      if (wss) {
-        clientCount = wss.sockets.sockets.size || 0
-      }
-
-      res.writeHead(200, { "Content-Type": "application/json" })
-
-      // For HEAD requests, just send headers without body
-      if (req.method === "HEAD") {
-        res.end()
-      } else {
-        const healthData: HealthResponse = {
-          status: "healthy",
-          service: "ws-relay",
-          version: packageJson.version,
-          uptime: ms(uptimeMs, { long: true }),
-          uptimeMs: uptimeMs,
-          connections: {
-            current: currentConnections,
-            total: totalConnections,
-            clients: clientCount,
-          },
-          messages: {
-            total: messagesRelayed,
-            byEvent: eventCounts,
-            rate:
-              uptimeMs > 0
-                ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(
-                    2
-                  )}/min`
-                : "0/min",
-          },
-          port: WEBSOCKET_RELAY_SERVER_PORT,
-          environment: process.env.NODE_ENV || "development",
-        }
-        res.end(JSON.stringify(healthData))
-      }
-    } else {
-      // Let Socket.io handle other requests
-      res.writeHead(404)
-      res.end()
+    // Get connected clients count
+    let clientCount = 0
+    if (wss) {
+      clientCount = wss.sockets.sockets.size || 0
     }
+
+    res.writeHead(200, { "Content-Type": "application/json" })
+
+    // For HEAD requests, just send headers without body
+    if (req.method === "HEAD") {
+      res.end()
+    } else {
+      const healthData: HealthResponse = {
+        status: "healthy",
+        service: "ws-relay",
+        version: packageJson.version,
+        uptime: ms(uptimeMs, { long: true }),
+        uptimeMs: uptimeMs,
+        connections: {
+          current: currentConnections,
+          total: totalConnections,
+          clients: clientCount,
+        },
+        messages: {
+          total: messagesRelayed,
+          byEvent: eventCounts,
+          rate:
+            uptimeMs > 0
+              ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(2)}/min`
+              : "0/min",
+        },
+        port: WEBSOCKET_RELAY_SERVER_PORT,
+        environment: process.env.NODE_ENV || "development",
+      }
+      res.end(JSON.stringify(healthData))
+    }
+  } else {
+    // Let Socket.io handle other requests
+    res.writeHead(404)
+    res.end()
   }
-)
+})
 
 const wss = new Server<any, any, any, SocketData>(httpServer)
 
@@ -109,8 +105,7 @@ const relayEvents = [
 type RelayEvent = (typeof relayEvents)[number]
 
 wss.on("connection", (socket: Socket<any, any, any, SocketData>) => {
-  const clientId =
-    (socket.handshake.query.clientId as string) || "Unknown"
+  const clientId = (socket.handshake.query.clientId as string) || "Unknown"
   socket.data.clientId = clientId
   totalConnections++
   currentConnections++
@@ -118,9 +113,7 @@ wss.on("connection", (socket: Socket<any, any, any, SocketData>) => {
 
   socket.on("disconnect", () => {
     currentConnections--
-    console.log(
-      `Client disconnected: ${socket.id} (${socket.data.clientId})`
-    )
+    console.log(`Client disconnected: ${socket.id} (${socket.data.clientId})`)
   })
 
   relayEvents.forEach((event: RelayEvent) => {

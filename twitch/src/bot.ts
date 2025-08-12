@@ -115,7 +115,7 @@ export class TwitchBot {
   private setActiveChannels(channels: TwitchChannel[]) {
     this.channelList = []
     this.channelConfigMap.clear()
-    
+
     channels.forEach((channel) => {
       if (channel.active) {
         this.channelList.push(channel.channelName)
@@ -126,25 +126,31 @@ export class TwitchBot {
 
   private async refreshActiveChannels() {
     try {
-      const response = await this.helpaApi.getAxiosInstance().get("/api/configs/twitch/activeChannels")
+      const response = await this.helpaApi
+        .getAxiosInstance()
+        .get("/api/configs/twitch/activeChannels")
       const channels = response.data
-      
+
       const newChannelList = channels
         .filter((c: TwitchChannel) => c.active)
         .map((c: TwitchChannel) => c.channelName)
-      
+
       // Join new channels
-      const channelsToJoin = newChannelList.filter((c: string) => !this.channelList.includes(c))
+      const channelsToJoin = newChannelList.filter(
+        (c: string) => !this.channelList.includes(c)
+      )
       for (const channel of channelsToJoin) {
         await this.bot?.join(channel)
       }
-      
+
       // Leave removed channels
-      const channelsToLeave = this.channelList.filter((c: string) => !newChannelList.includes(c))
+      const channelsToLeave = this.channelList.filter(
+        (c: string) => !newChannelList.includes(c)
+      )
       for (const channel of channelsToLeave) {
         await this.bot?.part(channel)
       }
-      
+
       this.setActiveChannels(channels)
     } catch (error) {
       console.error("Error refreshing active channels:", error)
@@ -164,7 +170,7 @@ export class TwitchBot {
       if (!message.startsWith(this.config.cmdPrefix)) return
       const args = message.slice(1).split(" ")
       const commandNoPrefix = args.shift()?.toLowerCase()
-      
+
       switch (commandNoPrefix) {
         case "join":
           let channelToJoin = tags.username || ""
@@ -235,8 +241,11 @@ export class TwitchBot {
     const cooldownKey = `${channel}-${commandName}`
     const now = Date.now()
     const cooldownEntry = this.cooldowns.get(cooldownKey)
-    
-    if (cooldownEntry && now - cooldownEntry.lastUsed < cooldownEntry.cooldown) {
+
+    if (
+      cooldownEntry &&
+      now - cooldownEntry.lastUsed < cooldownEntry.cooldown
+    ) {
       return // Still in cooldown
     }
 
@@ -244,9 +253,11 @@ export class TwitchBot {
     let command = this.cachedCommands.get(commandName)
     if (!command) {
       try {
-        const response = await this.helpaApi.getAxiosInstance().post(`/api/commands/find`, {
-          command: commandName
-        })
+        const response = await this.helpaApi
+          .getAxiosInstance()
+          .post(`/api/commands/find`, {
+            command: commandName,
+          })
         if (response.status === 200) {
           command = response.data
           if (command) {
@@ -260,7 +271,8 @@ export class TwitchBot {
     }
 
     if (command && command.enabled) {
-      const cooldownMs = (command.cooldown || channelConfig.textCommandCooldown || 10) * 1000
+      const cooldownMs =
+        (command.cooldown || channelConfig.textCommandCooldown || 10) * 1000
       this.cooldowns.set(cooldownKey, {
         lastUsed: now,
         cooldown: cooldownMs,
@@ -270,35 +282,41 @@ export class TwitchBot {
     }
   }
 
-  private async handleJoinChannel(data: { payload: { channelName: string }; source: string }) {
+  private async handleJoinChannel(data: {
+    payload: { channelName: string }
+    source: string
+  }) {
     const { channelName } = data.payload
-    
+
     try {
       await this.bot?.join(channelName)
       this.channelList.push(channelName)
-      
+
       if (data.source === "twitch-chat") {
         await this.bot?.say(`#${channelName}`, this.messages.onJoin)
       }
-      
+
       console.log(`✅ Joined channel: ${channelName}`)
     } catch (error) {
       console.error(`Error joining channel ${channelName}:`, error)
     }
   }
 
-  private async handleLeaveChannel(data: { payload: { channelName: string }; source: string }) {
+  private async handleLeaveChannel(data: {
+    payload: { channelName: string }
+    source: string
+  }) {
     const { channelName } = data.payload
-    
+
     try {
       if (data.source === "twitch-chat") {
         await this.bot?.say(`#${channelName}`, this.messages.onLeave)
       }
-      
+
       await this.bot?.part(channelName)
       this.channelList = this.channelList.filter((c) => c !== channelName)
       this.channelConfigMap.delete(channelName)
-      
+
       console.log(`✅ Left channel: ${channelName}`)
     } catch (error) {
       console.error(`Error leaving channel ${channelName}:`, error)

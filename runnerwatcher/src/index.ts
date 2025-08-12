@@ -48,12 +48,12 @@ async function init(): Promise<void> {
     console.log(
       `Connecting to websocket relay server: ${WEBSOCKET_RELAY_SERVER}...`
     )
-    
+
     wsRelay.on("connect_error", (err: Error) => {
       console.log(`Connection error!`)
       console.log(err)
     })
-    
+
     wsRelay.on("connect", () => {
       console.log(`Connected! Socket ID: ${wsRelay.id}`)
     })

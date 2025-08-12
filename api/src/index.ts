@@ -77,7 +77,9 @@ app.use(cors({ origin: originWhitelist, credentials: true }))
 
 // Set up logging - use 'dev' for colored output with more details
 // Options: 'combined', 'common', 'dev', 'short', 'tiny'
-const logFormat = process.env.LOG_FORMAT || (process.env.NODE_ENV === 'production' ? 'short' : 'dev')
+const logFormat =
+  process.env.LOG_FORMAT ||
+  (process.env.NODE_ENV === "production" ? "short" : "dev")
 app.use(logger(logFormat))
 
 // Track requests
@@ -140,13 +142,13 @@ app.use(function (
   next: NextFunction
 ) {
   // Log all errors with full details
-  console.error('API Error:', {
+  console.error("API Error:", {
     name: err.name,
     message: err.message,
     code: err.code,
-    stack: err.stack
+    stack: err.stack,
   })
-  
+
   if (err.name === "UnauthorizedError") {
     res.status(401).json({ error: err.name + ": " + err.message })
   } else if (err.code === "permission_denied") {

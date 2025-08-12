@@ -92,19 +92,22 @@ class RunnerWatcher extends EventEmitter {
   private init(): void {
     this.listener.listen(Number(TWITCH_WEBHOOK_LISTENER_PORT) || 3012)
 
-    this.listener.on("notification", async (notification: TwitchNotification) => {
-      console.log("\r\n-------------------------------------\r\n")
-      console.log(
-        `Received ${notification.subscription.type} event for ${notification.event.broadcaster_user_login}`
-      )
-      console.log(notification.event)
-      console.log(`Processing event in ${DELAY_FOR_API_SECONDS} seconds...`)
+    this.listener.on(
+      "notification",
+      async (notification: TwitchNotification) => {
+        console.log("\r\n-------------------------------------\r\n")
+        console.log(
+          `Received ${notification.subscription.type} event for ${notification.event.broadcaster_user_login}`
+        )
+        console.log(notification.event)
+        console.log(`Processing event in ${DELAY_FOR_API_SECONDS} seconds...`)
 
-      // Waiting here to ensure fresh data is available via Twitch API
-      setTimeout(() => {
-        this.processEvent(notification)
-      }, DELAY_FOR_API_SECONDS * 1000)
-    })
+        // Waiting here to ensure fresh data is available via Twitch API
+        setTimeout(() => {
+          this.processEvent(notification)
+        }, DELAY_FOR_API_SECONDS * 1000)
+      }
+    )
   }
 
   private async processEvent(notification: TwitchNotification): Promise<void> {
@@ -164,7 +167,9 @@ class RunnerWatcher extends EventEmitter {
           stream,
         })
       } else {
-        console.log(`❌ Not alerting for ${user.login}'s stream (recently alerted or wrong type)`)
+        console.log(
+          `❌ Not alerting for ${user.login}'s stream (recently alerted or wrong type)`
+        )
       }
     } catch (error) {
       console.error(`Error processing event:`, error)

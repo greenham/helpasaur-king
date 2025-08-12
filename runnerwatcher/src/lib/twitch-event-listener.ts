@@ -145,10 +145,7 @@ class TwitchEventListener extends EventEmitter {
         .update(message)
         .digest("hex")
 
-    return crypto.timingSafeEqual(
-      Buffer.from(hmac),
-      Buffer.from(signature)
-    )
+    return crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(signature))
   }
 
   listen(port: number): void {
