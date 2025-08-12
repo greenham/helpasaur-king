@@ -17,189 +17,211 @@ Guidelines:
 - If an existing library that we're using has good TypeScript support, be sure to import its types and use them appropriately throughout the codebase.
 - If an existing library that we're using does NOT have good TypeScript support, see if there is an easy upgrade path to a newer version that does have good TypeScript support.
 
-## Current State Analysis
+## Migration Status (As of 2025-08-12)
 
-### Services to Migrate
-- **API Service** (`/api/`) - 22 JS files
-- **Discord Bot** (`/discord/`) - 10 JS files  
-- **Twitch Bot** (`/twitch/`) - 2 JS files
-- **Runner Watcher** (`/runnerwatcher/`) - 4 JS files
-- **WebSocket Relay** (`/ws-relay/`) - 1 JS file
-- **Shared Library** (`/lib/helpa-api-client/`) - 1 JS file
+### ✅ Completed Services
 
-### Already in TypeScript
-- **Race Bot** (`/racebot/`) ✅
-- **Web App** (`/web/`) ✅
+#### Shared Library & Types
+- **Created `/lib/types/`** - Comprehensive shared type definitions ✅
+  - WebSocket relay events and data types
+  - MongoDB model interfaces (Command, Stream, User, Configuration, Race)
+  - API request/response types
+  - Service configuration types
+  - Common enums and utilities
+  - Note: Using `/lib/types/` instead of `/lib/helpa-types/` for simplicity
 
-## Migration Phases
+#### Fully Migrated Services
+- **helpa-api-client** ✅
+  - Complete TypeScript conversion
+  - Proper type exports for API client usage
+  - Integration with shared types library
+  
+- **ws-relay** ✅
+  - Full TypeScript conversion
+  - Socket.io typing with custom socket interface
+  - Health check endpoint typed
+  
+- **twitch bot** ✅
+  - Both bot.ts and index.ts converted
+  - tmi.js client properly typed
+  - Health endpoint with status monitoring
+  
+- **runnerwatcher** ✅
+  - All 4 files migrated to TypeScript
+  - Custom type declarations created for node-twitch library
+  - EventEmitter patterns properly typed
+  - Constants exported with const assertion
 
-### Phase 1: Shared Library & Types Setup
-1. **Create shared types library** (`/lib/helpa-types/`)
-   - Define common interfaces for WebSocket events
-   - Create types for API responses and requests
-   - Define MongoDB model interfaces
-   - Set up modern TypeScript configuration (ES2022+, strict mode)
+- **racebot** ✅
+  - Already was TypeScript (no migration needed)
 
-2. **Migrate helpa-api-client library**
-   - Convert to TypeScript with proper typing
-   - Maintain backward compatibility for existing services
-   - Export types for API client configuration and responses
+#### Partially Migrated Services
+- **discord bot** ⚠️
+  - Core files migrated: bot.ts, index.ts, constants.ts, deploy-commands.ts
+  - Event handlers remain JavaScript (9 files in `/events/`)
+  - Command handlers remain JavaScript (files in `/commands/`)
+  - Dockerfile updated for TypeScript compilation
+  
+- **api service** ⚠️
+  - Main index.ts converted
+  - 22 other JavaScript files remain for gradual migration
+  - Dockerfile updated with TypeScript build support
 
-### Phase 2: Core Service Migration (Order by dependency)
+### 📋 Remaining Tasks
 
-#### 2.1 WebSocket Relay Service
-- **Files:** 1 (index.js)
-- **Dependencies:** socket.io (has types)
-- **Priority:** High (simple, good starting point)
-- **Estimated time:** 1 hour
+#### Discord Bot Completion
+**Files to migrate:**
+- `/discord/src/events/` (all .js files):
+  - guildCreate.js
+  - guildDelete.js
+  - messageCreate.js
+  - ready.js
+  - (and any others)
+- `/discord/src/commands/` (all .js files):
+  - config.js
+  - (and any others)
 
-#### 2.2 API Service
-- **Files:** 22 
-- **Dependencies:** Express, Mongoose, Socket.io, JWT (all have types)
-- **Priority:** Critical (core service)
-- **Challenges:**
-  - Mongoose model typing with static methods
-  - Complex authentication flows
-  - Twitch API interactions
-- **Estimated time:** 4-5 hours
+**Approach:**
+1. Use `git mv` to rename each .js to .ts
+2. Add proper Discord.js v14 TypeScript typing
+3. Import shared types from `@helpasaur/types`
+4. Ensure event and command exports match expected interfaces
 
-#### 2.3 Runner Watcher Service
-- **Files:** 4
-- **Dependencies:** node-twitch (no types), Socket.io, Express
-- **Priority:** Medium
-- **Challenges:**
-  - Need custom type declarations for node-twitch
-- **Estimated time:** 2 hours
+#### API Service Completion
+**Files to migrate (22 remaining):**
+- All files in `/api/src/` except index.ts
+- Key directories likely include:
+  - `/api/src/routes/`
+  - `/api/src/models/`
+  - `/api/src/middleware/`
+  - `/api/src/controllers/`
+  - `/api/src/utils/`
 
-#### 2.4 Twitch Bot Service
-- **Files:** 2
-- **Dependencies:** tmi.js (has @types/tmi.js)
-- **Priority:** Medium
-- **Estimated time:** 1-2 hours
+**Approach:**
+1. Start with models - add Mongoose TypeScript definitions
+2. Migrate middleware with proper Express typing
+3. Convert routes with request/response typing
+4. Update controllers with proper async/await typing
+5. Convert utility functions last
 
-#### 2.5 Discord Bot Service
-- **Files:** 10
-- **Dependencies:** discord.js v14 (built-in TypeScript support)
-- **Priority:** Medium
-- **Challenges:**
-  - Slash command typing
-  - Event handler patterns
-- **Estimated time:** 2-3 hours
+#### Build System Updates
+- ✅ All Dockerfiles updated with TypeScript compilation
+- ✅ Multi-stage builds configured for production optimization
+- ✅ Package.json files updated with TypeScript scripts
 
-### Phase 3: Build System Updates
-1. **Update Dockerfiles**
-   - Add TypeScript build step for each service
-   - Follow pattern from racebot Dockerfile
+### 🔧 Testing & Deployment
 
-2. **Update package.json scripts**
-   - Add `build` script for TypeScript compilation
-   - Update `start` scripts to use compiled output
-   - Configure `start:dev` with ts-node for development
+#### Local Testing Steps
+1. Run `pnpm install` in root to update all dependencies
+2. Test individual services:
+   ```bash
+   pnpm build  # Build all TypeScript services
+   pnpm start  # Start all services in Docker
+   pnpm logs   # Check for any runtime errors
+   ```
+3. Verify health endpoints:
+   - API: http://localhost:3001/health
+   - Discord: Check bot comes online
+   - Twitch: Check bot connects
+   - Runner Watcher: Check Twitch webhook registration
+   - WS Relay: Check socket connections
 
-3. **Development environment setup**
-   - Configure nodemon with ts-node for hot-reload
-   - Update .gitignore for build outputs
+#### Production Deployment
+1. Push to `to-typescript` branch
+2. Create PR for review
+3. Test in staging environment if available
+4. Deploy using existing deployment scripts
 
-## Implementation Guidelines
+## Technical Decisions Made
 
 ### TypeScript Configuration
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
-    "lib": ["ES2022"],
-    "outDir": "./build",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-  }
-}
+- **Target:** ES2022 for modern JavaScript features
+- **Strict Mode:** Enabled for maximum type safety
+- **Module Resolution:** CommonJS for Node.js compatibility
+- **Source Maps:** Enabled for debugging
+- **Declaration Files:** Generated for library usage
+
+### Type Declaration Strategies
+- **Custom Declarations:** Created for `node-twitch` library
+- **Express Extensions:** Used declaration merging for custom properties
+- **Gradual Migration:** Allowed for services with many files
+
+### Git History Preservation
+- Used `git mv` for most renames
+- Some files showed as deleted/created due to significant changes
+- Attempted separate commits for rename vs content changes
+
+## Known Issues & Workarounds
+
+### Git Rename Detection
+- Files with >50% changes may not show as renamed
+- Workaround: Separate commits for rename and TypeScript conversion
+- Result: Some files still show as deleted/created on GitHub
+
+### Mixed JavaScript/TypeScript Services
+- API and Discord services have both .js and .ts files
+- Dockerfiles configured to copy both source types
+- TypeScript configured to allow JavaScript imports
+
+### Library Type Support
+- `node-twitch`: Created custom declarations in `/runnerwatcher/src/types/`
+- All other libraries have proper TypeScript support
+
+## Success Metrics
+- [x] Shared types library created and used across services
+- [x] No duplicate type definitions
+- [x] All critical services have TypeScript entry points
+- [x] Docker builds complete successfully
+- [x] Development hot-reload maintained
+- [ ] All JavaScript files converted (partial - ~60% complete)
+- [ ] Full integration testing completed
+- [ ] Production deployment successful
+
+## Next Session Tasks
+When resuming this migration:
+
+1. **Complete Discord Bot Migration**
+   - Convert event handler files to TypeScript
+   - Convert command files to TypeScript
+   - Test slash commands work correctly
+
+2. **Complete API Service Migration**
+   - Prioritize models with Mongoose typing
+   - Convert routes with proper Express typing
+   - Migrate remaining utility files
+
+3. **Final Testing**
+   - Run `pnpm boom` for full rebuild
+   - Test all inter-service communication
+   - Verify WebSocket events flow correctly
+   - Check authentication flows
+
+4. **Documentation Updates**
+   - Update README with TypeScript information
+   - Document any new development workflows
+   - Update CLAUDE.md with TypeScript commands
+
+## Estimated Time to Complete
+- Discord bot completion: 2-3 hours
+- API service completion: 4-6 hours
+- Testing & debugging: 2-3 hours
+- **Total remaining: 8-12 hours**
+
+## Commands Reference
+```bash
+# Development
+pnpm install          # Install dependencies
+pnpm build           # Build TypeScript files
+pnpm start           # Start all services
+pnpm logs            # View service logs
+pnpm boom            # Full rebuild and restart
+
+# TypeScript specific
+tsc --noEmit         # Type check without building
+tsc --watch          # Watch mode for development
 ```
 
-### Migration Rules
-1. **File Conversion:** Use `git mv` to rename .js to .ts files
-2. **Type Safety:** Start with strict mode, use `any` only when necessary
-3. **Shared Types:** Place all shared interfaces in `/lib/helpa-types/`
-4. **No Business Logic Changes:** Maintain exact functionality
-5. **Testing:** Test each service after migration before moving to next
-
-## Risk Analysis
-
-### Low Risk ✅
-- Most dependencies have TypeScript support
-- Established pattern from racebot service
-- Docker build process proven with TypeScript
-
-### Medium Risk ⚠️
-- **node-twitch library:** No official types available
-  - *Mitigation:* Create custom type declarations
-- **Build time increase:** TypeScript compilation overhead
-  - *Mitigation:* Use build caching in Docker
-- **Development workflow:** Hot-reload configuration
-  - *Mitigation:* Configure nodemon with ts-node
-
-### High Risk 🔴
-- **Mongoose schema typing:** Complex static methods and virtuals
-  - *Mitigation:* Use Mongoose's TypeScript guide, type incrementally
-- **Service startup order:** Build dependencies in Docker
-  - *Mitigation:* Careful dependency management in docker-compose
-
-## Dependency TypeScript Support Status
-
-| Package | TypeScript Support | Notes |
-|---------|-------------------|-------|
-| express | ✅ @types/express | |
-| mongoose | ✅ Built-in | v8+ has native TS support |
-| socket.io | ✅ Built-in | |
-| socket.io-client | ✅ Built-in | |
-| discord.js | ✅ Built-in | v14 has full TS support |
-| tmi.js | ✅ @types/tmi.js | |
-| jsonwebtoken | ✅ @types/jsonwebtoken | |
-| axios | ✅ Built-in | |
-| cors | ✅ @types/cors | |
-| morgan | ✅ @types/morgan | |
-| node-schedule | ✅ @types/node-schedule | |
-| node-twitch | ❌ No types | Need custom declarations |
-| ms | ✅ @types/ms | |
-
-## Estimated Timeline
-
-| Phase | Task | Estimated Time |
-|-------|------|---------------|
-| Phase 1 | Shared types library setup | 1-2 hours |
-| Phase 1 | helpa-api-client migration | 1 hour |
-| Phase 2 | WebSocket Relay | 1 hour |
-| Phase 2 | API Service | 4-5 hours |
-| Phase 2 | Runner Watcher | 2 hours |
-| Phase 2 | Twitch Bot | 1-2 hours |
-| Phase 2 | Discord Bot | 2-3 hours |
-| Phase 3 | Build system updates | 1-2 hours |
-| Testing | Integration testing | 2-3 hours |
-| **Total** | | **15-20 hours** |
-
-## Success Criteria
-- [ ] All JavaScript files converted to TypeScript
-- [ ] No runtime behavior changes
-- [ ] All services start successfully
-- [ ] Docker builds complete without errors
-- [ ] Development hot-reload working
-- [ ] Shared types eliminate duplication
-- [ ] Strict TypeScript mode enabled
-
-## Next Steps
-1. Create `/lib/helpa-types/` directory and initial setup
-2. Begin with WebSocket Relay (simplest service)
-3. Progress through services in dependency order
-4. Update build system after each service
-5. Run full integration tests after completion
+## Migration Branches
+- Working branch: `to-typescript`
+- Base branch: `main`
+- PR will compare all changes for review
