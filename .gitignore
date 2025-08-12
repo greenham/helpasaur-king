@@ -16,6 +16,3 @@ backups/*
 dist/
 */dist/
 *.tsbuildinfo
-
-# Package manager lock files (if using npm in individual services)
-*/package-lock.json
