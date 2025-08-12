@@ -24,14 +24,18 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 
 ```bash
 # Development (from root)
-pnpm start              # Start backend services and show instructions for web
-pnpm start:backend      # Start backend services in Docker (detached)
+pnpm start              # Start all services in Docker (detached)
 pnpm start:web          # Start web dev server (run in separate terminal)
 pnpm stop               # Stop all Docker services
 pnpm build              # Build all Docker images
-pnpm logs               # View Docker service logs
-pnpm boom               # Full rebuild and restart
+pnpm logs               # View app service logs (api, discord, twitch, runnerwatcher, racebot, ws-relay)
+pnpm logs:all           # View all Docker service logs (including mongo/mongo-express)
+pnpm boom               # Full rebuild and restart (stop, build, start, logs)
 pnpm version:bump       # Bump version in all package.json files
+
+# Code Formatting
+pnpm format             # Format all code with Prettier
+pnpm format:check       # Check code formatting without making changes
 
 # Monitoring Stack Commands (local development only)
 pnpm monitor:start      # Start Uptime Kuma monitoring locally
@@ -40,17 +44,9 @@ pnpm monitor:restart    # Restart monitoring
 pnpm monitor:logs       # View monitoring logs
 pnpm monitor:generate   # Generate monitoring configs from template
 pnpm monitor:import     # Import configs to Uptime Kuma via API
-
-# Service-specific development (when working on individual services)
-cd api && npm run dev                    # API with nodemon
-cd discord && npm run dev                # Discord bot with nodemon
-cd twitch && npm run dev                 # Twitch bot with nodemon
-cd web && npm run dev                    # React app with Parcel dev server
-cd racebot && npm run dev                # Race bot with ts-node-dev
-cd runnerwatcher && npm run dev          # Runner watcher with nodemon
 ```
 
-**Note**: Web app runs locally on your host machine (not in Docker). Start backend with `pnpm start:backend`, then run `pnpm start:web` in a separate terminal for the web dev server on port 3000.
+**Note**: Web app runs locally on your host machine (not in Docker). Start backend services with `pnpm start`, then run `pnpm start:web` in a separate terminal for the web dev server on port 3000.
 
 ## Production Scripts
 
@@ -211,3 +207,5 @@ Each service has a `.env.sample` file showing required variables. Key ones:
 - `API_HOST`: API URL for web app (required at build time)
 - `TWITCH_APP_CLIENT_ID`: Twitch client ID for web app (required at build time)
 - Update @CLAUDE.md anytime modifications are made to the package.json scripts.
+
+- Use pnpm for all package operations
