@@ -1,24 +1,33 @@
-const axios = require("axios")
-const axiosRetry = require("axios-retry").default
+import axios, { AxiosInstance, AxiosError } from "axios"
+import axiosRetry from "axios-retry"
+import {
+  ServiceConfigOptions,
+  ServiceConfig,
+  ServiceAuthResponse,
+  ServiceName,
+} from "@helpasaur/types"
 
 /**
  * Helps services connect to the Helpa API.
- * @class
  */
-class HelpaApi {
+export class HelpaApi {
+  private apiHost: string
+  private apiKey: string
+  private serviceName: ServiceName
+  private accessToken: string | null = null
+  private api: AxiosInstance
+
   /**
    * Constructs a new HelpaApi instance.
-   * @param {Object} options - The options for configuring the HelpaApi instance.
-   * @param {string} options.apiHost - The API host URL.
-   * @param {string} options.apiKey - The API key for authentication.
-   * @param {string} options.serviceName - The name of the service.
+   * @param options - The options for configuring the HelpaApi instance.
    * @throws {Error} If any of the required constructor values are missing.
    */
-  constructor({ apiHost, apiKey, serviceName }) {
+  constructor(options: ServiceConfigOptions) {
+    const { apiHost, apiKey, serviceName } = options
+
     this.apiHost = apiHost
     this.apiKey = apiKey
     this.serviceName = serviceName
-    this.accessToken = null
 
     // Throw an error if any of the required constructor values are missing
     if (!this.apiHost || !this.apiKey || !this.serviceName) {
@@ -35,7 +44,7 @@ class HelpaApi {
     axiosRetry(this.api, {
       retries: 20,
       retryDelay: () => 10000,
-      onRetry: (retryCount, error, requestConfig) => {
+      onRetry: (retryCount: number, error: AxiosError, requestConfig: any) => {
         console.log(`🔴 API Request Error:`, error.toString())
         console.log(
           `🔁 Retrying call to ${requestConfig.url} (attempt #${retryCount})`
@@ -46,20 +55,23 @@ class HelpaApi {
 
   /**
    * Authorizes the service with the API.
-   * @returns {Promise<boolean>} A promise that resolves to true if the service is authorized successfully, or false otherwise.
+   * @returns A promise that resolves to true if the service is authorized successfully, or false otherwise.
    */
-  async authorizeService() {
+  async authorizeService(): Promise<boolean> {
     try {
-      const result = await this.api.get(`${this.apiHost}/auth/service`, {
-        headers: { Authorization: this.apiKey },
-      })
+      const result = await this.api.get<ServiceAuthResponse>(
+        `${this.apiHost}/auth/service`,
+        {
+          headers: { Authorization: this.apiKey },
+        }
+      )
       console.log(`✅ Service authorized with API!`)
       const { token } = result.data
       this.accessToken = token
       // Use JWT for all subsequent calls
       this.api.defaults.headers.common["Authorization"] = `Bearer ${token}`
       return true
-    } catch (err) {
+    } catch (err: any) {
       console.error(`🔴 Error authorizing service: ${err.message}`)
       return false
     }
@@ -68,9 +80,9 @@ class HelpaApi {
   /**
    * Retrieves the service configuration from the API.
    * If necessary, it authorizes the service before making the request.
-   * @returns {Promise<Object|null>} The service configuration object, or null if an error occurs.
+   * @returns The service configuration object, or null if an error occurs.
    */
-  async getServiceConfig() {
+  async getServiceConfig(): Promise<ServiceConfig> {
     try {
       // auth first if necessary
       let authorized = this.accessToken !== null
@@ -83,17 +95,30 @@ class HelpaApi {
       }
 
       // console.log(`Fetching ${this.serviceName} config from API...`);
-      const response = await this.api.get(
+      const response = await this.api.get<{ config: ServiceConfig }>(
         `${this.apiHost}/api/configs/${this.serviceName}`
       )
       // console.log(`✅ Config Retrieved!`);
       return response.data.config
-    } catch (err) {
+    } catch (err: any) {
       throw new Error(`🔴 Error fetching service config: ${err.message}`)
     }
   }
+
+  /**
+   * Get the axios instance for making custom API calls
+   */
+  getAxiosInstance(): AxiosInstance {
+    return this.api
+  }
+
+  /**
+   * Get the current access token
+   */
+  getAccessToken(): string | null {
+    return this.accessToken
+  }
 }
 
-module.exports = {
-  HelpaApi,
-}
+// Export everything from types for convenience
+export * from "@helpasaur/types"
