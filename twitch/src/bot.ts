@@ -1,11 +1,30 @@
-const { io } = require("socket.io-client")
-const tmi = require("tmi.js")
-const crypto = require("crypto")
+import { io, Socket } from "socket.io-client"
+import * as tmi from "tmi.js"
+import * as crypto from "crypto"
+import {
+  HelpaApi,
+  ICommand,
+  TwitchBotConfig,
+  RelayData,
+  ChannelPayload,
+} from "helpa-api-client"
+
 const packageJson = require("../package.json")
 const { WEBSOCKET_RELAY_SERVER } = process.env
 
-class TwitchBot {
-  constructor(config, helpaApi) {
+export class TwitchBot {
+  config: TwitchBotConfig
+  helpaApi: HelpaApi
+  cooldowns: Map<string, Map<string, number>>
+  cachedCommands: Map<string, ICommand | null>
+  bot: tmi.Client | null
+  wsRelay: Socket | null
+  messages: { onJoin: string; onLeave: string }
+  lastRandomRoomMap: Map<string, number>
+  channelList: string[]
+  activeChannels: any[]
+  channelMap: Map<string, any>
+  constructor(config: TwitchBotConfig, helpaApi: HelpaApi) {
     this.config = config
     this.helpaApi = helpaApi
     this.cooldowns = new Map()
@@ -754,4 +773,4 @@ class TwitchBot {
   }
 }
 
-exports.TwitchBot = TwitchBot
+// Export is at class level now
