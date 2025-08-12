@@ -1,23 +1,24 @@
-const { REST, Routes } = require("discord.js")
-const fs = require("node:fs")
-const path = require("node:path")
-const { HelpaApi } = require("helpa-api-client")
+import { REST, Routes } from "discord.js"
+import * as fs from "node:fs"
+import * as path from "node:path"
+import { HelpaApi } from "helpa-api-client"
+
 const helpaApiClient = new HelpaApi({
-  apiHost: process.env.API_HOST,
-  apiKey: process.env.API_KEY,
-  serviceName: process.env.SERVICE_NAME,
+  apiHost: process.env.API_HOST!,
+  apiKey: process.env.API_KEY!,
+  serviceName: process.env.SERVICE_NAME!,
 })
 
 helpaApiClient
   .getServiceConfig()
-  .then((config) => {
+  .then((config: any) => {
     if (!config) {
       throw new Error(`Unable to get service config from API!`)
     }
 
     const { clientId, token } = config
 
-    const commands = []
+    const commands: any[] = []
     const commandsPath = path.join(__dirname, "commands")
     const commandFiles = fs
       .readdirSync(commandsPath)
@@ -47,11 +48,11 @@ helpaApiClient
         )
 
         // The put method is used to fully refresh all commands with the current set
-        const data = await rest.put(
+        const data = (await rest.put(
           // GUILD-SPECIFIC DEPLOY: Routes.applicationGuildCommands(clientId, guildId),
           Routes.applicationCommands(clientId),
           { body: commands }
-        )
+        )) as any[]
 
         console.log(
           `Successfully reloaded ${data.length} application (/) commands.`
@@ -76,7 +77,7 @@ helpaApiClient
     //   }
     // })();
   })
-  .catch((error) => {
+  .catch((error: any) => {
     console.error("Error fetching service config:", error)
   })
 

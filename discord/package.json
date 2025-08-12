@@ -1,14 +1,16 @@
 {
   "name": "helpa-discord",
   "version": "1.12.0",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node ./src/index.js",
-    "start:dev": "nodemon ./src",
-    "deploy-commands": "node ./src/deploy-commands.js"
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "start:dev": "nodemon ./src/index.ts",
+    "deploy-commands": "tsx ./src/deploy-commands.ts"
   },
   "dependencies": {
+    "@helpasaur/types": "file:../lib/types",
     "discord.js": "^14.14.1",
     "express": "^4.19.2",
     "helpa-api-client": "file:../lib/helpa-api-client",
@@ -17,6 +19,13 @@
     "socket.io-client": "^4.5.4"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@types/express": "^4.17.21",
+    "@types/ms": "^0.7.34",
+    "@types/node": "^20.10.5",
+    "@types/node-schedule": "^2.1.5",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   }
 }

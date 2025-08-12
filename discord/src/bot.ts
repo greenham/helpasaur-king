@@ -1,16 +1,35 @@
-const {
+import {
   ActivityType,
   Client,
   Collection,
   Events,
   GatewayIntentBits,
   Partials,
-} = require("discord.js")
-const fs = require("node:fs")
-const path = require("node:path")
+  ChatInputCommandInteraction,
+  SlashCommandBuilder,
+} from "discord.js"
+import * as fs from "node:fs"
+import * as path from "node:path"
+import { HelpaApi } from "helpa-api-client"
+import { DiscordConfig } from "@helpasaur/types"
 
-class DiscordBot {
-  constructor(config, helpaApi) {
+interface DiscordCommand {
+  data: SlashCommandBuilder | any
+  execute: (interaction: ChatInputCommandInteraction) => Promise<void>
+  helpaApi?: HelpaApi
+}
+
+interface ExtendedClient extends Client {
+  config: DiscordConfig
+  commands: Collection<string, DiscordCommand>
+  setRandomActivity: () => void
+}
+
+export class DiscordBot {
+  public discordClient: ExtendedClient
+  private helpaApi: HelpaApi
+
+  constructor(config: DiscordConfig, helpaApi: HelpaApi) {
     this.discordClient = new Client({
       intents: [
         GatewayIntentBits.Guilds,
@@ -19,7 +38,7 @@ class DiscordBot {
         GatewayIntentBits.DirectMessages,
       ],
       partials: [Partials.Channel],
-    })
+    }) as ExtendedClient
 
     this.discordClient.config = config
     this.discordClient.commands = new Collection()
@@ -31,7 +50,7 @@ class DiscordBot {
           )
         ]
       console.log(`Setting Discord activity to: ${activity}`)
-      this.discordClient.user.setActivity(activity, {
+      this.discordClient.user!.setActivity(activity, {
         type: ActivityType.Streaming,
         url: `https://twitch.tv/helpasaurking`,
       })
@@ -44,7 +63,7 @@ class DiscordBot {
     }, 60000)
   }
 
-  start() {
+  start(): void {
     // Log the bot in to Discord
     console.log(`Logging bot into Discord...`)
     this.discordClient.login(this.discordClient.config.token)
@@ -54,22 +73,22 @@ class DiscordBot {
     this.handleCommands()
   }
 
-  refreshConfig() {
+  refreshConfig(): void {
     this.helpaApi
       .getServiceConfig()
-      .then((config) => {
+      .then((config: any) => {
         if (!config) {
           throw new Error(`Unable to refresh service config from API!`)
         }
 
-        this.discordClient.config = config
+        this.discordClient.config = config as DiscordConfig
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error("🛑 Error refreshing service config:", error)
       })
   }
 
-  handleEvents() {
+  handleEvents(): void {
     // Read in events to be handled
     const eventsPath = path.join(__dirname, "events")
     const eventFiles = fs
@@ -78,7 +97,7 @@ class DiscordBot {
 
     for (const file of eventFiles) {
       const filePath = path.join(eventsPath, file)
-      const event = require(filePath)
+      const event: any = require(filePath)
       event.helpaApi = this.helpaApi
       if (event.once) {
         this.discordClient.once(event.name, (...args) => event.execute(...args))
@@ -88,7 +107,7 @@ class DiscordBot {
     }
   }
 
-  handleCommands() {
+  handleCommands(): void {
     // Read in commands to be handled
     const commandsPath = path.join(__dirname, "commands")
     const commandFiles = fs
@@ -97,7 +116,7 @@ class DiscordBot {
 
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file)
-      const command = require(filePath)
+      const command: DiscordCommand = require(filePath)
       command.helpaApi = this.helpaApi
       // Set a new item in the Collection with the key as the command name and the value as the exported module
       if ("data" in command && "execute" in command) {
@@ -140,4 +159,3 @@ class DiscordBot {
     })
   }
 }
-exports.DiscordBot = DiscordBot
