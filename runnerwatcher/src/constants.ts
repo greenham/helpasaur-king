@@ -1,4 +1,4 @@
-module.exports = Object.freeze({
+export const Constants = Object.freeze({
   // Notification request headers
   TWITCH_MESSAGE_ID: "Twitch-Eventsub-Message-Id",
   TWITCH_MESSAGE_TIMESTAMP: "Twitch-Eventsub-Message-Timestamp",
@@ -14,4 +14,6 @@ module.exports = Object.freeze({
   STREAM_ONLINE_EVENT: "stream.online",
   CHANNEL_UPDATE_EVENT: "channel.update",
   STREAM_ONLINE_TYPE_LIVE: "live",
-})
+} as const)
+
+export type ConstantsType = typeof Constants

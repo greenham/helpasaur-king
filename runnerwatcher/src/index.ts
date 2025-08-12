@@ -1,28 +1,31 @@
-const { io } = require("socket.io-client")
-const { HelpaApi } = require("helpa-api-client")
-const RunnerWatcher = require("./lib/runner-watcher")
+import { io, Socket } from "socket.io-client"
+import { HelpaApi } from "helpa-api-client"
+import { RunnerWatcher } from "./lib/runner-watcher"
+import { RunnerWatcherConfig, StreamAlertPayload } from "@helpasaur/types"
+
 const packageJson = require("../package.json")
 
 const { SERVICE_NAME, WEBSOCKET_RELAY_SERVER } = process.env
 
 const helpaApi = new HelpaApi({
-  apiHost: process.env.API_HOST,
-  apiKey: process.env.API_KEY,
-  serviceName: SERVICE_NAME,
+  apiHost: process.env.API_HOST!,
+  apiKey: process.env.API_KEY!,
+  serviceName: "runnerwatcher",
 })
 
-async function init() {
+async function init(): Promise<void> {
   try {
-    const streamAlertsConfig = await helpaApi.getServiceConfig(SERVICE_NAME)
+    const streamAlertsConfig =
+      (await helpaApi.getServiceConfig()) as RunnerWatcherConfig
     const runnerwatcher = new RunnerWatcher(streamAlertsConfig)
-    const wsRelay = io(WEBSOCKET_RELAY_SERVER, {
+    const wsRelay: Socket = io(WEBSOCKET_RELAY_SERVER!, {
       query: { clientId: `${packageJson.name} v${packageJson.version}` },
     })
 
     console.log(
       `Connecting to websocket relay server: ${WEBSOCKET_RELAY_SERVER}...`
     )
-    wsRelay.on("connect_error", (err) => {
+    wsRelay.on("connect_error", (err: Error) => {
       console.log(`Connection error!`)
       console.log(err)
     })
@@ -30,7 +33,7 @@ async function init() {
       console.log(`Connected! Socket ID: ${wsRelay.id}`)
     })
 
-    runnerwatcher.on("streamEvent", (data) => {
+    runnerwatcher.on("streamEvent", (data: StreamAlertPayload) => {
       wsRelay.emit("streamAlert", data)
     })
   } catch (err) {
