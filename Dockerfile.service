@@ -1,4 +1,4 @@
-# Generic service Dockerfile template
+# Generic service Dockerfile template for a TypeScript project
 # Usage: docker build --build-arg SERVICE=<service-name> -f Dockerfile.service .
 FROM helpa-base:latest as base
 
@@ -19,8 +19,11 @@ CMD ["pnpm", "start:dev"]
 FROM app as prod-build
 ARG SERVICE
 ENV NODE_ENV=production
+WORKDIR /app/${SERVICE}
 RUN pnpm build
-RUN pnpm --prod deploy /prod/${SERVICE}
+# Deploy from workspace root with filter using package name
+WORKDIR /app
+RUN pnpm --filter helpa-${SERVICE} --prod deploy /prod/${SERVICE}
 
 # Production runtime stage - minimal image
 FROM node:18-alpine as prod
