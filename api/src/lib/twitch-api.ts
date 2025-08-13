@@ -1,23 +1,44 @@
-const TwitchApi = require("node-twitch").default
+import TwitchApi from "node-twitch"
+
 const { TWITCH_EVENTSUB_SECRET_KEY, TWITCH_EVENTSUB_WEBHOOK_URL } = process.env
 const STREAM_ONLINE_EVENT = "stream.online"
 const CHANNEL_UPDATE_EVENT = "channel.update"
 
+interface SubscriptionData {
+  channel: string
+  userId: string
+}
+
+interface EventSubSubscription {
+  id: string
+  type: string
+  version: string
+  status: string
+  condition: any
+  transport: any
+}
+
 class TwitchApiWithEventSub extends TwitchApi {
-  constructor(options) {
+  constructor(options: any) {
     super(options)
   }
 
-  getSubscriptions(params = false) {
+  getSubscriptions(
+    params: any = false
+  ): Promise<{ data: EventSubSubscription[] }> {
     let queryString = ""
     if (params) {
       queryString = "?" + new URLSearchParams(params).toString()
     }
-    return this._get(`/eventsub/subscriptions${queryString}`)
+    return (this as any)._get(`/eventsub/subscriptions${queryString}`)
   }
 
-  createSubscription(userId, type, version = "1") {
-    return this._post("/eventsub/subscriptions", {
+  createSubscription(
+    userId: string,
+    type: string,
+    version = "1"
+  ): Promise<any> {
+    return (this as any)._post("/eventsub/subscriptions", {
       type,
       version,
       condition: {
@@ -31,24 +52,25 @@ class TwitchApiWithEventSub extends TwitchApi {
     })
   }
 
-  deleteSubscription(id) {
-    return this._delete(`/eventsub/subscriptions?id=${id}`)
+  deleteSubscription(id: string): Promise<any> {
+    return (this as any)._delete(`/eventsub/subscriptions?id=${id}`)
   }
 
-  clearSubscriptions() {
+  clearSubscriptions(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.getSubscriptions()
         .then((res) => {
           console.log(`Found ${res.data.length} subscriptions to delete...`)
           if (res.data.length === 0) {
             resolve()
+            return
           }
 
           const deletions = res.data.map((s) => {
             return this.deleteSubscription(s.id)
           })
 
-          Promise.allSettled(deletions).then(resolve)
+          Promise.allSettled(deletions).then(() => resolve())
         })
         .catch((err) => {
           console.error(err)
@@ -57,7 +79,9 @@ class TwitchApiWithEventSub extends TwitchApi {
     })
   }
 
-  async subscribeToStreamEvents(data) {
+  async subscribeToStreamEvents(
+    data: SubscriptionData
+  ): Promise<PromiseSettledResult<any>[]> {
     const events = [STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT]
     const { channel, userId } = data
 
@@ -70,4 +94,4 @@ class TwitchApiWithEventSub extends TwitchApi {
   }
 }
 
-module.exports = TwitchApiWithEventSub
+export default TwitchApiWithEventSub
