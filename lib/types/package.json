@@ -8,6 +8,9 @@
     "build:watch": "tsc --watch"
   },
   "license": "MIT",
+  "dependencies": {
+    "mongoose": "^8.9.5"
+  },
   "devDependencies": {
     "@types/node": "^20.8.10",
     "typescript": "^5.2.2"

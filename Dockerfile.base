@@ -16,8 +16,7 @@ RUN mkdir -p /app/src /app/build /app/dist
 RUN mkdir -p /usr/local/bin
 
 # Copy and build all library packages
-COPY . /lib
-WORKDIR /lib
+COPY lib /lib
 
 # Build @helpasaur/types
 WORKDIR /lib/types
@@ -26,6 +25,19 @@ RUN pnpm install && pnpm build
 # Build @helpasaur/helpa-api-client
 WORKDIR /lib/helpa-api-client
 RUN pnpm install && pnpm build
+
+# Setup workspace structure for all services
+WORKDIR /workspace
+COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY api/package.json ./api/
+COPY discord/package.json ./discord/
+COPY twitch/package.json ./twitch/
+COPY runnerwatcher/package.json ./runnerwatcher/
+COPY ws-relay/package.json ./ws-relay/
+COPY racebot/package.json ./racebot/
+COPY web/package.json ./web/
+COPY lib/types/package.json ./lib/types/
+COPY lib/helpa-api-client/package.json ./lib/helpa-api-client/
 
 # Return to app directory
 WORKDIR /app
@@ -36,3 +48,4 @@ WORKDIR /app
 # - Common directories created
 # - curl and wget for health checks
 # - Pre-built library packages in /lib
+# - Workspace configuration with all package.json files in /workspace

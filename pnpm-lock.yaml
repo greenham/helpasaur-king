@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      helpa-api-client:
-        specifier: file:./lib/helpa-api-client
-        version: file:lib/helpa-api-client
     devDependencies:
       prettier:
         specifier: ^3.0.3
@@ -152,6 +148,19 @@ importers:
       axios-retry:
         specifier: ^4.5.0
         version: 4.5.0(axios@1.11.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.19.10
+      typescript:
+        specifier: ^5.2.2
+        version: 5.9.2
+
+  lib/types:
+    dependencies:
+      mongoose:
+        specifier: ^8.9.5
+        version: 8.17.1
     devDependencies:
       '@types/node':
         specifier: ^20.8.10
@@ -4427,10 +4436,29 @@ packages:
       axios: 1.11.0
       axios-retry: 4.5.0(axios@1.11.0)
     transitivePeerDependencies:
+      - '@aws-sdk/credential-providers'
+      - '@mongodb-js/zstd'
       - debug
+      - gcp-metadata
+      - kerberos
+      - mongodb-client-encryption
+      - snappy
+      - socks
+      - supports-color
     dev: false
 
   file:lib/types:
     resolution: {directory: lib/types, type: directory}
     name: '@helpasaur/types'
+    dependencies:
+      mongoose: 8.17.1
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-providers'
+      - '@mongodb-js/zstd'
+      - gcp-metadata
+      - kerberos
+      - mongodb-client-encryption
+      - snappy
+      - socks
+      - supports-color
     dev: false

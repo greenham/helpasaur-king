@@ -4,7 +4,8 @@ name: "helpa"
 services:
   helpa-base:
     build:
-      context: ./lib
+      context: .
+      dockerfile: ./Dockerfile.base
       target: builder
     image: helpa-base:latest
 

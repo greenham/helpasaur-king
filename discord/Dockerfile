@@ -1,29 +1,34 @@
 FROM helpa-base:latest as base
+WORKDIR /workspace
 
-COPY pnpm-lock.yaml ./
-COPY discord/package.json ./
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-
+# Development stage - with all dependencies including devDependencies
 FROM base as dev
 ENV NODE_ENV=development
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-COPY discord/tsconfig.json ./
-COPY discord/src /app/src
+    pnpm install --frozen-lockfile --filter "discord..."
+COPY discord/tsconfig.json ./discord/
+COPY discord/src ./discord/src
+WORKDIR /app
+RUN ln -s /workspace/discord/node_modules ./node_modules
+COPY discord/src ./src
 CMD ["pnpm", "start:dev"]
 
+# Production build stage
 FROM base as prod-build
-ENV NODE_ENV=production
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-COPY discord/tsconfig.json ./
-COPY discord/src /app/src
+    pnpm install --frozen-lockfile --filter "discord..."
+COPY discord/tsconfig.json ./discord/
+COPY discord/src ./discord/src
+WORKDIR /workspace/discord
 RUN pnpm build
+# Deploy production-ready package
+WORKDIR /workspace
+RUN pnpm --filter discord --prod deploy /prod/discord
 
-FROM base as prod
+# Production runtime stage - minimal image
+FROM node:18-alpine as prod
+WORKDIR /app
 ENV NODE_ENV=production
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --prod --shamefully-hoist
-COPY --from=prod-build /app/dist /app/dist
-CMD ["pnpm", "start"]
+# Copy the deployed package with only production dependencies
+COPY --from=prod-build /prod/discord ./
+CMD ["node", "dist/bot.js"]

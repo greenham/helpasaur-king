@@ -1,29 +1,34 @@
 FROM helpa-base:latest as base
+WORKDIR /workspace
 
-COPY pnpm-lock.yaml ./
-COPY api/package.json ./
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-
+# Development stage - with all dependencies including devDependencies
 FROM base as dev
 ENV NODE_ENV=development
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-COPY api/tsconfig.json ./
-COPY api/src /app/src
+    pnpm install --frozen-lockfile --filter "api..."
+COPY api/tsconfig.json ./api/
+COPY api/src ./api/src
+WORKDIR /app
+RUN ln -s /workspace/api/node_modules ./node_modules
+COPY api/src ./src
 CMD ["pnpm", "start:dev"]
 
+# Production build stage
 FROM base as prod-build
-ENV NODE_ENV=production
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-COPY api/tsconfig.json ./
-COPY api/src /app/src
+    pnpm install --frozen-lockfile --filter "api..."
+COPY api/tsconfig.json ./api/
+COPY api/src ./api/src
+WORKDIR /workspace/api
 RUN pnpm build
+# Deploy production-ready package
+WORKDIR /workspace
+RUN pnpm --filter api --prod deploy /prod/api
 
-FROM base as prod
+# Production runtime stage - minimal image
+FROM node:18-alpine as prod
+WORKDIR /app
 ENV NODE_ENV=production
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --prod --shamefully-hoist
-COPY --from=prod-build /app/dist /app/dist
-CMD ["pnpm", "start"]
+# Copy the deployed package with only production dependencies
+COPY --from=prod-build /prod/api ./
+CMD ["node", "dist/index.js"]

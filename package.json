@@ -22,9 +22,6 @@
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
-  "dependencies": {
-    "helpa-api-client": "file:./lib/helpa-api-client"
-  },
   "devDependencies": {
     "prettier": "^3.0.3"
   }

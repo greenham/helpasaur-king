@@ -1,30 +1,34 @@
-FROM helpa-base:latest as builder
-
-COPY pnpm-lock.yaml ./
-COPY racebot/package.json ./
-# Install ALL dependencies (including dev) for build
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-
-COPY racebot/ .
-RUN pnpm build
-
 FROM helpa-base:latest as base
+WORKDIR /workspace
 
-COPY pnpm-lock.yaml ./
-COPY racebot/package.json ./
-
+# Development stage - with all dependencies including devDependencies
 FROM base as dev
 ENV NODE_ENV=development
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --shamefully-hoist
-COPY racebot/ .
+    pnpm install --frozen-lockfile --filter "racebot..."
+COPY racebot/tsconfig.json ./racebot/
+COPY racebot/src ./racebot/src
+WORKDIR /app
+RUN ln -s /workspace/racebot/node_modules ./node_modules
+COPY racebot/src ./src
 CMD ["pnpm", "start:dev"]
 
-FROM base as prod
-ENV NODE_ENV=production
+# Production build stage
+FROM base as prod-build
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --prod --shamefully-hoist
-# Copy built artifacts from builder stage
-COPY --from=builder /app/build ./build
-CMD ["pnpm", "start"]
+    pnpm install --frozen-lockfile --filter "racebot..."
+COPY racebot/tsconfig.json ./racebot/
+COPY racebot/src ./racebot/src
+WORKDIR /workspace/racebot
+RUN pnpm build
+# Deploy production-ready package
+WORKDIR /workspace
+RUN pnpm --filter racebot --prod deploy /prod/racebot
+
+# Production runtime stage - minimal image
+FROM node:18-alpine as prod
+WORKDIR /app
+ENV NODE_ENV=production
+# Copy the deployed package with only production dependencies
+COPY --from=prod-build /prod/racebot ./
+CMD ["node", "build/index.js"]
