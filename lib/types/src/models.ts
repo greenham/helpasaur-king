@@ -19,16 +19,37 @@ export interface ICommandModel extends Model<ICommandDocument> {
 
 // User Model
 export interface IUser {
-  username: string
-  email?: string
-  twitchId?: string
-  twitchUsername?: string
-  twitchAccessToken?: string
-  twitchRefreshToken?: string
-  avatar?: string
-  role?: "user" | "admin" | "moderator"
-  createdAt?: Date
-  updatedAt?: Date
+  twitchUserData?: {
+    id: string
+    login: string
+    display_name: string
+    broadcaster_type?: string
+    description?: string
+    profile_image_url?: string
+    offline_image_url?: string
+    view_count?: number
+    created_at?: Date
+    auth?: {
+      access_token?: string
+      expires_at?: number
+      refresh_token?: string
+      scope?: string[]
+      token_type?: string
+    }
+  }
+  permissions?: string[]
+  lastLogin?: Date
+  twitchBotConfig?: {
+    active?: boolean
+    commandsEnabled?: boolean
+    commandPrefix?: string
+    textCommandCooldown?: number
+    practiceListsEnabled?: boolean
+    allowModsToManagePracticeLists?: boolean
+    weeklyRaceAlertEnabled?: boolean
+    createdAt?: Date
+    lastUpdated?: Date
+  }
 }
 
 export interface IUserDocument extends IUser, Document {}
@@ -45,7 +66,7 @@ export interface IAccount {
 
 export interface IAccountDocument extends IAccount, Document {}
 
-// Configuration Model
+// Configuration Model (for generic configs)
 export interface IConfig {
   key: string
   value: any
@@ -54,6 +75,13 @@ export interface IConfig {
 }
 
 export interface IConfigDocument extends IConfig, Document {}
+
+// Configuration Model (for specific configs like stream alerts)
+export interface IConfiguration {
+  config?: any
+}
+
+export interface IConfigurationDocument extends IConfiguration, Document {}
 
 // Command Log Model
 export interface ICommandLog {

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, Response, NextFunction, RequestHandler } from "express"
 import { expressjwt as jwt } from "express-jwt"
 import User from "../models/user"
 
@@ -23,7 +23,7 @@ export const requireAuthKey = (
   next()
 }
 
-export const requireJwtToken = jwt({
+export const requireJwtToken: RequestHandler = jwt({
   secret: JWT_SECRET_KEY!,
   algorithms: ["HS256"],
   getToken: (req: any) => {
@@ -58,10 +58,11 @@ export const getRequestedChannel = async (
       requestedChannel = req.body.channel
     } else {
       const user = await User.findById(req.user.sub)
-      if (!user) return false
+      if (!user || !user.twitchUserData) return false
       requestedChannel = user.twitchUserData.login
     }
   }
 
   return requestedChannel
 }
+// trigger
