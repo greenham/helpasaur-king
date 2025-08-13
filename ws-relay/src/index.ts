@@ -5,7 +5,6 @@ import {
   WebSocketRelayEvent,
   RelayData,
   WebSocketServerStats,
-  WebSocketClientOptions,
 } from "@helpasaur/types"
 const packageJson = require("../package.json")
 const { WEBSOCKET_RELAY_SERVER_PORT } = process.env
@@ -88,8 +87,7 @@ const relayEvents: WebSocketRelayEvent[] = [
 
 wss.on("connection", (socket: Socket) => {
   const customSocket = socket as CustomSocket
-  const clientId =
-    (socket.handshake.query as WebSocketClientOptions).clientId || "Unknown"
+  const clientId = (socket.handshake.query.clientId as string) || "Unknown"
   customSocket.data.clientId = clientId
   totalConnections++
   currentConnections++

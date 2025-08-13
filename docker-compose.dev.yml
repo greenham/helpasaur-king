@@ -5,33 +5,33 @@ services:
 
   api-server:
     volumes:
-      - ./api/src:/app/src
+      - ./api/src:/app/api/src
       - ./lib/types:/lib/types
       - ./lib/helpa-api-client:/lib/helpa-api-client
 
   discord-bot:
     volumes:
-      - ./discord/src:/app/src
+      - ./discord/src:/app/discord/src
       - ./lib/types:/lib/types
       - ./lib/helpa-api-client:/lib/helpa-api-client
 
   twitch-bot:
     volumes:
-      - ./twitch/src:/app/src
+      - ./twitch/src:/app/twitch/src
       - ./lib/types:/lib/types
       - ./lib/helpa-api-client:/lib/helpa-api-client
 
   runnerwatcher:
     volumes:
-      - ./runnerwatcher/src:/app/src
+      - ./runnerwatcher/src:/app/runnerwatcher/src
       - ./lib/types:/lib/types
       - ./lib/helpa-api-client:/lib/helpa-api-client
 
   racebot:
     volumes:
-      - ./racebot/src:/app/src
+      - ./racebot/src:/app/racebot/src
 
   ws-relay:
     volumes:
-      - ./ws-relay/src:/app/src
+      - ./ws-relay/src:/app/ws-relay/src
       - ./lib/types:/lib/types
