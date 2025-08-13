@@ -147,7 +147,9 @@ router.post("/leave", async (req: Request, res: Response) => {
         .json({ result: "noop", message: `Not in ${requestedChannel}!` })
     }
 
-    user.twitchBotConfig.active = false
+    if (user.twitchBotConfig) {
+      user.twitchBotConfig.active = false
+    }
     user.markModified("twitchBotConfig")
     await user.save()
 
@@ -197,7 +199,11 @@ router.patch("/config", async (req: Request, res: Response) => {
             message: "Command prefix must be exactly one character",
           })
         }
-        if (!ALLOWED_COMMAND_PREFIXES.includes(value)) {
+        if (
+          !ALLOWED_COMMAND_PREFIXES.includes(
+            value as (typeof ALLOWED_COMMAND_PREFIXES)[number]
+          )
+        ) {
           return res.status(400).json({
             result: "error",
             message: `Invalid command prefix. Allowed: ${ALLOWED_COMMAND_PREFIXES.join(", ")}`,
@@ -230,14 +236,16 @@ router.patch("/config", async (req: Request, res: Response) => {
     // Apply updates
     for (const [path, value] of Object.entries(updates)) {
       const keys = path.split(".")
-      let current = user
+      let current: any = user
       for (let i = 0; i < keys.length - 1; i++) {
         current = current[keys[i]]
       }
       current[keys[keys.length - 1]] = value
     }
 
-    user.twitchBotConfig.lastUpdated = Date.now()
+    if (user.twitchBotConfig) {
+      user.twitchBotConfig.lastUpdated = new Date()
+    }
     user.markModified("twitchBotConfig")
     await user.save()
 
@@ -246,18 +254,20 @@ router.patch("/config", async (req: Request, res: Response) => {
       !(req as any).user?.permissions.includes("service") ||
       (req as any).user?.sub !== "twitch"
     ) {
-      ;(req as any).app.wsRelay.emit("configUpdate", {
-        roomId: user.twitchUserData.id,
-        channelName: user.twitchUserData.login,
-        displayName: user.twitchUserData.display_name,
-        ...user.twitchBotConfig,
-      })
+      if (user.twitchUserData) {
+        ;(req as any).app.wsRelay.emit("configUpdate", {
+          roomId: user.twitchUserData.id,
+          channelName: user.twitchUserData.login,
+          displayName: user.twitchUserData.display_name,
+          ...user.twitchBotConfig,
+        })
+      }
     }
 
     res.status(200).json({
       result: "success",
       twitchBotConfig: {
-        roomId: user.twitchUserData.id,
+        roomId: user.twitchUserData?.id,
         ...user.twitchBotConfig,
       },
     })

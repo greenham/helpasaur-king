@@ -130,6 +130,9 @@ router.delete(
       )
 
       // Ensure this channel is in the list already
+      if (!streamAlertsConfig || !streamAlertsConfig.config) {
+        return res.status(500).json({ error: "Configuration not found" })
+      }
       const channelIndex = streamAlertsConfig.config.channels.findIndex(
         (c: any) => c.id == req.params.id
       )
@@ -182,6 +185,9 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" })
+      if (!streamAlertsConfig?.config) {
+        return res.status(500).json({ error: "Configuration not found" })
+      }
       const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config)
       const results = await twitchApiClient.getSubscriptions(req.query)
       res.status(200).json(results)

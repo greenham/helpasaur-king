@@ -34,7 +34,8 @@ CommandSchema.statics.isUnique = async function (
   aliases?: string[]
 ) {
   // Ensure command name uniqueness
-  let existingCommand = await this.findByNameOrAlias(command)
+  const model = this as any as ICommandModel
+  let existingCommand = await model.findByNameOrAlias(command)
   if (existingCommand) {
     return false
   }

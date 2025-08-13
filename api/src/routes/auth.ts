@@ -171,7 +171,7 @@ router.get(`/logout`, async (req: Request, res: Response) => {
   const redirectPath = req.query.redirect || "/"
 
   // Redirect to client
-  res.redirect(CLIENT_POST_AUTH_REDIRECT_URL + redirectPath)
+  res.redirect((CLIENT_POST_AUTH_REDIRECT_URL || "/") + redirectPath)
 })
 
 export default router
