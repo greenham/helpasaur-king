@@ -26,7 +26,7 @@ WORKDIR /app
 RUN pnpm --filter helpa-${SERVICE} --prod deploy /prod/${SERVICE}
 
 # Production runtime stage - minimal image
-FROM node:18-alpine as prod
+FROM node:20-alpine as prod
 ARG SERVICE
 WORKDIR /app
 COPY --from=prod-build /prod/${SERVICE} ./
