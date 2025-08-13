@@ -1,11 +1,14 @@
+# Generic service Dockerfile template
+# Usage: docker build --build-arg SERVICE=<service-name> -f Dockerfile.service .
 FROM helpa-base:latest as base
 
 # Copy source and install all dependencies
 FROM base as app
-WORKDIR /app/ws-relay
+ARG SERVICE
+WORKDIR /app/${SERVICE}
 RUN pnpm install --frozen-lockfile
-COPY ws-relay/tsconfig.json ./
-COPY ws-relay/src ./src
+COPY ${SERVICE}/tsconfig.json ./
+COPY ${SERVICE}/src ./src
 
 # Development stage
 FROM app as dev
@@ -14,14 +17,14 @@ CMD ["pnpm", "start:dev"]
 
 # Production build stage
 FROM app as prod-build
+ARG SERVICE
 ENV NODE_ENV=production
 RUN pnpm build
-# Deploy production-ready package
-RUN pnpm --prod deploy /prod/ws-relay
+RUN pnpm --prod deploy /prod/${SERVICE}
 
 # Production runtime stage - minimal image
 FROM node:18-alpine as prod
+ARG SERVICE
 WORKDIR /app
-# Copy the deployed package with only production dependencies
-COPY --from=prod-build /prod/ws-relay ./
-CMD ["node", "build/index.js"]
+COPY --from=prod-build /prod/${SERVICE} ./
+CMD ["node", "dist/index.js"]

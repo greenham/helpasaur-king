@@ -73,8 +73,10 @@ services:
     image: helpa-api:${VERSION:-${BUILD_TARGET}}
     build:
       context: .
-      dockerfile: ./api/Dockerfile
+      dockerfile: ./Dockerfile.service
       target: ${BUILD_TARGET}
+      args:
+        SERVICE: api
     restart: on-failure
     logging:
       driver: local
@@ -125,8 +127,10 @@ services:
     image: helpa-discord:${VERSION:-${BUILD_TARGET}}
     build:
       context: .
-      dockerfile: ./discord/Dockerfile
+      dockerfile: ./Dockerfile.service
       target: ${BUILD_TARGET}
+      args:
+        SERVICE: discord
     restart: on-failure
     logging:
       driver: local
@@ -168,8 +172,10 @@ services:
     image: helpa-twitch:${VERSION:-${BUILD_TARGET}}
     build:
       context: .
-      dockerfile: ./twitch/Dockerfile
+      dockerfile: ./Dockerfile.service
       target: ${BUILD_TARGET}
+      args:
+        SERVICE: twitch
     restart: on-failure
     logging:
       driver: local
@@ -240,8 +246,10 @@ services:
     image: helpa-runnerwatcher:${VERSION:-${BUILD_TARGET}}
     build:
       context: .
-      dockerfile: ./runnerwatcher/Dockerfile
+      dockerfile: ./Dockerfile.service
       target: ${BUILD_TARGET}
+      args:
+        SERVICE: runnerwatcher
     restart: on-failure
     logging:
       driver: local
@@ -287,8 +295,10 @@ services:
     image: helpa-racebot:${VERSION:-${BUILD_TARGET}}
     build:
       context: .
-      dockerfile: ./racebot/Dockerfile
+      dockerfile: ./Dockerfile.service
       target: ${BUILD_TARGET}
+      args:
+        SERVICE: racebot
     restart: on-failure
     logging:
       driver: local
@@ -332,8 +342,10 @@ services:
     image: helpa-ws-relay:${VERSION:-${BUILD_TARGET}}
     build:
       context: .
-      dockerfile: ./ws-relay/Dockerfile
+      dockerfile: ./Dockerfile.service
       target: ${BUILD_TARGET}
+      args:
+        SERVICE: ws-relay
     restart: on-failure
     logging:
       driver: local

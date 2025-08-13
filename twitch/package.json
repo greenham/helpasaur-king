@@ -1,12 +1,12 @@
 {
   "name": "helpa-twitch",
   "version": "1.12.0",
-  "main": "./build/index.js",
+  "main": "./dist/index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "node ./build/index.js",
-    "start:dev": "nodemon --exec ts-node ./src/index.ts"
+    "start": "node ./dist/index.js",
+    "start:dev": "nodemon ./src/index.ts"
   },
   "dependencies": {
     "@helpasaur/types": "file:../lib/types",
