@@ -2,7 +2,6 @@ FROM helpa-base:latest as base
 
 COPY pnpm-lock.yaml ./
 COPY ws-relay/package.json ./
-COPY lib/types /lib/types
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --shamefully-hoist
 

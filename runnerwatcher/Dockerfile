@@ -2,8 +2,6 @@ FROM helpa-base:latest as base
 
 COPY pnpm-lock.yaml ./
 COPY runnerwatcher/package.json ./
-COPY lib/helpa-api-client /lib/helpa-api-client
-COPY lib/types /lib/types
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --shamefully-hoist
 

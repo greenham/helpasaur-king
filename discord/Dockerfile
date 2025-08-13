@@ -2,8 +2,6 @@ FROM helpa-base:latest as base
 
 COPY pnpm-lock.yaml ./
 COPY discord/package.json ./
-COPY lib/helpa-api-client /lib/helpa-api-client
-COPY lib/types /lib/types
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --shamefully-hoist
 
@@ -28,6 +26,4 @@ ENV NODE_ENV=production
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --prod --shamefully-hoist
 COPY --from=prod-build /app/dist /app/dist
-COPY discord/src/events /app/dist/events
-COPY discord/src/commands /app/dist/commands
 CMD ["pnpm", "start"]
