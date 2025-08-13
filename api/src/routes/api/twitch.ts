@@ -1,32 +1,38 @@
-const express = require("express")
-const router = express.Router()
-const TwitchApi = require("../../lib/twitch-api")
-const Config = require("../../models/config")
-const User = require("../../models/user")
-const { getRequestedChannel } = require("../../lib/utils")
-const guard = require("express-jwt-permissions")()
-const { ALLOWED_COMMAND_PREFIXES } = require("../../constants")
+import express, { Request, Response, Router } from "express"
+import guard from "express-jwt-permissions"
+import TwitchApi from "../../lib/twitch-api"
+import Config from "../../models/config"
+import User from "../../models/user"
+import { getRequestedChannel } from "../../lib/utils"
+import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
+
+const router: Router = express.Router()
+const permissionGuard = guard()
 
 // GET /channels -> returns list of channels currently auto-joined by the bot (admin-only)
-router.get("/channels", guard.check("admin"), async (req, res) => {
-  try {
-    const users = await User.find({ "twitchBotConfig.active": true })
-    const channels = users.map((u) => u.twitchUserData.login).sort()
-    res.status(200).json(channels)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
+router.get(
+  "/channels",
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const users = await User.find({ "twitchBotConfig.active": true })
+      const channels = users.map((u: any) => u.twitchUserData.login).sort()
+      res.status(200).json(channels)
+    } catch (err: any) {
+      res.status(500).json({ message: err.message })
+    }
   }
-})
+)
 
 // POST /join -> adds requested or logged-in user to join list for twitch bot
-router.post("/join", async (req, res) => {
-  let user
+router.post("/join", async (req: Request, res: Response) => {
+  let user: any
   // check for a logged-in user requesting the bot to join the channel
   if (
-    !req.user.permissions.includes("service") &&
-    (!req.user.permissions.includes("admin") || !req.body.channel)
+    !(req as any).user?.permissions.includes("service") &&
+    (!(req as any).user?.permissions.includes("admin") || !req.body.channel)
   ) {
-    user = await User.findById(req.user.sub)
+    user = await User.findById((req as any).user?.sub)
     user.twitchBotConfig.active = true
     user.markModified("twitchBotConfig")
     await user.save()
@@ -56,7 +62,7 @@ router.post("/join", async (req, res) => {
         await user.save()
       } else {
         // Get user data from Twitch
-        const { config: streamAlertsConfig } = await Config.findOne({
+        const { config: streamAlertsConfig }: any = await Config.findOne({
           id: "streamAlerts",
         })
         const twitchApiClient = new TwitchApi({
@@ -68,7 +74,9 @@ router.post("/join", async (req, res) => {
         try {
           const response = await twitchApiClient.getUsers(requestedChannel)
           if (!response || !response.data || !response.data[0]) {
-            throw new Error(`Unable to get user data for channel ${channel}`)
+            throw new Error(
+              `Unable to get user data for channel ${requestedChannel}`
+            )
           }
           twitchUserData = response.data[0]
         } catch (err) {
@@ -96,14 +104,17 @@ router.post("/join", async (req, res) => {
           })
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       return res.status(500).json({ result: "error", message: err.message })
     }
   }
 
   // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
-  if (!req.user.permissions.includes("service") || req.user.sub !== "twitch") {
-    req.app.wsRelay.emit("joinChannel", {
+  if (
+    !(req as any).user?.permissions.includes("service") ||
+    (req as any).user?.sub !== "twitch"
+  ) {
+    ;(req as any).app.wsRelay.emit("joinChannel", {
       channel: user.twitchUserData.login,
     })
   }
@@ -118,7 +129,7 @@ router.post("/join", async (req, res) => {
 })
 
 // POST /leave -> removes requested or logged-in user from join list for twitch bot
-router.post("/leave", async (req, res) => {
+router.post("/leave", async (req: Request, res: Response) => {
   const requestedChannel = await getRequestedChannel(req)
   if (!requestedChannel) {
     return res
@@ -142,20 +153,20 @@ router.post("/leave", async (req, res) => {
 
     // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
     if (
-      !req.user.permissions.includes("service") ||
-      req.user.sub !== "twitch"
+      !(req as any).user?.permissions.includes("service") ||
+      (req as any).user?.sub !== "twitch"
     ) {
-      req.app.wsRelay.emit("leaveChannel", requestedChannel)
+      ;(req as any).app.wsRelay.emit("leaveChannel", requestedChannel)
     }
 
     res.status(200).json({ result: "success" })
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message })
   }
 })
 
 // PATCH /config -> updates twitch bot configuration for a channel
-router.patch("/config", async (req, res) => {
+router.patch("/config", async (req: Request, res: Response) => {
   const requestedChannel = await getRequestedChannel(req)
   if (!requestedChannel) {
     return res
@@ -173,7 +184,7 @@ router.patch("/config", async (req, res) => {
     "weeklyRaceAlertEnabled",
   ]
 
-  const updates = {}
+  const updates: any = {}
   for (const field of allowedFields) {
     if (req.body.hasOwnProperty(field)) {
       const value = req.body[field]
@@ -232,10 +243,10 @@ router.patch("/config", async (req, res) => {
 
     // Emit configuration update event to the twitch bot
     if (
-      !req.user.permissions.includes("service") ||
-      req.user.sub !== "twitch"
+      !(req as any).user?.permissions.includes("service") ||
+      (req as any).user?.sub !== "twitch"
     ) {
-      req.app.wsRelay.emit("configUpdate", {
+      ;(req as any).app.wsRelay.emit("configUpdate", {
         roomId: user.twitchUserData.id,
         channelName: user.twitchUserData.login,
         displayName: user.twitchUserData.display_name,
@@ -250,9 +261,9 @@ router.patch("/config", async (req, res) => {
         ...user.twitchBotConfig,
       },
     })
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message })
   }
 })
 
-module.exports = router
+export default router

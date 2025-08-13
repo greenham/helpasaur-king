@@ -1,16 +1,18 @@
-const express = require("express")
-const router = express.Router()
-const guard = require("express-jwt-permissions")()
-const { requireJwtToken } = require("../../lib/utils")
-const Config = require("../../models/config")
+import express, { Request, Response, Router } from "express"
+import guard from "express-jwt-permissions"
+import { requireJwtToken } from "../../lib/utils"
+import Config from "../../models/config"
+
+const router: Router = express.Router()
+const permissionGuard = guard()
 
 // Endpoint: /discord
 
 // GET /api/discord/joinUrl
 // - Returns the URL to join the bot to a guild
-router.get("/joinUrl", async (req, res) => {
+router.get("/joinUrl", async (req: Request, res: Response) => {
   try {
-    const discordConfig = await Config.findOne({ id: "discord" })
+    const discordConfig: any = await Config.findOne({ id: "discord" })
     res.status(200).json({
       result: "success",
       message: "OK",
@@ -20,7 +22,7 @@ router.get("/joinUrl", async (req, res) => {
         discordConfig.config.oauth.permissions
       }&scope=${discordConfig.config.oauth.scopes.join("%20")}`,
     })
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ result: "error", message: err.message })
   }
 })
@@ -30,13 +32,13 @@ router.get("/joinUrl", async (req, res) => {
 router.post(
   "/guild",
   requireJwtToken,
-  guard.check(["service"]),
-  async (req, res) => {
+  permissionGuard.check(["service"]),
+  async (req: Request, res: Response) => {
     try {
       // assume req.body contains a valid guild object
       // add this to config for discord (guilds array)
-      const discordConfig = await Config.findOne({ id: "discord" })
-      if (discordConfig.config.guilds.find((g) => g.id === req.body.id)) {
+      const discordConfig: any = await Config.findOne({ id: "discord" })
+      if (discordConfig.config.guilds.find((g: any) => g.id === req.body.id)) {
         return res.status(200).json({
           result: "noop",
           message: `Already joined guild: ${req.body.name} (${req.body.id})!`,
@@ -48,7 +50,7 @@ router.post(
       await discordConfig.save()
 
       res.status(201).json({ result: "success", message: "OK" })
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ result: "error", message: err.message })
     }
   }
@@ -59,8 +61,8 @@ router.post(
 router.patch(
   "/guild/:id",
   requireJwtToken,
-  guard.check(["service"]),
-  async (req, res) => {
+  permissionGuard.check(["service"]),
+  async (req: Request, res: Response) => {
     if (!req.params.id || !req.params.id.match(/\d+/)) {
       return res.status(400).json({
         result: "error",
@@ -71,9 +73,9 @@ router.patch(
     try {
       // assume req.body contains a valid patch for a guild object
       // update this in config for discord (guilds array)
-      const discordConfig = await Config.findOne({ id: "discord" })
+      const discordConfig: any = await Config.findOne({ id: "discord" })
       const index = discordConfig.config.guilds.findIndex(
-        (g) => g.id === req.params.id
+        (g: any) => g.id === req.params.id
       )
       if (index === -1) {
         return res.status(404).json({
@@ -90,10 +92,10 @@ router.patch(
       await discordConfig.save()
 
       res.status(200).json({ result: "success", message: "OK" })
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ result: "error", message: err.message })
     }
   }
 )
 
-module.exports = router
+export default router

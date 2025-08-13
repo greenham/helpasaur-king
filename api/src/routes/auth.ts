@@ -1,12 +1,12 @@
-const express = require("express")
-const router = express.Router()
-const axios = require("axios")
-const jwt = require("jsonwebtoken")
-const ms = require("ms")
-const TwitchApi = require("node-twitch").default
-const Config = require("../models/config")
-const User = require("../models/user")
-const { requireAuthKey } = require("../lib/utils")
+import express, { Request, Response, Router } from "express"
+import axios from "axios"
+import jwt from "jsonwebtoken"
+import ms from "ms"
+import TwitchApi from "node-twitch"
+import Config from "../models/config"
+import User from "../models/user"
+import { requireAuthKey } from "../lib/utils"
+
 const {
   CLIENT_POST_AUTH_REDIRECT_URL,
   JWT_SECRET_KEY,
@@ -15,19 +15,20 @@ const {
   API_HOST,
   ALLOWED_SERVICES,
 } = process.env
+
 const loginExpirationLength = "7d"
+const router: Router = express.Router()
 
 // Endpoint: GET /auth/twitch
-router.get(`/twitch`, async (req, res) => {
-  const { config: streamAlertsConfig } = await Config.findOne({
-    id: "streamAlerts",
-  })
+router.get(`/twitch`, async (req: Request, res: Response) => {
+  const configDoc = await Config.findOne({ id: "streamAlerts" })
+  const { config: streamAlertsConfig } = configDoc as any
 
   //const redirectPath = req.query.redirect || "/";
   const redirectUrl = CLIENT_POST_AUTH_REDIRECT_URL // + redirectPath;
 
   // Validate authorization code from Twitch
-  const authCode = req.query.code || false
+  const authCode = (req.query.code as string) || false
   if (!authCode) {
     return res.redirect(redirectUrl + "?error=missing_code")
   }
@@ -72,7 +73,7 @@ router.get(`/twitch`, async (req, res) => {
     scopes: [],
   })
 
-  let twitchUserData = null
+  let twitchUserData: any = null
   try {
     twitchUserData = await twitchApiUser.getCurrentUser()
   } catch (err) {
@@ -80,7 +81,7 @@ router.get(`/twitch`, async (req, res) => {
   }
   twitchUserData.auth = twitchAuthData
 
-  let localUser
+  let localUser: any
   try {
     // Fetch local user via twitch ID
     localUser = await User.findOne({ "twitchUserData.id": twitchUserData.id })
@@ -102,7 +103,7 @@ router.get(`/twitch`, async (req, res) => {
   // Issue a JWT with the user's permissions and ID
   const idToken = jwt.sign(
     { permissions: localUser.permissions },
-    JWT_SECRET_KEY,
+    JWT_SECRET_KEY!,
     {
       expiresIn: loginExpirationLength,
       subject: localUser._id.toString(),
@@ -124,33 +125,33 @@ router.get(`/twitch`, async (req, res) => {
   const signature = idParts[2]
   const maxAge = ms(loginExpirationLength)
 
-  res.cookie(JWT_HEADER_COOKIE_NAME, headerAndPayload, {
+  res.cookie(JWT_HEADER_COOKIE_NAME!, headerAndPayload, {
     httpOnly: false,
     maxAge,
   })
-  res.cookie(JWT_FOOTER_COOKIE_NAME, signature, {
+  res.cookie(JWT_FOOTER_COOKIE_NAME!, signature, {
     maxAge,
   })
 
   // Redirect to client
-  res.redirect(redirectUrl)
+  res.redirect(redirectUrl!)
 })
 
 // Endpoint: GET /auth/service
 // This is for our internal services like the discord and twitch bots, runnerwatcher, etc.
 // It issues the same kind of JWT as users get, but it's long-lived and identifies the service instead of a user
-router.get(`/service`, requireAuthKey, async (req, res) => {
+router.get(`/service`, requireAuthKey, async (req: Request, res: Response) => {
   // Validate service name
-  const serviceName = req.headers["x-service-name"] || false
+  const serviceName = (req.headers["x-service-name"] as string) || false
   if (!serviceName) {
     return res.status(400).send({ message: "Missing service name" })
   }
-  if (!ALLOWED_SERVICES.includes(serviceName)) {
+  if (!ALLOWED_SERVICES?.includes(serviceName)) {
     return res.status(400).send({ message: "Invalid service name" })
   }
 
   // Issue a long-running JWT with the "service" permission and the service name as the subject
-  const idToken = jwt.sign({ permissions: ["service"] }, JWT_SECRET_KEY, {
+  const idToken = jwt.sign({ permissions: ["service"] }, JWT_SECRET_KEY!, {
     expiresIn: "365d",
     subject: serviceName,
   })
@@ -162,10 +163,10 @@ router.get(`/service`, requireAuthKey, async (req, res) => {
 })
 
 // Endpoint: GET /auth/logout
-router.get(`/logout`, async (req, res) => {
+router.get(`/logout`, async (req: Request, res: Response) => {
   // Clear cookies
-  res.cookie(JWT_HEADER_COOKIE_NAME, "")
-  res.cookie(JWT_FOOTER_COOKIE_NAME, "")
+  res.cookie(JWT_HEADER_COOKIE_NAME!, "")
+  res.cookie(JWT_FOOTER_COOKIE_NAME!, "")
 
   const redirectPath = req.query.redirect || "/"
 
@@ -173,4 +174,4 @@ router.get(`/logout`, async (req, res) => {
   res.redirect(CLIENT_POST_AUTH_REDIRECT_URL + redirectPath)
 })
 
-module.exports = router
+export default router

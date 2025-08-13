@@ -1,8 +1,10 @@
-const express = require("express")
-const router = express.Router()
-const PracLists = require("../../models/pracLists")
-const { requireJwtToken } = require("../../lib/utils")
-const guard = require("express-jwt-permissions")()
+import express, { Request, Response, Router } from "express"
+import guard from "express-jwt-permissions"
+import PracLists from "../../models/pracLists"
+import { requireJwtToken } from "../../lib/utils"
+
+const router: Router = express.Router()
+const permissionGuard = guard()
 
 // Endpoint: /prac
 
@@ -12,8 +14,8 @@ const guard = require("express-jwt-permissions")()
 router.post(
   "/:twitchUserId/lists/:listName/entries",
   requireJwtToken,
-  guard.check("service"),
-  async (req, res) => {
+  permissionGuard.check("service"),
+  async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
       res.status(400).json({ message: "Missing twitchUserId!" })
@@ -57,7 +59,7 @@ router.post(
       res.status(201).json({
         message: `Added entry #${newId} to ${listName} practice list.`,
       })
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ message: err.message })
     }
   }
@@ -67,8 +69,8 @@ router.post(
 router.get(
   "/:twitchUserId/lists/:listName/entries/random",
   requireJwtToken,
-  guard.check("service"),
-  async (req, res) => {
+  permissionGuard.check("service"),
+  async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
       res.status(400).json({ message: "Missing twitchUserId!" })
@@ -96,7 +98,7 @@ router.get(
         id: randomIndex,
         entry: randomEntry,
       })
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ message: err.message })
     }
   }
@@ -106,8 +108,8 @@ router.get(
 router.delete(
   "/:twitchUserId/lists/:listName/entries/:entryId",
   requireJwtToken,
-  guard.check("service"),
-  async (req, res) => {
+  permissionGuard.check("service"),
+  async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
       res.status(400).json({ message: "Missing twitchUserId!" })
@@ -125,7 +127,7 @@ router.delete(
         res.status(404).json({ message: "No practice list found!" })
         return
       }
-      const entryId = req.params.entryId
+      const entryId = parseInt(req.params.entryId)
       if (entryId < 1 || entryId > result.entries.length) {
         res.status(400).json({ message: "Invalid entry ID!" })
         return
@@ -136,7 +138,7 @@ router.delete(
       res.status(200).json({
         message: `Deleted entry #${entryId} from ${listName} practice list!`,
       })
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ message: err.message })
     }
   }
@@ -146,8 +148,8 @@ router.delete(
 router.get(
   "/:twitchUserId/lists/:listName",
   requireJwtToken,
-  guard.check("service"),
-  async (req, res) => {
+  permissionGuard.check("service"),
+  async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
       res.status(400).json({ message: "Missing twitchUserId!" })
@@ -171,7 +173,7 @@ router.get(
           .map((e, idx) => `[${idx + 1}] ${e}`)
           .join(" | "),
       })
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ message: err.message })
     }
   }
@@ -181,8 +183,8 @@ router.get(
 router.delete(
   "/:twitchUserId/lists/:listName",
   requireJwtToken,
-  guard.check("service"),
-  async (req, res) => {
+  permissionGuard.check("service"),
+  async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
       res.status(400).json({ message: "Missing twitchUserId!" })
@@ -203,10 +205,10 @@ router.delete(
       }
 
       res.status(200).json({ message: `Practice list cleared!` })
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ message: err.message })
     }
   }
 )
 
-module.exports = router
+export default router

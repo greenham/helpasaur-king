@@ -1,39 +1,40 @@
-const express = require("express")
-const router = express.Router()
-const Config = require("../../models/config")
-const User = require("../../models/user")
+import express, { Request, Response, Router } from "express"
+import Config from "../../models/config"
+import User from "../../models/user"
+
+const router: Router = express.Router()
 
 // Endpoint: /config
 
 // GET / -> returns all configs
-router.get("/", async (req, res) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
     const configs = await Config.find()
     res.status(200).json(configs)
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message })
   }
 })
 
 // GET /:id -> returns config for id
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: Request, res: Response) => {
   try {
     const result = await Config.findOne({ id: req.params.id })
     res.status(200).json(result)
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message })
   }
 })
 
 // GET /twitch/activeChannels -> returns active channels to be joined by the Twitch bot
-router.get("/twitch/activeChannels", async (req, res) => {
-  if (req.user.sub !== "twitch") {
+router.get("/twitch/activeChannels", async (req: Request, res: Response) => {
+  if ((req as any).user?.sub !== "twitch") {
     return res.status(401).json({ message: "Unauthorized" })
   }
 
   try {
     const users = await User.find({ "twitchBotConfig.active": true })
-    const channels = users.map((u) =>
+    const channels = users.map((u: any) =>
       Object.assign(
         {
           roomId: u.twitchUserData.id,
@@ -44,9 +45,9 @@ router.get("/twitch/activeChannels", async (req, res) => {
       )
     )
     res.status(200).json(channels)
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message })
   }
 })
 
-module.exports = router
+export default router
