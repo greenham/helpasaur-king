@@ -1,6 +1,11 @@
-const mongoose = require("mongoose")
+import mongoose, { Schema, Document } from "mongoose"
+import { IUser } from "@helpasaur/types"
 
-const userSchema = new mongoose.Schema({
+export interface IUserDocument extends IUser, Document {
+  _id: mongoose.Types.ObjectId
+}
+
+const userSchema = new Schema<IUserDocument>({
   twitchUserData: {
     id: {
       type: String,
@@ -94,6 +99,6 @@ const userSchema = new mongoose.Schema({
   },
 })
 
-const User = mongoose.model("User", userSchema)
+const User = mongoose.model<IUserDocument>("User", userSchema)
 
-module.exports = User
+export default User
