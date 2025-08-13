@@ -1,9 +1,10 @@
-const express = require("express")
-const router = express.Router()
-const { ALLOWED_COMMAND_PREFIXES } = require("../../constants")
+import express, { Request, Response, Router } from "express"
+import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
+
+const router: Router = express.Router()
 
 // GET /configs -> returns all public constants and configuration options
-router.get("/configs", async (_req, res) => {
+router.get("/configs", async (_req: Request, res: Response) => {
   res.status(200).json({
     twitch: {
       commandPrefixes: ALLOWED_COMMAND_PREFIXES,
@@ -14,4 +15,4 @@ router.get("/configs", async (_req, res) => {
   })
 })
 
-module.exports = router
+export default router
