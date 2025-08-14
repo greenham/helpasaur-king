@@ -1,16 +1,14 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "./build/",
-    "sourceMap": true,
-    "strict": true,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
+    "rootDir": "./src",
     "module": "esnext",
     "moduleResolution": "node",
     "target": "esnext",
-    "allowJs": true,
     "jsx": "react",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "build"]
 }
