@@ -24,10 +24,12 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 
 ```bash
 # Development (from root)
-pnpm start              # Start all services in Docker (detached)
+pnpm start              # Start all services (uses docker-compose.yml + override.yml automatically)
 pnpm start:web          # Start web dev server (run in separate terminal)
 pnpm stop               # Stop all Docker services
-pnpm build              # Build all Docker images
+pnpm build              # Build all Docker images locally (docker-compose.build.yml)
+pnpm build:prod         # Build production images with registry tags (docker-compose.build.prod.yml)
+pnpm build:push         # Build and push production images to registry
 pnpm logs               # View app service logs (api, discord, twitch, runnerwatcher, racebot, ws-relay)
 pnpm logs:all           # View all Docker service logs (including mongo/mongo-express)
 pnpm boom               # Full rebuild and restart (stop, build, start, logs)
@@ -114,9 +116,12 @@ graph TD
 ## Database & Infrastructure
 
 - **MongoDB 7**: Main database, accessed via Mongoose ODM
-- **Docker Compose**: Orchestrates all services with dev/prod configurations
-  - Main stack: `docker-compose.yml` for application services
-  - Monitoring stack: `docker-compose.monitoring.yml` for Uptime Kuma (local development only)
+- **Docker Compose**: Orchestrates all services with separated concerns
+  - `docker-compose.yml`: Runtime configuration (services, networks, volumes, health checks)
+  - `docker-compose.build.yml`: Local development build configuration (simple tags like helpa-api:dev)
+  - `docker-compose.build.prod.yml`: CI/production build configuration (registry tags like ghcr.io/...)
+  - `docker-compose.override.yml`: Development overrides (auto-loaded, contains volume mounts)
+  - `docker-compose.monitoring.yml`: Uptime Kuma monitoring stack (local development only)
 - **Nginx**: Reverse proxy for API/services (production), proxies to local web dev server (development)
 - **Uptime Kuma**: Service monitoring dashboard (local only, port 3333) - monitors production services externally
 - **Environment**: Services use `.env` files (not committed), see `.env.sample` files

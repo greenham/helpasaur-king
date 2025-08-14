@@ -1,6 +1,7 @@
 # Generic service Dockerfile template for a TypeScript project
 # Usage: docker build --build-arg SERVICE=<service-name> -f Dockerfile.service .
-FROM helpa-base:latest as base
+ARG VERSION=dev
+FROM helpa-base:${VERSION} as base
 
 # Copy source and install all dependencies
 FROM base as app
