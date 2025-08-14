@@ -94,11 +94,9 @@ export class HelpaApi {
         throw new Error(`🔴 Unable to authorize service with API!`)
       }
 
-      // console.log(`Fetching ${this.serviceName} config from API...`);
       const response = await this.api.get<{ config: ServiceConfig }>(
         `${this.apiHost}/api/configs/${this.serviceName}`
       )
-      // console.log(`✅ Config Retrieved!`);
       return response.data.config
     } catch (err: any) {
       throw new Error(`🔴 Error fetching service config: ${err.message}`)
