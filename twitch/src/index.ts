@@ -12,69 +12,61 @@ const helpaApiClient = new HelpaApi({
   serviceName: "twitch",
 })
 
-helpaApiClient
-  .getServiceConfig()
-  .then((config: ServiceConfig) => {
+export const DEFAULT_COMMAND_PREFIX = "!"
+
+async function init() {
+  try {
+    // Get service config
+    const config = await helpaApiClient.getServiceConfig()
     if (!config) {
       throw new Error(`Unable to get service config from API!`)
     }
 
     // Cast the generic config to TwitchBotConfig
     const twitchConfig = config as TwitchBotConfig
-    const bot = new TwitchBot(twitchConfig, helpaApiClient)
 
     // Get the initial list of active channels the bot should join
-    helpaApiClient
+    const response = await helpaApiClient
       .getAxiosInstance()
       .get("/api/configs/twitch/activeChannels")
-      .then((response: any) => {
-        const channels = response.data
-        bot.start(channels)
 
-        // Start health check server after bot starts
-        const healthApp = express()
-        const healthPort = process.env.TWITCH_HEALTH_PORT || 3011
+    const channels = response.data
+    const bot = new TwitchBot(twitchConfig, helpaApiClient, channels)
+    bot.start()
 
-        healthApp.get(
-          "/health",
-          (_req: express.Request, res: express.Response) => {
-            try {
-              const connectionState = bot.bot?.readyState() || "CLOSED"
-              const uptimeMs = (bot.bot as any)?._connectTimestamp
-                ? Date.now() - (bot.bot as any)._connectTimestamp
-                : 0
-              res.status(200).json({
-                status: "healthy",
-                service: "twitch",
-                version: packageJson.version,
-                connected: connectionState === "OPEN",
-                connectionState: connectionState,
-                channelCount: bot.channelList ? bot.channelList.length : 0, // just the count, not names
-                uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
-                uptimeMs: uptimeMs, // keep raw ms for monitoring tools
-                commandPrefix: (bot.config as any)?.cmdPrefix || "!",
-                username: bot.config?.username || "unknown", // bot's public username is ok
-                environment: process.env.NODE_ENV || "development",
-              })
-            } catch (error: any) {
-              console.error("Health check error:", error)
-              res.status(503).json({
-                status: "unhealthy",
-                service: "twitch",
-                error: error.message,
-              })
-            }
-          }
-        )
+    // Start health check server after bot starts
+    const healthApp = express()
+    const healthPort = process.env.TWITCH_HEALTH_PORT || 3011
 
-        healthApp.listen(healthPort, () => {
-          console.log(`Health check endpoint available on port ${healthPort}`)
+    healthApp.get("/health", (_req: express.Request, res: express.Response) => {
+      try {
+        res.status(200).json({
+          status: "healthy",
+          service: "twitch",
+          version: packageJson.version,
+          channelCount: bot.channelList ? bot.channelList.length : 0,
+          commandPrefix: bot.config?.cmdPrefix || DEFAULT_COMMAND_PREFIX,
+          username: bot.config.username || "unknown",
+          environment: process.env.NODE_ENV || "development",
         })
-      })
-      .catch((error: unknown) => {
-        console.error("Error fetching active channels:", error)
-      })
-  })
-  .catch((error: unknown) => {
-    console.error("Error fetching service config:", error)
-  })
+      } catch (error: any) {
+        console.error("Health check error:", error)
+        res.status(503).json({
+          status: "unhealthy",
+          service: "twitch",
+          error: error.message,
+        })
+      }
+    })
+
+    healthApp.listen(healthPort, () => {
+      console.log(`Health check endpoint available on port ${healthPort}`)
+    })
+  } catch (error: any) {
+    console.error("🛑 Error starting Twitch bot:", error.message)
+    process.exit(1)
+  }
+}
+
+// Start the bot
+init()

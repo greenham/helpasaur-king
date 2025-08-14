@@ -33,6 +33,8 @@ export interface TwitchBotConfig {
   channels: string[]
   clientId?: string
   clientSecret?: string
+  cmdPrefix?: string
+  blacklistedUsers?: string[]
 }
 
 // Runner Watcher types

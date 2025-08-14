@@ -11,32 +11,45 @@ import {
 
 const packageJson = require("../package.json")
 const { WEBSOCKET_RELAY_SERVER } = process.env
+const DEFAULT_COMMAND_PREFIX = "!"
 
 export class TwitchBot {
   config: TwitchBotConfig
   helpaApi: HelpaApi
-  cooldowns: Map<string, Map<string, number>>
+  cooldowns: Map<string, number>
   cachedCommands: Map<string, ICommand | null>
-  bot: tmi.Client | null
-  wsRelay: Socket | null
+  bot: tmi.Client
+  wsRelay: Socket
   messages: { onJoin: string; onLeave: string }
   lastRandomRoomMap: Map<string, number>
-  channelList: string[]
-  activeChannels: any[]
-  channelMap: Map<string, any>
-  constructor(config: TwitchBotConfig, helpaApi: HelpaApi) {
+  channelList: string[] = []
+  activeChannels: any[] = []
+  channelMap: Map<string, any> = new Map()
+  constructor(config: TwitchBotConfig, helpaApi: HelpaApi, channels: string[]) {
     this.config = config
     this.helpaApi = helpaApi
     this.cooldowns = new Map()
     this.cachedCommands = new Map()
-    this.bot = null
-    this.wsRelay = null
+    this.lastRandomRoomMap = new Map()
+
     // @TODO: Replace HelpasaurKing with this.config.botDisplayName
+    // @TODO: Replace prod URL with env appropriate URL
     this.messages = {
       onJoin: `👋 Hello, I'm HelpasaurKing and I'm very high in potassium... like a banana! 🍌 Commands: https://helpasaur.com/commands | Manage: https://helpasaur.com/twitch`,
-      onLeave: `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix}join)`,
+      onLeave: `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix || DEFAULT_COMMAND_PREFIX}join)`,
     }
-    this.lastRandomRoomMap = new Map()
+
+    this.bot = new tmi.Client({
+      options: { debug: false },
+      identity: {
+        username: this.config.username,
+        password: this.config.oauth,
+      },
+      channels: [...channels],
+    } as any)
+    this.setActiveChannels(channels)
+
+    this.wsRelay = this.connectToRelay()
   }
 
   // {
@@ -51,23 +64,19 @@ export class TwitchBot {
   //    createdAt: ISODate('2024-01-21T22:47:24.975Z'),
   //    lastUpdated: ISODate('2024-01-21T22:47:24.975Z')
   // }
-  start(channels) {
-    this.setActiveChannels(channels)
-    this.bot = new tmi.Client({
-      options: { debug: false },
-      identity: {
-        username: this.config.username,
-        password: this.config.oauth,
-      },
-      channels: [...this.channelList],
-      skipMembership: true,
-    })
-
+  start() {
     this.bot.connect().catch(console.error)
 
     this.bot.on("message", this.handleMessage.bind(this))
 
-    this.wsRelay = io(WEBSOCKET_RELAY_SERVER, {
+    // Update active channels list every minute so we pick up config changes quickly
+    setInterval(() => {
+      this.refreshActiveChannels()
+    }, 60000)
+  }
+
+  connectToRelay(): Socket {
+    const relay = io(WEBSOCKET_RELAY_SERVER, {
       query: { clientId: `${packageJson.name} v${packageJson.version}` },
     })
 
@@ -75,23 +84,20 @@ export class TwitchBot {
       `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
     )
 
-    this.wsRelay.on("connect_error", (err) => {
+    relay.on("connect_error", (err) => {
       console.log(`Connection error!`)
       console.log(err)
     })
 
-    this.wsRelay.on("connect", () => {
-      console.log(`✅ Connected! Socket ID: ${this.wsRelay.id}`)
+    relay.on("connect", () => {
+      console.log(`✅ Connected! Socket ID: ${relay?.id}`)
     })
 
-    this.wsRelay.on("joinChannel", this.handleJoinChannel.bind(this))
-    this.wsRelay.on("leaveChannel", this.handleLeaveChannel.bind(this))
-    this.wsRelay.on("configUpdate", this.handleConfigUpdate.bind(this))
+    relay.on("joinChannel", this.handleJoinChannel.bind(this))
+    relay.on("leaveChannel", this.handleLeaveChannel.bind(this))
+    relay.on("configUpdate", this.handleConfigUpdate.bind(this))
 
-    // Update active channels list every minute so we pick up config changes quickly
-    setInterval(() => {
-      this.refreshActiveChannels()
-    }, 60000)
+    return relay
   }
 
   async handleMessage(channel, tags, message, self) {
@@ -100,7 +106,8 @@ export class TwitchBot {
     // Handle commands in the bot's channel (using the global default command prefix)
     // - join, leave
     if (channel === `#${this.config.username}`) {
-      if (!message.startsWith(this.config.cmdPrefix)) return
+      if (!message.startsWith(this.config.cmdPrefix || DEFAULT_COMMAND_PREFIX))
+        return
       const args = message.slice(1).split(" ")
       const commandNoPrefix = args.shift().toLowerCase()
       switch (commandNoPrefix) {
@@ -135,9 +142,11 @@ export class TwitchBot {
           this.channelList.push(channelToJoin)
 
           try {
-            const result = await this.helpaApi.api.post(`/api/twitch/join`, {
-              channel: channelToJoin,
-            })
+            const result = await this.helpaApi
+              .getAxiosInstance()
+              .post(`/api/twitch/join`, {
+                channel: channelToJoin,
+              })
 
             if (result.data.result === "success") {
               // update the local map with the new channel config
@@ -150,7 +159,7 @@ export class TwitchBot {
             console.log(
               `Result of /api/twitch/join: ${JSON.stringify(result.data)}`
             )
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Error calling /api/twitch/join: ${err.message}`)
           }
           break
@@ -178,7 +187,7 @@ export class TwitchBot {
           this.bot
             .say(
               channel,
-              `@${tags["display-name"]} >> Leaving ${channelToLeave}... use ${this.config.cmdPrefix}join in this channel to re-join at any time!`
+              `@${tags["display-name"]} >> Leaving ${channelToLeave}... use ${this.config.cmdPrefix || DEFAULT_COMMAND_PREFIX}join in this channel to re-join at any time!`
             )
             .catch(console.error)
 
@@ -190,14 +199,16 @@ export class TwitchBot {
           this.channelMap.delete(tags["room-id"])
 
           try {
-            const result = await this.helpaApi.api.post(`/api/twitch/leave`, {
-              channel: channelToLeave,
-            })
+            const result = await this.helpaApi
+              .getAxiosInstance()
+              .post(`/api/twitch/leave`, {
+                channel: channelToLeave,
+              })
 
             console.log(
               `Result of /api/twitch/leave: ${JSON.stringify(result.data)}`
             )
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Error calling /api/twitch/leave: ${err.message}`)
           }
           break
@@ -212,7 +223,7 @@ export class TwitchBot {
 
     if (!message.startsWith(channelConfig.commandPrefix)) return
 
-    if (this.config.blacklistedUsers.includes(tags.username)) {
+    if (this.config.blacklistedUsers?.includes(tags.username)) {
       console.log(
         `Received command from blacklisted user ${tags.username} (${tags["user-id"]}) in ${channel}`
       )
@@ -294,12 +305,11 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.api.post(
-              `/api/prac/${targetUser}/lists/${listName}/entries`,
-              {
+            const response = await this.helpaApi
+              .getAxiosInstance()
+              .post(`/api/prac/${targetUser}/lists/${listName}/entries`, {
                 entry: entryName,
-              }
-            )
+              })
             console.log(response.data.message)
             this.bot.say(channel, response.data.message).catch(console.error)
             return
@@ -319,9 +329,9 @@ export class TwitchBot {
 
           try {
             // get their list
-            const response = await this.helpaApi.api(
-              `/api/prac/${targetUser}/lists/${listName}`
-            )
+            const response = await this.helpaApi
+              .getAxiosInstance()
+              .get(`/api/prac/${targetUser}/lists/${listName}`)
             const entries = response.data.entries
 
             // choose a random entry
@@ -371,9 +381,11 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry ID: ${entryId}`
           )
           try {
-            const response = await this.helpaApi.api.delete(
-              `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
-            )
+            const response = await this.helpaApi
+              .getAxiosInstance()
+              .delete(
+                `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
+              )
             console.log(response.data.message)
             this.bot.say(channel, response.data.message).catch(console.error)
             return
@@ -391,9 +403,9 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
           )
           try {
-            const response = await this.helpaApi.api(
-              `/api/prac/${targetUser}/lists/${listName}`
-            )
+            const response = await this.helpaApi
+              .getAxiosInstance()
+              .get(`/api/prac/${targetUser}/lists/${listName}`)
             this.bot
               .say(
                 channel,
@@ -431,9 +443,9 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.api.delete(
-              `/api/prac/${targetUser}/lists/${listName}`
-            )
+            const response = await this.helpaApi
+              .getAxiosInstance()
+              .delete(`/api/prac/${targetUser}/lists/${listName}`)
             this.bot.say(channel, response.data.message).catch(console.error)
             return
           } catch (err) {
@@ -459,20 +471,23 @@ export class TwitchBot {
       return
     }
 
-    let command = false
-    let cachedCommand = this.cachedCommands.get(commandNoPrefix)
+    let command: (ICommand & { staleAfter?: number }) | null | undefined =
+      this.cachedCommands.get(commandNoPrefix)
+    let refreshCache = true
 
-    if (cachedCommand && Date.now() > cachedCommand.staleAfter) {
-      cachedCommand = false
+    if (command && Date.now() > command.staleAfter) {
+      refreshCache = false
     }
 
     console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`)
 
-    if (!cachedCommand) {
+    if (refreshCache) {
       try {
-        const response = await this.helpaApi.api.post(`/api/commands/find`, {
-          command: commandNoPrefix,
-        })
+        const response = await this.helpaApi
+          .getAxiosInstance()
+          .post(`/api/commands/find`, {
+            command: commandNoPrefix,
+          })
 
         if (response.status === 200) {
           command = response.data
@@ -486,8 +501,6 @@ export class TwitchBot {
         console.error(`Error while fetching command: ${err}`)
         return
       }
-    } else {
-      command = cachedCommand
     }
 
     if (!command) return
@@ -499,15 +512,11 @@ export class TwitchBot {
       let now = Date.now()
       if (now - timeUsed <= channelConfig.textCommandCooldown * 1000) {
         onCooldown =
-          (channelConfig.textCommandCooldown * 1000 - (now - timeUsed)) / 1000
+          channelConfig.textCommandCooldown * 1000 - (now - timeUsed) > 0
       }
     }
 
     if (onCooldown !== false) {
-      return
-    }
-
-    if (command === false) {
       return
     }
 
@@ -525,7 +534,7 @@ export class TwitchBot {
     }
 
     try {
-      await this.helpaApi.api.post(`/api/commands/logs`, {
+      await this.helpaApi.getAxiosInstance().post(`/api/commands/logs`, {
         command: command.command,
         alias: aliasUsed,
         source: "twitch",
@@ -625,10 +634,12 @@ export class TwitchBot {
       console.log(`[${channel}] Enabling ${toggleConfig.featureName}...`)
 
       try {
-        const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
-          channel: tags.username,
-          [toggleConfig.configField]: true,
-        })
+        const result = await this.helpaApi
+          .getAxiosInstance()
+          .patch(`/api/twitch/config`, {
+            channel: tags.username,
+            [toggleConfig.configField]: true,
+          })
 
         if (result.data.result === "success") {
           // Update local config
@@ -667,10 +678,12 @@ export class TwitchBot {
       console.log(`[${channel}] Disabling ${toggleConfig.featureName}...`)
 
       try {
-        const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
-          channel: tags.username,
-          [toggleConfig.configField]: false,
-        })
+        const result = await this.helpaApi
+          .getAxiosInstance()
+          .patch(`/api/twitch/config`, {
+            channel: tags.username,
+            [toggleConfig.configField]: false,
+          })
 
         if (result.data.result === "success") {
           // Update local config
@@ -747,7 +760,8 @@ export class TwitchBot {
 
   refreshActiveChannels() {
     this.helpaApi
-      .api("/api/configs/twitch/activeChannels")
+      .getAxiosInstance()
+      .get("/api/configs/twitch/activeChannels")
       .then((response) => {
         if (!response) {
           throw new Error(`Unable to refresh active channel list from API!`)
@@ -772,5 +786,3 @@ export class TwitchBot {
     })
   }
 }
-
-// Export is at class level now
