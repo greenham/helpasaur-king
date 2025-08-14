@@ -7,25 +7,25 @@ services:
     volumes:
       - ./api:/app/api
       - ./lib/types:/app/lib/types
-      - ./lib/helpa-api-client:/app/lib/helpa-api-client
+      - ./lib/api-client:/app/lib/api-client
 
   discord-bot:
     volumes:
       - ./discord:/app/discord
       - ./lib/types:/app/lib/types
-      - ./lib/helpa-api-client:/app/lib/helpa-api-client
+      - ./lib/api-client:/app/lib/api-client
 
   twitch-bot:
     volumes:
       - ./twitch:/app/twitch
       - ./lib/types:/app/lib/types
-      - ./lib/helpa-api-client:/app/lib/helpa-api-client
+      - ./lib/api-client:/app/lib/api-client
 
   runnerwatcher:
     volumes:
       - ./runnerwatcher:/app/runnerwatcher
       - ./lib/types:/app/lib/types
-      - ./lib/helpa-api-client:/app/lib/helpa-api-client
+      - ./lib/api-client:/app/lib/api-client
 
   racebot:
     volumes:

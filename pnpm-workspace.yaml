@@ -8,7 +8,7 @@ packages:
   - "racebot"
   - "ws-relay"
   # Shared libraries
-  - "lib/helpa-api-client"
+  - "lib/api-client"
   - "lib/types"
   # Monitoring utilities
   - "monitoring"

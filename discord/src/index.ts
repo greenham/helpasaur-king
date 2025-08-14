@@ -1,4 +1,4 @@
-import { HelpaApi } from "helpa-api-client"
+import { HelpaApi } from "@helpasaur/api-client"
 import { DiscordBot } from "./bot"
 import express from "express"
 import ms from "ms"

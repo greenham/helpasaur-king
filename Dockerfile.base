@@ -26,8 +26,8 @@ COPY lib ./lib
 WORKDIR /app/lib/types
 RUN pnpm install && pnpm build
 
-# Build @helpasaur/helpa-api-client
-WORKDIR /app/lib/helpa-api-client
+# Build @helpasaur/api-client
+WORKDIR /app/lib/api-client
 RUN pnpm install && pnpm build
 
 # Return to app directory

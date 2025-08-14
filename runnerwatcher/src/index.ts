@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client"
-import { HelpaApi } from "helpa-api-client"
+import { HelpaApi } from "@helpasaur/api-client"
 import { RunnerWatcher } from "./lib/runner-watcher"
 import { RunnerWatcherConfig, StreamAlertPayload } from "@helpasaur/types"
 

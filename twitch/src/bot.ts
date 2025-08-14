@@ -7,7 +7,7 @@ import {
   TwitchBotConfig,
   RelayData,
   ChannelPayload,
-} from "helpa-api-client"
+} from "@helpasaur/api-client"
 
 const packageJson = require("../package.json")
 const { WEBSOCKET_RELAY_SERVER } = process.env
@@ -21,7 +21,7 @@ export class TwitchBot {
   bot: tmi.Client
   wsRelay: Socket
   messages: { onJoin: string; onLeave: string }
-  lastRandomRoomMap: Map<string, number>
+  lastRandomRoomMap: Map<string, string>
   channelList: string[] = []
   activeChannels: any[] = []
   channelMap: Map<string, any> = new Map()
@@ -475,7 +475,7 @@ export class TwitchBot {
       this.cachedCommands.get(commandNoPrefix)
     let refreshCache = true
 
-    if (command && Date.now() > command.staleAfter) {
+    if (command && command.staleAfter && Date.now() > command.staleAfter) {
       refreshCache = false
     }
 
@@ -717,7 +717,13 @@ export class TwitchBot {
       .catch(console.error)
   }
 
-  handleApiError(err, errorMessageBase, channel, tags, statusErrors = null) {
+  handleApiError(
+    err: any,
+    errorMessageBase: string,
+    channel: string,
+    tags: any,
+    statusErrors: { [key: number]: string } | null = null
+  ) {
     console.error(errorMessageBase)
     if (err.response) {
       console.error(

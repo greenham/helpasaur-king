@@ -5,7 +5,7 @@ import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
 } from "discord.js"
-import { HelpaApi } from "helpa-api-client"
+import { HelpaApi } from "@helpasaur/api-client"
 
 export interface DiscordEvent {
   name: string

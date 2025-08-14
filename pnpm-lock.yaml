@@ -90,6 +90,9 @@ importers:
 
   discord:
     dependencies:
+      '@helpasaur/api-client':
+        specifier: file:../lib/api-client
+        version: file:lib/api-client
       '@helpasaur/types':
         specifier: file:../lib/types
         version: file:lib/types
@@ -99,9 +102,6 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.21.2
-      helpa-api-client:
-        specifier: file:../lib/helpa-api-client
-        version: file:lib/helpa-api-client
       ms:
         specifier: ^2.1.3
         version: 2.1.3
@@ -137,7 +137,7 @@ importers:
         specifier: ^5.3.3
         version: 5.9.2
 
-  lib/helpa-api-client:
+  lib/api-client:
     dependencies:
       '@helpasaur/types':
         specifier: file:../types
@@ -226,15 +226,15 @@ importers:
 
   runnerwatcher:
     dependencies:
+      '@helpasaur/api-client':
+        specifier: file:../lib/api-client
+        version: file:lib/api-client
       '@helpasaur/types':
         specifier: file:../lib/types
         version: file:lib/types
       express:
         specifier: ^4.19.2
         version: 4.21.2
-      helpa-api-client:
-        specifier: file:../lib/helpa-api-client
-        version: file:lib/helpa-api-client
       ms:
         specifier: ^2.1.3
         version: 2.1.3
@@ -266,15 +266,15 @@ importers:
 
   twitch:
     dependencies:
+      '@helpasaur/api-client':
+        specifier: file:../lib/api-client
+        version: file:lib/api-client
       '@helpasaur/types':
         specifier: file:../lib/types
         version: file:lib/types
       express:
         specifier: ^4.19.2
         version: 4.21.2
-      helpa-api-client:
-        specifier: file:../lib/helpa-api-client
-        version: file:lib/helpa-api-client
       ms:
         specifier: ^2.1.3
         version: 2.1.3
@@ -4430,9 +4430,9 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  file:lib/helpa-api-client:
-    resolution: {directory: lib/helpa-api-client, type: directory}
-    name: helpa-api-client
+  file:lib/api-client:
+    resolution: {directory: lib/api-client, type: directory}
+    name: '@helpasaur/api-client'
     dependencies:
       '@helpasaur/types': file:lib/types
       axios: 1.11.0

@@ -17,10 +17,8 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@helpasaur/types": ["./lib/types/dist"],
-      "@helpasaur/types/*": ["./lib/types/dist/*"],
-      "helpa-api-client": ["./lib/helpa-api-client/dist"],
-      "helpa-api-client/*": ["./lib/helpa-api-client/dist/*"]
+      "@helpasaur/types": ["lib/types/src/index.ts"],
+      "@helpasaur/api-client": ["lib/api-client/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
