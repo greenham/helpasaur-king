@@ -1,17 +1,10 @@
 import { io, Socket } from "socket.io-client"
 import * as tmi from "tmi.js"
 import * as crypto from "crypto"
-import {
-  HelpaApi,
-  ICommand,
-  TwitchBotConfig,
-  RelayData,
-  ChannelPayload,
-} from "@helpasaur/api-client"
-
-const packageJson = require("../package.json")
+import { HelpaApi, ICommand, TwitchBotConfig } from "@helpasaur/api-client"
+import { version as packageVersion, name as packageName } from "../package.json"
+import { DEFAULT_COMMAND_PREFIX } from "."
 const { WEBSOCKET_RELAY_SERVER } = process.env
-const DEFAULT_COMMAND_PREFIX = "!"
 
 export class TwitchBot {
   config: TwitchBotConfig
@@ -77,7 +70,7 @@ export class TwitchBot {
 
   connectToRelay(): Socket {
     const relay = io(WEBSOCKET_RELAY_SERVER, {
-      query: { clientId: `${packageJson.name} v${packageJson.version}` },
+      query: { clientId: `${packageName} v${packageVersion}` },
     })
 
     console.log(

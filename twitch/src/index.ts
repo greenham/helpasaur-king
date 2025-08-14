@@ -1,10 +1,8 @@
-import { HelpaApi } from "@helpasaur/api-client"
-import { TwitchBot } from "./bot"
 import express from "express"
-import ms from "ms"
-import { ServiceConfig, TwitchBotConfig } from "@helpasaur/types"
-
-const packageJson = require("../package.json")
+import { HelpaApi } from "@helpasaur/api-client"
+import { TwitchBotConfig } from "@helpasaur/types"
+import { TwitchBot } from "./bot"
+import { version as packageVersion } from "../package.json"
 
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST!,
@@ -29,12 +27,13 @@ async function init() {
     const response = await helpaApiClient
       .getAxiosInstance()
       .get("/api/configs/twitch/activeChannels")
-
     const channels = response.data
+
+    // Start the bot
     const bot = new TwitchBot(twitchConfig, helpaApiClient, channels)
     bot.start()
 
-    // Start health check server after bot starts
+    // Start health check server
     const healthApp = express()
     const healthPort = process.env.TWITCH_HEALTH_PORT || 3011
 
@@ -43,7 +42,7 @@ async function init() {
         res.status(200).json({
           status: "healthy",
           service: "twitch",
-          version: packageJson.version,
+          version: packageVersion,
           channelCount: bot.channelList ? bot.channelList.length : 0,
           commandPrefix: bot.config?.cmdPrefix || DEFAULT_COMMAND_PREFIX,
           username: bot.config.username || "unknown",
