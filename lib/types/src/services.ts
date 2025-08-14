@@ -42,6 +42,7 @@ export interface RunnerWatcherConfig {
   webhookSecret: string
   callbackUrl: string
   gamesToWatch?: string[]
+  streamers?: string[]
 }
 
 // Race Bot types

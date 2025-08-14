@@ -1,8 +1,26 @@
 import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
-import TwitchApi, { StreamData } from "node-twitch"
+import TwitchApi from "node-twitch"
 import { Constants } from "../constants"
 import { RunnerWatcherConfig, StreamAlertPayload } from "@helpasaur/types"
+
+// Type definition for node-twitch StreamData
+interface StreamData {
+  id: string
+  user_id: string
+  user_login: string
+  user_name: string
+  game_id: string
+  game_name: string
+  type: string
+  title: string
+  viewer_count: number
+  started_at: string
+  language: string
+  thumbnail_url: string
+  tag_ids: string[]
+  is_mature: boolean
+}
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
 const { STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT, STREAM_ONLINE_TYPE_LIVE } =
@@ -147,7 +165,7 @@ export class RunnerWatcher extends EventEmitter {
   async fetchStreamData(userId: string): Promise<StreamData | null> {
     console.log(`Fetching stream data for user ${userId}...`)
     const api = await this.getTwitchApi()
-    const response = await api.getStreams({ user_id: userId })
+    const response = await api.getStreams({ user_id: userId } as any)
     const streamData = response.data[0]
     if (!streamData) {
       return null
@@ -175,9 +193,7 @@ export class RunnerWatcher extends EventEmitter {
       this.twitchApi = new TwitchApi({
         client_id: this.config.twitchClientId,
         client_secret: this.config.twitchClientSecret,
-        isApp: true,
       })
-      await this.twitchApi.generateAppAccessToken()
     }
     return this.twitchApi
   }

@@ -1,13 +1,5 @@
 // Type declarations for node-twitch
 declare module "node-twitch" {
-  export interface TwitchOptions {
-    client_id: string
-    client_secret: string
-    access_token?: string
-    refresh_token?: string
-    isApp?: boolean
-  }
-
   export interface StreamData {
     id: string
     user_id: string
@@ -50,7 +42,12 @@ declare module "node-twitch" {
   }
 
   export default class TwitchApi {
-    constructor(options: TwitchOptions)
+    constructor(options: {
+      client_id: string
+      client_secret: string
+      access_token?: string
+      refresh_token?: string
+    })
 
     getStreams(options?: any): Promise<{ data: StreamData[] }>
     getUsers(options?: any): Promise<{ data: UserData[] }>
@@ -58,9 +55,5 @@ declare module "node-twitch" {
     addEventSubSubscription(options: any): Promise<any>
     removeEventSubSubscription(id: string): Promise<any>
     getAccessToken(): Promise<string>
-    generateAppAccessToken(): Promise<{
-      access_token: string
-      expires_in: number
-    }>
   }
 }

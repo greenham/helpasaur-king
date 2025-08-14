@@ -89,7 +89,8 @@ export class TwitchEventListener extends EventEmitter {
     )
     if (messageSignature !== computedSignature) {
       console.log(`Invalid signature on Twitch EventSub notification!`)
-      return res.status(403).send("Forbidden")
+      res.status(403).send("Forbidden")
+      return
     }
 
     // Handle message type
