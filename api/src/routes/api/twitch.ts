@@ -70,7 +70,7 @@ router.post("/join", async (req: Request, res: Response) => {
           client_secret: streamAlertsConfig.clientSecret,
         })
 
-        let twitchUserData = null
+        let twitchUserData: any = null
         try {
           const response = await twitchApiClient.getUsers(requestedChannel)
           if (!response || !response.data || !response.data[0]) {

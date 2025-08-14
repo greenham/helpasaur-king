@@ -9,8 +9,8 @@ WORKDIR /app
 # Install common system dependencies for debugging and health checks
 RUN apk add --no-cache curl wget
 
-# Copy package management configuration
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy package management configuration and root TypeScript config
+COPY pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
 COPY api/package.json ./api/
 COPY discord/package.json ./discord/
 COPY twitch/package.json ./twitch/

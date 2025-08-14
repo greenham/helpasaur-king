@@ -14,3 +14,4 @@ backups/*
 
 # TypeScript build outputs
 **/dist/
+**/build/

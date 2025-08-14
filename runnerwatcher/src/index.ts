@@ -5,7 +5,7 @@ import { RunnerWatcherConfig, StreamAlertPayload } from "@helpasaur/types"
 
 const packageJson = require("../package.json")
 
-const { SERVICE_NAME, WEBSOCKET_RELAY_SERVER } = process.env
+const { WEBSOCKET_RELAY_SERVER } = process.env
 
 const helpaApi = new HelpaApi({
   apiHost: process.env.API_HOST!,

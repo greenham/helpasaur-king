@@ -2,13 +2,14 @@ import { HelpaApi } from "helpa-api-client"
 import { DiscordBot } from "./bot"
 import express from "express"
 import ms from "ms"
+import { ServiceName } from "@helpasaur/types"
 
 const packageJson = require("../package.json")
 
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST!,
   apiKey: process.env.API_KEY!,
-  serviceName: process.env.SERVICE_NAME!,
+  serviceName: process.env.SERVICE_NAME as ServiceName,
 })
 
 helpaApiClient
