@@ -1,21 +1,22 @@
-const EventEmitter = require("events")
-const TwitchEventListener = require("./twitch-event-listener")
-const TwitchApi = require("node-twitch").default
+import { EventEmitter } from "events"
+import { TwitchEventListener } from "./twitch-event-listener"
+import TwitchApi from "node-twitch"
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
-const {
-  STREAM_ONLINE_EVENT,
-  CHANNEL_UPDATE_EVENT,
-  STREAM_ONLINE_TYPE_LIVE,
-} = require("../constants")
+import { Constants } from "../constants"
+const { STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT, STREAM_ONLINE_TYPE_LIVE } =
+  Constants
 const DELAY_FOR_API_SECONDS = 10
 const ALERT_DELAY_SECONDS = 15 * 60
 
 // Maintain a cache of streams we've recently alerted
-let cachedStreams = []
+let cachedStreams: any[] = []
 
 class RunnerWatcher extends EventEmitter {
-  constructor(config) {
+  config: any
+  listener: TwitchEventListener
+
+  constructor(config: any) {
     super()
 
     this.config = config
@@ -31,10 +32,10 @@ class RunnerWatcher extends EventEmitter {
     this.init()
   }
 
-  init() {
-    this.listener.listen(TWITCH_WEBHOOK_LISTENER_PORT)
+  init(): void {
+    this.listener.listen(parseInt(TWITCH_WEBHOOK_LISTENER_PORT || "3010", 10))
 
-    this.listener.on("notification", async (notification) => {
+    this.listener.on("notification", async (notification: any) => {
       console.log("\r\n-------------------------------------\r\n")
       console.log(
         `Received ${notification.subscription.type} event for ${notification.event.broadcaster_user_login}`
@@ -49,7 +50,7 @@ class RunnerWatcher extends EventEmitter {
     })
   }
 
-  async processEvent(notification) {
+  async processEvent(notification: any): Promise<void> {
     const { subscription, event } = notification
     let eventType = subscription.type
     const user = {
@@ -75,7 +76,7 @@ class RunnerWatcher extends EventEmitter {
         return
       }
 
-      let stream = streamResult.data[0]
+      let stream: any = streamResult.data[0]
 
       // Replace some stream data from API if this is an update event
       if (eventType === CHANNEL_UPDATE_EVENT) {
@@ -188,4 +189,4 @@ class RunnerWatcher extends EventEmitter {
   }
 }
 
-module.exports = RunnerWatcher
+export { RunnerWatcher }
