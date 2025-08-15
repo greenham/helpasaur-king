@@ -143,7 +143,6 @@ const configCommand: DiscordCommand = {
     if (!currentGuildConfig) {
       await interaction.editReply({
         content: "Unable to find a configuration for this guild!",
-        ephemeral: true,
       })
       return
     }
@@ -224,7 +223,6 @@ const configCommand: DiscordCommand = {
     if (!commandConfig) {
       await interaction.editReply({
         content: "That's not a valid subcommand!",
-        ephemeral: true,
       })
       return
     }
@@ -240,7 +238,6 @@ const configCommand: DiscordCommand = {
     if (currentGuildConfig[guildConfigKey] === newValue) {
       await interaction.editReply({
         content: "That's already the value!",
-        ephemeral: true,
       })
       return
     }
@@ -253,7 +250,6 @@ const configCommand: DiscordCommand = {
       .patch(`/api/discord/guild/${interaction.guildId}`, guildUpdate)
     await interaction.editReply({
       content: `Updated ${inlineCode(subcommand)} to ${inlineCode(String(newValue))}!`,
-      ephemeral: true,
     })
   },
 }

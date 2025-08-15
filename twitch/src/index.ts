@@ -1,5 +1,5 @@
 import express from "express"
-import { HelpaApi } from "@helpasaur/api-client"
+import { HelpaApi, ServiceName } from "@helpasaur/api-client"
 import { TwitchBotConfig } from "./types"
 import { TwitchBot } from "./bot"
 import { version as packageVersion } from "../package.json"
@@ -7,7 +7,7 @@ import { version as packageVersion } from "../package.json"
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST!,
   apiKey: process.env.API_KEY!,
-  serviceName: "twitch",
+  serviceName: process.env.SERVICE_NAME as ServiceName,
 })
 
 export const DEFAULT_COMMAND_PREFIX = "!"
@@ -16,12 +16,12 @@ async function init() {
   try {
     // Get service config
     const config = await helpaApiClient.getServiceConfig()
-    if (!config) {
+    if (!config || !config.config) {
       throw new Error(`Unable to get service config from API!`)
     }
 
     // Cast the generic config to TwitchBotConfig
-    const twitchConfig = config as TwitchBotConfig
+    const twitchConfig = config.config as TwitchBotConfig
 
     // Get the initial list of active channels the bot should join
     const response = await helpaApiClient

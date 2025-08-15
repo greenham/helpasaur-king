@@ -9,7 +9,7 @@ const { WEBSOCKET_RELAY_SERVER } = process.env
 const helpaApi = new HelpaApi({
   apiHost: process.env.API_HOST!,
   apiKey: process.env.API_KEY!,
-  serviceName: process.env.SERVICE_NAME! as ServiceName,
+  serviceName: process.env.SERVICE_NAME as ServiceName,
 })
 
 async function init(): Promise<void> {

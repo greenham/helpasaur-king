@@ -1,9 +1,9 @@
-import { HelpaApi, ServiceName } from "@helpasaur/api-client"
-import { DiscordBot } from "./bot"
 import express from "express"
 import ms from "ms"
-
-const packageJson = require("../package.json")
+import { HelpaApi, ServiceName } from "@helpasaur/api-client"
+import { DiscordBot } from "./bot"
+import { DiscordConfig } from "./types/config"
+import { version as packageVersion } from "../package.json"
 
 const helpaApiClient = new HelpaApi({
   apiHost: process.env.API_HOST!,
@@ -11,14 +11,19 @@ const helpaApiClient = new HelpaApi({
   serviceName: process.env.SERVICE_NAME as ServiceName,
 })
 
-helpaApiClient
-  .getServiceConfig()
-  .then((config: any) => {
-    if (!config) {
+async function init() {
+  try {
+    // Get service config
+    const config = await helpaApiClient.getServiceConfig()
+    if (!config || !config.config) {
       throw new Error(`Unable to get service config from API!`)
     }
 
-    const bot = new DiscordBot(config, helpaApiClient)
+    // Cast the generic config to DiscordConfig
+    const discordConfig = config.config as DiscordConfig
+
+    // Create and start the bot
+    const bot = new DiscordBot(discordConfig, helpaApiClient)
 
     // Listen for ready event to track bot status
     bot.discordClient.once("ready", () => {
@@ -33,7 +38,7 @@ helpaApiClient
             res.status(200).json({
               status: "healthy",
               service: "discord",
-              version: packageJson.version,
+              version: packageVersion,
               connected: bot.discordClient.ws.status === 0,
               uptime: bot.discordClient.uptime
                 ? ms(bot.discordClient.uptime, { long: true })
@@ -50,8 +55,10 @@ helpaApiClient
               environment: process.env.NODE_ENV || "development",
             })
           } catch (error: any) {
+            console.error("Health check error:", error)
             res.status(503).json({
               status: "unhealthy",
+              service: "discord",
               error: error.message,
             })
           }
@@ -64,7 +71,11 @@ helpaApiClient
     })
 
     bot.start()
-  })
-  .catch((error: any) => {
-    console.error("Error fetching service config:", error)
-  })
+  } catch (error: any) {
+    console.error("🛑 Error starting Discord bot:", error.message)
+    process.exit(1)
+  }
+}
+
+// Start the bot
+init()
