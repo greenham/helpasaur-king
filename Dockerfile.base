@@ -1,3 +1,10 @@
+# This image serves as a base for app services with common tools pre-installed
+# Services extending this image get:
+# - pnpm@8 and nodemon pre-installed
+# - curl and wget for health checks
+# - Pre-built library packages in /app/libs
+# - Workspace configuration with all package.json files in /app
+
 FROM node:20-alpine as builder
 
 # Install common global packages
@@ -25,18 +32,10 @@ COPY libs/twitch-api-client ./libs/twitch-api-client
 
 # Build @helpasaur/api-client
 WORKDIR /app/libs/@helpasaur/api-client
-RUN pnpm install --ignore-workspace --prod=false && pnpm build
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --ignore-workspace --prod=false && pnpm build
 
 # Build twitch-api-client
 WORKDIR /app/libs/twitch-api-client
-RUN pnpm install --ignore-workspace --prod=false && pnpm build
-
-# Return to app directory
-WORKDIR /app
-
-# This image serves as a base for app services with common tools pre-installed
-# Services extending this image get:
-# - pnpm@8 and nodemon pre-installed
-# - curl and wget for health checks
-# - Pre-built library packages in /app/libs
-# - Workspace configuration with all package.json files in /app
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --ignore-workspace --prod=false && pnpm build
