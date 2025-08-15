@@ -60,7 +60,7 @@ export class TwitchEventListener extends EventEmitter {
     })
 
     this.app.post(
-      "/webhooks/eventsub",
+      "/eventsub",
       (req: express.Request, res: express.Response) => {
         this.handleWebhook(req, res)
       }

@@ -6,6 +6,8 @@ export interface RunnerWatcherConfig {
   callbackUrl: string
   gamesToWatch?: string[]
   streamers?: string[]
+  alttpGameIds: string[]
+  statusFilters?: string
 }
 
 // Stream Alert payload

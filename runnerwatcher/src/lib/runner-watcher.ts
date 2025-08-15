@@ -94,13 +94,6 @@ export class RunnerWatcher extends EventEmitter {
         })
       }
 
-      // Check if stream.type is live
-      if (event.type !== STREAM_ONLINE_TYPE_LIVE) {
-        return console.log(
-          `Ignoring ${subscription.type} event with stream.type of "${event.type}"`
-        )
-      }
-
       // Check if this user is in the streamers list
       if (!this.streamerIsListed(event.broadcaster_user_login)) {
         return console.log(
@@ -108,11 +101,41 @@ export class RunnerWatcher extends EventEmitter {
         )
       }
 
-      // Stream is live, type is 'live', user is in the list, so let's alert!
+      // Fetch stream data to validate it's actually live
       const streamData = await this.fetchStreamData(event.broadcaster_user_id)
-      if (streamData) {
-        return this.alertStream(streamData)
+      if (!streamData) {
+        return console.log(
+          `No stream data found for ${event.broadcaster_user_login}`
+        )
       }
+
+      // Check if stream.type is live (not playlist, watch_party, premiere, rerun)
+      if (streamData.type !== STREAM_ONLINE_TYPE_LIVE) {
+        return console.log(
+          `Ignoring ${subscription.type} event - stream type is "${streamData.type}", not "live"`
+        )
+      }
+
+      // Ensure stream is ALttP
+      if (!this.config.alttpGameIds.includes(streamData.game_id)) {
+        return console.log(
+          `Not streaming configured game (${streamData.game_name}), skipping...`
+        )
+      }
+
+      // Check if stream title passes filters
+      if (this.config.statusFilters) {
+        const speedrunTester = new RegExp(this.config.statusFilters, "i")
+        if (
+          !speedrunTester.test(streamData.title) &&
+          !speedrunTester.test(streamData.title.replace(/\s/g, ""))
+        ) {
+          return console.log(`Stream title does not pass filters, skipping...`)
+        }
+      }
+
+      // Stream is live, type is 'live', user is in the list, game is ALttP, title passes filters, so let's alert!
+      return this.alertStream(streamData)
     }
     // channel.update
     else if (subscription.type === CHANNEL_UPDATE_EVENT) {
@@ -129,6 +152,36 @@ export class RunnerWatcher extends EventEmitter {
         return console.log(
           `Ignoring ${subscription.type} event for unlisted streamer ${event.broadcaster_user_login}`
         )
+      }
+
+      // Check if stream.type is live (not playlist, watch_party, premiere, rerun)
+      if (streamData.type !== STREAM_ONLINE_TYPE_LIVE) {
+        return console.log(
+          `Ignoring ${subscription.type} event - stream type is "${streamData.type}", not "live"`
+        )
+      }
+
+      // Replace game data from the channel.update event
+      streamData.game_id = event.category_id
+      streamData.game_name = event.category_name
+      streamData.title = event.title
+
+      // Ensure stream is ALttP
+      if (!this.config.alttpGameIds.includes(streamData.game_id)) {
+        return console.log(
+          `Not streaming configured game (${streamData.game_name}), skipping...`
+        )
+      }
+
+      // Check if stream title passes filters
+      if (this.config.statusFilters) {
+        const speedrunTester = new RegExp(this.config.statusFilters, "i")
+        if (
+          !speedrunTester.test(streamData.title) &&
+          !speedrunTester.test(streamData.title.replace(/\s/g, ""))
+        ) {
+          return console.log(`Stream title does not pass filters, skipping...`)
+        }
       }
 
       // Check if stream is already in our cache
