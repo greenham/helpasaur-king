@@ -9,7 +9,7 @@
     "start:dev": "nodemon ./src/index.ts"
   },
   "dependencies": {
-    "@helpasaur/api-client": "file:../lib/api-client",
+    "@helpasaur/api-client": "file:../libs/api-client",
     "@helpasaur/ws-relay": "file:../ws-relay",
     "express": "^4.19.2",
     "ms": "^2.1.3",

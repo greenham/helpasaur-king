@@ -17,7 +17,7 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@helpasaur/api-client": ["lib/api-client/dist/index.d.ts"],
+      "@helpasaur/api-client": ["libs/api-client/dist/index.d.ts"],
       "@helpasaur/ws-relay": ["ws-relay/dist/index.d.ts"]
     }
   },

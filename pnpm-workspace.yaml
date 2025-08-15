@@ -8,6 +8,6 @@ packages:
   - "racebot"
   - "ws-relay"
   # Shared libraries
-  - "lib/api-client"
+  - "libs/api-client"
   # Monitoring utilities
   - "monitoring"

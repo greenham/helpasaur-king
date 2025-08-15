@@ -15,7 +15,7 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 - **Race Bot** (`/racebot/`): TypeScript service for weekly racetime.gg race creation (Sundays 11:30 AM PT)
 - **Runner Watcher** (`/runnerwatcher/`): Stream monitoring via Twitch EventSub
 - **WebSocket Relay** (`/ws-relay/`): Socket.io hub for inter-service communication
-- **Shared Library** (`/lib/api-client/`): Common Axios-based API client (@helpasaur/api-client)
+- **Shared Library** (`/libs/api-client/`): Common Axios-based API client (@helpasaur/api-client)
 - **Monitoring** (`/monitoring/`): Uptime Kuma monitoring stack (separate from main application)
 
 ## Essential Development Commands

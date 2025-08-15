@@ -88,8 +88,8 @@ importers:
   discord:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../lib/api-client
-        version: file:lib/api-client
+        specifier: file:../libs/api-client
+        version: file:libs/api-client
       discord.js:
         specifier: ^14.14.1
         version: 14.21.0
@@ -131,7 +131,7 @@ importers:
         specifier: ^5.3.3
         version: 5.9.2
 
-  lib/api-client:
+  libs/api-client:
     dependencies:
       axios:
         specifier: ^1.8.2
@@ -205,8 +205,8 @@ importers:
   runnerwatcher:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../lib/api-client
-        version: file:lib/api-client
+        specifier: file:../libs/api-client
+        version: file:libs/api-client
       '@helpasaur/ws-relay':
         specifier: file:../ws-relay
         version: file:ws-relay
@@ -245,8 +245,8 @@ importers:
   twitch:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../lib/api-client
-        version: file:lib/api-client
+        specifier: file:../libs/api-client
+        version: file:libs/api-client
       express:
         specifier: ^4.19.2
         version: 4.21.2
@@ -4400,8 +4400,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  file:lib/api-client:
-    resolution: {directory: lib/api-client, type: directory}
+  file:libs/api-client:
+    resolution: {directory: libs/api-client, type: directory}
     name: '@helpasaur/api-client'
     dependencies:
       axios: 1.11.0

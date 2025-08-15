@@ -20,10 +20,10 @@ COPY racebot/package.json ./racebot/
 COPY web/package.json ./web/
 
 # Copy and build library packages
-COPY lib/api-client ./lib/api-client
+COPY libs/api-client ./libs/api-client
 
 # Build @helpasaur/api-client
-WORKDIR /app/lib/api-client
+WORKDIR /app/libs/api-client
 RUN pnpm install && pnpm build
 
 # Return to app directory

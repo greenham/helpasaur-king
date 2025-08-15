@@ -6,22 +6,22 @@ services:
   api-server:
     volumes:
       - ./api:/app/api
-      - ./lib/api-client:/app/lib/api-client
+      - ./libs/api-client:/app/libs/api-client
 
   discord-bot:
     volumes:
       - ./discord:/app/discord
-      - ./lib/api-client:/app/lib/api-client
+      - ./libs/api-client:/app/libs/api-client
 
   twitch-bot:
     volumes:
       - ./twitch:/app/twitch
-      - ./lib/api-client:/app/lib/api-client
+      - ./libs/api-client:/app/libs/api-client
 
   runnerwatcher:
     volumes:
       - ./runnerwatcher:/app/runnerwatcher
-      - ./lib/api-client:/app/lib/api-client
+      - ./libs/api-client:/app/libs/api-client
 
   racebot:
     volumes:
