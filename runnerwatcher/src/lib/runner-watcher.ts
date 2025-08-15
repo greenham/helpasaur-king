@@ -2,25 +2,12 @@ import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
 import TwitchApi from "node-twitch"
 import { Constants } from "../constants"
-import { RunnerWatcherConfig, StreamAlertPayload } from "../types"
-
-// Type definition for node-twitch StreamData
-interface StreamData {
-  id: string
-  user_id: string
-  user_login: string
-  user_name: string
-  game_id: string
-  game_name: string
-  type: string
-  title: string
-  viewer_count: number
-  started_at: string
-  language: string
-  thumbnail_url: string
-  tag_ids: string[]
-  is_mature: boolean
-}
+import {
+  RunnerWatcherConfig,
+  StreamAlertPayload,
+  StreamData,
+  CachedStream,
+} from "../types"
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
 const { STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT, STREAM_ONLINE_TYPE_LIVE } =
@@ -29,10 +16,6 @@ const DELAY_FOR_API_SECONDS = 10
 const ALERT_DELAY_SECONDS = 15 * 60
 
 // Maintain a cache of streams we've recently alerted
-interface CachedStream {
-  streamId: string
-  alertedAt: Date
-}
 let cachedStreams: CachedStream[] = []
 
 export class RunnerWatcher extends EventEmitter {
