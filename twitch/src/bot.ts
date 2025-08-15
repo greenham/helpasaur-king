@@ -33,15 +33,16 @@ export class TwitchBot {
       onLeave: `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix || DEFAULT_COMMAND_PREFIX}join)`,
     }
 
+    this.setActiveChannels(channels)
+
     this.bot = new tmi.Client({
       options: { debug: false },
       identity: {
         username: this.config.username,
         password: this.config.oauth,
       },
-      channels: [...channels],
+      channels: this.channelList,
     } as any)
-    this.setActiveChannels(channels)
 
     this.wsRelay = this.connectToRelay()
   }
