@@ -229,12 +229,12 @@ importers:
       ms:
         specifier: ^2.1.3
         version: 2.1.3
-      node-twitch:
-        specifier: ^0.5.0
-        version: 0.5.0
       socket.io-client:
         specifier: ^4.7.2
         version: 4.8.1
+      twitch-api-client:
+        specifier: file:../libs/twitch-api-client
+        version: file:libs/twitch-api-client
     devDependencies:
       '@types/express':
         specifier: ^4.17.21
@@ -3705,14 +3705,6 @@ packages:
       cron-parser: 4.9.0
       long-timeout: 0.1.1
       sorted-array-functions: 1.3.0
-    dev: false
-
-  /node-twitch@0.5.0:
-    resolution: {integrity: sha512-4sN4P8R5NeBuuBMZhqKHqLYB9fKcyR8sCU39eGKe/xU5TiFRA3M/2ou9FeyD5EU7EzAb7TgunKQOaY2wMdAFSQ==}
-    dependencies:
-      node-fetch: 2.7.0
-    transitivePeerDependencies:
-      - encoding
     dev: false
 
   /nodemon@3.1.10:

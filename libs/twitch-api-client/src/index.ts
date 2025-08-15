@@ -23,7 +23,7 @@ export interface TwitchApiConfig {
 }
 
 export class TwitchApiClient {
-  private apiClient: ApiClient
+  public readonly apiClient: ApiClient
   private clientId: string
   private clientSecret: string
   private eventSubConfig?: EventSubConfig
@@ -133,17 +133,6 @@ export class TwitchApiClient {
     })
 
     return await Promise.allSettled(subscriptions)
-  }
-
-  // Additional methods needed for compatibility with existing code
-  async getUsers(login: string): Promise<{ data: any[] }> {
-    try {
-      const user = await this.apiClient.users.getUserByName(login)
-      return { data: user ? [user] : [] }
-    } catch (error) {
-      console.error(`Failed to get user ${login}:`, error)
-      return { data: [] }
-    }
   }
 
   async getStreams(filter: any): Promise<{ data: any[] }> {

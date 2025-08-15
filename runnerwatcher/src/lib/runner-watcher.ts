@@ -1,6 +1,6 @@
 import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
-import TwitchApi from "node-twitch"
+import { TwitchApiClient } from "twitch-api-client"
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
 import { Constants } from "../constants"
@@ -60,7 +60,7 @@ class RunnerWatcher extends EventEmitter {
     }
 
     try {
-      const twitchApi = new TwitchApi({
+      const twitchApi = new TwitchApiClient({
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
       })
@@ -166,11 +166,15 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Pull user info
-      let userResult = await twitchApi.getUsers(user.id)
-      if (!userResult || !userResult.data || !userResult.data[0]) {
-        console.log(`Unable to get data for user ${user.name}!`)
-      } else {
-        stream.user = userResult.data[0]
+      try {
+        const userData = await twitchApi.apiClient.users.getUserById(user.id)
+        if (userData) {
+          stream.user = userData
+        } else {
+          console.log(`Unable to get data for user ${user.name}!`)
+        }
+      } catch (err) {
+        console.log(`Unable to get data for user ${user.name}!`, err)
       }
 
       // Let the people know!

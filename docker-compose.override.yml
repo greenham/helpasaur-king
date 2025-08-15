@@ -30,8 +30,10 @@ services:
     volumes:
       - ./runnerwatcher:/app/runnerwatcher
       - ./libs/@helpasaur/api-client:/app/libs/@helpasaur/api-client
+      - ./libs/twitch-api-client:/app/libs/twitch-api-client
       - /app/runnerwatcher/node_modules
       - /app/libs/@helpasaur/api-client/node_modules
+      - /app/libs/twitch-api-client/node_modules
 
   racebot:
     volumes:
