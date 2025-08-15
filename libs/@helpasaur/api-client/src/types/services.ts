@@ -11,8 +11,9 @@ export type ServiceName =
 // Service configuration options for API client
 export interface ServiceConfigOptions {
   apiHost: string
-  apiKey: string
+  apiKey?: string
   serviceName: ServiceName
+  webMode?: boolean
 }
 
 // Service Authorization
