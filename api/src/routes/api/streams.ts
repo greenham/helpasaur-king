@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from "express"
-import TwitchApi from "node-twitch"
+import TwitchApi from "../../lib/twitch-api"
 import Config from "../../models/config"
 
 const router: Router = express.Router()
