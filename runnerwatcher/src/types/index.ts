@@ -41,6 +41,9 @@ export interface StreamData {
 }
 
 export interface CachedStream {
-  streamId: string
-  alertedAt: Date
+  id: string // stream id
+  user_id: string
+  title: string
+  game_id: string
+  lastAlertedAt: number // timestamp
 }

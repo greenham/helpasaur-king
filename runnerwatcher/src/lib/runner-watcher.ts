@@ -62,28 +62,6 @@ export class RunnerWatcher extends EventEmitter {
 
     // stream.online
     if (subscription.type === STREAM_ONLINE_EVENT) {
-      // Immediately add this streamId to our cache to avoid multiple alerts
-      // Twitch sometimes duplicates these events, so let's block them here
-      const cachedStream = cachedStreams.find((s) => s.streamId === event.id)
-      if (cachedStream) {
-        return console.log(
-          `Ignoring duplicate stream.online event for stream ${event.id}`
-        )
-      } else {
-        console.log(`Adding stream ${event.id} to cache`)
-        cachedStreams.push({
-          streamId: event.id,
-          alertedAt: new Date(),
-        })
-      }
-
-      // Check if this user is in the streamers list
-      if (!this.streamerIsListed(event.broadcaster_user_login)) {
-        return console.log(
-          `Ignoring ${subscription.type} event for unlisted streamer ${event.broadcaster_user_login}`
-        )
-      }
-
       // Fetch stream data to validate it's actually live
       const streamData = await this.fetchStreamData(event.broadcaster_user_id)
       if (!streamData) {
@@ -117,8 +95,44 @@ export class RunnerWatcher extends EventEmitter {
         }
       }
 
+      // Check if we have a cached stream for this user
+      const cachedStreamForUser = cachedStreams.find(
+        (s) => s.user_id === streamData.user_id
+      )
+
+      if (cachedStreamForUser) {
+        // Check if it's been long enough since the last alert
+        const secondsSinceLastAlert = Math.floor(
+          (Date.now() - cachedStreamForUser.lastAlertedAt) / 1000
+        )
+        if (secondsSinceLastAlert < ALERT_DELAY_SECONDS) {
+          return console.log(
+            `Only ${secondsSinceLastAlert} seconds since last alert, skipping...`
+          )
+        }
+
+        // Check if this is the same stream ID (duplicate event)
+        if (cachedStreamForUser.id === streamData.id) {
+          return console.log(`Stream is already in the cache, skipping...`)
+        }
+      }
+
+      // Remove any cached stream data for this user
+      cachedStreams = cachedStreams.filter(
+        (s) => s.user_id !== streamData.user_id
+      )
+
+      // Cache the new stream
+      cachedStreams.push({
+        id: streamData.id,
+        user_id: streamData.user_id,
+        title: streamData.title,
+        game_id: streamData.game_id,
+        lastAlertedAt: Date.now(),
+      })
+
       // Stream is live, type is 'live', user is in the list, game is ALttP, title passes filters, so let's alert!
-      return this.alertStream(streamData)
+      return this.alertStream(streamData, STREAM_ONLINE_EVENT)
     }
     // channel.update
     else if (subscription.type === CHANNEL_UPDATE_EVENT) {
@@ -127,13 +141,6 @@ export class RunnerWatcher extends EventEmitter {
       if (!streamData) {
         return console.log(
           `Ignoring ${subscription.type} event for offline streamer ${event.broadcaster_user_login}`
-        )
-      }
-
-      // Check if this user is in the streamers list
-      if (!this.streamerIsListed(event.broadcaster_user_login)) {
-        return console.log(
-          `Ignoring ${subscription.type} event for unlisted streamer ${event.broadcaster_user_login}`
         )
       }
 
@@ -167,35 +174,56 @@ export class RunnerWatcher extends EventEmitter {
         }
       }
 
-      // Check if stream is already in our cache
-      const cachedStream = cachedStreams.find(
-        (s) => s.streamId === streamData.id
+      // Check if we have a cached stream for this user
+      const cachedStreamForUser = cachedStreams.find(
+        (s) => s.user_id === streamData.user_id
       )
-      if (cachedStream) {
-        // If the stream is in the cache, check if it's been > ALERT_DELAY_SECONDS minutes since we last alerted
-        const now = new Date()
-        const alertedAt = new Date(cachedStream.alertedAt)
-        const secondsSinceAlert = (now.getTime() - alertedAt.getTime()) / 1000
-        if (secondsSinceAlert < ALERT_DELAY_SECONDS) {
+
+      // If this wasn't cached before (game wasn't ALttP or title didn't pass)
+      // treat it as a stream.online event
+      let eventType: string = CHANNEL_UPDATE_EVENT
+      if (!cachedStreamForUser) {
+        console.log(
+          `Stream not found in cache after ${CHANNEL_UPDATE_EVENT}, treating as ${STREAM_ONLINE_EVENT}!`
+        )
+        eventType = STREAM_ONLINE_EVENT
+      } else {
+        // Check if it's been long enough since the last alert
+        const secondsSinceLastAlert = Math.floor(
+          (Date.now() - cachedStreamForUser.lastAlertedAt) / 1000
+        )
+        if (secondsSinceLastAlert < ALERT_DELAY_SECONDS) {
           return console.log(
-            `Ignoring ${subscription.type} event for stream ${streamData.id} (alerted ${secondsSinceAlert} seconds ago)`
+            `Only ${secondsSinceLastAlert} seconds since last alert, skipping...`
           )
+        }
+
+        // Check if title or game actually changed
+        if (
+          cachedStreamForUser.title === event.title &&
+          cachedStreamForUser.game_id === event.category_id
+        ) {
+          return console.log(`Title or game has not changed, skipping...`)
         }
       }
 
-      // Stream is live, user is in the list, and we haven't alerted recently, so let's alert!
-      console.log(`Adding stream ${streamData.id} to cache`)
-      cachedStreams.push({
-        streamId: streamData.id,
-        alertedAt: new Date(),
-      })
-      return this.alertStream(streamData)
-    }
-  }
+      // Remove any cached stream data for this user
+      cachedStreams = cachedStreams.filter(
+        (s) => s.user_id !== streamData.user_id
+      )
 
-  streamerIsListed(username: string): boolean {
-    const streamers = this.config.streamers || []
-    return streamers.includes(username)
+      // Cache the updated stream
+      cachedStreams.push({
+        id: streamData.id,
+        user_id: streamData.user_id,
+        title: streamData.title,
+        game_id: streamData.game_id,
+        lastAlertedAt: Date.now(),
+      })
+
+      // Stream is live, user is in the list, and we haven't alerted recently, so let's alert!
+      return this.alertStream(streamData, eventType)
+    }
   }
 
   async fetchStreamData(userId: string): Promise<StreamData | null> {
@@ -209,19 +237,22 @@ export class RunnerWatcher extends EventEmitter {
     return streamData
   }
 
-  alertStream(streamData: StreamData): void {
-    const alert: StreamAlertPayload = {
-      streamId: streamData.id,
-      username: streamData.user_login,
-      title: streamData.title,
-      game: streamData.game_name,
-      viewers: streamData.viewer_count,
-      thumbnailUrl: streamData.thumbnail_url,
-      startedAt: streamData.started_at,
-      type: "live",
+  async alertStream(streamData: StreamData, eventType: string): Promise<void> {
+    // Fetch user data to match original payload structure
+    const api = await this.getTwitchApi()
+    const userResult = await api.getUsers(streamData.user_id)
+
+    if (userResult && userResult.data && userResult.data[0]) {
+      // Add user data to stream object to match original structure
+      ;(streamData as any).user = userResult.data[0]
     }
+
+    // Add eventType to match original structure
+    ;(streamData as any).eventType = eventType
+
     console.log(`Emitting stream alert for ${streamData.user_login}!`)
-    this.emit("streamEvent", alert)
+    // Emit the full stream data object to match original behavior
+    this.emit("streamEvent", streamData)
   }
 
   async getTwitchApi(): Promise<TwitchApi> {
