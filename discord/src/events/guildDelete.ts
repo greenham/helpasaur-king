@@ -22,11 +22,9 @@ const guildDeleteEvent: DiscordEvent = {
 
     // De-activate this guild via the API
     try {
-      await this.helpaApi
-        ?.getAxiosInstance()
-        .patch(`/api/discord/guild/${guild.id}`, {
-          active: false,
-        })
+      await this.helpaApi?.api.patch(`/api/discord/guild/${guild.id}`, {
+        active: false,
+      })
 
       // Update the local config
       client.config.guilds[guildConfigIndex].active = false

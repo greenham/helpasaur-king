@@ -15,7 +15,7 @@ export class HelpaApi {
   private apiKey: string
   private serviceName: ServiceName
   private accessToken: string | null = null
-  private api: AxiosInstance
+  public readonly api: AxiosInstance
 
   /**
    * Constructs a new HelpaApi instance.
@@ -104,13 +104,6 @@ export class HelpaApi {
   }
 
   /**
-   * Get the axios instance for making custom API calls
-   */
-  getAxiosInstance(): AxiosInstance {
-    return this.api
-  }
-
-  /**
    * Get the current access token
    */
   getAccessToken(): string | null {
@@ -120,6 +113,3 @@ export class HelpaApi {
 
 // Export all types for convenience
 export * from "./types"
-
-// For backward compatibility during migration
-export type { CommandDTO as ICommand } from "./types"

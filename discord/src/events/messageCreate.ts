@@ -51,11 +51,9 @@ const messageCreateEvent: DiscordEvent = {
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
-        const response = await this.helpaApi
-          ?.getAxiosInstance()
-          .post(`/api/commands/find`, {
-            command: commandNoPrefix,
-          })
+        const response = await this.helpaApi?.api.post(`/api/commands/find`, {
+          command: commandNoPrefix,
+        })
 
         if (response?.status === 200) {
           command = response.data
@@ -133,7 +131,7 @@ const messageCreateEvent: DiscordEvent = {
     cooldowns.set(cooldownKey, Date.now())
 
     // Log command use
-    await this.helpaApi?.getAxiosInstance().post(`/api/commands/logs`, {
+    await this.helpaApi?.api.post(`/api/commands/logs`, {
       command: command.command,
       alias: aliasUsed,
       source: "discord",

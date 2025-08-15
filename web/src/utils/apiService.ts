@@ -1,3 +1,4 @@
+import { HelpaApi } from "@helpasaur/api-client"
 import { Command } from "../types/commands"
 
 if (!process.env.API_HOST) {
@@ -6,6 +7,12 @@ if (!process.env.API_HOST) {
   )
 }
 const API_URL = process.env.API_HOST + "/api"
+
+// const helpaApiClient = new HelpaApi({
+//   apiHost: API_URL,
+//   apiKey: process.env.API_KEY!,
+//   serviceName: "web",
+// })
 
 export const getCommands = async () => {
   const response = await fetch(`${API_URL}/commands`)
@@ -105,16 +112,6 @@ export const leaveTwitchChannel = async (twitchUsername?: string) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   })
-  try {
-    await handleApiResponse(response)
-  } catch (e) {
-    throw e
-  }
-  return response.json()
-}
-
-export const getPublicConfigs = async () => {
-  const response = await fetch(`${API_URL}/public/configs`)
   try {
     await handleApiResponse(response)
   } catch (e) {

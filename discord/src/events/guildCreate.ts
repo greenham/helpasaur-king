@@ -18,11 +18,9 @@ const guildCreateEvent: DiscordEvent = {
       if (!client.config.guilds[guildConfigIndex].active) {
         console.log(`Re-activating guild ${guild.name} (${guild.id})`)
         try {
-          await this.helpaApi
-            ?.getAxiosInstance()
-            .patch(`/api/discord/guild/${guild.id}`, {
-              active: true,
-            })
+          await this.helpaApi?.api.patch(`/api/discord/guild/${guild.id}`, {
+            active: true,
+          })
           console.log(`Re-activated guild ${guild.name} (${guild.id})`)
 
           // Update the local config
@@ -49,9 +47,7 @@ const guildCreateEvent: DiscordEvent = {
 
     // Create this guild via the API
     try {
-      await this.helpaApi
-        ?.getAxiosInstance()
-        .post(`/api/discord/guild`, guildConfig)
+      await this.helpaApi?.api.post(`/api/discord/guild`, guildConfig)
 
       // Update the local config
       client.config.guilds.push(guildConfig)

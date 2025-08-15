@@ -2,7 +2,6 @@ import express, { Request, Response, Router } from "express"
 import axios from "axios"
 import jwt from "jsonwebtoken"
 import ms from "ms"
-import Config from "../models/config"
 import User from "../models/user"
 import { requireAuthKey, getUserTwitchApiClient } from "../lib/utils"
 
@@ -13,6 +12,8 @@ const {
   JWT_FOOTER_COOKIE_NAME,
   API_HOST,
   ALLOWED_SERVICES,
+  TWITCH_APP_CLIENT_ID,
+  TWITCH_APP_CLIENT_SECRET,
 } = process.env
 
 const loginExpirationLength = "7d"
@@ -20,9 +21,6 @@ const router: Router = express.Router()
 
 // Endpoint: GET /auth/twitch
 router.get(`/twitch`, async (req: Request, res: Response) => {
-  const configDoc = await Config.findOne({ id: "streamAlerts" })
-  const { config: streamAlertsConfig } = configDoc as any
-
   //const redirectPath = req.query.redirect || "/";
   const redirectUrl = CLIENT_POST_AUTH_REDIRECT_URL // + redirectPath;
 
@@ -39,8 +37,8 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   // Get access and ID tokens from Twitch
   const requestUrl =
     "https://id.twitch.tv/oauth2/token" +
-    `?client_id=${streamAlertsConfig.clientId}` +
-    `&client_secret=${streamAlertsConfig.clientSecret}` +
+    `?client_id=${TWITCH_APP_CLIENT_ID}` +
+    `&client_secret=${TWITCH_APP_CLIENT_SECRET}` +
     `&code=${authCode}` +
     "&grant_type=authorization_code" +
     `&redirect_uri=${API_HOST + "/auth/twitch"}`

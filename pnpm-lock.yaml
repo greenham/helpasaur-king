@@ -297,6 +297,9 @@ importers:
 
   web:
     dependencies:
+      '@helpasaur/api-client':
+        specifier: ../../../libs/@helpasaur/api-client
+        version: link:../../../libs/@helpasaur/api-client
       '@popperjs/core':
         specifier: ^2.11.8
         version: 2.11.8

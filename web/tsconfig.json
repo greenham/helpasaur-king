@@ -4,6 +4,7 @@
     "outDir": "./build/",
     "rootDir": "./src",
     "module": "esnext",
+    "lib": ["ES2022", "DOM"],
     "moduleResolution": "node",
     "target": "esnext",
     "jsx": "react",

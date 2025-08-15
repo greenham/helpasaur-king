@@ -144,7 +144,9 @@ export class TwitchApiClient {
     return await Promise.allSettled(subscriptions)
   }
 
-  async getStreams(filter: HelixPaginatedStreamFilter): Promise<HelixStream[]> {
+  async getStreams(
+    filter?: HelixPaginatedStreamFilter
+  ): Promise<HelixStream[]> {
     try {
       const streams = await this.apiClient.streams.getStreams(filter)
       return streams.data

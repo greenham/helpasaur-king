@@ -4,8 +4,9 @@ import { useQuery } from "@tanstack/react-query"
 import { Alert, Badge, Container, Spinner } from "react-bootstrap"
 import { filterStreams } from "../utils/utils"
 import LivestreamsList from "../components/LivestreamsList"
-import { getConfig, getLivestreams } from "../utils/apiService"
+import { getLivestreams } from "../utils/apiService"
 import { TwitchStream } from "../types/streams"
+import { useConfig } from "../hooks/useConfig"
 
 interface LivestreamsPageProps {}
 interface FilteredStreams {
@@ -14,12 +15,11 @@ interface FilteredStreams {
 }
 
 const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
-  const configQuery = useQuery({ queryKey: ["config"], queryFn: getConfig })
   const {
     data: webConfig,
     isError: configError,
     isLoading: configLoading,
-  } = configQuery
+  } = useConfig()
 
   const streamsQuery = useQuery({
     queryKey: ["livestreams"],

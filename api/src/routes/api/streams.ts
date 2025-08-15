@@ -5,15 +5,13 @@ import { getTwitchApiClient } from "../../lib/utils"
 
 const router: Router = express.Router()
 
-const getStreamAlertsConfig = async () => {
-  return await Config.findOne({ id: "streamAlerts" })
-}
-
 // Endpoint: /streams
 
 // GET /live -> returns all live alttp streams
 router.get("/live", async (req: Request, res: Response) => {
-  const { config: streamAlertsConfig }: any = await getStreamAlertsConfig()
+  const { config: streamAlertsConfig }: any = await Config.findOne({
+    id: "streamAlerts",
+  })
   const twitchApiClient = getTwitchApiClient()
 
   let filter: HelixPaginatedStreamFilter = {
