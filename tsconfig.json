@@ -17,8 +17,8 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@helpasaur/types": ["lib/types/src/index.ts"],
-      "@helpasaur/api-client": ["lib/api-client/src/index.ts"]
+      "@helpasaur/api-client": ["lib/api-client/dist/index.d.ts"],
+      "@helpasaur/ws-relay": ["ws-relay/dist/index.d.ts"]
     }
   },
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]

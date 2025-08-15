@@ -9,7 +9,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@helpasaur/types": "file:../types",
     "axios": "^1.8.2",
     "axios-retry": "^4.5.0"
   },

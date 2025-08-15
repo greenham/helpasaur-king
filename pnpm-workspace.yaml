@@ -9,6 +9,5 @@ packages:
   - "ws-relay"
   # Shared libraries
   - "lib/api-client"
-  - "lib/types"
   # Monitoring utilities
   - "monitoring"

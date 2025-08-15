@@ -11,7 +11,7 @@ import {
 import * as fs from "node:fs"
 import * as path from "node:path"
 import { HelpaApi } from "@helpasaur/api-client"
-import { DiscordConfig } from "@helpasaur/types"
+import { DiscordConfig } from "./types/config"
 
 interface DiscordCommand {
   data: SlashCommandBuilder | any

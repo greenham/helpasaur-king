@@ -1,7 +1,8 @@
 import { io, Socket } from "socket.io-client"
 import * as tmi from "tmi.js"
 import * as crypto from "crypto"
-import { HelpaApi, ICommand, TwitchBotConfig } from "@helpasaur/api-client"
+import { HelpaApi, ICommand } from "@helpasaur/api-client"
+import { TwitchBotConfig } from "./types"
 import { version as packageVersion, name as packageName } from "../package.json"
 import { DEFAULT_COMMAND_PREFIX } from "."
 const { WEBSOCKET_RELAY_SERVER } = process.env

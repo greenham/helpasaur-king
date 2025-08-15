@@ -6,25 +6,21 @@ services:
   api-server:
     volumes:
       - ./api:/app/api
-      - ./lib/types:/app/lib/types
       - ./lib/api-client:/app/lib/api-client
 
   discord-bot:
     volumes:
       - ./discord:/app/discord
-      - ./lib/types:/app/lib/types
       - ./lib/api-client:/app/lib/api-client
 
   twitch-bot:
     volumes:
       - ./twitch:/app/twitch
-      - ./lib/types:/app/lib/types
       - ./lib/api-client:/app/lib/api-client
 
   runnerwatcher:
     volumes:
       - ./runnerwatcher:/app/runnerwatcher
-      - ./lib/types:/app/lib/types
       - ./lib/api-client:/app/lib/api-client
 
   racebot:
@@ -34,4 +30,3 @@ services:
   ws-relay:
     volumes:
       - ./ws-relay:/app/ws-relay
-      - ./lib/types:/app/lib/types

@@ -1,11 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose"
-
-export interface IPracListsDocument extends Document {
-  _id: mongoose.Types.ObjectId
-  twitchUserId: string
-  name: string
-  entries: string[]
-}
+import mongoose, { Schema } from "mongoose"
+import { IPracListsDocument } from "../types/models"
 
 const PracListsSchema = new Schema<IPracListsDocument>({
   twitchUserId: { type: String, required: true },

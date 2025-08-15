@@ -1,14 +1,5 @@
-import mongoose, { Schema, Document, Model } from "mongoose"
-import { ICommand } from "@helpasaur/types"
-
-export interface ICommandDocument extends ICommand, Document {
-  _id: mongoose.Types.ObjectId
-}
-
-interface ICommandModel extends Model<ICommandDocument> {
-  findByNameOrAlias(command: string): Promise<ICommandDocument | null>
-  isUnique(command: string, aliases?: string[]): Promise<boolean>
-}
+import mongoose, { Schema } from "mongoose"
+import { ICommandDocument, ICommandModel } from "../types/models"
 
 const CommandSchema = new Schema<ICommandDocument>({
   command: String,

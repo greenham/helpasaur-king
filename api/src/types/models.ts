@@ -85,29 +85,26 @@ export interface IConfigurationDocument extends IConfiguration, Document {}
 
 // Command Log Model
 export interface ICommandLog {
+  createdAt: Date
   command: string
+  alias?: string
+  source: string
   username: string
-  channel?: string
-  platform: "discord" | "twitch"
-  timestamp: Date
-  response?: string
+  metadata?: any
 }
 
 export interface ICommandLogDocument extends ICommandLog, Document {}
 
-// Prac Lists Model
-export interface IPracList {
+// Practice Lists Model
+export interface IPracLists {
+  twitchUserId: string
   name: string
-  items: string[]
-  owner?: string
-  public?: boolean
-  createdAt?: Date
-  updatedAt?: Date
+  entries: string[]
 }
 
-export interface IPracListDocument extends IPracList, Document {}
+export interface IPracListsDocument extends IPracLists, Document {}
 
-// Stream Model (inferred from context)
+// Stream Model
 export interface IStream {
   username: string
   userId?: string
@@ -123,7 +120,7 @@ export interface IStream {
 
 export interface IStreamDocument extends IStream, Document {}
 
-// Race Model (inferred from racebot context)
+// Race Model
 export interface IRace {
   roomUrl?: string
   roomName?: string
@@ -133,3 +130,5 @@ export interface IRace {
   participants?: string[]
   createdAt?: Date
 }
+
+export interface IRaceDocument extends IRace, Document {}

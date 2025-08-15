@@ -6,15 +6,43 @@ export interface ApiResponse<T = any> {
   message?: string
 }
 
+// Service names
+export type ServiceName =
+  | "api"
+  | "discord"
+  | "twitch"
+  | "runnerwatcher"
+  | "racebot"
+  | "ws-relay"
+
+// Service configuration options for API client
+export interface ServiceConfigOptions {
+  apiHost: string
+  apiKey: string
+  serviceName: ServiceName
+}
+
 // Service Authorization
 export interface ServiceAuthResponse {
   token: string
   expiresIn?: string
 }
 
-// Service Config
+// Service Config (generic config returned from API)
 export interface ServiceConfig {
   [key: string]: any
+}
+
+// Temporary - for migration purposes
+// TODO: Remove once services import from their own types
+export interface TwitchBotConfig {
+  username: string
+  oauth: string
+  channels: string[]
+  clientId?: string
+  clientSecret?: string
+  cmdPrefix?: string
+  blacklistedUsers?: string[]
 }
 
 // JWT Token payload
@@ -65,27 +93,4 @@ export interface PaginatedResponse<T> {
     total: number
     totalPages: number
   }
-}
-
-// Command endpoints
-export interface CommandCreateRequest {
-  command: string
-  aliases?: string[]
-  response: string
-  category?: string
-  enabled?: boolean
-}
-
-export interface CommandUpdateRequest {
-  aliases?: string[]
-  response?: string
-  category?: string
-  enabled?: boolean
-}
-
-// Stream endpoints
-export interface StreamQueryParams {
-  isLive?: boolean
-  game?: string
-  username?: string
 }

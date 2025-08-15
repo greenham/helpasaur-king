@@ -1,9 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose"
-import { IUser } from "@helpasaur/types"
-
-export interface IUserDocument extends IUser, Document {
-  _id: mongoose.Types.ObjectId
-}
+import mongoose, { Schema } from "mongoose"
+import { IUserDocument } from "../types/models"
 
 const userSchema = new Schema<IUserDocument>({
   twitchUserData: {

@@ -19,12 +19,8 @@ COPY ws-relay/package.json ./ws-relay/
 COPY racebot/package.json ./racebot/
 COPY web/package.json ./web/
 
-# Copy and build all library packages
-COPY lib ./lib
-
-# Build @helpasaur/types
-WORKDIR /app/lib/types
-RUN pnpm install && pnpm build
+# Copy and build library packages
+COPY lib/api-client ./lib/api-client
 
 # Build @helpasaur/api-client
 WORKDIR /app/lib/api-client

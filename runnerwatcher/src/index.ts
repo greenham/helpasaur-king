@@ -1,7 +1,8 @@
 import { io, Socket } from "socket.io-client"
 import { HelpaApi } from "@helpasaur/api-client"
 import { RunnerWatcher } from "./lib/runner-watcher"
-import { RunnerWatcherConfig, StreamAlertPayload } from "@helpasaur/types"
+import { RunnerWatcherConfig } from "./types"
+import { StreamAlertPayload } from "@helpasaur/ws-relay"
 
 const packageJson = require("../package.json")
 

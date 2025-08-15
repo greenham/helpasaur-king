@@ -5,7 +5,7 @@ import {
   ServiceConfig,
   ServiceAuthResponse,
   ServiceName,
-} from "@helpasaur/types"
+} from "./types"
 
 /**
  * Helps services connect to the Helpa API.
@@ -118,5 +118,8 @@ export class HelpaApi {
   }
 }
 
-// Export everything from types for convenience
-export * from "@helpasaur/types"
+// Export all types for convenience
+export * from "./types"
+
+// For backward compatibility during migration
+export type { CommandDTO as ICommand } from "./types"

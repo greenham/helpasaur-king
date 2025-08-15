@@ -1,4 +1,4 @@
-import { DiscordGuildConfig } from "@helpasaur/types"
+import { DiscordGuildConfig } from "./types/config"
 
 export const defaultGuildConfig: DiscordGuildConfig = {
   active: true,

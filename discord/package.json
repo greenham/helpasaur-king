@@ -10,10 +10,9 @@
     "deploy-commands": "tsx ./src/deploy-commands.ts"
   },
   "dependencies": {
-    "@helpasaur/types": "file:../lib/types",
+    "@helpasaur/api-client": "file:../lib/api-client",
     "discord.js": "^14.14.1",
     "express": "^4.19.2",
-    "@helpasaur/api-client": "file:../lib/api-client",
     "ms": "^2.1.3",
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.5.4"

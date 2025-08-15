@@ -1,8 +1,7 @@
-import { HelpaApi } from "@helpasaur/api-client"
+import { HelpaApi, ServiceName } from "@helpasaur/api-client"
 import { DiscordBot } from "./bot"
 import express from "express"
 import ms from "ms"
-import { ServiceName } from "@helpasaur/types"
 
 const packageJson = require("../package.json")
 

@@ -1,6 +1,6 @@
 import express from "express"
 import { HelpaApi } from "@helpasaur/api-client"
-import { TwitchBotConfig } from "@helpasaur/types"
+import { TwitchBotConfig } from "./types"
 import { TwitchBot } from "./bot"
 import { version as packageVersion } from "../package.json"
 

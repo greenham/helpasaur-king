@@ -1,11 +1,11 @@
-// WebSocket Relay Events
+// WebSocket Relay Event Types
 export type WebSocketRelayEvent =
   | "streamAlert"
   | "weeklyRaceRoomCreated"
   | "joinChannel"
   | "leaveChannel"
 
-// Relay Data structure
+// Relay Data structure for all events
 export interface RelayData<T = any> {
   payload: T
   source: string
@@ -43,7 +43,7 @@ export interface WebSocketClientOptions {
   clientId: string
 }
 
-// WebSocket server stats
+// WebSocket server statistics
 export interface WebSocketServerStats {
   status: "healthy" | "unhealthy"
   service: string

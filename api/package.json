@@ -9,7 +9,6 @@
     "start:dev": "nodemon ./src/index.ts"
   },
   "dependencies": {
-    "@helpasaur/types": "file:../lib/types",
     "axios": "^1.8.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

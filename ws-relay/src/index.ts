@@ -1,11 +1,10 @@
 import { Server, Socket } from "socket.io"
 import { createServer, IncomingMessage, ServerResponse } from "http"
 import ms from "ms"
-import {
-  WebSocketRelayEvent,
-  RelayData,
-  WebSocketServerStats,
-} from "@helpasaur/types"
+import { WebSocketRelayEvent, RelayData, WebSocketServerStats } from "./types"
+
+// Re-export types for other services to use
+export * from "./types"
 const packageJson = require("../package.json")
 const { WEBSOCKET_RELAY_SERVER_PORT } = process.env
 
