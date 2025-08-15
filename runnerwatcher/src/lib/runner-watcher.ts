@@ -2,8 +2,7 @@ import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
 import TwitchApi from "node-twitch"
 import { Constants } from "../constants"
-import { RunnerWatcherConfig } from "../types"
-import { StreamAlertPayload } from "@helpasaur/ws-relay"
+import { RunnerWatcherConfig, StreamAlertPayload } from "../types"
 
 // Type definition for node-twitch StreamData
 interface StreamData {

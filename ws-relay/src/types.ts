@@ -11,33 +11,6 @@ export interface RelayData<T = any> {
   source: string
 }
 
-// Stream Alert payload
-export interface StreamAlertPayload {
-  streamId?: string
-  username?: string
-  title?: string
-  game?: string
-  viewers?: number
-  thumbnailUrl?: string
-  startedAt?: string
-  type?: "live" | "offline"
-}
-
-// Weekly Race Room payload
-export interface WeeklyRaceRoomPayload {
-  roomUrl?: string
-  roomName?: string
-  goal?: string
-  startTime?: string
-  status?: string
-}
-
-// Channel events payload
-export interface ChannelPayload {
-  channel: string
-  username?: string
-}
-
 // WebSocket client connection options
 export interface WebSocketClientOptions {
   clientId: string

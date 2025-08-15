@@ -1,5 +1,5 @@
 {
-  "name": "@helpasaur/ws-relay",
+  "name": "ws-relay",
   "version": "1.12.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
