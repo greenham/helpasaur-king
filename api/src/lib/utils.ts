@@ -1,12 +1,17 @@
 import { Request, Response, NextFunction, RequestHandler } from "express"
 import { expressjwt as jwt } from "express-jwt"
 import User from "../models/user"
+import TwitchApiClient from "twitch-api-client"
 
 const {
   API_KEY,
   JWT_SECRET_KEY,
   JWT_HEADER_COOKIE_NAME,
   JWT_FOOTER_COOKIE_NAME,
+  TWITCH_APP_CLIENT_ID,
+  TWITCH_APP_CLIENT_SECRET,
+  TWITCH_EVENTSUB_SECRET_KEY,
+  TWITCH_EVENTSUB_WEBHOOK_URL,
 } = process.env
 
 interface AuthenticatedRequest extends Request {
@@ -65,4 +70,29 @@ export const getRequestedChannel = async (
 
   return requestedChannel
 }
-// trigger
+
+export const getTwitchApiClient = () => {
+  return new TwitchApiClient({
+    client_id: TWITCH_APP_CLIENT_ID!,
+    client_secret: TWITCH_APP_CLIENT_SECRET!,
+    eventSub:
+      TWITCH_EVENTSUB_SECRET_KEY && TWITCH_EVENTSUB_WEBHOOK_URL
+        ? {
+            secret: TWITCH_EVENTSUB_SECRET_KEY,
+            webhookUrl: TWITCH_EVENTSUB_WEBHOOK_URL,
+          }
+        : undefined,
+  })
+}
+
+export const getUserTwitchApiClient = (
+  accessToken: string,
+  scopes: string[]
+) => {
+  return new TwitchApiClient({
+    client_id: TWITCH_APP_CLIENT_ID!,
+    client_secret: TWITCH_APP_CLIENT_SECRET!,
+    access_token: accessToken,
+    scopes: scopes,
+  })
+}

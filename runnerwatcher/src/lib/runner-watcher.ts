@@ -167,7 +167,7 @@ class RunnerWatcher extends EventEmitter {
 
       // Pull user info
       try {
-        const userData = await twitchApi.apiClient.users.getUserById(user.id)
+        const userData = await twitchApi.getUserById(user.id)
         if (userData) {
           stream.user = userData
         } else {

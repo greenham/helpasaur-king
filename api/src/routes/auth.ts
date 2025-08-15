@@ -2,10 +2,9 @@ import express, { Request, Response, Router } from "express"
 import axios from "axios"
 import jwt from "jsonwebtoken"
 import ms from "ms"
-import TwitchApi from "../lib/twitch-api"
 import Config from "../models/config"
 import User from "../models/user"
-import { requireAuthKey } from "../lib/utils"
+import { requireAuthKey, getUserTwitchApiClient } from "../lib/utils"
 
 const {
   CLIENT_POST_AUTH_REDIRECT_URL,
@@ -66,20 +65,19 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   console.log(`Received access token for user: ${userAccessToken}`)
 
   // Get user data from Twitch with the user's access token
-  const twitchApiUser = new TwitchApi({
-    client_id: streamAlertsConfig.clientId,
-    client_secret: streamAlertsConfig.clientSecret,
-    access_token: userAccessToken,
-    scopes: [],
-  })
+  const twitchApiUser = getUserTwitchApiClient(userAccessToken, [])
 
-  let twitchUserData: any = null
+  let twitchUserData: any
   try {
-    twitchUserData = await twitchApiUser.getCurrentUser()
+    const currentUserData =
+      await twitchApiUser.getCurrentUserData(userAccessToken)
+    twitchUserData = {
+      ...currentUserData,
+      auth: twitchAuthData,
+    }
   } catch (err) {
     console.error(`Error fetching user data from Twitch!`, err)
   }
-  twitchUserData.auth = twitchAuthData
 
   let localUser: any
   try {
@@ -109,11 +107,6 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
       subject: localUser._id.toString(),
     }
   )
-
-  console.log(
-    `Generated ID token for Twitch user: ${twitchUserData.display_name}`
-  )
-  console.log(idToken)
 
   // Set cookies on the client with the JWT
   // Split out the header, payload, and signature

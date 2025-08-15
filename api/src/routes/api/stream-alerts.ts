@@ -1,17 +1,10 @@
 import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
-import TwitchApi from "../../lib/twitch-api"
 import Config from "../../models/config"
+import { getTwitchApiClient } from "../../lib/utils"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
-
-const getTwitchApiClient = (config: any) => {
-  return new TwitchApi({
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
-  })
-}
 
 // Endpoint: /streamAlerts
 
@@ -67,7 +60,7 @@ router.post(
     }
 
     const streamAlertsConfig: any = await Config.findOne({ id: "streamAlerts" })
-    const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config)
+    const twitchApiClient = getTwitchApiClient()
     console.log(
       `Adding ${req.body.channels.length} channels to stream alerts...`
     )
@@ -87,8 +80,7 @@ router.post(
       }
 
       // Query Twitch API for the user info by their login name
-      const userData =
-        await twitchApiClient.apiClient.users.getUserByName(channel)
+      const userData = await twitchApiClient.getUserByName(channel)
       if (!userData) {
         return {
           status: "error",
@@ -145,7 +137,7 @@ router.delete(
       }
 
       // Delete event subscriptions
-      const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config)
+      const twitchApiClient = getTwitchApiClient()
       console.log(
         `Removing event subscriptions for ${streamAlertsConfig.config.channels[channelIndex].login}`
       )
@@ -184,11 +176,7 @@ router.get(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     try {
-      const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" })
-      if (!streamAlertsConfig?.config) {
-        return res.status(500).json({ error: "Configuration not found" })
-      }
-      const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config)
+      const twitchApiClient = getTwitchApiClient()
       const results = await twitchApiClient.getSubscriptions(req.query)
       res.status(200).json(results)
     } catch (err) {
@@ -201,8 +189,7 @@ router.delete(
   "/subscriptions/all",
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
-    const streamAlertsConfig: any = await Config.findOne({ id: "streamAlerts" })
-    const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config)
+    const twitchApiClient = getTwitchApiClient()
     twitchApiClient
       .clearSubscriptions()
       .then((results) => {
@@ -237,15 +224,14 @@ router.post(
     }
 
     const streamAlertsConfig: any = await Config.findOne({ id: "streamAlerts" })
-    const twitchApiClient = getTwitchApiClient(streamAlertsConfig.config)
+    const twitchApiClient = getTwitchApiClient()
     console.log(
       `Blacklisting ${req.body.channels.length} channels from stream directory...`
     )
 
     const results = req.body.channels.map(async (channel: string) => {
       // Query Twitch API for the user info by their login name
-      const userData =
-        await twitchApiClient.apiClient.users.getUserByName(channel)
+      const userData = await twitchApiClient.getUserByName(channel)
       if (!userData) {
         return {
           status: "error",

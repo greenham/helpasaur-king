@@ -1,5 +1,14 @@
-import { ApiClient } from "@twurple/api"
-import { AppTokenAuthProvider, StaticAuthProvider } from "@twurple/auth"
+import {
+  ApiClient,
+  HelixPaginatedStreamFilter,
+  HelixPrivilegedUser,
+  HelixStream,
+} from "@twurple/api"
+import {
+  AppTokenAuthProvider,
+  StaticAuthProvider,
+  getTokenInfo,
+} from "@twurple/auth"
 
 export const STREAM_ONLINE_EVENT = "stream.online"
 export const CHANNEL_UPDATE_EVENT = "channel.update"
@@ -135,36 +144,30 @@ export class TwitchApiClient {
     return await Promise.allSettled(subscriptions)
   }
 
-  async getStreams(filter: any): Promise<{ data: any[] }> {
+  async getStreams(filter: HelixPaginatedStreamFilter): Promise<HelixStream[]> {
     try {
-      const params: any = {}
-
-      if (filter.type) params.type = filter.type
-      if (filter.first) params.limit = filter.first
-      if (filter.game_id) {
-        // Handle both single game ID and array of game IDs
-        if (Array.isArray(filter.game_id)) {
-          params.game = filter.game_id
-        } else {
-          params.game = [filter.game_id]
-        }
-      }
-      if (filter.cursor) params.after = filter.cursor
-      if (filter.user_id) params.userId = filter.user_id
-      if (filter.channel) params.userId = filter.channel
-
-      const streams = await this.apiClient.streams.getStreams(params)
-      return { data: streams.data }
+      const streams = await this.apiClient.streams.getStreams(filter)
+      return streams.data
     } catch (error) {
       console.error(`Failed to get streams:`, error)
-      return { data: [] }
+      return []
     }
   }
 
-  async getCurrentUser(): Promise<any> {
+  async getCurrentUserData(
+    accessToken: string,
+    withEmail: boolean = false
+  ): Promise<HelixPrivilegedUser> {
     try {
+      const tokenInfo = await getTokenInfo(accessToken)
+      if (!tokenInfo || !tokenInfo.userId) {
+        let error = `Failed to get current user: no valid token found!`
+        console.error(error)
+        throw error
+      }
       const user = await this.apiClient.users.getAuthenticatedUser(
-        this.clientId
+        tokenInfo.userId,
+        withEmail
       )
       return user
     } catch (error) {
@@ -172,6 +175,29 @@ export class TwitchApiClient {
       throw error
     }
   }
+
+  async getUserByName(name: string): Promise<any> {
+    try {
+      const user = await this.apiClient.users.getUserByName(name)
+      return user
+    } catch (error) {
+      console.error(`Failed to get user by name ${name}:`, error)
+      throw error
+    }
+  }
+
+  async getUserById(id: string): Promise<any> {
+    try {
+      const user = await this.apiClient.users.getUserById(id)
+      return user
+    } catch (error) {
+      console.error(`Failed to get user by id ${id}:`, error)
+      throw error
+    }
+  }
 }
+
+// Re-export all types from @twurple/api
+export * from "@twurple/api"
 
 export default TwitchApiClient

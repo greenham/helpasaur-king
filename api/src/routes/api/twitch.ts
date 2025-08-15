@@ -1,9 +1,7 @@
 import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
-import TwitchApi from "../../lib/twitch-api"
-import Config from "../../models/config"
 import User from "../../models/user"
-import { getRequestedChannel } from "../../lib/utils"
+import { getRequestedChannel, getTwitchApiClient } from "../../lib/utils"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
 
 const router: Router = express.Router()
@@ -62,23 +60,17 @@ router.post("/join", async (req: Request, res: Response) => {
         await user.save()
       } else {
         // Get user data from Twitch
-        const { config: streamAlertsConfig }: any = await Config.findOne({
-          id: "streamAlerts",
-        })
-        const twitchApiClient = new TwitchApi({
-          client_id: streamAlertsConfig.clientId,
-          client_secret: streamAlertsConfig.clientSecret,
-        })
+        const twitchApiClient = getTwitchApiClient()
 
         let twitchUserData: any = null
         try {
-          const response = await twitchApiClient.getUsers(requestedChannel)
-          if (!response || !response.data || !response.data[0]) {
+          const response = await twitchApiClient.getUserByName(requestedChannel)
+          if (!response) {
             throw new Error(
               `Unable to get user data for channel ${requestedChannel}`
             )
           }
-          twitchUserData = response.data[0]
+          twitchUserData = response
         } catch (err) {
           console.error(
             `Error fetching user data for ${requestedChannel} from Twitch!`,
