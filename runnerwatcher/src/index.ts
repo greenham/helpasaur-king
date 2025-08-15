@@ -1,25 +1,24 @@
 import { io, Socket } from "socket.io-client"
-import { HelpaApi } from "@helpasaur/api-client"
+import { HelpaApi, ServiceName } from "@helpasaur/api-client"
 import { RunnerWatcher } from "./lib/runner-watcher"
 import { RunnerWatcherConfig, StreamAlertPayload } from "./types"
-
-const packageJson = require("../package.json")
+import { name as packageName, version as packageVersion } from "../package.json"
 
 const { WEBSOCKET_RELAY_SERVER } = process.env
 
 const helpaApi = new HelpaApi({
   apiHost: process.env.API_HOST!,
   apiKey: process.env.API_KEY!,
-  serviceName: "runnerwatcher",
+  serviceName: process.env.SERVICE_NAME! as ServiceName,
 })
 
 async function init(): Promise<void> {
   try {
-    const streamAlertsConfig =
-      (await helpaApi.getServiceConfig()) as RunnerWatcherConfig
-    const runnerwatcher = new RunnerWatcher(streamAlertsConfig)
+    const config = await helpaApi.getServiceConfig()
+    const runnerWatcherConfig = config.config as RunnerWatcherConfig
+    const runnerwatcher = new RunnerWatcher(runnerWatcherConfig)
     const wsRelay: Socket = io(WEBSOCKET_RELAY_SERVER!, {
-      query: { clientId: `${packageJson.name} v${packageJson.version}` },
+      query: { clientId: `${packageName} v${packageVersion}` },
     })
 
     console.log(
@@ -42,7 +41,3 @@ async function init(): Promise<void> {
 }
 
 init()
-
-// Array.from(crypto.randomBytes(32), function (byte) {
-//   return ("0" + (byte & 0xff).toString(16)).slice(-2);
-// }).join("");

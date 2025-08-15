@@ -94,10 +94,10 @@ export class HelpaApi {
         throw new Error(`🔴 Unable to authorize service with API!`)
       }
 
-      const response = await this.api.get<{ config: ServiceConfig }>(
+      const response = await this.api.get<ServiceConfig>(
         `${this.apiHost}/api/configs/${this.serviceName}`
       )
-      return response.data.config
+      return response.data
     } catch (err: any) {
       throw new Error(`🔴 Error fetching service config: ${err.message}`)
     }

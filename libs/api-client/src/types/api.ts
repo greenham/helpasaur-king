@@ -11,7 +11,7 @@ export type ServiceName =
   | "api"
   | "discord"
   | "twitch"
-  | "runnerwatcher"
+  | "streamAlerts"
   | "racebot"
   | "ws-relay"
 
@@ -30,7 +30,10 @@ export interface ServiceAuthResponse {
 
 // Service Config (generic config returned from API)
 export interface ServiceConfig {
-  [key: string]: any
+  id?: string
+  config: {
+    [key: string]: any
+  }
 }
 
 // Temporary - for migration purposes

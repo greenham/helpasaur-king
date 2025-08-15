@@ -45,7 +45,7 @@ export class RunnerWatcher extends EventEmitter {
 
     this.config = config
 
-    if (!this.config.twitchClientId || !this.config.twitchClientSecret) {
+    if (!this.config.clientId || !this.config.clientSecret) {
       throw new Error(
         `Missing config parameter! clientId and clientSecret must be set.`
       )
@@ -191,8 +191,8 @@ export class RunnerWatcher extends EventEmitter {
   async getTwitchApi(): Promise<TwitchApi> {
     if (!this.twitchApi) {
       this.twitchApi = new TwitchApi({
-        client_id: this.config.twitchClientId,
-        client_secret: this.config.twitchClientSecret,
+        client_id: this.config.clientId,
+        client_secret: this.config.clientSecret,
       })
     }
     return this.twitchApi

@@ -1,7 +1,7 @@
 // Runner Watcher Configuration
 export interface RunnerWatcherConfig {
-  twitchClientId: string
-  twitchClientSecret: string
+  clientId: string
+  clientSecret: string
   webhookSecret: string
   callbackUrl: string
   gamesToWatch?: string[]
