@@ -1,5 +1,46 @@
 # Changelog
 
+## 1.13.0
+
+_2025-08-15_
+
+### What's Changed
+
+#### Features
+
+- feat: Add static.helpasaur.com support for static asset serving by @greenham
+  - Configure nginx to serve static assets from dedicated subdomain
+  - Add SSL support with 30-day cache headers for optimal performance
+  - Migrate Discord bot and web app assets to use static.helpasaur.com URLs
+
+- feat: Add Claude Code auto-formatting hook by @greenham
+  - Integrate Prettier formatting with Claude Code workflow
+  - Automatic code formatting on file modifications
+
+#### Infrastructure
+
+- refactor: Major codebase cleanup and modernization by @greenham
+  - Removed 6000+ lines of legacy code and unused utilities
+  - Deleted deprecated libraries: speedgaming, src-categories, srl-race-alerts, srtv, wiki
+  - Streamlined codebase for better maintainability
+
+- style: Apply Prettier formatting to entire codebase by @greenham in https://github.com/greenham/helpasaur-king/pull/95
+  - Established consistent code formatting across all services
+  - Added .prettierrc configuration and .prettierignore patterns
+  - Configured VSCode settings for automatic formatting
+
+#### Improvements
+
+- refactor: Improve development workflow and API retry configuration by @greenham
+  - Enhanced developer experience with better error handling
+  - Optimized API retry logic for reliability
+
+- fix: Improve WebSocket Relay health monitoring by @greenham
+  - Allow external access to health check endpoint in production
+  - Simplified health check configuration
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.12.0...1.13.0
+
 ## 1.12.0
 
 _2025-08-11_

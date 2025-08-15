@@ -161,7 +161,7 @@ const readyEvent: DiscordEvent = {
           .setTimestamp()
           .setFooter({
             text: source,
-            iconURL: "https://helpasaur.com/img/TwitchGlitchPurple.png",
+            iconURL: "https://static.helpasaur.com/img/TwitchGlitchPurple.png",
           })
 
         if (stream.eventType === STREAM_ONLINE_EVENT) {
@@ -228,7 +228,7 @@ const readyEvent: DiscordEvent = {
             .setURL(raceRoomUrl)
             .setAuthor({
               name: "hap e weekly",
-              iconURL: "https://helpasaur.com/img/ljsmile.png",
+              iconURL: "https://static.helpasaur.com/img/ljsmile.png",
               url: raceRoomUrl,
             })
             .addFields(
@@ -241,7 +241,7 @@ const readyEvent: DiscordEvent = {
             .setTimestamp()
             .setFooter({
               text: source,
-              iconURL: "https://helpasaur.com/img/ljsmile.png",
+              iconURL: "https://static.helpasaur.com/img/ljsmile.png",
             })
 
           channel
