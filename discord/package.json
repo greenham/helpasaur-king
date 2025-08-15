@@ -10,7 +10,7 @@
     "deploy-commands": "tsx ./src/deploy-commands.ts"
   },
   "dependencies": {
-    "@helpasaur/api-client": "file:../libs/api-client",
+    "@helpasaur/api-client": "file:../libs/@helpasaur/api-client",
     "discord.js": "^14.14.1",
     "express": "^4.19.2",
     "ms": "^2.1.3",

@@ -7,26 +7,36 @@ services:
     volumes:
       - ./api:/app/api
       - ./libs/api-client:/app/libs/api-client
+      - /app/api/node_modules
+      - /app/libs/api-client/node_modules
 
   discord-bot:
     volumes:
       - ./discord:/app/discord
       - ./libs/api-client:/app/libs/api-client
+      - /app/discord/node_modules
+      - /app/libs/api-client/node_modules
 
   twitch-bot:
     volumes:
       - ./twitch:/app/twitch
       - ./libs/api-client:/app/libs/api-client
+      - /app/twitch/node_modules
+      - /app/libs/api-client/node_modules
 
   runnerwatcher:
     volumes:
       - ./runnerwatcher:/app/runnerwatcher
       - ./libs/api-client:/app/libs/api-client
+      - /app/runnerwatcher/node_modules
+      - /app/libs/api-client/node_modules
 
   racebot:
     volumes:
       - ./racebot:/app/racebot
+      - /app/racebot/node_modules
 
   ws-relay:
     volumes:
       - ./ws-relay:/app/ws-relay
+      - /app/ws-relay/node_modules

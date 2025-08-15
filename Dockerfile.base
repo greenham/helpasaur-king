@@ -20,11 +20,12 @@ COPY racebot/package.json ./racebot/
 COPY web/package.json ./web/
 
 # Copy and build library packages
-COPY libs/api-client ./libs/api-client
+COPY libs/@helpasaur/api-client ./libs/@helpasaur/api-client
 
 # Build @helpasaur/api-client
-WORKDIR /app/libs/api-client
-RUN pnpm install && pnpm build
+WORKDIR /app/libs/@helpasaur/api-client
+# Install dependencies in isolation (not as workspace) and include dev deps for building
+RUN pnpm install --ignore-workspace --prod=false && pnpm build
 
 # Return to app directory
 WORKDIR /app

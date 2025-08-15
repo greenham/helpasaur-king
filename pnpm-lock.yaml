@@ -91,8 +91,8 @@ importers:
   discord:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../libs/api-client
-        version: file:libs/api-client
+        specifier: file:../libs/@helpasaur/api-client
+        version: file:libs/@helpasaur/api-client
       discord.js:
         specifier: ^14.14.1
         version: 14.21.0
@@ -132,22 +132,6 @@ importers:
         version: 4.20.4
       typescript:
         specifier: ^5.3.3
-        version: 5.9.2
-
-  libs/api-client:
-    dependencies:
-      axios:
-        specifier: ^1.8.2
-        version: 1.11.0
-      axios-retry:
-        specifier: ^4.5.0
-        version: 4.5.0(axios@1.11.0)
-    devDependencies:
-      '@types/node':
-        specifier: ^20.8.10
-        version: 20.19.10
-      typescript:
-        specifier: ^5.2.2
         version: 5.9.2
 
   monitoring:
@@ -208,8 +192,8 @@ importers:
   runnerwatcher:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../libs/api-client
-        version: file:libs/api-client
+        specifier: file:../libs/@helpasaur/api-client
+        version: file:libs/@helpasaur/api-client
       express:
         specifier: ^4.19.2
         version: 4.21.2
@@ -245,8 +229,8 @@ importers:
   twitch:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../libs/api-client
-        version: file:libs/api-client
+        specifier: file:../libs/@helpasaur/api-client
+        version: file:libs/@helpasaur/api-client
       express:
         specifier: ^4.19.2
         version: 4.21.2
@@ -3494,7 +3478,6 @@ packages:
   /micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
-    requiresBuild: true
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
@@ -3652,7 +3635,6 @@ packages:
 
   /node-addon-api@7.1.1:
     resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
-    requiresBuild: true
     dev: true
 
   /node-fetch@2.7.0:
@@ -4510,8 +4492,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  file:libs/api-client:
-    resolution: {directory: libs/api-client, type: directory}
+  file:libs/@helpasaur/api-client:
+    resolution: {directory: libs/@helpasaur/api-client, type: directory}
     name: '@helpasaur/api-client'
     dependencies:
       axios: 1.11.0
