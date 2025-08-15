@@ -1,4 +1,4 @@
-import express from "express"
+import express, { Request, Response, NextFunction } from "express"
 import cors from "cors"
 import logger from "morgan"
 import mongoose from "mongoose"
@@ -6,14 +6,13 @@ import { io, Socket } from "socket.io-client"
 import cookieParser from "cookie-parser"
 import ms from "ms"
 import routes from "./routes"
-
+import { name as packageName, version as packageVersion } from "../package.json"
 const {
   MONGODB_URL,
   PORT,
   API_CORS_ORIGINS_WHITELIST,
   WEBSOCKET_RELAY_SERVER,
 } = process.env
-const packageJson = require("../package.json")
 
 // Track API stats
 const startTime = Date.now()
@@ -21,11 +20,7 @@ let requestCount = 0
 let errorCount = 0
 
 // Middleware to track requests
-const trackRequests = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
+const trackRequests = (req: Request, res: Response, next: NextFunction) => {
   requestCount++
 
   // Track errors
@@ -60,7 +55,7 @@ database.once("connected", () => {
 
 // Connect to websocket relay to communicate with other services
 const wsRelay = io(WEBSOCKET_RELAY_SERVER!, {
-  query: { clientId: `${packageJson.name} v${packageJson.version}` },
+  query: { clientId: `${packageName} v${packageVersion}` },
 })
 console.log(
   `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
@@ -92,14 +87,14 @@ app.wsRelay = wsRelay
 app.use(cookieParser())
 
 // Health check endpoint
-app.get("/health", async (req: express.Request, res: express.Response) => {
+app.get("/health", async (req: Request, res: Response) => {
   try {
     const uptimeMs = Date.now() - startTime
 
     res.status(200).json({
       status: "healthy",
       service: "api",
-      version: packageJson.version,
+      version: packageVersion,
       uptime: ms(uptimeMs, { long: true }),
       uptimeMs: uptimeMs,
       requestCount: requestCount,
@@ -125,12 +120,7 @@ app.get("/health", async (req: express.Request, res: express.Response) => {
 // Set up routes
 app.use(routes)
 
-app.use(function (
-  err: any,
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) {
+app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
   if (err.name === "UnauthorizedError") {
     res.status(401).json({ error: err.name + ": " + err.message })
   } else if (err.code === "permission_denied") {
