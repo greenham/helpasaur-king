@@ -8,6 +8,7 @@ packages:
   - "racebot"
   - "ws-relay"
   # Shared libraries
-  - "libs/api-client"
+  - "libs/@helpasaur/api-client"
+  - "libs/twitch-api-client"
   # Monitoring utilities
   - "monitoring"

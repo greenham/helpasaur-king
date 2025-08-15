@@ -21,10 +21,14 @@ COPY web/package.json ./web/
 
 # Copy and build library packages
 COPY libs/@helpasaur/api-client ./libs/@helpasaur/api-client
+COPY libs/twitch-api-client ./libs/twitch-api-client
 
 # Build @helpasaur/api-client
 WORKDIR /app/libs/@helpasaur/api-client
-# Install dependencies in isolation (not as workspace) and include dev deps for building
+RUN pnpm install --ignore-workspace --prod=false && pnpm build
+
+# Build twitch-api-client
+WORKDIR /app/libs/twitch-api-client
 RUN pnpm install --ignore-workspace --prod=false && pnpm build
 
 # Return to app directory
@@ -34,5 +38,5 @@ WORKDIR /app
 # Services extending this image get:
 # - pnpm@8 and nodemon pre-installed
 # - curl and wget for health checks
-# - Pre-built library packages in /app/lib
+# - Pre-built library packages in /app/libs
 # - Workspace configuration with all package.json files in /app
