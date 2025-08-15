@@ -87,15 +87,15 @@ router.post(
       }
 
       // Query Twitch API for the user info by their login name
-      const userResult = await twitchApiClient.getUsers(channel)
-      if (!userResult || !userResult.data || !userResult.data[0]) {
+      const userData =
+        await twitchApiClient.apiClient.users.getUserByName(channel)
+      if (!userData) {
         return {
           status: "error",
           channel,
           message: `Unable to get user data for channel ${channel}`,
         }
       }
-      const userData = userResult.data[0]
 
       const subscriptionResults = await twitchApiClient.subscribeToStreamEvents(
         {
@@ -244,15 +244,15 @@ router.post(
 
     const results = req.body.channels.map(async (channel: string) => {
       // Query Twitch API for the user info by their login name
-      const userResult = await twitchApiClient.getUsers(channel)
-      if (!userResult || !userResult.data || !userResult.data[0]) {
+      const userData =
+        await twitchApiClient.apiClient.users.getUserByName(channel)
+      if (!userData) {
         return {
           status: "error",
           channel,
           message: `Unable to get user data for channel ${channel}`,
         }
       }
-      const userData = userResult.data[0]
 
       // Ensure this user isn't in the blacklist already
       if (streamAlertsConfig.config.blacklistedUsers.includes(userData.id)) {
