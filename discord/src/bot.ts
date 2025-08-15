@@ -75,11 +75,11 @@ export class DiscordBot {
     this.helpaApi
       .getServiceConfig()
       .then((config: any) => {
-        if (!config) {
+        if (!config || !config.config) {
           throw new Error(`Unable to refresh service config from API!`)
         }
 
-        this.discordClient.config = config as DiscordConfig
+        this.discordClient.config = config.config as DiscordConfig
       })
       .catch((error: any) => {
         console.error("🛑 Error refreshing service config:", error)
