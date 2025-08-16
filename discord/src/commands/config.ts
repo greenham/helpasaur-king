@@ -3,6 +3,7 @@ import {
   ChannelType,
   inlineCode,
   ChatInputCommandInteraction,
+  MessageFlags,
 } from "discord.js"
 import { DiscordCommand } from "../types/events"
 
@@ -131,7 +132,7 @@ const configCommand: DiscordCommand = {
     ),
   async execute(interaction: ChatInputCommandInteraction) {
     // Defer reply while fetching current config
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] })
 
     const subcommand = interaction.options.getSubcommand()
     const { guildId, client } = interaction as any

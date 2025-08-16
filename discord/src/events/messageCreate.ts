@@ -1,4 +1,4 @@
-import { EmbedBuilder, Collection, Message } from "discord.js"
+import { EmbedBuilder, Collection, Message, MessageFlags } from "discord.js"
 import { defaultGuildConfig } from "../constants"
 import { DiscordEvent } from "../types/events"
 
@@ -34,7 +34,7 @@ const messageCreateEvent: DiscordEvent = {
         }&permissions=${
           client.config.oauth.permissions
         }&scope=${client.config.oauth.scopes.join("%20")}`,
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       } as any)
       return
     }

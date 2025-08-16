@@ -7,6 +7,7 @@ import {
   Partials,
   ChatInputCommandInteraction,
   SlashCommandBuilder,
+  MessageFlags,
 } from "discord.js"
 import * as fs from "node:fs"
 import * as path from "node:path"
@@ -145,12 +146,12 @@ export class DiscordBot {
         if (interaction.replied || interaction.deferred) {
           await interaction.followUp({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: [MessageFlags.Ephemeral],
           })
         } else {
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: [MessageFlags.Ephemeral],
           })
         }
       }
