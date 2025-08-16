@@ -1,6 +1,6 @@
 import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
-import { TwitchApiClient } from "twitch-api-client"
+import { TwitchApiClient, HelixUser } from "twitch-api-client"
 import { Constants } from "../constants"
 import {
   WatchedTwitchStream,

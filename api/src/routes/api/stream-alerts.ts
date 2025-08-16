@@ -2,6 +2,7 @@ import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import Config from "../../models/config"
 import { getTwitchApiClient } from "../../lib/utils"
+import { HelixUser } from "twitch-api-client"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -80,7 +81,8 @@ router.post(
       }
 
       // Query Twitch API for the user info by their login name
-      const userData = await twitchApiClient.getUserByName(channel)
+      const userData: HelixUser | null =
+        await twitchApiClient.getUserByName(channel)
       if (!userData) {
         return {
           status: "error",
@@ -231,7 +233,8 @@ router.post(
 
     const results = req.body.channels.map(async (channel: string) => {
       // Query Twitch API for the user info by their login name
-      const userData = await twitchApiClient.getUserByName(channel)
+      const userData: HelixUser | null =
+        await twitchApiClient.getUserByName(channel)
       if (!userData) {
         return {
           status: "error",

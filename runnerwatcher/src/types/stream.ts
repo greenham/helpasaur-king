@@ -1,4 +1,4 @@
-import { HelixStream } from "twitch-api-client"
+import { HelixStream, HelixUser } from "twitch-api-client"
 
 // Extended stream type for runnerwatcher service
 // Combines HelixStream data with custom properties added by our service
@@ -20,12 +20,7 @@ export interface WatchedTwitchStream {
   isMature: boolean
 
   // Custom properties added by runnerwatcher
-  user?: {
-    id: string
-    login: string
-    display_name: string
-    [key: string]: any
-  }
+  user?: HelixUser
   alert_sent_at?: Date
   [key: string]: any // Allow additional dynamic properties
 }

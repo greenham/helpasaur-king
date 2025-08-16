@@ -3,6 +3,7 @@ import guard from "express-jwt-permissions"
 import User from "../../models/user"
 import { getRequestedChannel, getTwitchApiClient } from "../../lib/utils"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
+import { HelixUser } from "twitch-api-client"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -62,9 +63,10 @@ router.post("/join", async (req: Request, res: Response) => {
         // Get user data from Twitch
         const twitchApiClient = getTwitchApiClient()
 
-        let twitchUserData: any = null
+        let twitchUserData: HelixUser | null = null
         try {
-          const response = await twitchApiClient.getUserByName(requestedChannel)
+          const response: HelixUser | null =
+            await twitchApiClient.getUserByName(requestedChannel)
           if (!response) {
             throw new Error(
               `Unable to get user data for channel ${requestedChannel}`
