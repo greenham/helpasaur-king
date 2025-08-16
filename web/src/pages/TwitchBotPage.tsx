@@ -58,7 +58,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
           and send <code>!join</code> or <code>!leave</code>.
         </Alert>
       )}
-      {user && (
+      {user && twitchBotConfig && (
         <TwitchUserBotManagement
           user={user}
           twitchBotConfig={twitchBotConfig}
@@ -131,7 +131,7 @@ const TwitchUserBotManagement: React.FunctionComponent<
   // Get mutation objects
   const joinChannelMutation = useJoinTwitchChannel()
   const leaveChannelMutation = useLeaveTwitchChannel()
-  const updateConfigMutation = useUpdateTwitchBotConfig()
+  const updateConfigMutation = useUpdateTwitchBotConfig({ showToast: false })
 
   // Memoize allowed prefixes to avoid unnecessary recalculations
   const allowedPrefixes = useMemo(() => {
@@ -142,11 +142,11 @@ const TwitchUserBotManagement: React.FunctionComponent<
   }, [webConfig])
 
   const handleJoinRequest = async () => {
-    joinChannelMutation.mutate()
+    joinChannelMutation.mutate(undefined)
   }
 
   const handleLeaveRequest = async () => {
-    leaveChannelMutation.mutate()
+    leaveChannelMutation.mutate(undefined)
     handleCloseLeaveModal()
   }
 

@@ -1,5 +1,4 @@
 import * as React from "react"
-import { useToast } from "../../hooks/useToast"
 import { useHelpaApi } from "../../hooks/useHelpaApi"
 import {
   Container,
@@ -14,8 +13,6 @@ import {
 
 interface ManageTwitchBotProps {}
 const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
-  const toast = useToast()
-
   const { useTwitchBotChannels, useJoinTwitchChannel, useLeaveTwitchChannel } =
     useHelpaApi()
   const { data: twitchBotChannels } = useTwitchBotChannels()
@@ -33,13 +30,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
   const handleAddChannelToTwitchBot = async () => {
     joinChannelMutation.mutate(channelToJoin, {
       onSuccess: () => {
-        toast.success(`Twitch bot has joined ${channelToJoin}!`)
         setChannelToJoin("")
-      },
-      onError: (error: any) => {
-        toast.error(
-          `Twitch bot failed to join ${channelToJoin}: ${error.message}`
-        )
       },
     })
   }
@@ -54,13 +45,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
   const handleRemoveChannelFromTwitchBot = async () => {
     leaveChannelMutation.mutate(channelToRemove, {
       onSuccess: () => {
-        toast.success(`Twitch bot has left ${channelToRemove}!`)
         setChannelToRemove("")
-      },
-      onError: (error: any) => {
-        toast.error(
-          `Twitch bot failed to leave ${channelToRemove}: ${error.message}`
-        )
       },
     })
   }

@@ -1,5 +1,4 @@
 import * as React from "react"
-import { useToast } from "../../hooks/useToast"
 import { useHelpaApi } from "../../hooks/useHelpaApi"
 import {
   Container,
@@ -17,7 +16,6 @@ interface ManageStreamAlertsProps {}
 const ManageStreamAlerts: React.FunctionComponent<
   ManageStreamAlertsProps
 > = () => {
-  const toast = useToast()
   const {
     useStreamAlertsChannels,
     useAddChannelToStreamAlerts,
@@ -38,13 +36,7 @@ const ManageStreamAlerts: React.FunctionComponent<
   const handleAddChannelToStreamAlerts = async () => {
     addChannelMutation.mutate(channelToAdd, {
       onSuccess: () => {
-        toast.success(`Added ${channelToAdd} to stream alerts!`)
         setChannelToAdd("")
-      },
-      onError: (error: any) => {
-        toast.error(
-          `Failed to add ${channelToAdd} to stream alerts: ${error.message}`
-        )
       },
     })
   }
@@ -59,13 +51,7 @@ const ManageStreamAlerts: React.FunctionComponent<
   const handleRemoveChannelFromStreamAlerts = async () => {
     removeChannelMutation.mutate(channelToRemove, {
       onSuccess: () => {
-        toast.success(`Removed channel from stream alerts!`)
         setChannelToRemove("")
-      },
-      onError: (error: any) => {
-        toast.error(
-          `Failed to remove channel from stream alerts: ${error.message}`
-        )
       },
     })
   }

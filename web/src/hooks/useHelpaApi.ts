@@ -20,6 +20,12 @@ import {
 } from "@helpasaur/api-client"
 import { useToast } from "./useToast"
 
+// Extended mutation options with toast control
+interface MutationOptionsWithToast<TData, TError, TVariables>
+  extends Omit<UseMutationOptions<TData, TError, TVariables>, "mutationFn"> {
+  showToast?: boolean
+}
+
 if (!process.env.API_HOST) {
   throw new Error(
     "API_HOST environment variable is not defined. Please set it during build time."
@@ -162,155 +168,243 @@ export const useHelpaApi = () => {
      * Update Twitch bot configuration
      */
     useUpdateTwitchBotConfig: (
-      options?: Omit<
-        UseMutationOptions<MutationResponse, Error, ConfigUpdatePayload>,
-        "mutationFn"
+      options?: MutationOptionsWithToast<
+        MutationResponse,
+        Error,
+        ConfigUpdatePayload
       >
-    ) =>
-      useMutation({
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (config: ConfigUpdatePayload) =>
           helpaApiClient.updateTwitchBotConfig(config),
-        onSuccess: () => {
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
+          if (showToast) {
+            toast.success("Twitch bot configuration updated!")
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        ...options,
-      }),
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(`Failed to update configuration: ${error.message}`)
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
 
     /**
      * Join Twitch channel
      */
     useJoinTwitchChannel: (
-      options?: Omit<
-        UseMutationOptions<TwitchBotChannelResponse, Error, string | undefined>,
-        "mutationFn"
+      options?: MutationOptionsWithToast<
+        TwitchBotChannelResponse,
+        Error,
+        string | undefined
       >
-    ) =>
-      useMutation({
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (twitchUsername?: string) =>
           helpaApiClient.joinTwitchChannel(twitchUsername),
-        onSuccess: () => {
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
+          if (showToast && data.result === "success") {
+            toast.success(
+              data.message || `Joined channel: ${variables || "your channel"}`
+            )
+          } else if (showToast && data.result === "noop") {
+            toast.info(data.message || "Already in channel")
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        ...options,
-      }),
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(`Failed to join channel: ${error.message}`)
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
 
     /**
      * Leave Twitch channel
      */
     useLeaveTwitchChannel: (
-      options?: Omit<
-        UseMutationOptions<TwitchBotChannelResponse, Error, string | undefined>,
-        "mutationFn"
+      options?: MutationOptionsWithToast<
+        TwitchBotChannelResponse,
+        Error,
+        string | undefined
       >
-    ) =>
-      useMutation({
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (twitchUsername?: string) =>
           helpaApiClient.leaveTwitchChannel(twitchUsername),
-        onSuccess: () => {
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
+          if (showToast && data.result === "success") {
+            toast.success(
+              data.message || `Left channel: ${variables || "your channel"}`
+            )
+          } else if (showToast && data.result === "noop") {
+            toast.info(data.message || "Not in channel")
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        ...options,
-      }),
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(`Failed to leave channel: ${error.message}`)
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
 
     /**
      * Create command
      */
     useCreateCommand: (
-      options?: Omit<
-        UseMutationOptions<MutationResponse, Error, Partial<Command>>,
-        "mutationFn"
+      options?: MutationOptionsWithToast<
+        MutationResponse,
+        Error,
+        Partial<Command>
       >
-    ) =>
-      useMutation({
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (command: Partial<Command>) =>
           helpaApiClient.createCommand(command),
-        onSuccess: (_data, variables) => {
-          toast.success(`Command '${variables.command}' created!`)
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          if (showToast) {
+            toast.success(`Command '${variables.command}' created!`)
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        onError: (err: Error) => {
-          toast.error(`Unable to create command: ${err.message}`)
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(`Unable to create command: ${error.message}`)
+          }
+          mutationOptions.onError?.(error, variables, context)
         },
-        ...options,
-      }),
+        ...mutationOptions,
+      })
+    },
 
     /**
      * Update command
      */
     useUpdateCommand: (
-      options?: Omit<
-        UseMutationOptions<MutationResponse, Error, Command>,
-        "mutationFn"
-      >
-    ) =>
-      useMutation({
+      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (command: Command) => helpaApiClient.updateCommand(command),
-        onSuccess: (_data, variables) => {
-          toast.success(`Command '${variables.command}' updated!`)
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          if (showToast) {
+            toast.success(`Command '${variables.command}' updated!`)
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        onError: (err: Error) => {
-          toast.error(`Unable to update command: ${err.message}`)
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(`Unable to update command: ${error.message}`)
+          }
+          mutationOptions.onError?.(error, variables, context)
         },
-        ...options,
-      }),
+        ...mutationOptions,
+      })
+    },
 
     /**
      * Delete command
      */
     useDeleteCommand: (
-      options?: Omit<
-        UseMutationOptions<MutationResponse, Error, Command>,
-        "mutationFn"
-      >
-    ) =>
-      useMutation({
+      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (command: Command) => helpaApiClient.deleteCommand(command),
-        onSuccess: (_data, variables) => {
-          toast.success(`Command '${variables.command}' deleted!`)
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          if (showToast) {
+            toast.success(`Command '${variables.command}' deleted!`)
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        onError: (err: Error) => {
-          toast.error(`Unable to delete command: ${err.message}`)
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(`Unable to delete command: ${error.message}`)
+          }
+          mutationOptions.onError?.(error, variables, context)
         },
-        ...options,
-      }),
+        ...mutationOptions,
+      })
+    },
 
     /**
      * Add channel to stream alerts
      */
     useAddChannelToStreamAlerts: (
-      options?: Omit<
-        UseMutationOptions<MutationResponse, Error, string>,
-        "mutationFn"
-      >
-    ) =>
-      useMutation({
+      options?: MutationOptionsWithToast<MutationResponse, Error, string>
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (twitchUsername: string) =>
           helpaApiClient.addChannelToStreamAlerts(twitchUsername),
-        onSuccess: () => {
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["streamAlertsChannels"] })
+          if (showToast) {
+            toast.success(`Added ${variables} to stream alerts!`)
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        ...options,
-      }),
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(
+              `Failed to add ${variables} to stream alerts: ${error.message}`
+            )
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
 
     /**
      * Remove channel from stream alerts
      */
     useRemoveChannelFromStreamAlerts: (
-      options?: Omit<
-        UseMutationOptions<MutationResponse, Error, string>,
-        "mutationFn"
-      >
-    ) =>
-      useMutation({
+      options?: MutationOptionsWithToast<MutationResponse, Error, string>
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
         mutationFn: (twitchUserId: string) =>
           helpaApiClient.removeChannelFromStreamAlerts(twitchUserId),
-        onSuccess: () => {
+        onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["streamAlertsChannels"] })
+          if (showToast) {
+            toast.success(`Removed ${variables} from stream alerts!`)
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
         },
-        ...options,
-      }),
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(
+              `Failed to remove ${variables} from stream alerts: ${error.message}`
+            )
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
   }
 
   return {
