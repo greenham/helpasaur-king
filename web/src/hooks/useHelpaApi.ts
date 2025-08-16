@@ -23,6 +23,23 @@ import { useToast } from "./useToast"
 // Web-specific response types for React Query mutations
 type MutationResponse = ApiResponse<{}>
 
+/**
+ * Helper function to extract data from ApiResponse<T> or throw an error
+ * @param response - The API response to extract data from
+ * @param operation - The operation name for error messages
+ * @returns The extracted data
+ * @throws Error if the response indicates failure or has no data
+ */
+function extractApiResponseData<T>(
+  response: ApiResponse<T>,
+  operation: string
+): T {
+  if (response.result === "success" && response.data !== undefined) {
+    return response.data
+  }
+  throw new Error(response.message || `Failed to ${operation}`)
+}
+
 // Extended mutation options with toast control
 interface MutationOptionsWithToast<TData, TError, TVariables>
   extends Omit<UseMutationOptions<TData, TError, TVariables>, "mutationFn"> {
@@ -62,10 +79,7 @@ export const useHelpaApi = () => {
         queryKey: ["config"],
         queryFn: async () => {
           const response = await helpaApiClient.getWebConfig()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(response.message || "Failed to get config")
+          return extractApiResponseData(response, "get config")
         },
         staleTime: 60 * 60 * 1000, // 1 hour
         ...options,
@@ -81,10 +95,7 @@ export const useHelpaApi = () => {
         queryKey: ["user"],
         queryFn: async () => {
           const response = await helpaApiClient.getCurrentUser()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(response.message || "Failed to get user")
+          return extractApiResponseData(response, "get user")
         },
         retry: 0,
         ...options,
@@ -100,10 +111,7 @@ export const useHelpaApi = () => {
         queryKey: ["commands"],
         queryFn: async () => {
           const response = await helpaApiClient.getCommands()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(response.message || "Failed to get commands")
+          return extractApiResponseData(response, "get commands")
         },
         ...options,
       }),
@@ -121,10 +129,7 @@ export const useHelpaApi = () => {
         queryKey: ["livestreams"],
         queryFn: async () => {
           const response = await helpaApiClient.getLivestreams()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(response.message || "Failed to get livestreams")
+          return extractApiResponseData(response, "get livestreams")
         },
         refetchInterval: 1000 * 60, // 1 minute
         ...options,
@@ -143,10 +148,7 @@ export const useHelpaApi = () => {
         queryKey: ["discordJoinUrl"],
         queryFn: async () => {
           const response = await helpaApiClient.getDiscordJoinUrl()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(response.message || "Failed to get Discord join URL")
+          return extractApiResponseData(response, "get Discord join URL")
         },
         ...options,
       }),
@@ -164,10 +166,7 @@ export const useHelpaApi = () => {
         queryKey: ["twitchBotConfig"],
         queryFn: async () => {
           const response = await helpaApiClient.getTwitchBotConfig()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(response.message || "Failed to get Twitch bot config")
+          return extractApiResponseData(response, "get Twitch bot config")
         },
         retry: 0,
         ...options,
@@ -183,12 +182,7 @@ export const useHelpaApi = () => {
         queryKey: ["twitchBotChannels"],
         queryFn: async () => {
           const response = await helpaApiClient.getTwitchBotChannels()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(
-            response.message || "Failed to get Twitch bot channels"
-          )
+          return extractApiResponseData(response, "get Twitch bot channels")
         },
         ...options,
       }),
@@ -206,12 +200,7 @@ export const useHelpaApi = () => {
         queryKey: ["streamAlertsChannels"],
         queryFn: async () => {
           const response = await helpaApiClient.getStreamAlertsChannels()
-          if (response.result === "success" && response.data) {
-            return response.data
-          }
-          throw new Error(
-            response.message || "Failed to get stream alerts channels"
-          )
+          return extractApiResponseData(response, "get stream alerts channels")
         },
         ...options,
       }),
