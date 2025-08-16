@@ -3,6 +3,8 @@ import {
   HelixPaginatedStreamFilter,
   HelixPrivilegedUser,
   HelixStream,
+  HelixUser,
+  HelixEventSubSubscription,
 } from "@twurple/api"
 import {
   AppTokenAuthProvider,
@@ -54,7 +56,9 @@ export class TwitchApiClient {
     this.apiClient = new ApiClient({ authProvider })
   }
 
-  async getSubscriptions(params: any = false): Promise<{ data: any[] }> {
+  async getSubscriptions(
+    params: any = false
+  ): Promise<{ data: HelixEventSubSubscription[] }> {
     const subscriptions = await this.apiClient.eventSub.getSubscriptions()
 
     // Filter based on params if provided
@@ -73,7 +77,7 @@ export class TwitchApiClient {
     userId: string,
     type: string,
     version = "1"
-  ): Promise<any> {
+  ): Promise<HelixEventSubSubscription> {
     if (!this.eventSubConfig) {
       throw new Error("EventSub configuration not provided")
     }
@@ -101,7 +105,7 @@ export class TwitchApiClient {
     }
   }
 
-  async deleteSubscription(id: string): Promise<any> {
+  async deleteSubscription(id: string): Promise<{ success: boolean }> {
     try {
       await this.apiClient.eventSub.deleteSubscription(id)
       return { success: true }
@@ -178,7 +182,7 @@ export class TwitchApiClient {
     }
   }
 
-  async getUserByName(name: string): Promise<any> {
+  async getUserByName(name: string): Promise<HelixUser | null> {
     try {
       const user = await this.apiClient.users.getUserByName(name)
       return user
@@ -188,7 +192,7 @@ export class TwitchApiClient {
     }
   }
 
-  async getUserById(id: string): Promise<any> {
+  async getUserById(id: string): Promise<HelixUser | null> {
     try {
       const user = await this.apiClient.users.getUserById(id)
       return user

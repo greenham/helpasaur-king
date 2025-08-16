@@ -1,10 +1,9 @@
-import express from "express"
+import express, { Application, Request, Response } from "express"
 import * as crypto from "crypto"
 import { EventEmitter } from "events"
 import ms from "ms"
 import { Constants } from "../constants"
-
-const packageJson = require("../../package.json")
+import { version as packageVersion } from "../../package.json"
 
 const { TWITCH_EVENTSUB_SECRET_KEY } = process.env
 
@@ -19,7 +18,7 @@ const {
 } = Constants
 
 export class TwitchEventListener extends EventEmitter {
-  private app: express.Application
+  private app: Application
   private listeningPort: number | null
   private startTime: number
   private eventsReceived: number
@@ -35,13 +34,13 @@ export class TwitchEventListener extends EventEmitter {
     this.app.use(express.raw({ type: "application/json" }))
 
     // Health check endpoint
-    this.app.get("/health", (_req: express.Request, res: express.Response) => {
+    this.app.get("/health", (_req: Request, res: Response) => {
       try {
         const uptimeMs = Date.now() - this.startTime
         res.status(200).json({
           status: "healthy",
           service: "runnerwatcher",
-          version: packageJson.version,
+          version: packageVersion,
           port: this.listeningPort || "not started",
           uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
           uptimeMs: uptimeMs, // keep raw ms for monitoring tools
@@ -59,12 +58,9 @@ export class TwitchEventListener extends EventEmitter {
       }
     })
 
-    this.app.post(
-      "/eventsub",
-      (req: express.Request, res: express.Response) => {
-        this.handleWebhook(req, res)
-      }
-    )
+    this.app.post("/eventsub", (req: Request, res: Response) => {
+      this.handleWebhook(req, res)
+    })
   }
 
   listen(port: number): void {
@@ -74,7 +70,7 @@ export class TwitchEventListener extends EventEmitter {
     })
   }
 
-  handleWebhook(req: express.Request, res: express.Response): void {
+  handleWebhook(req: Request, res: Response): void {
     const notification = JSON.parse(req.body)
     const messageId = req.header(TWITCH_MESSAGE_ID)
     const messageTimestamp = req.header(TWITCH_MESSAGE_TIMESTAMP)
