@@ -1,9 +1,6 @@
 import {
   ApiClient,
   HelixPaginatedStreamFilter,
-  HelixPrivilegedUser,
-  HelixStream,
-  HelixUser,
   HelixEventSubSubscription,
 } from "@twurple/api"
 import { getRawData, DataObject } from "@twurple/common"
@@ -14,18 +11,19 @@ import {
 } from "@twurple/auth"
 import {
   EventSubConfig,
-  SubscriptionData,
+  SubscribeToStreamEventsOptions,
   TwitchApiConfig,
   TwitchStreamData,
   TwitchUserData,
   TwitchPrivilegedUserData,
+  GetSubscriptionOptions,
 } from "./types"
 
 export const STREAM_ONLINE_EVENT = "stream.online"
 export const CHANNEL_UPDATE_EVENT = "channel.update"
 
 // Helper function to extract raw data from @twurple class instances using official API
-function convertTwurpleRawData<TData>(obj: DataObject<TData>): TData {
+export function convertTwurpleRawData<TData>(obj: DataObject<TData>): TData {
   // Use @twurple's official getRawData function
   return getRawData(obj)
 }
@@ -54,20 +52,27 @@ export class TwitchApiClient {
   }
 
   async getSubscriptions(
-    params: any = false
-  ): Promise<{ data: HelixEventSubSubscription[] }> {
+    params?: GetSubscriptionOptions
+  ): Promise<HelixEventSubSubscription[]> {
     const subscriptions = await this.apiClient.eventSub.getSubscriptions()
+    if (!subscriptions || !subscriptions.data) {
+      return []
+    }
 
     // Filter based on params if provided
-    let data = subscriptions.data
+    let subscriptionsData = subscriptions.data
     if (params && params.status) {
-      data = data.filter((sub: any) => sub.status === params.status)
+      subscriptionsData = subscriptionsData.filter(
+        (sub: HelixEventSubSubscription) => sub.status === params.status
+      )
     }
     if (params && params.type) {
-      data = data.filter((sub: any) => sub.type === params.type)
+      subscriptionsData = subscriptionsData.filter(
+        (sub: HelixEventSubSubscription) => sub.type === params.type
+      )
     }
 
-    return { data }
+    return subscriptionsData
   }
 
   async createSubscription(
@@ -102,7 +107,7 @@ export class TwitchApiClient {
     }
   }
 
-  async deleteSubscription(id: string): Promise<{ success: boolean }> {
+  async deleteSubscription(id: string): Promise<{ success: true }> {
     try {
       await this.apiClient.eventSub.deleteSubscription(id)
       return { success: true }
@@ -112,28 +117,31 @@ export class TwitchApiClient {
     }
   }
 
-  async clearSubscriptions(): Promise<void> {
+  async clearSubscriptions(): Promise<
+    PromiseSettledResult<{ success: true }>[]
+  > {
     try {
-      const res = await this.getSubscriptions()
-      console.log(`Found ${res.data.length} subscriptions to delete...`)
+      const subscriptions = await this.getSubscriptions()
+      console.log(`Found ${subscriptions.length} subscriptions to delete...`)
 
-      if (res.data.length === 0) {
-        return
+      if (subscriptions.length === 0) {
+        return []
       }
 
-      const deletions = res.data.map((s: any) => {
+      const deletions = subscriptions.map((s: HelixEventSubSubscription) => {
         return this.deleteSubscription(s.id)
       })
 
-      await Promise.allSettled(deletions)
-    } catch (err) {
-      console.error(err)
+      return await Promise.allSettled(deletions)
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   }
 
   async subscribeToStreamEvents(
-    data: SubscriptionData
-  ): Promise<PromiseSettledResult<any>[]> {
+    data: SubscribeToStreamEventsOptions
+  ): Promise<PromiseSettledResult<HelixEventSubSubscription>[]> {
     const events = [STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT]
     const { channel, userId } = data
 

@@ -158,6 +158,9 @@ importers:
       '@twurple/auth':
         specifier: ^7.4.0
         version: 7.4.0
+      '@twurple/common':
+        specifier: ^7.4.0
+        version: 7.4.0
     devDependencies:
       '@types/node':
         specifier: ^20.8.10

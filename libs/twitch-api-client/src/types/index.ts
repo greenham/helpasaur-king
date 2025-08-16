@@ -1,3 +1,5 @@
+import { HelixEventSubSubscriptionStatus } from "@twurple/api"
+
 export interface TwitchStreamData {
   id: string
   user_id: string
@@ -33,7 +35,7 @@ export interface TwitchPrivilegedUserData extends TwitchUserData {
   email?: string
 }
 
-export interface SubscriptionData {
+export interface SubscribeToStreamEventsOptions {
   channel: string
   userId: string
 }
@@ -49,4 +51,9 @@ export interface TwitchApiConfig {
   access_token?: string
   scopes?: string[]
   eventSub?: EventSubConfig
+}
+
+export interface GetSubscriptionOptions {
+  status: HelixEventSubSubscriptionStatus
+  type: string
 }
