@@ -1,12 +1,10 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { Alert, Badge, Container, Spinner } from "react-bootstrap"
 import { filterStreams } from "../utils/utils"
 import LivestreamsList from "../components/LivestreamsList"
-import { getLivestreams } from "../utils/apiService"
 import { TwitchStream } from "../types/streams"
-import { useConfig } from "../hooks/useConfig"
+import { useHelpaApi } from "../hooks/useHelpaApi"
 
 interface LivestreamsPageProps {}
 interface FilteredStreams {
@@ -15,23 +13,18 @@ interface FilteredStreams {
 }
 
 const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
+  const { useConfig, useLivestreams } = useHelpaApi()
   const {
     data: webConfig,
     isError: configError,
     isLoading: configLoading,
   } = useConfig()
-
-  const streamsQuery = useQuery({
-    queryKey: ["livestreams"],
-    queryFn: getLivestreams,
-    refetchInterval: 1000 * 60,
-  })
   const {
     data: allStreams,
     isError: streamsError,
     isLoading: streamsLoading,
     isFetching: streamsFetching,
-  } = streamsQuery
+  } = useLivestreams()
 
   const [mergedStreams, setMergedStreams] = useState<Array<TwitchStream>>([])
 

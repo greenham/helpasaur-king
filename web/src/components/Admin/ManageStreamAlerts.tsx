@@ -1,11 +1,12 @@
 import * as React from "react"
 import { useToast } from "../../hooks/useToast"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import {
-  addChannelToStreamAlerts,
-  getStreamAlertsChannels,
-  removeChannelFromStreamAlerts,
-} from "../../utils/apiService"
+// import {
+//   addChannelToStreamAlerts,
+//   getStreamAlertsChannels,
+//   removeChannelFromStreamAlerts,
+// } from "../../utils/apiService"
+import { useHelpaApi } from "../../hooks/useHelpaApi"
 import {
   Container,
   Row,
@@ -23,11 +24,8 @@ const ManageStreamAlerts: React.FunctionComponent<
   ManageStreamAlertsProps
 > = () => {
   const toast = useToast()
-
-  const { data: streamAlertsChannels } = useQuery({
-    queryKey: ["streamAlertsChannels"],
-    queryFn: getStreamAlertsChannels,
-  })
+  const { useStreamAlertsChannels } = useHelpaApi()
+  const { data: streamAlertsChannels } = useStreamAlertsChannels()
   const queryClient = useQueryClient()
 
   const [channelToAdd, setChannelToAdd] = React.useState("")

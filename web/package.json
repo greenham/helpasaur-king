@@ -6,10 +6,8 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "clean": "npx rimraf build",
     "start": "parcel src/index.html -p 3000 --dist-dir build --open",
-    "build": "parcel build src/index.html --dist-dir build",
-    "serve": "serve -l 3000 -s ./build"
+    "build": "parcel build src/index.html --dist-dir build"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",

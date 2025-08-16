@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useEffect } from "react"
 import { Alert, Container, ListGroup, Spinner } from "react-bootstrap"
-import { useUser } from "../hooks/useUser"
+import { useHelpaApi } from "../hooks/useHelpaApi"
 import ManageStreamAlerts from "../components/Admin/ManageStreamAlerts"
 import ManageTwitchBot from "../components/Admin/ManageTwitchBot"
 
@@ -11,7 +11,7 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
     document.title = "Admin | Helpasaur King"
   }, [])
 
-  const { data: user, isLoading: userLoading } = useUser()
+  const { data: user, isLoading: userLoading } = useHelpaApi().useUser()
 
   if (userLoading)
     return (

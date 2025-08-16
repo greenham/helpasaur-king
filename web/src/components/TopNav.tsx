@@ -12,7 +12,7 @@ import {
 import { LinkContainer } from "react-router-bootstrap"
 import { getTwitchLoginUrl } from "../utils/utils"
 import { useLocation } from "react-router-dom"
-import { useUser } from "../hooks/useUser"
+import { useHelpaApi } from "../hooks/useHelpaApi"
 
 const RESOURCES = [
   {
@@ -66,7 +66,7 @@ const popover = (
 )
 
 function TopNav() {
-  const { data: user } = useUser()
+  const { data: user } = useHelpaApi().useUser()
   const logo = new URL("../img/logo.png", import.meta.url).toString()
   const location = useLocation()
 
