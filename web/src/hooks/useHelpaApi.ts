@@ -57,7 +57,13 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["config"],
-        queryFn: () => helpaApiClient.getWebConfig(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getWebConfig()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(response.message || "Failed to get config")
+        },
         staleTime: 60 * 60 * 1000, // 1 hour
         ...options,
       }),
@@ -70,7 +76,13 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["user"],
-        queryFn: () => helpaApiClient.getCurrentUser(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getCurrentUser()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(response.message || "Failed to get user")
+        },
         retry: 0,
         ...options,
       }),
@@ -83,7 +95,13 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["commands"],
-        queryFn: () => helpaApiClient.getCommands(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getCommands()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(response.message || "Failed to get commands")
+        },
         ...options,
       }),
 
@@ -98,7 +116,13 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["livestreams"],
-        queryFn: () => helpaApiClient.getLivestreams(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getLivestreams()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(response.message || "Failed to get livestreams")
+        },
         refetchInterval: 1000 * 60, // 1 minute
         ...options,
       }),
@@ -129,7 +153,13 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["twitchBotConfig"],
-        queryFn: () => helpaApiClient.getTwitchBotConfig(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getTwitchBotConfig()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(response.message || "Failed to get Twitch bot config")
+        },
         retry: 0,
         ...options,
       }),
@@ -142,7 +172,15 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["twitchBotChannels"],
-        queryFn: () => helpaApiClient.getTwitchBotChannels(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getTwitchBotChannels()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(
+            response.message || "Failed to get Twitch bot channels"
+          )
+        },
         ...options,
       }),
 
@@ -157,7 +195,15 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["streamAlertsChannels"],
-        queryFn: () => helpaApiClient.getStreamAlertsChannels(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getStreamAlertsChannels()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(
+            response.message || "Failed to get stream alerts channels"
+          )
+        },
         ...options,
       }),
   }

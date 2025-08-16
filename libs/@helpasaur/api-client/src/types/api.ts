@@ -84,23 +84,6 @@ export interface TwitchStream {
   isOnAlertsList?: boolean
 }
 
-// Discord Types
-export interface DiscordJoinUrlResponse {
-  result: "success" | "error"
-  message: string
-  url?: string
-}
-
-// Twitch Bot Types
-export interface TwitchBotChannelResponse {
-  result: "success" | "error" | "noop"
-  message?: string
-  channel?: string
-  data?: {
-    twitchBotConfig?: TwitchBotConfig & { roomId?: string }
-  }
-}
-
 // Stream Alerts Types
 export interface StreamAlertsChannel {
   id: string
@@ -109,22 +92,15 @@ export interface StreamAlertsChannel {
   profile_image_url?: string
 }
 
-export interface StreamAlertsResponse {
-  result: "success" | "error" | "noop"
-  message?: string
-  channels?: StreamAlertsChannel[]
-}
-
-// Mutation Response Types
-export interface MutationResponse {
-  result: "success" | "error" | "noop"
-  message?: string
-}
-
-// Command Mutation Types
-export interface CommandMutationResponse extends MutationResponse {
-  command?: Command
-}
+// Standardized Response Type Aliases using ApiResponse<T>
+export type DiscordJoinUrlResponse = ApiResponse<{ url?: string }>
+export type TwitchBotChannelResponse = ApiResponse<{
+  channel?: string
+  twitchBotConfig?: TwitchBotConfig & { roomId?: string }
+}>
+export type StreamAlertsResponse = ApiResponse<StreamAlertsChannel[]>
+export type MutationResponse = ApiResponse<{}>
+export type CommandMutationResponse = ApiResponse<{ command?: Command }>
 
 // Configuration Update Types
 export interface ConfigUpdatePayload {
@@ -136,25 +112,11 @@ export interface ConfigUpdatePayload {
   weeklyRaceAlertEnabled?: boolean
 }
 
-// Active Channels Response Types
-export interface ActiveChannelsResponse {
-  result: "success" | "error"
-  message?: string
-  channels?: string[]
-}
-
-// Command Find Types
+// Request Types (no changes needed)
 export interface CommandFindRequest {
   command: string
 }
 
-export interface CommandFindResponse {
-  result: "success" | "error" | "noop"
-  message?: string
-  command?: Command
-}
-
-// Command Log Types
 export interface CommandLogRequest {
   command: string
   user: string
@@ -164,7 +126,10 @@ export interface CommandLogRequest {
   roomId?: string
 }
 
-export interface CommandLogResponse extends MutationResponse {}
+// Standardized Response Types using ApiResponse<T>
+export type ActiveChannelsResponse = ApiResponse<string[]>
+export type CommandFindResponse = ApiResponse<{ command?: Command }>
+export type CommandLogResponse = ApiResponse<{}>
 
 // Discord Guild Configuration Types
 export interface GuildConfig {
@@ -200,6 +165,4 @@ export interface GuildConfigUpdate {
   weeklyRaceAlertRoleId?: string | null
 }
 
-export interface GuildConfigResponse extends MutationResponse {
-  guild?: GuildConfig
-}
+export type GuildConfigResponse = ApiResponse<{ guild?: GuildConfig }>

@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosError } from "axios"
 import axiosRetry from "axios-retry"
 import {
+  ApiResponse,
   ServiceConfigOptions,
   ServiceConfig,
   ServiceAuthResponse,
@@ -146,7 +147,7 @@ export class HelpaApi {
   /**
    * Get all commands from the API
    */
-  async getCommands(): Promise<Command[]> {
+  async getCommands(): Promise<ApiResponse<Command[]>> {
     try {
       const response = await this.api.get("/api/commands")
       return response.data
@@ -158,7 +159,7 @@ export class HelpaApi {
   /**
    * Get live streams from the API
    */
-  async getLivestreams(): Promise<TwitchStream[]> {
+  async getLivestreams(): Promise<ApiResponse<TwitchStream[]>> {
     try {
       const response = await this.api.get("/api/streams/live")
       return response.data
@@ -170,7 +171,7 @@ export class HelpaApi {
   /**
    * Get web configuration from the API
    */
-  async getWebConfig(): Promise<WebConfig> {
+  async getWebConfig(): Promise<ApiResponse<WebConfig>> {
     try {
       const response = await this.api.get("/api/web/config")
       return response.data
@@ -196,7 +197,7 @@ export class HelpaApi {
   /**
    * Get current user information
    */
-  async getCurrentUser(): Promise<ApiUser> {
+  async getCurrentUser(): Promise<ApiResponse<ApiUser>> {
     try {
       const response = await this.api.get("/api/me")
       return response.data
@@ -208,7 +209,7 @@ export class HelpaApi {
   /**
    * Get Twitch bot configuration for current user
    */
-  async getTwitchBotConfig(): Promise<TwitchBotConfig> {
+  async getTwitchBotConfig(): Promise<ApiResponse<TwitchBotConfig>> {
     try {
       const response = await this.api.get("/api/me/twitch")
       return response.data
@@ -264,7 +265,7 @@ export class HelpaApi {
   /**
    * Get Twitch bot channels
    */
-  async getTwitchBotChannels(): Promise<string[]> {
+  async getTwitchBotChannels(): Promise<ApiResponse<string[]>> {
     try {
       const response = await this.api.get("/api/twitch/channels")
       return response.data
@@ -317,7 +318,7 @@ export class HelpaApi {
   /**
    * Get stream alerts channels
    */
-  async getStreamAlertsChannels(): Promise<StreamAlertsChannel[]> {
+  async getStreamAlertsChannels(): Promise<ApiResponse<StreamAlertsChannel[]>> {
     try {
       const response = await this.api.get("/api/streamAlerts/channels")
       return response.data
@@ -401,7 +402,7 @@ export class HelpaApi {
   /**
    * Get a specific command by ID
    */
-  async getCommandById(commandId: string): Promise<Command> {
+  async getCommandById(commandId: string): Promise<ApiResponse<Command>> {
     try {
       const response = await this.api.get(`/api/commands/${commandId}`)
       return response.data

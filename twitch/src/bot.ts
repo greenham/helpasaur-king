@@ -475,7 +475,7 @@ export class TwitchBot {
         })
 
         if (response.result === "success") {
-          command = response.command
+          command = response.data?.command
 
           if (command) {
             command.staleAfter = Date.now() + 10 * 60 * 1000
