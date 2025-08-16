@@ -1,0 +1,35 @@
+# Generic service Dockerfile template for a TypeScript project
+# Usage: docker build --build-arg SERVICE=<service-name> -f Dockerfile.service .
+ARG VERSION=dev
+FROM helpa-base:${VERSION} as base
+
+# Copy source and install all dependencies
+FROM base as app
+ARG SERVICE
+WORKDIR /app/${SERVICE}
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
+COPY ${SERVICE}/tsconfig.json ./
+COPY ${SERVICE}/src ./src
+
+# Development stage
+FROM app as dev
+ENV NODE_ENV=development
+CMD ["pnpm", "start:dev"]
+
+# Production build stage
+FROM app as prod-build
+ARG SERVICE
+ENV NODE_ENV=production
+WORKDIR /app/${SERVICE}
+RUN pnpm build
+# Deploy from workspace root with filter using package name
+WORKDIR /app
+RUN pnpm --filter helpa-${SERVICE} --prod deploy /prod/${SERVICE}
+
+# Production runtime stage - minimal image
+FROM node:20-alpine as prod
+ARG SERVICE
+WORKDIR /app
+COPY --from=prod-build /prod/${SERVICE} ./
+CMD ["node", "dist/index.js"]

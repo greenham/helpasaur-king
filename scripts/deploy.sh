@@ -40,7 +40,7 @@ echo -e "${GREEN}   ✓ .env file found${NC}"
 
 # Pull the new images from ghcr.io
 echo -e "\n${YELLOW}📦 Pulling images from GitHub Container Registry...${NC}"
-if VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml pull; then
+if VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml pull; then
   echo -e "${GREEN}   ✓ Images pulled successfully${NC}"
 else
   echo -e "${RED}   ❌ Failed to pull images${NC}"
@@ -49,7 +49,7 @@ fi
 
 # Start production services with version-tagged images
 echo -e "\n${YELLOW}🔄 Starting services with --force-recreate...${NC}"
-if VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.prod.yml up -d --force-recreate; then
+if VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate; then
   echo -e "${GREEN}   ✓ Services started successfully${NC}"
 else
   echo -e "${RED}   ❌ Failed to start services${NC}"

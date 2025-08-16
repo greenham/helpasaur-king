@@ -1,0 +1,127 @@
+version: "3.8"
+name: "helpa-build-prod"
+
+# Production/CI build configuration
+# Usage: VERSION=1.12.0 docker compose -f docker-compose.build.prod.yml build --push
+# This file builds images with registry tags for production deployment
+
+services:
+  helpa-base:
+    image: helpa-base:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./Dockerfile.base
+      target: builder
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "build.commit=${GIT_COMMIT:-unknown}"
+        - "build.date=${BUILD_DATE:-unknown}"
+
+  api-server:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-api:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: api
+        VERSION: ${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-api:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=api"
+
+  discord-bot:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-discord:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: discord
+        VERSION: ${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-discord:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=discord"
+
+  twitch-bot:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-twitch:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: twitch
+        VERSION: ${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-twitch:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=twitch"
+
+  runnerwatcher:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-runnerwatcher:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: runnerwatcher
+        VERSION: ${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-runnerwatcher:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=runnerwatcher"
+
+  racebot:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-racebot:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: racebot
+        VERSION: ${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-racebot:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=racebot"
+
+  ws-relay:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-ws-relay:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: ws-relay
+        VERSION: ${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-ws-relay:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=ws-relay"

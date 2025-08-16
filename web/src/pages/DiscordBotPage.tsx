@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap"
 import { useEffect } from "react"
 import { Link } from "react-router-dom"
-import { getDiscordJoinUrl } from "../utils/apiService"
+import { useHelpaApi } from "../hooks/useHelpaApi"
 
 const commandGroups = [
   {
@@ -106,15 +106,11 @@ const commandGroups = [
 interface DiscordBotPageProps {}
 
 const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
-  const [joinUrl, setJoinUrl] = React.useState<string>("")
+  const { useDiscordJoinUrl } = useHelpaApi()
+  const { data: joinUrlResponse } = useDiscordJoinUrl()
 
   useEffect(() => {
     document.title = "Discord Bot | Helpasaur King"
-    getDiscordJoinUrl().then((response) => {
-      if (response.result === "success") {
-        setJoinUrl(response.url)
-      }
-    })
   }, [])
 
   return (
@@ -152,11 +148,11 @@ const DiscordBotPage: React.FunctionComponent<DiscordBotPageProps> = () => {
         <Col>
           <Alert variant="dark" className="p-5 border-1 border-secondary">
             <h2>Would you like HelpasaurKing to help your Discord server?</h2>
-            {!joinUrl && <Spinner animation="border" />}
-            {joinUrl && (
+            {!joinUrlResponse?.url && <Spinner animation="border" />}
+            {joinUrlResponse?.url && (
               <Button
                 variant="primary"
-                href={joinUrl}
+                href={joinUrlResponse.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 size="lg"

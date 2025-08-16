@@ -1,0 +1,80 @@
+version: "3.8"
+name: "helpa-build"
+
+# Local development build configuration
+# Usage: docker compose -f docker-compose.build.yml build
+# This file builds images with local tags for development use
+
+services:
+  helpa-base:
+    image: helpa-base:dev
+    build:
+      context: .
+      dockerfile: ./Dockerfile.base
+      target: builder
+
+  api-server:
+    image: helpa-api:dev
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: dev
+      args:
+        SERVICE: api
+
+  discord-bot:
+    image: helpa-discord:dev
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: dev
+      args:
+        SERVICE: discord
+
+  twitch-bot:
+    image: helpa-twitch:dev
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: dev
+      args:
+        SERVICE: twitch
+
+  runnerwatcher:
+    image: helpa-runnerwatcher:dev
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: dev
+      args:
+        SERVICE: runnerwatcher
+
+  racebot:
+    image: helpa-racebot:dev
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: dev
+      args:
+        SERVICE: racebot
+
+  ws-relay:
+    image: helpa-ws-relay:dev
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: dev
+      args:
+        SERVICE: ws-relay

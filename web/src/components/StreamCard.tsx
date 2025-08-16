@@ -1,5 +1,5 @@
 import * as React from "react"
-import { TwitchStream } from "../types/streams"
+import { TwitchStream } from "@helpasaur/api-client"
 import Card from "react-bootstrap/Card"
 import Badge from "react-bootstrap/Badge"
 import Button from "react-bootstrap/Button"
@@ -36,7 +36,7 @@ function StreamCard(props: StreamCardProps) {
         </Button>
       </Card.Header>
       <a
-        href={getTwitchUrl(stream.user_login)}
+        href={getTwitchUrl(stream.userName)}
         target="_blank"
         rel="noopener noreferrer"
       >

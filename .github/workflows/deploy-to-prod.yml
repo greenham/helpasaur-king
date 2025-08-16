@@ -19,7 +19,6 @@ jobs:
         with:
           sparse-checkout: |
             docker-compose.yml
-            docker-compose.ghcr.yml
             docker-compose.prod.yml
             nginx/
             scripts/
@@ -30,7 +29,7 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "docker-compose.yml,docker-compose.ghcr.yml,docker-compose.prod.yml,nginx/,scripts/"
+          source: "docker-compose.yml,docker-compose.prod.yml,nginx/,scripts/"
           target: "${{ secrets.DEPLOY_PATH }}"
           overwrite: true
           rm: false

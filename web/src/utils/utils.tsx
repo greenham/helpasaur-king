@@ -1,5 +1,4 @@
-import { Command } from "../types/commands"
-import { TwitchStream, StreamAlertsConfig } from "../types/streams"
+import { Command, TwitchStream, WebConfig } from "@helpasaur/api-client"
 
 export const sizeStreamThumbnail = (
   url: string,
@@ -33,10 +32,7 @@ export const getTwitchLoginUrl = () => {
   return `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`
 }
 
-export const filterStreams = (
-  streams: TwitchStream[],
-  config: StreamAlertsConfig
-) => {
+export const filterStreams = (streams: TwitchStream[], config: WebConfig) => {
   if (streams && streams.length > 0) {
     const { blacklistedUsers, channels, statusFilters } = config
     const speedrunTester = new RegExp(statusFilters, "i")

@@ -1,0 +1,273 @@
+import express, { Request, Response, Router } from "express"
+import guard from "express-jwt-permissions"
+import User from "../../models/user"
+import { getRequestedChannel, getTwitchApiClient } from "../../lib/utils"
+import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
+import { HelixUser } from "twitch-api-client"
+
+const router: Router = express.Router()
+const permissionGuard = guard()
+
+// GET /channels -> returns list of channels currently auto-joined by the bot (admin-only)
+router.get(
+  "/channels",
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const users = await User.find({ "twitchBotConfig.active": true })
+      const channels = users.map((u: any) => u.twitchUserData.login).sort()
+      res.status(200).json(channels)
+    } catch (err: any) {
+      res.status(500).json({ message: err.message })
+    }
+  }
+)
+
+// POST /join -> adds requested or logged-in user to join list for twitch bot
+router.post("/join", async (req: Request, res: Response) => {
+  let user: any
+  // check for a logged-in user requesting the bot to join the channel
+  if (
+    !(req as any).user?.permissions.includes("service") &&
+    (!(req as any).user?.permissions.includes("admin") || !req.body.channel)
+  ) {
+    user = await User.findById((req as any).user?.sub)
+    user.twitchBotConfig.active = true
+    user.markModified("twitchBotConfig")
+    await user.save()
+  } else {
+    // otherwise, extract the requested channel from the service or admin request
+    const requestedChannel = await getRequestedChannel(req)
+    if (!requestedChannel) {
+      return res
+        .status(400)
+        .json({ result: "error", message: "Invalid channel provided" })
+    }
+
+    try {
+      user = await User.findOne({
+        "twitchUserData.login": requestedChannel,
+      })
+      if (user) {
+        if (user.twitchBotConfig?.active) {
+          return res.status(200).json({
+            result: "noop",
+            message: `Already joined ${requestedChannel}!`,
+          })
+        }
+
+        user.twitchBotConfig.active = true
+        user.markModified("twitchBotConfig")
+        await user.save()
+      } else {
+        // Get user data from Twitch
+        const twitchApiClient = getTwitchApiClient()
+
+        let twitchUserData: HelixUser | null = null
+        try {
+          const response: HelixUser | null =
+            await twitchApiClient.getUserByName(requestedChannel)
+          if (!response) {
+            throw new Error(
+              `Unable to get user data for channel ${requestedChannel}`
+            )
+          }
+          twitchUserData = response
+        } catch (err) {
+          console.error(
+            `Error fetching user data for ${requestedChannel} from Twitch!`,
+            err
+          )
+          return res.status(500).json({
+            result: "error",
+            message: `Unable to fetch twitch user data for ${requestedChannel}!`,
+          })
+        }
+
+        try {
+          // Create new user and set the twitch bot to active
+          user = await User.create({
+            twitchUserData,
+            twitchBotConfig: { active: true },
+          })
+        } catch (err) {
+          console.error(`Error creating new user for ${requestedChannel}!`, err)
+          return res.status(500).json({
+            result: "error",
+            message: `Unable to create new user for ${requestedChannel}!`,
+          })
+        }
+      }
+    } catch (err: any) {
+      return res.status(500).json({ result: "error", message: err.message })
+    }
+  }
+
+  // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
+  if (
+    !(req as any).user?.permissions.includes("service") ||
+    (req as any).user?.sub !== "twitch"
+  ) {
+    ;(req as any).app.wsRelay.emit("joinChannel", {
+      channel: user.twitchUserData.login,
+    })
+  }
+
+  res.status(200).json({
+    result: "success",
+    twitchBotConfig: {
+      roomId: user.twitchUserData.id,
+      ...user.twitchBotConfig,
+    },
+  })
+})
+
+// POST /leave -> removes requested or logged-in user from join list for twitch bot
+router.post("/leave", async (req: Request, res: Response) => {
+  const requestedChannel = await getRequestedChannel(req)
+  if (!requestedChannel) {
+    return res
+      .status(400)
+      .json({ result: "error", message: "Invalid channel provided" })
+  }
+
+  try {
+    const user = await User.findOne({
+      "twitchUserData.login": requestedChannel,
+    })
+    if (!user) {
+      return res
+        .status(200)
+        .json({ result: "noop", message: `Not in ${requestedChannel}!` })
+    }
+
+    if (user.twitchBotConfig) {
+      user.twitchBotConfig.active = false
+    }
+    user.markModified("twitchBotConfig")
+    await user.save()
+
+    // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
+    if (
+      !(req as any).user?.permissions.includes("service") ||
+      (req as any).user?.sub !== "twitch"
+    ) {
+      ;(req as any).app.wsRelay.emit("leaveChannel", requestedChannel)
+    }
+
+    res.status(200).json({ result: "success" })
+  } catch (err: any) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// PATCH /config -> updates twitch bot configuration for a channel
+router.patch("/config", async (req: Request, res: Response) => {
+  const requestedChannel = await getRequestedChannel(req)
+  if (!requestedChannel) {
+    return res
+      .status(400)
+      .json({ result: "error", message: "Invalid channel provided" })
+  }
+
+  // Validate that only allowed config fields are being updated
+  const allowedFields = [
+    "commandsEnabled",
+    "commandPrefix",
+    "textCommandCooldown",
+    "practiceListsEnabled",
+    "allowModsToManagePracticeLists",
+    "weeklyRaceAlertEnabled",
+  ]
+
+  const updates: any = {}
+  for (const field of allowedFields) {
+    if (req.body.hasOwnProperty(field)) {
+      const value = req.body[field]
+
+      // Validate commandPrefix if provided
+      if (field === "commandPrefix") {
+        if (typeof value !== "string" || value.length !== 1) {
+          return res.status(400).json({
+            result: "error",
+            message: "Command prefix must be exactly one character",
+          })
+        }
+        if (
+          !ALLOWED_COMMAND_PREFIXES.includes(
+            value as (typeof ALLOWED_COMMAND_PREFIXES)[number]
+          )
+        ) {
+          return res.status(400).json({
+            result: "error",
+            message: `Invalid command prefix. Allowed: ${ALLOWED_COMMAND_PREFIXES.join(", ")}`,
+          })
+        }
+      }
+
+      updates[`twitchBotConfig.${field}`] = value
+    }
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res
+      .status(400)
+      .json({ result: "error", message: "No valid fields to update" })
+  }
+
+  try {
+    const user = await User.findOne({
+      "twitchUserData.login": requestedChannel,
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        result: "error",
+        message: `User ${requestedChannel} not found`,
+      })
+    }
+
+    // Apply updates
+    for (const [path, value] of Object.entries(updates)) {
+      const keys = path.split(".")
+      let current: any = user
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]]
+      }
+      current[keys[keys.length - 1]] = value
+    }
+
+    if (user.twitchBotConfig) {
+      user.twitchBotConfig.lastUpdated = new Date()
+    }
+    user.markModified("twitchBotConfig")
+    await user.save()
+
+    // Emit configuration update event to the twitch bot
+    if (
+      !(req as any).user?.permissions.includes("service") ||
+      (req as any).user?.sub !== "twitch"
+    ) {
+      if (user.twitchUserData) {
+        ;(req as any).app.wsRelay.emit("configUpdate", {
+          roomId: user.twitchUserData.id,
+          channelName: user.twitchUserData.login,
+          displayName: user.twitchUserData.display_name,
+          ...user.twitchBotConfig,
+        })
+      }
+    }
+
+    res.status(200).json({
+      result: "success",
+      twitchBotConfig: {
+        roomId: user.twitchUserData?.id,
+        ...user.twitchBotConfig,
+      },
+    })
+  } catch (err: any) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+export default router

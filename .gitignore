@@ -10,3 +10,8 @@ web/build/
 web/.parcel-cache/
 backups/*
 .parcel-cache
+.claude/settings.local.json
+
+# TypeScript build outputs
+**/dist/
+**/build/
