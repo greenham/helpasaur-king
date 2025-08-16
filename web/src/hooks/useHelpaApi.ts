@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryOptions,
+  UseMutationOptions,
+} from "@tanstack/react-query"
 import {
   HelpaApi,
   Command,
@@ -8,6 +14,9 @@ import {
   DiscordJoinUrlResponse,
   TwitchBotConfig,
   ConfigUpdatePayload,
+  MutationResponse,
+  TwitchBotChannelResponse,
+  StreamAlertsChannel,
 } from "@helpasaur/api-client"
 import { useToast } from "./useToast"
 
@@ -37,7 +46,9 @@ export const useHelpaApi = () => {
     /**
      * Get web configuration
      */
-    useConfig: (options?: any) =>
+    useConfig: (
+      options?: Omit<UseQueryOptions<WebConfig, Error>, "queryKey" | "queryFn">
+    ) =>
       useQuery({
         queryKey: ["config"],
         queryFn: () => helpaApiClient.getWebConfig(),
@@ -48,7 +59,9 @@ export const useHelpaApi = () => {
     /**
      * Get current user
      */
-    useUser: (options?: any) =>
+    useUser: (
+      options?: Omit<UseQueryOptions<ApiUser, Error>, "queryKey" | "queryFn">
+    ) =>
       useQuery({
         queryKey: ["user"],
         queryFn: () => helpaApiClient.getCurrentUser(),
@@ -59,7 +72,9 @@ export const useHelpaApi = () => {
     /**
      * Get all commands
      */
-    useCommands: (options?: any) =>
+    useCommands: (
+      options?: Omit<UseQueryOptions<Command[], Error>, "queryKey" | "queryFn">
+    ) =>
       useQuery({
         queryKey: ["commands"],
         queryFn: () => helpaApiClient.getCommands(),
@@ -69,7 +84,12 @@ export const useHelpaApi = () => {
     /**
      * Get live streams
      */
-    useLivestreams: (options?: any) =>
+    useLivestreams: (
+      options?: Omit<
+        UseQueryOptions<TwitchStream[], Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
       useQuery({
         queryKey: ["livestreams"],
         queryFn: () => helpaApiClient.getLivestreams(),
@@ -80,7 +100,12 @@ export const useHelpaApi = () => {
     /**
      * Get Discord join URL
      */
-    useDiscordJoinUrl: (options?: any) =>
+    useDiscordJoinUrl: (
+      options?: Omit<
+        UseQueryOptions<DiscordJoinUrlResponse, Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
       useQuery({
         queryKey: ["discordJoinUrl"],
         queryFn: () => helpaApiClient.getDiscordJoinUrl(),
@@ -90,7 +115,12 @@ export const useHelpaApi = () => {
     /**
      * Get Twitch bot configuration
      */
-    useTwitchBotConfig: (options?: any) =>
+    useTwitchBotConfig: (
+      options?: Omit<
+        UseQueryOptions<TwitchBotConfig, Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
       useQuery({
         queryKey: ["twitchBotConfig"],
         queryFn: () => helpaApiClient.getTwitchBotConfig(),
@@ -101,7 +131,9 @@ export const useHelpaApi = () => {
     /**
      * Get Twitch bot channels
      */
-    useTwitchBotChannels: (options?: any) =>
+    useTwitchBotChannels: (
+      options?: Omit<UseQueryOptions<string[], Error>, "queryKey" | "queryFn">
+    ) =>
       useQuery({
         queryKey: ["twitchBotChannels"],
         queryFn: () => helpaApiClient.getTwitchBotChannels(),
@@ -111,7 +143,12 @@ export const useHelpaApi = () => {
     /**
      * Get stream alerts channels
      */
-    useStreamAlertsChannels: (options?: any) =>
+    useStreamAlertsChannels: (
+      options?: Omit<
+        UseQueryOptions<StreamAlertsChannel[], Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
       useQuery({
         queryKey: ["streamAlertsChannels"],
         queryFn: () => helpaApiClient.getStreamAlertsChannels(),
@@ -124,7 +161,12 @@ export const useHelpaApi = () => {
     /**
      * Update Twitch bot configuration
      */
-    useUpdateTwitchBotConfig: (options?: any) =>
+    useUpdateTwitchBotConfig: (
+      options?: Omit<
+        UseMutationOptions<MutationResponse, Error, ConfigUpdatePayload>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (config: ConfigUpdatePayload) =>
           helpaApiClient.updateTwitchBotConfig(config),
@@ -137,7 +179,12 @@ export const useHelpaApi = () => {
     /**
      * Join Twitch channel
      */
-    useJoinTwitchChannel: (options?: any) =>
+    useJoinTwitchChannel: (
+      options?: Omit<
+        UseMutationOptions<TwitchBotChannelResponse, Error, string | undefined>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (twitchUsername?: string) =>
           helpaApiClient.joinTwitchChannel(twitchUsername),
@@ -150,7 +197,12 @@ export const useHelpaApi = () => {
     /**
      * Leave Twitch channel
      */
-    useLeaveTwitchChannel: (options?: any) =>
+    useLeaveTwitchChannel: (
+      options?: Omit<
+        UseMutationOptions<TwitchBotChannelResponse, Error, string | undefined>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (twitchUsername?: string) =>
           helpaApiClient.leaveTwitchChannel(twitchUsername),
@@ -163,15 +215,20 @@ export const useHelpaApi = () => {
     /**
      * Create command
      */
-    useCreateCommand: (options?: any) =>
+    useCreateCommand: (
+      options?: Omit<
+        UseMutationOptions<MutationResponse, Error, Partial<Command>>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (command: Partial<Command>) =>
           helpaApiClient.createCommand(command),
-        onSuccess: (data, variables) => {
+        onSuccess: (_data, variables) => {
           toast.success(`Command '${variables.command}' created!`)
           queryClient.invalidateQueries({ queryKey: ["commands"] })
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           toast.error(`Unable to create command: ${err.message}`)
         },
         ...options,
@@ -180,14 +237,19 @@ export const useHelpaApi = () => {
     /**
      * Update command
      */
-    useUpdateCommand: (options?: any) =>
+    useUpdateCommand: (
+      options?: Omit<
+        UseMutationOptions<MutationResponse, Error, Command>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (command: Command) => helpaApiClient.updateCommand(command),
-        onSuccess: (data, variables) => {
+        onSuccess: (_data, variables) => {
           toast.success(`Command '${variables.command}' updated!`)
           queryClient.invalidateQueries({ queryKey: ["commands"] })
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           toast.error(`Unable to update command: ${err.message}`)
         },
         ...options,
@@ -196,14 +258,19 @@ export const useHelpaApi = () => {
     /**
      * Delete command
      */
-    useDeleteCommand: (options?: any) =>
+    useDeleteCommand: (
+      options?: Omit<
+        UseMutationOptions<MutationResponse, Error, Command>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (command: Command) => helpaApiClient.deleteCommand(command),
-        onSuccess: (data, variables) => {
+        onSuccess: (_data, variables) => {
           toast.success(`Command '${variables.command}' deleted!`)
           queryClient.invalidateQueries({ queryKey: ["commands"] })
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           toast.error(`Unable to delete command: ${err.message}`)
         },
         ...options,
@@ -212,7 +279,12 @@ export const useHelpaApi = () => {
     /**
      * Add channel to stream alerts
      */
-    useAddChannelToStreamAlerts: (options?: any) =>
+    useAddChannelToStreamAlerts: (
+      options?: Omit<
+        UseMutationOptions<MutationResponse, Error, string>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (twitchUsername: string) =>
           helpaApiClient.addChannelToStreamAlerts(twitchUsername),
@@ -225,7 +297,12 @@ export const useHelpaApi = () => {
     /**
      * Remove channel from stream alerts
      */
-    useRemoveChannelFromStreamAlerts: (options?: any) =>
+    useRemoveChannelFromStreamAlerts: (
+      options?: Omit<
+        UseMutationOptions<MutationResponse, Error, string>,
+        "mutationFn"
+      >
+    ) =>
       useMutation({
         mutationFn: (twitchUserId: string) =>
           helpaApiClient.removeChannelFromStreamAlerts(twitchUserId),
