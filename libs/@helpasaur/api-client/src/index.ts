@@ -10,11 +10,10 @@ import {
   ApiUser,
   WebConfig,
   TwitchStream,
-  DiscordJoinUrlResponse,
+  DiscordJoinUrl,
   TwitchBotConfig,
-  TwitchBotChannelResponse,
+  TwitchBotChannelData,
   StreamAlertsChannel,
-  MutationResponse,
   ConfigUpdatePayload,
   ActiveChannelsResponse,
   CommandFindRequest,
@@ -23,7 +22,9 @@ import {
   CommandLogResponse,
   GuildConfig,
   GuildConfigUpdate,
-  GuildConfigResponse,
+  GuildConfigData,
+  CommandMutationData,
+  CommandFindData,
 } from "./types"
 
 /**
@@ -183,7 +184,7 @@ export class HelpaApi {
   /**
    * Get Discord join URL from the API
    */
-  async getDiscordJoinUrl(): Promise<DiscordJoinUrlResponse> {
+  async getDiscordJoinUrl(): Promise<ApiResponse<DiscordJoinUrl>> {
     try {
       const response = await this.api.get("/api/discord/joinUrl")
       return response.data
@@ -223,7 +224,7 @@ export class HelpaApi {
    */
   async updateTwitchBotConfig(
     config: ConfigUpdatePayload
-  ): Promise<MutationResponse> {
+  ): Promise<ApiResponse<{}>> {
     try {
       const response = await this.api.patch("/api/twitch/config", config)
       return response.data
@@ -237,7 +238,7 @@ export class HelpaApi {
    */
   async joinTwitchChannel(
     twitchUsername?: string
-  ): Promise<TwitchBotChannelResponse> {
+  ): Promise<ApiResponse<TwitchBotChannelData>> {
     try {
       const body = twitchUsername ? { channel: twitchUsername } : {}
       const response = await this.api.post("/api/twitch/join", body)
@@ -252,7 +253,7 @@ export class HelpaApi {
    */
   async leaveTwitchChannel(
     twitchUsername?: string
-  ): Promise<TwitchBotChannelResponse> {
+  ): Promise<ApiResponse<TwitchBotChannelData>> {
     try {
       const body = twitchUsername ? { channel: twitchUsername } : {}
       const response = await this.api.post("/api/twitch/leave", body)
@@ -277,7 +278,7 @@ export class HelpaApi {
   /**
    * Create a new command
    */
-  async createCommand(command: Partial<Command>): Promise<MutationResponse> {
+  async createCommand(command: Partial<Command>): Promise<ApiResponse<{}>> {
     try {
       const response = await this.api.post("/api/commands", command)
       return response.data
@@ -289,7 +290,7 @@ export class HelpaApi {
   /**
    * Update an existing command
    */
-  async updateCommand(command: Command): Promise<MutationResponse> {
+  async updateCommand(command: Command): Promise<ApiResponse<{}>> {
     try {
       const response = await this.api.patch(
         `/api/commands/${command._id}`,
@@ -304,7 +305,7 @@ export class HelpaApi {
   /**
    * Delete a command
    */
-  async deleteCommand(command: Command): Promise<MutationResponse> {
+  async deleteCommand(command: Command): Promise<ApiResponse<{}>> {
     try {
       const response = await this.api.delete(`/api/commands/${command._id}`, {
         data: command,
@@ -332,7 +333,7 @@ export class HelpaApi {
    */
   async addChannelToStreamAlerts(
     twitchUsername: string
-  ): Promise<MutationResponse> {
+  ): Promise<ApiResponse<{}>> {
     try {
       const response = await this.api.post("/api/streamAlerts/channels", {
         channels: [twitchUsername],
@@ -348,7 +349,7 @@ export class HelpaApi {
    */
   async removeChannelFromStreamAlerts(
     twitchUserId: string
-  ): Promise<MutationResponse> {
+  ): Promise<ApiResponse<{}>> {
     try {
       const response = await this.api.delete(
         `/api/streamAlerts/channels/${twitchUserId}`
@@ -414,7 +415,7 @@ export class HelpaApi {
   /**
    * Delete a specific command by ID
    */
-  async deleteCommandById(commandId: string): Promise<MutationResponse> {
+  async deleteCommandById(commandId: string): Promise<ApiResponse<{}>> {
     try {
       const response = await this.api.delete(`/api/commands/${commandId}`)
       return response.data
@@ -428,7 +429,7 @@ export class HelpaApi {
    */
   async createGuildConfig(
     guildConfig: GuildConfig
-  ): Promise<GuildConfigResponse> {
+  ): Promise<ApiResponse<GuildConfigData>> {
     try {
       const response = await this.api.post("/api/discord/guild", guildConfig)
       return response.data
@@ -443,7 +444,7 @@ export class HelpaApi {
   async updateGuildConfig(
     guildId: string,
     updates: GuildConfigUpdate
-  ): Promise<GuildConfigResponse> {
+  ): Promise<ApiResponse<GuildConfigData>> {
     try {
       const response = await this.api.patch(
         `/api/discord/guild/${guildId}`,

@@ -11,11 +11,11 @@ import {
   ApiUser,
   WebConfig,
   TwitchStream,
-  DiscordJoinUrlResponse,
   TwitchBotConfig,
   ConfigUpdatePayload,
-  MutationResponse,
-  TwitchBotChannelResponse,
+  DiscordJoinUrl,
+  TwitchBotChannelData,
+  ApiResponse,
   StreamAlertsChannel,
 } from "@helpasaur/api-client"
 import { useToast } from "./useToast"
@@ -132,13 +132,19 @@ export const useHelpaApi = () => {
      */
     useDiscordJoinUrl: (
       options?: Omit<
-        UseQueryOptions<DiscordJoinUrlResponse, Error>,
+        UseQueryOptions<DiscordJoinUrl, Error>,
         "queryKey" | "queryFn"
       >
     ) =>
       useQuery({
         queryKey: ["discordJoinUrl"],
-        queryFn: () => helpaApiClient.getDiscordJoinUrl(),
+        queryFn: async () => {
+          const response = await helpaApiClient.getDiscordJoinUrl()
+          if (response.result === "success" && response.data) {
+            return response.data
+          }
+          throw new Error(response.message || "Failed to get Discord join URL")
+        },
         ...options,
       }),
 
@@ -215,7 +221,7 @@ export const useHelpaApi = () => {
      */
     useUpdateTwitchBotConfig: (
       options?: MutationOptionsWithToast<
-        MutationResponse,
+        ApiResponse<{}>,
         Error,
         ConfigUpdatePayload
       >
@@ -246,7 +252,7 @@ export const useHelpaApi = () => {
      */
     useJoinTwitchChannel: (
       options?: MutationOptionsWithToast<
-        TwitchBotChannelResponse,
+        ApiResponse<TwitchBotChannelData>,
         Error,
         string | undefined
       >
@@ -281,7 +287,7 @@ export const useHelpaApi = () => {
      */
     useLeaveTwitchChannel: (
       options?: MutationOptionsWithToast<
-        TwitchBotChannelResponse,
+        ApiResponse<TwitchBotChannelData>,
         Error,
         string | undefined
       >
@@ -316,7 +322,7 @@ export const useHelpaApi = () => {
      */
     useCreateCommand: (
       options?: MutationOptionsWithToast<
-        MutationResponse,
+        ApiResponse<{}>,
         Error,
         Partial<Command>
       >
@@ -346,7 +352,7 @@ export const useHelpaApi = () => {
      * Update command
      */
     useUpdateCommand: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
+      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, Command>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -372,7 +378,7 @@ export const useHelpaApi = () => {
      * Delete command
      */
     useDeleteCommand: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
+      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, Command>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -398,7 +404,7 @@ export const useHelpaApi = () => {
      * Add channel to stream alerts
      */
     useAddChannelToStreamAlerts: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, string>
+      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, string>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -427,7 +433,7 @@ export const useHelpaApi = () => {
      * Remove channel from stream alerts
      */
     useRemoveChannelFromStreamAlerts: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, string>
+      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, string>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({

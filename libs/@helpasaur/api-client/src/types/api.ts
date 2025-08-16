@@ -92,15 +92,27 @@ export interface StreamAlertsChannel {
   profile_image_url?: string
 }
 
-// Standardized Response Type Aliases using ApiResponse<T>
-export type DiscordJoinUrlResponse = ApiResponse<{ url?: string }>
-export type TwitchBotChannelResponse = ApiResponse<{
+// Concrete data types for API responses
+export interface DiscordJoinUrl {
+  url?: string
+}
+
+export interface TwitchBotChannelData {
   channel?: string
   twitchBotConfig?: TwitchBotConfig & { roomId?: string }
-}>
-export type StreamAlertsResponse = ApiResponse<StreamAlertsChannel[]>
-export type MutationResponse = ApiResponse<{}>
-export type CommandMutationResponse = ApiResponse<{ command?: Command }>
+}
+
+export interface CommandMutationData {
+  command?: Command
+}
+
+export interface GuildConfigData {
+  guild?: GuildConfig
+}
+
+export interface CommandFindData {
+  command?: Command
+}
 
 // Configuration Update Types
 export interface ConfigUpdatePayload {
@@ -126,9 +138,10 @@ export interface CommandLogRequest {
   roomId?: string
 }
 
-// Standardized Response Types using ApiResponse<T>
+// Note: ActiveChannelsResponse, CommandFindResponse, and CommandLogResponse
+// are kept as type aliases for backward compatibility with existing code
 export type ActiveChannelsResponse = ApiResponse<string[]>
-export type CommandFindResponse = ApiResponse<{ command?: Command }>
+export type CommandFindResponse = ApiResponse<CommandFindData>
 export type CommandLogResponse = ApiResponse<{}>
 
 // Discord Guild Configuration Types
@@ -164,5 +177,3 @@ export interface GuildConfigUpdate {
   weeklyRaceAlertChannelId?: string | null
   weeklyRaceAlertRoleId?: string | null
 }
-
-export type GuildConfigResponse = ApiResponse<{ guild?: GuildConfig }>
