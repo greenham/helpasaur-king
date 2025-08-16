@@ -15,10 +15,18 @@ import {
   StreamAlertsChannel,
   MutationResponse,
   ConfigUpdatePayload,
+  ActiveChannelsResponse,
+  CommandFindRequest,
+  CommandFindResponse,
+  CommandLogRequest,
+  CommandLogResponse,
+  GuildConfig,
+  GuildConfigUpdate,
+  GuildConfigResponse,
 } from "./types"
 
 /**
- * Helps services connect to the Helpa API.
+ * Helps external clients and internal services use the Helpa API
  */
 export class HelpaApi {
   private apiHost: string
@@ -349,6 +357,100 @@ export class HelpaApi {
       throw new Error(
         `Failed to remove channel from stream alerts: ${err.message}`
       )
+    }
+  }
+
+  /**
+   * Get active Twitch channels from configuration
+   */
+  async getActiveChannels(): Promise<ActiveChannelsResponse> {
+    try {
+      const response = await this.api.get("/api/configs/twitch/activeChannels")
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to get active channels: ${err.message}`)
+    }
+  }
+
+  /**
+   * Find a command by name
+   */
+  async findCommand(request: CommandFindRequest): Promise<CommandFindResponse> {
+    try {
+      const response = await this.api.post("/api/commands/find", request)
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to find command: ${err.message}`)
+    }
+  }
+
+  /**
+   * Log command usage
+   */
+  async logCommandUsage(
+    logData: CommandLogRequest
+  ): Promise<CommandLogResponse> {
+    try {
+      const response = await this.api.post("/api/commands/logs", logData)
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to log command usage: ${err.message}`)
+    }
+  }
+
+  /**
+   * Get a specific command by ID
+   */
+  async getCommandById(commandId: string): Promise<Command> {
+    try {
+      const response = await this.api.get(`/api/commands/${commandId}`)
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to get command by ID: ${err.message}`)
+    }
+  }
+
+  /**
+   * Delete a specific command by ID
+   */
+  async deleteCommandById(commandId: string): Promise<MutationResponse> {
+    try {
+      const response = await this.api.delete(`/api/commands/${commandId}`)
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to delete command by ID: ${err.message}`)
+    }
+  }
+
+  /**
+   * Create Discord guild configuration
+   */
+  async createGuildConfig(
+    guildConfig: GuildConfig
+  ): Promise<GuildConfigResponse> {
+    try {
+      const response = await this.api.post("/api/discord/guild", guildConfig)
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to create guild config: ${err.message}`)
+    }
+  }
+
+  /**
+   * Update Discord guild configuration
+   */
+  async updateGuildConfig(
+    guildId: string,
+    updates: GuildConfigUpdate
+  ): Promise<GuildConfigResponse> {
+    try {
+      const response = await this.api.patch(
+        `/api/discord/guild/${guildId}`,
+        updates
+      )
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to update guild config: ${err.message}`)
     }
   }
 }

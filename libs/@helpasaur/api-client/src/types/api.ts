@@ -96,6 +96,9 @@ export interface TwitchBotChannelResponse {
   result: "success" | "error" | "noop"
   message?: string
   channel?: string
+  data?: {
+    twitchBotConfig?: TwitchBotConfig & { roomId?: string }
+  }
 }
 
 // Stream Alerts Types
@@ -131,4 +134,72 @@ export interface ConfigUpdatePayload {
   commandPrefix?: string
   textCommandCooldown?: number
   weeklyRaceAlertEnabled?: boolean
+}
+
+// Active Channels Response Types
+export interface ActiveChannelsResponse {
+  result: "success" | "error"
+  message?: string
+  channels?: string[]
+}
+
+// Command Find Types
+export interface CommandFindRequest {
+  command: string
+}
+
+export interface CommandFindResponse {
+  result: "success" | "error" | "noop"
+  message?: string
+  command?: Command
+}
+
+// Command Log Types
+export interface CommandLogRequest {
+  command: string
+  user: string
+  channel: string
+  platform: "discord" | "twitch"
+  guildId?: string
+  roomId?: string
+}
+
+export interface CommandLogResponse extends MutationResponse {}
+
+// Discord Guild Configuration Types
+export interface GuildConfig {
+  _id?: string
+  guildId?: string
+  guildName?: string
+  id?: string
+  name?: string
+  active: boolean
+  cmdPrefix?: string
+  textCmdCooldown?: number
+  enableStreamAlerts: boolean
+  streamAlertsChannelId?: string | null
+  enableWeeklyRaceAlert: boolean
+  enableWeeklyRaceRoomAlert?: boolean
+  weeklyRaceAlertChannelId?: string | null
+  weeklyRaceAlertRoleId?: string | null
+  createdAt?: Date
+  lastUpdated?: Date
+}
+
+export interface GuildConfigUpdate {
+  guildName?: string
+  name?: string
+  active?: boolean
+  cmdPrefix?: string
+  textCmdCooldown?: number
+  enableStreamAlerts?: boolean
+  streamAlertsChannelId?: string | null
+  enableWeeklyRaceAlert?: boolean
+  enableWeeklyRaceRoomAlert?: boolean
+  weeklyRaceAlertChannelId?: string | null
+  weeklyRaceAlertRoleId?: string | null
+}
+
+export interface GuildConfigResponse extends MutationResponse {
+  guild?: GuildConfig
 }

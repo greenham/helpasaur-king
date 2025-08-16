@@ -18,7 +18,7 @@ const guildCreateEvent: DiscordEvent = {
       if (!client.config.guilds[guildConfigIndex].active) {
         console.log(`Re-activating guild ${guild.name} (${guild.id})`)
         try {
-          await this.helpaApi?.api.patch(`/api/discord/guild/${guild.id}`, {
+          await this.helpaApi?.updateGuildConfig(guild.id, {
             active: true,
           })
           console.log(`Re-activated guild ${guild.name} (${guild.id})`)
@@ -39,7 +39,12 @@ const guildCreateEvent: DiscordEvent = {
     }
 
     const guildConfig = Object.assign(
-      { id: guild.id, name: guild.name },
+      {
+        guildId: guild.id,
+        guildName: guild.name,
+        id: guild.id,
+        name: guild.name,
+      },
       defaultGuildConfig
     )
 
@@ -47,7 +52,7 @@ const guildCreateEvent: DiscordEvent = {
 
     // Create this guild via the API
     try {
-      await this.helpaApi?.api.post(`/api/discord/guild`, guildConfig)
+      await this.helpaApi?.createGuildConfig(guildConfig)
 
       // Update the local config
       client.config.guilds.push(guildConfig)

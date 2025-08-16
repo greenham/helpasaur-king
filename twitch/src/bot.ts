@@ -137,11 +137,12 @@ export class TwitchBot {
           this.channelList.push(channelToJoin)
 
           try {
-            const result = await this.helpaApi.api.post(`/api/twitch/join`, {
-              channel: channelToJoin,
-            })
+            const result = await this.helpaApi.joinTwitchChannel(channelToJoin)
 
-            if (result.data.result === "success") {
+            if (
+              result.result === "success" &&
+              result.data?.twitchBotConfig?.roomId
+            ) {
               // update the local map with the new channel config
               this.channelMap.set(
                 result.data.twitchBotConfig.roomId,
@@ -149,9 +150,7 @@ export class TwitchBot {
               )
             }
 
-            console.log(
-              `Result of /api/twitch/join: ${JSON.stringify(result.data)}`
-            )
+            console.log(`Result of /api/twitch/join: ${JSON.stringify(result)}`)
           } catch (err: any) {
             console.error(`Error calling /api/twitch/join: ${err.message}`)
           }
@@ -192,12 +191,11 @@ export class TwitchBot {
           this.channelMap.delete(tags["room-id"])
 
           try {
-            const result = await this.helpaApi.api.post(`/api/twitch/leave`, {
-              channel: channelToLeave,
-            })
+            const result =
+              await this.helpaApi.leaveTwitchChannel(channelToLeave)
 
             console.log(
-              `Result of /api/twitch/leave: ${JSON.stringify(result.data)}`
+              `Result of /api/twitch/leave: ${JSON.stringify(result)}`
             )
           } catch (err: any) {
             console.error(`Error calling /api/twitch/leave: ${err.message}`)
@@ -472,12 +470,12 @@ export class TwitchBot {
 
     if (refreshCache) {
       try {
-        const response = await this.helpaApi.api.post(`/api/commands/find`, {
+        const response = await this.helpaApi.findCommand({
           command: commandNoPrefix,
         })
 
-        if (response.status === 200) {
-          command = response.data
+        if (response.result === "success") {
+          command = response.command
 
           if (command) {
             command.staleAfter = Date.now() + 10 * 60 * 1000
@@ -521,15 +519,12 @@ export class TwitchBot {
     }
 
     try {
-      await this.helpaApi.api.post(`/api/commands/logs`, {
+      await this.helpaApi.logCommandUsage({
         command: command.command,
-        alias: aliasUsed,
-        source: "twitch",
-        username: tags.username,
-        metadata: {
-          channel,
-          tags,
-        },
+        user: tags.username || "unknown",
+        channel: channel,
+        platform: "twitch",
+        roomId: tags["room-id"],
       })
     } catch (err) {
       console.error(`Error while logging command: ${err}`)
@@ -621,12 +616,11 @@ export class TwitchBot {
       console.log(`[${channel}] Enabling ${toggleConfig.featureName}...`)
 
       try {
-        const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
-          channel: tags.username,
+        const result = await this.helpaApi.updateTwitchBotConfig({
           [toggleConfig.configField]: true,
         })
 
-        if (result.data.result === "success") {
+        if (result.result === "success") {
           // Update local config
           channelConfig[toggleConfig.configField] = true
           this.channelMap.set(tags["room-id"], channelConfig)
@@ -663,12 +657,11 @@ export class TwitchBot {
       console.log(`[${channel}] Disabling ${toggleConfig.featureName}...`)
 
       try {
-        const result = await this.helpaApi.api.patch(`/api/twitch/config`, {
-          channel: tags.username,
+        const result = await this.helpaApi.updateTwitchBotConfig({
           [toggleConfig.configField]: false,
         })
 
-        if (result.data.result === "success") {
+        if (result.result === "success") {
           // Update local config
           channelConfig[toggleConfig.configField] = false
           this.channelMap.set(tags["room-id"], channelConfig)

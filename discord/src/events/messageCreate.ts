@@ -51,12 +51,12 @@ const messageCreateEvent: DiscordEvent = {
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
-        const response = await this.helpaApi?.api.post(`/api/commands/find`, {
+        const response = await this.helpaApi?.findCommand({
           command: commandNoPrefix,
         })
 
-        if (response?.status === 200) {
-          command = response.data
+        if (response?.result === "success") {
+          command = response.command
 
           if (command) {
             // Cache it for 10 minutes
@@ -131,15 +131,12 @@ const messageCreateEvent: DiscordEvent = {
     cooldowns.set(cooldownKey, Date.now())
 
     // Log command use
-    await this.helpaApi?.api.post(`/api/commands/logs`, {
+    await this.helpaApi?.logCommandUsage({
       command: command.command,
-      alias: aliasUsed,
-      source: "discord",
-      username: author.username,
-      metadata: {
-        guild: guildConfig.name,
-        author,
-      },
+      user: author.username,
+      channel: guildConfig.name,
+      platform: "discord",
+      guildId: interaction.guildId || undefined,
     })
   },
 }
