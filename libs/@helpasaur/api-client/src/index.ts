@@ -23,8 +23,6 @@ import {
   GuildConfig,
   GuildConfigUpdate,
   GuildConfigData,
-  CommandMutationData,
-  CommandFindData,
 } from "./types"
 
 /**
@@ -82,8 +80,10 @@ export class HelpaApi {
   }
 
   /**
-   * Authorizes the service with the API.
-   * @returns A promise that resolves to true if the service is authorized successfully, or false otherwise.
+   * Authorizes the service with the API using the provided API key
+   * In web mode, this method always returns true as user auth is handled by cookies
+   * @returns Promise resolving to true if service is authorized successfully, false otherwise
+   * @throws Error logged to console if authorization fails (does not throw exception)
    */
   async authorizeService(): Promise<boolean> {
     // Skip authorization in web mode - user auth handled by cookies
@@ -111,9 +111,10 @@ export class HelpaApi {
   }
 
   /**
-   * Retrieves the service configuration from the API.
-   * If necessary, it authorizes the service before making the request.
-   * @returns The service configuration object, or null if an error occurs.
+   * Retrieves the service configuration from the API
+   * Automatically authorizes the service first if not already authenticated
+   * @returns Promise resolving to the service configuration object
+   * @throws Error if authorization fails or the API request fails
    */
   async getServiceConfig(): Promise<ServiceConfig> {
     try {
@@ -136,17 +137,12 @@ export class HelpaApi {
     }
   }
 
-  /**
-   * Get the current access token
-   */
-  getAccessToken(): string | null {
-    return this.accessToken
-  }
-
   // Public endpoints (no authentication required)
 
   /**
    * Get all commands from the API
+   * @returns Promise resolving to API response containing array of commands
+   * @throws Error if the API request fails
    */
   async getCommands(): Promise<ApiResponse<Command[]>> {
     try {
@@ -159,6 +155,8 @@ export class HelpaApi {
 
   /**
    * Get live streams from the API
+   * @returns Promise resolving to API response containing array of live Twitch streams
+   * @throws Error if the API request fails
    */
   async getLivestreams(): Promise<ApiResponse<TwitchStream[]>> {
     try {
@@ -171,6 +169,8 @@ export class HelpaApi {
 
   /**
    * Get web configuration from the API
+   * @returns Promise resolving to API response containing web app configuration
+   * @throws Error if the API request fails
    */
   async getWebConfig(): Promise<ApiResponse<WebConfig>> {
     try {
@@ -182,7 +182,9 @@ export class HelpaApi {
   }
 
   /**
-   * Get Discord join URL from the API
+   * Get Discord server join URL from the API
+   * @returns Promise resolving to API response containing Discord join URL data
+   * @throws Error if the API request fails
    */
   async getDiscordJoinUrl(): Promise<ApiResponse<DiscordJoinUrl>> {
     try {
@@ -196,7 +198,9 @@ export class HelpaApi {
   // User-authenticated endpoints (require cookies in web mode)
 
   /**
-   * Get current user information
+   * Get current authenticated user information
+   * @returns Promise resolving to API response containing current user data
+   * @throws Error if the API request fails or user is not authenticated
    */
   async getCurrentUser(): Promise<ApiResponse<ApiUser>> {
     try {
@@ -208,7 +212,9 @@ export class HelpaApi {
   }
 
   /**
-   * Get Twitch bot configuration for current user
+   * Get Twitch bot configuration for the current authenticated user
+   * @returns Promise resolving to API response containing user's Twitch bot settings
+   * @throws Error if the API request fails or user is not authenticated
    */
   async getTwitchBotConfig(): Promise<ApiResponse<TwitchBotConfig>> {
     try {
@@ -220,7 +226,10 @@ export class HelpaApi {
   }
 
   /**
-   * Update Twitch bot configuration for current user
+   * Update Twitch bot configuration for the current authenticated user
+   * @param config - The configuration updates to apply
+   * @returns Promise resolving to API response confirming the update
+   * @throws Error if the API request fails or user is not authenticated
    */
   async updateTwitchBotConfig(
     config: ConfigUpdatePayload
@@ -234,7 +243,10 @@ export class HelpaApi {
   }
 
   /**
-   * Join Twitch channel
+   * Join a Twitch channel with the bot
+   * @param twitchUsername - The Twitch username/channel to join (optional, defaults to current user's channel)
+   * @returns Promise resolving to API response containing channel join result and bot config
+   * @throws Error if the API request fails or user is not authenticated
    */
   async joinTwitchChannel(
     twitchUsername?: string
@@ -249,7 +261,10 @@ export class HelpaApi {
   }
 
   /**
-   * Leave Twitch channel
+   * Leave a Twitch channel with the bot
+   * @param twitchUsername - The Twitch username/channel to leave (optional, defaults to current user's channel)
+   * @returns Promise resolving to API response containing channel leave result
+   * @throws Error if the API request fails or user is not authenticated
    */
   async leaveTwitchChannel(
     twitchUsername?: string
@@ -264,7 +279,9 @@ export class HelpaApi {
   }
 
   /**
-   * Get Twitch bot channels
+   * Get list of Twitch channels that the bot is currently in
+   * @returns Promise resolving to API response containing array of channel names
+   * @throws Error if the API request fails or user is not authenticated
    */
   async getTwitchBotChannels(): Promise<ApiResponse<string[]>> {
     try {
@@ -276,7 +293,10 @@ export class HelpaApi {
   }
 
   /**
-   * Create a new command
+   * Create a new bot command
+   * @param command - The command data to create (partial Command object)
+   * @returns Promise resolving to API response confirming command creation
+   * @throws Error if the API request fails or user is not authenticated
    */
   async createCommand(command: Partial<Command>): Promise<ApiResponse<{}>> {
     try {
@@ -288,7 +308,10 @@ export class HelpaApi {
   }
 
   /**
-   * Update an existing command
+   * Update an existing bot command
+   * @param command - The complete command object with updates
+   * @returns Promise resolving to API response confirming command update
+   * @throws Error if the API request fails or user is not authenticated
    */
   async updateCommand(command: Command): Promise<ApiResponse<{}>> {
     try {
@@ -303,7 +326,10 @@ export class HelpaApi {
   }
 
   /**
-   * Delete a command
+   * Delete an existing bot command
+   * @param command - The command object to delete
+   * @returns Promise resolving to API response confirming command deletion
+   * @throws Error if the API request fails or user is not authenticated
    */
   async deleteCommand(command: Command): Promise<ApiResponse<{}>> {
     try {
@@ -317,7 +343,9 @@ export class HelpaApi {
   }
 
   /**
-   * Get stream alerts channels
+   * Get list of channels configured for stream alerts
+   * @returns Promise resolving to API response containing array of stream alert channels
+   * @throws Error if the API request fails
    */
   async getStreamAlertsChannels(): Promise<ApiResponse<StreamAlertsChannel[]>> {
     try {
@@ -329,7 +357,10 @@ export class HelpaApi {
   }
 
   /**
-   * Add channel to stream alerts
+   * Add a Twitch channel to stream alerts monitoring
+   * @param twitchUsername - The Twitch username to add to stream alerts
+   * @returns Promise resolving to API response confirming the channel was added
+   * @throws Error if the API request fails or user is not authenticated
    */
   async addChannelToStreamAlerts(
     twitchUsername: string
@@ -345,7 +376,10 @@ export class HelpaApi {
   }
 
   /**
-   * Remove channel from stream alerts
+   * Remove a Twitch channel from stream alerts monitoring
+   * @param twitchUserId - The Twitch user ID to remove from stream alerts
+   * @returns Promise resolving to API response confirming the channel was removed
+   * @throws Error if the API request fails or user is not authenticated
    */
   async removeChannelFromStreamAlerts(
     twitchUserId: string
@@ -363,7 +397,9 @@ export class HelpaApi {
   }
 
   /**
-   * Get active Twitch channels from configuration
+   * Get list of active Twitch channels from service configuration
+   * @returns Promise resolving to API response containing array of active channel names
+   * @throws Error if the API request fails or service is not authenticated
    */
   async getActiveChannels(): Promise<ActiveChannelsResponse> {
     try {
@@ -375,7 +411,10 @@ export class HelpaApi {
   }
 
   /**
-   * Find a command by name
+   * Find a specific bot command by name
+   * @param request - The command search request containing command name
+   * @returns Promise resolving to API response containing the found command (if any)
+   * @throws Error if the API request fails or service is not authenticated
    */
   async findCommand(request: CommandFindRequest): Promise<CommandFindResponse> {
     try {
@@ -387,7 +426,10 @@ export class HelpaApi {
   }
 
   /**
-   * Log command usage
+   * Log usage of a bot command for analytics and monitoring
+   * @param logData - The command usage log data including user, channel, and platform info
+   * @returns Promise resolving to API response confirming the log was recorded
+   * @throws Error if the API request fails or service is not authenticated
    */
   async logCommandUsage(
     logData: CommandLogRequest
@@ -401,7 +443,10 @@ export class HelpaApi {
   }
 
   /**
-   * Get a specific command by ID
+   * Get a specific bot command by its unique ID
+   * @param commandId - The unique identifier of the command to retrieve
+   * @returns Promise resolving to API response containing the command data
+   * @throws Error if the API request fails or command is not found
    */
   async getCommandById(commandId: string): Promise<ApiResponse<Command>> {
     try {
@@ -413,7 +458,10 @@ export class HelpaApi {
   }
 
   /**
-   * Delete a specific command by ID
+   * Delete a specific bot command by its unique ID
+   * @param commandId - The unique identifier of the command to delete
+   * @returns Promise resolving to API response confirming command deletion
+   * @throws Error if the API request fails or command is not found
    */
   async deleteCommandById(commandId: string): Promise<ApiResponse<{}>> {
     try {
@@ -425,7 +473,10 @@ export class HelpaApi {
   }
 
   /**
-   * Create Discord guild configuration
+   * Create Discord guild configuration for a new server
+   * @param guildConfig - The guild configuration data to create
+   * @returns Promise resolving to API response containing the created guild config
+   * @throws Error if the API request fails or service is not authenticated
    */
   async createGuildConfig(
     guildConfig: GuildConfig
@@ -439,7 +490,11 @@ export class HelpaApi {
   }
 
   /**
-   * Update Discord guild configuration
+   * Update Discord guild configuration settings
+   * @param guildId - The Discord guild ID to update
+   * @param updates - The configuration updates to apply
+   * @returns Promise resolving to API response containing the updated guild config
+   * @throws Error if the API request fails or service is not authenticated
    */
   async updateGuildConfig(
     guildId: string,
@@ -459,7 +514,12 @@ export class HelpaApi {
   // Practice list endpoints
 
   /**
-   * Add entry to practice list
+   * Add an entry to a user's practice list
+   * @param targetUser - The Twitch user ID whose practice list to modify
+   * @param listName - The name of the practice list (e.g., "rooms")
+   * @param entry - The entry text to add to the list
+   * @returns Promise resolving to API response confirming entry was added
+   * @throws Error if the API request fails or service is not authenticated
    */
   async addPracticeListEntry(
     targetUser: string,
@@ -478,7 +538,11 @@ export class HelpaApi {
   }
 
   /**
-   * Get practice list entries
+   * Get all entries from a user's practice list
+   * @param targetUser - The Twitch user ID whose practice list to retrieve
+   * @param listName - The name of the practice list (e.g., "rooms")
+   * @returns Promise resolving to API response containing array of practice entries
+   * @throws Error if the API request fails or practice list is not found
    */
   async getPracticeList(
     targetUser: string,
@@ -495,7 +559,12 @@ export class HelpaApi {
   }
 
   /**
-   * Delete entry from practice list
+   * Delete a specific entry from a user's practice list by its index
+   * @param targetUser - The Twitch user ID whose practice list to modify
+   * @param listName - The name of the practice list (e.g., "rooms")
+   * @param entryId - The 1-based index of the entry to delete
+   * @returns Promise resolving to API response confirming entry was deleted
+   * @throws Error if the API request fails or entry is not found
    */
   async deletePracticeListEntry(
     targetUser: string,
@@ -513,7 +582,11 @@ export class HelpaApi {
   }
 
   /**
-   * Clear entire practice list
+   * Clear all entries from a user's practice list
+   * @param targetUser - The Twitch user ID whose practice list to clear
+   * @param listName - The name of the practice list (e.g., "rooms")
+   * @returns Promise resolving to API response confirming list was cleared
+   * @throws Error if the API request fails or practice list is not found
    */
   async clearPracticeList(
     targetUser: string,
