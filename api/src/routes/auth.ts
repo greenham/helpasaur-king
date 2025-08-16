@@ -148,7 +148,6 @@ router.get(`/service`, requireAuthKey, async (req: Request, res: Response) => {
   })
 
   console.log(`Generated ID token for service: ${serviceName}`)
-  console.log(idToken)
 
   res.status(200).send({ token: idToken })
 })

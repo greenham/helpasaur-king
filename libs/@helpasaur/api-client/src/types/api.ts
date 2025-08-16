@@ -56,29 +56,30 @@ export interface ApiUser {
 // Web Configuration Types
 export interface WebConfig {
   channels: TwitchUserData[]
-  statusFilters: string[]
+  statusFilters: string
   blacklistedUsers: string[]
   twitch: {
     commandPrefixes: string[]
   }
 }
 
-// Stream Types (matches HelixStream from @twurple/api)
+// Stream Types (matches HelixStreamData from @twurple/api)
 export interface TwitchStream {
   id: string
-  userId: string
-  userName: string
-  userDisplayName: string
-  gameId: string
-  gameName: string
+  user_id: string
+  user_login: string
+  user_name: string
+  game_id: string
+  game_name: string
   type: string
   title: string
-  viewers: number
-  startDate: Date
+  viewer_count: number
+  started_at: string
   language: string
-  thumbnailUrl: string
+  thumbnail_url: string
+  tag_ids: string[]
   tags: string[]
-  isMature: boolean
+  is_mature: boolean
   // Additional properties added by our system
   isOnAlertsList?: boolean
 }

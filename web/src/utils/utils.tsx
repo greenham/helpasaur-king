@@ -41,7 +41,7 @@ export const filterStreams = (streams: TwitchStream[], config: WebConfig) => {
 
     // 1. remove streams from users on the blacklist
     filteredAndOrderedStreams = streams.filter(
-      (stream) => !blacklistedUsers.includes(stream.userId)
+      (stream) => !blacklistedUsers.includes(stream.user_id)
     )
 
     // 2. attempt to filter out most non-speedrun streams
@@ -51,7 +51,7 @@ export const filterStreams = (streams: TwitchStream[], config: WebConfig) => {
 
     // 3. feature streams that are in the alert list
     let featuredStreams = filteredAndOrderedStreams.filter((stream) =>
-      alertUserIds.includes(stream.userId)
+      alertUserIds.includes(stream.user_id)
     )
     featuredStreams = featuredStreams.map((s) => {
       s.isOnAlertsList = true
