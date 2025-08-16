@@ -10,10 +10,10 @@ import {
   Dropdown,
 } from "react-bootstrap"
 import { useEffect, useState, useMemo } from "react"
-import { IUser } from "../types/users"
 import { useToast } from "../hooks/useToast"
 import { getTwitchLoginUrl } from "../utils/utils"
 import { useHelpaApi } from "../hooks/useHelpaApi"
+import { ApiUser, TwitchBotConfig } from "@helpasaur/api-client"
 
 interface TwitchBotPageProps {}
 
@@ -68,20 +68,8 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
   )
 }
 
-interface TwitchBotConfig {
-  active: boolean
-  commandsEnabled: boolean
-  commandPrefix: string
-  textCommandCooldown: number
-  practiceListsEnabled: boolean
-  allowModsToManagePracticeLists: boolean
-  weeklyRaceAlertEnabled: boolean
-  createdAt: Date
-  lastUpdated: Date
-}
-
 interface TwitchUserBotManagementProps {
-  user: IUser
+  user: ApiUser
   twitchBotConfig: TwitchBotConfig
 }
 // Custom toggle component for better UX

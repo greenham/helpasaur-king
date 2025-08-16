@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 import { Alert, Badge, Container, Spinner } from "react-bootstrap"
 import { filterStreams } from "../utils/utils"
 import LivestreamsList from "../components/LivestreamsList"
-import { TwitchStream } from "../types/streams"
 import { useHelpaApi } from "../hooks/useHelpaApi"
+import { TwitchStream } from "@helpasaur/api-client"
 
 interface LivestreamsPageProps {}
 interface FilteredStreams {

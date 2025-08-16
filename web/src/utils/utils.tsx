@@ -1,5 +1,4 @@
-import { Command } from "../types/commands"
-import { TwitchStream, StreamAlertsConfig } from "../types/streams"
+import { Command, TwitchStream, WebConfig } from "@helpasaur/api-client"
 
 export const sizeStreamThumbnail = (
   url: string,
@@ -33,10 +32,7 @@ export const getTwitchLoginUrl = () => {
   return `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`
 }
 
-export const filterStreams = (
-  streams: TwitchStream[],
-  config: StreamAlertsConfig
-) => {
+export const filterStreams = (streams: TwitchStream[], config: WebConfig) => {
   if (streams && streams.length > 0) {
     const { blacklistedUsers, channels, statusFilters } = config
     const speedrunTester = new RegExp(statusFilters, "i")
@@ -45,7 +41,7 @@ export const filterStreams = (
 
     // 1. remove streams from users on the blacklist
     filteredAndOrderedStreams = streams.filter(
-      (stream) => !blacklistedUsers.includes(stream.user_id)
+      (stream) => !blacklistedUsers.includes(stream.userId)
     )
 
     // 2. attempt to filter out most non-speedrun streams
@@ -55,7 +51,7 @@ export const filterStreams = (
 
     // 3. feature streams that are in the alert list
     let featuredStreams = filteredAndOrderedStreams.filter((stream) =>
-      alertUserIds.includes(stream.user_id)
+      alertUserIds.includes(stream.userId)
     )
     featuredStreams = featuredStreams.map((s) => {
       s.isOnAlertsList = true

@@ -1,6 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { HelpaApi } from "@helpasaur/api-client"
-import { Command } from "../types/commands"
+import {
+  HelpaApi,
+  Command,
+  ApiUser,
+  WebConfig,
+  TwitchStream,
+  DiscordJoinUrlResponse,
+  TwitchBotConfig,
+  ConfigUpdatePayload,
+} from "@helpasaur/api-client"
 import { useToast } from "./useToast"
 
 if (!process.env.API_HOST) {
@@ -118,9 +126,8 @@ export const useHelpaApi = () => {
      */
     useUpdateTwitchBotConfig: (options?: any) =>
       useMutation({
-        mutationFn: (
-          config: Parameters<typeof helpaApiClient.updateTwitchBotConfig>[0]
-        ) => helpaApiClient.updateTwitchBotConfig(config),
+        mutationFn: (config: ConfigUpdatePayload) =>
+          helpaApiClient.updateTwitchBotConfig(config),
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
         },
@@ -158,7 +165,8 @@ export const useHelpaApi = () => {
      */
     useCreateCommand: (options?: any) =>
       useMutation({
-        mutationFn: (command: Command) => helpaApiClient.createCommand(command),
+        mutationFn: (command: Partial<Command>) =>
+          helpaApiClient.createCommand(command),
         onSuccess: (data, variables) => {
           toast.success(`Command '${variables.command}' created!`)
           queryClient.invalidateQueries({ queryKey: ["commands"] })

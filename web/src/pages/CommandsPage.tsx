@@ -4,6 +4,7 @@ import { Alert, Container, Spinner } from "react-bootstrap"
 import CommandsList from "../components/CommandsList"
 import { sortCommandsAlpha } from "../utils/utils"
 import { useHelpaApi } from "../hooks/useHelpaApi"
+import { Command } from "@helpasaur/api-client"
 
 interface CommandsPageProps {}
 

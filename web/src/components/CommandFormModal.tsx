@@ -1,13 +1,13 @@
 import * as React from "react"
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap"
-import { Command } from "../types/commands"
-type CommandFormModel = Command & { aliasesText?: string }
+import { Command } from "@helpasaur/api-client"
+type CommandFormModel = Partial<Command> & { aliasesText?: string }
 
 interface CommandFormModalProps {
   command: CommandFormModel
   show: boolean
   onHide: () => void
-  onSubmit: (command: Command) => void
+  onSubmit: (command: Partial<Command>) => void
 }
 
 const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (

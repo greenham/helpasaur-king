@@ -1,5 +1,5 @@
 import * as React from "react"
-import { TwitchStream } from "../types/streams"
+import { TwitchStream } from "@helpasaur/api-client"
 import Card from "react-bootstrap/Card"
 import Badge from "react-bootstrap/Badge"
 import Button from "react-bootstrap/Button"
@@ -25,25 +25,25 @@ function StreamCard(props: StreamCardProps) {
       <Card.Header className="d-grid p-0">
         <Button
           variant={stream.isOnAlertsList ? "secondary" : "primary"}
-          href={getTwitchUrl(stream.user_login)}
+          href={getTwitchUrl(stream.userName)}
           target="_blank"
           rel="noopener noreferrer"
           className="py-3"
         >
           <h5>
-            <i className="fa-regular fa-user"></i> {stream.user_name}
+            <i className="fa-regular fa-user"></i> {stream.userName}
           </h5>
         </Button>
       </Card.Header>
       <a
-        href={getTwitchUrl(stream.user_login)}
+        href={getTwitchUrl(stream.userName)}
         target="_blank"
         rel="noopener noreferrer"
       >
         <Card.Img
           variant="top"
           src={sizeStreamThumbnail(
-            stream.thumbnail_url,
+            stream.thumbnailUrl,
             thumbnailWidth,
             thumbnailHeight
           )}
@@ -53,7 +53,7 @@ function StreamCard(props: StreamCardProps) {
         <Card.Title>
           <p className="py-2 fw-bold">
             <a
-              href={getTwitchUrl(stream.user_login)}
+              href={getTwitchUrl(stream.userName)}
               target="_blank"
               rel="noopener noreferrer"
               className={`text-decoration-none link-light`}
@@ -66,12 +66,12 @@ function StreamCard(props: StreamCardProps) {
       <Card.Footer className="bg-dark">
         <Stack gap={1} className="font-monospace">
           <small>
-            <i className="fa-regular fa-eye"></i> {stream.viewer_count} viewers
+            <i className="fa-regular fa-eye"></i> {stream.viewers} viewers
           </small>
           <small>
             <i className="fa-solid fa-stopwatch"></i> Started{" "}
             <em>
-              <TimeAgo date={stream.started_at} />
+              <TimeAgo date={stream.startDate} />
             </em>
           </small>
           <Stack direction="horizontal" gap={1}>

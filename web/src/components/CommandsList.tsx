@@ -17,15 +17,15 @@ import {
   Table,
 } from "react-bootstrap"
 import LinkifyText from "./LinkifyText"
-import { Command } from "../types/commands"
+import { Command } from "@helpasaur/api-client"
 import CommandFormModal from "./CommandFormModal"
 
 interface CommandsListProps {
   commands: Command[]
   userCanEdit: boolean
-  createCommandMutation: UseMutationResult<any, any, any, any>
-  updateCommandMutation: UseMutationResult<any, any, any, any>
-  deleteCommandMutation: UseMutationResult<any, any, any, any>
+  createCommandMutation: UseMutationResult<any, any, Partial<Command>, any>
+  updateCommandMutation: UseMutationResult<any, any, Partial<Command>, any>
+  deleteCommandMutation: UseMutationResult<any, any, Command, any>
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
@@ -77,15 +77,18 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const [editCommandModalActive, setEditCommandModalActive] = useState(false)
   const hideEditCommandModal = () => setEditCommandModalActive(false)
   const showEditCommandModal = () => setEditCommandModalActive(true)
-  const [commandToEdit, setCommandToEdit] = useState<Command>(freshCommand)
+  const [commandToEdit, setCommandToEdit] =
+    useState<Partial<Command>>(freshCommand)
 
   const [deleteCommandModalActive, setDeleteCommandModalActive] =
     useState(false)
   const hideDeleteCommandModal = () => setDeleteCommandModalActive(false)
   const showDeleteCommandModal = () => setDeleteCommandModalActive(true)
-  const [commandToDelete, setCommandToDelete] = useState<Command>(freshCommand)
+  const [commandToDelete, setCommandToDelete] = useState<Command>(
+    freshCommand as Command
+  )
 
-  const saveCommand = async (command: Command) => {
+  const saveCommand = async (command: Partial<Command>) => {
     if (command._id !== "") {
       updateCommandMutation.mutate(command)
     } else {

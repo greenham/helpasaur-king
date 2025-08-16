@@ -5,6 +5,16 @@ import {
   ServiceConfig,
   ServiceAuthResponse,
   ServiceName,
+  Command,
+  ApiUser,
+  WebConfig,
+  TwitchStream,
+  DiscordJoinUrlResponse,
+  TwitchBotConfig,
+  TwitchBotChannelResponse,
+  StreamAlertsChannel,
+  MutationResponse,
+  ConfigUpdatePayload,
 } from "./types"
 
 /**
@@ -128,7 +138,7 @@ export class HelpaApi {
   /**
    * Get all commands from the API
    */
-  async getCommands(): Promise<any> {
+  async getCommands(): Promise<Command[]> {
     try {
       const response = await this.api.get("/api/commands")
       return response.data
@@ -140,7 +150,7 @@ export class HelpaApi {
   /**
    * Get live streams from the API
    */
-  async getLivestreams(): Promise<any> {
+  async getLivestreams(): Promise<TwitchStream[]> {
     try {
       const response = await this.api.get("/api/streams/live")
       return response.data
@@ -152,7 +162,7 @@ export class HelpaApi {
   /**
    * Get web configuration from the API
    */
-  async getWebConfig(): Promise<any> {
+  async getWebConfig(): Promise<WebConfig> {
     try {
       const response = await this.api.get("/api/web/config")
       return response.data
@@ -164,7 +174,7 @@ export class HelpaApi {
   /**
    * Get Discord join URL from the API
    */
-  async getDiscordJoinUrl(): Promise<any> {
+  async getDiscordJoinUrl(): Promise<DiscordJoinUrlResponse> {
     try {
       const response = await this.api.get("/api/discord/joinUrl")
       return response.data
@@ -178,7 +188,7 @@ export class HelpaApi {
   /**
    * Get current user information
    */
-  async getCurrentUser(): Promise<any> {
+  async getCurrentUser(): Promise<ApiUser> {
     try {
       const response = await this.api.get("/api/me")
       return response.data
@@ -190,7 +200,7 @@ export class HelpaApi {
   /**
    * Get Twitch bot configuration for current user
    */
-  async getTwitchBotConfig(): Promise<any> {
+  async getTwitchBotConfig(): Promise<TwitchBotConfig> {
     try {
       const response = await this.api.get("/api/me/twitch")
       return response.data
@@ -202,7 +212,9 @@ export class HelpaApi {
   /**
    * Update Twitch bot configuration for current user
    */
-  async updateTwitchBotConfig(config: any): Promise<any> {
+  async updateTwitchBotConfig(
+    config: ConfigUpdatePayload
+  ): Promise<MutationResponse> {
     try {
       const response = await this.api.patch("/api/twitch/config", config)
       return response.data
@@ -214,7 +226,9 @@ export class HelpaApi {
   /**
    * Join Twitch channel
    */
-  async joinTwitchChannel(twitchUsername?: string): Promise<any> {
+  async joinTwitchChannel(
+    twitchUsername?: string
+  ): Promise<TwitchBotChannelResponse> {
     try {
       const body = twitchUsername ? { channel: twitchUsername } : {}
       const response = await this.api.post("/api/twitch/join", body)
@@ -227,7 +241,9 @@ export class HelpaApi {
   /**
    * Leave Twitch channel
    */
-  async leaveTwitchChannel(twitchUsername?: string): Promise<any> {
+  async leaveTwitchChannel(
+    twitchUsername?: string
+  ): Promise<TwitchBotChannelResponse> {
     try {
       const body = twitchUsername ? { channel: twitchUsername } : {}
       const response = await this.api.post("/api/twitch/leave", body)
@@ -240,7 +256,7 @@ export class HelpaApi {
   /**
    * Get Twitch bot channels
    */
-  async getTwitchBotChannels(): Promise<any> {
+  async getTwitchBotChannels(): Promise<string[]> {
     try {
       const response = await this.api.get("/api/twitch/channels")
       return response.data
@@ -252,7 +268,7 @@ export class HelpaApi {
   /**
    * Create a new command
    */
-  async createCommand(command: any): Promise<any> {
+  async createCommand(command: Partial<Command>): Promise<MutationResponse> {
     try {
       const response = await this.api.post("/api/commands", command)
       return response.data
@@ -264,7 +280,7 @@ export class HelpaApi {
   /**
    * Update an existing command
    */
-  async updateCommand(command: any): Promise<any> {
+  async updateCommand(command: Command): Promise<MutationResponse> {
     try {
       const response = await this.api.patch(
         `/api/commands/${command._id}`,
@@ -279,7 +295,7 @@ export class HelpaApi {
   /**
    * Delete a command
    */
-  async deleteCommand(command: any): Promise<any> {
+  async deleteCommand(command: Command): Promise<MutationResponse> {
     try {
       const response = await this.api.delete(`/api/commands/${command._id}`, {
         data: command,
@@ -293,7 +309,7 @@ export class HelpaApi {
   /**
    * Get stream alerts channels
    */
-  async getStreamAlertsChannels(): Promise<any> {
+  async getStreamAlertsChannels(): Promise<StreamAlertsChannel[]> {
     try {
       const response = await this.api.get("/api/streamAlerts/channels")
       return response.data
@@ -305,7 +321,9 @@ export class HelpaApi {
   /**
    * Add channel to stream alerts
    */
-  async addChannelToStreamAlerts(twitchUsername: string): Promise<any> {
+  async addChannelToStreamAlerts(
+    twitchUsername: string
+  ): Promise<MutationResponse> {
     try {
       const response = await this.api.post("/api/streamAlerts/channels", {
         channels: [twitchUsername],
@@ -319,7 +337,9 @@ export class HelpaApi {
   /**
    * Remove channel from stream alerts
    */
-  async removeChannelFromStreamAlerts(twitchUserId: string): Promise<any> {
+  async removeChannelFromStreamAlerts(
+    twitchUserId: string
+  ): Promise<MutationResponse> {
     try {
       const response = await this.api.delete(
         `/api/streamAlerts/channels/${twitchUserId}`
