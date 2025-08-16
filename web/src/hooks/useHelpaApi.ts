@@ -20,6 +20,9 @@ import {
 } from "@helpasaur/api-client"
 import { useToast } from "./useToast"
 
+// Web-specific response types for React Query mutations
+type MutationResponse = ApiResponse<{}>
+
 // Extended mutation options with toast control
 interface MutationOptionsWithToast<TData, TError, TVariables>
   extends Omit<UseMutationOptions<TData, TError, TVariables>, "mutationFn"> {
@@ -221,7 +224,7 @@ export const useHelpaApi = () => {
      */
     useUpdateTwitchBotConfig: (
       options?: MutationOptionsWithToast<
-        ApiResponse<{}>,
+        MutationResponse,
         Error,
         ConfigUpdatePayload
       >
@@ -322,7 +325,7 @@ export const useHelpaApi = () => {
      */
     useCreateCommand: (
       options?: MutationOptionsWithToast<
-        ApiResponse<{}>,
+        MutationResponse,
         Error,
         Partial<Command>
       >
@@ -352,7 +355,7 @@ export const useHelpaApi = () => {
      * Update command
      */
     useUpdateCommand: (
-      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, Command>
+      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -378,7 +381,7 @@ export const useHelpaApi = () => {
      * Delete command
      */
     useDeleteCommand: (
-      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, Command>
+      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -404,7 +407,7 @@ export const useHelpaApi = () => {
      * Add channel to stream alerts
      */
     useAddChannelToStreamAlerts: (
-      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, string>
+      options?: MutationOptionsWithToast<MutationResponse, Error, string>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -433,7 +436,7 @@ export const useHelpaApi = () => {
      * Remove channel from stream alerts
      */
     useRemoveChannelFromStreamAlerts: (
-      options?: MutationOptionsWithToast<ApiResponse<{}>, Error, string>
+      options?: MutationOptionsWithToast<MutationResponse, Error, string>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
