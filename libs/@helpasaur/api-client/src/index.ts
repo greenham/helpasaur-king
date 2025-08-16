@@ -455,6 +455,79 @@ export class HelpaApi {
       throw new Error(`Failed to update guild config: ${err.message}`)
     }
   }
+
+  // Practice list endpoints
+
+  /**
+   * Add entry to practice list
+   */
+  async addPracticeListEntry(
+    targetUser: string,
+    listName: string,
+    entry: string
+  ): Promise<ApiResponse<{}>> {
+    try {
+      const response = await this.api.post(
+        `/api/prac/${targetUser}/lists/${listName}/entries`,
+        { entry }
+      )
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to add practice list entry: ${err.message}`)
+    }
+  }
+
+  /**
+   * Get practice list entries
+   */
+  async getPracticeList(
+    targetUser: string,
+    listName: string
+  ): Promise<ApiResponse<{ entries: string[] }>> {
+    try {
+      const response = await this.api.get(
+        `/api/prac/${targetUser}/lists/${listName}`
+      )
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to get practice list: ${err.message}`)
+    }
+  }
+
+  /**
+   * Delete entry from practice list
+   */
+  async deletePracticeListEntry(
+    targetUser: string,
+    listName: string,
+    entryId: number
+  ): Promise<ApiResponse<{}>> {
+    try {
+      const response = await this.api.delete(
+        `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
+      )
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to delete practice list entry: ${err.message}`)
+    }
+  }
+
+  /**
+   * Clear entire practice list
+   */
+  async clearPracticeList(
+    targetUser: string,
+    listName: string
+  ): Promise<ApiResponse<{}>> {
+    try {
+      const response = await this.api.delete(
+        `/api/prac/${targetUser}/lists/${listName}`
+      )
+      return response.data
+    } catch (err: any) {
+      throw new Error(`Failed to clear practice list: ${err.message}`)
+    }
+  }
 }
 
 // Export all types for convenience

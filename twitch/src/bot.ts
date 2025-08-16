@@ -294,14 +294,16 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.api.post(
-              `/api/prac/${targetUser}/lists/${listName}/entries`,
-              {
-                entry: entryName,
-              }
+            const response = await this.helpaApi.addPracticeListEntry(
+              targetUser,
+              listName,
+              entryName
             )
-            console.log(response.data.message)
-            this.bot.say(channel, response.data.message).catch(console.error)
+            if (response.result === "success") {
+              const message = response.message || "Entry added successfully!"
+              console.log(message)
+              this.bot.say(channel, message).catch(console.error)
+            }
             return
           } catch (err) {
             this.handleApiError(
@@ -319,9 +321,16 @@ export class TwitchBot {
 
           try {
             // get their list
-            const response = await this.helpaApi.api.get(
-              `/api/prac/${targetUser}/lists/${listName}`
+            const response = await this.helpaApi.getPracticeList(
+              targetUser,
+              listName
             )
+            if (response.result !== "success" || !response.data?.entries) {
+              this.bot
+                .say(channel, "No entries found in practice list")
+                .catch(console.error)
+              return
+            }
             const entries = response.data.entries
 
             // choose a random entry
@@ -371,11 +380,16 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry ID: ${entryId}`
           )
           try {
-            const response = await this.helpaApi.api.delete(
-              `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
+            const response = await this.helpaApi.deletePracticeListEntry(
+              targetUser,
+              listName,
+              entryId
             )
-            console.log(response.data.message)
-            this.bot.say(channel, response.data.message).catch(console.error)
+            if (response.result === "success") {
+              const message = response.message || "Entry deleted successfully!"
+              console.log(message)
+              this.bot.say(channel, message).catch(console.error)
+            }
             return
           } catch (err) {
             this.handleApiError(
@@ -391,17 +405,27 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
           )
           try {
-            const response = await this.helpaApi.api.get(
-              `/api/prac/${targetUser}/lists/${listName}`
+            const response = await this.helpaApi.getPracticeList(
+              targetUser,
+              listName
             )
-            this.bot
-              .say(
-                channel,
-                response.data.entries
-                  .map((e, idx) => `[${idx + 1}] ${e}`)
-                  .join(" | ")
-              )
-              .catch(console.error)
+            if (response.result === "success" && response.data?.entries) {
+              this.bot
+                .say(
+                  channel,
+                  response.data.entries
+                    .map((e, idx) => `[${idx + 1}] ${e}`)
+                    .join(" | ")
+                )
+                .catch(console.error)
+            } else {
+              this.bot
+                .say(
+                  channel,
+                  `No entries found in practice list! Add one using ${channelConfig.commandPrefix}pracadd <entry name>`
+                )
+                .catch(console.error)
+            }
             return
           } catch (err) {
             this.handleApiError(
@@ -431,10 +455,15 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.api.delete(
-              `/api/prac/${targetUser}/lists/${listName}`
+            const response = await this.helpaApi.clearPracticeList(
+              targetUser,
+              listName
             )
-            this.bot.say(channel, response.data.message).catch(console.error)
+            if (response.result === "success") {
+              const message =
+                response.message || "Practice list cleared successfully!"
+              this.bot.say(channel, message).catch(console.error)
+            }
             return
           } catch (err) {
             this.handleApiError(
