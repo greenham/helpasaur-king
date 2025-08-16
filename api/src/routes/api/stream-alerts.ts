@@ -149,12 +149,8 @@ router.delete(
       const subscriptions = await twitchApiClient.getSubscriptions({
         user_id: req.params.id,
       })
-      if (
-        subscriptions &&
-        subscriptions.data &&
-        subscriptions.data.length > 0
-      ) {
-        subscriptions.data.forEach(async (subscription: any) => {
+      if (subscriptions && subscriptions.length > 0) {
+        subscriptions.forEach(async (subscription: any) => {
           await twitchApiClient.deleteSubscription(subscription.id)
           console.log(`Deleted subscription ${subscription.id}`)
         })
