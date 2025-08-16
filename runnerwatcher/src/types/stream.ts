@@ -1,0 +1,55 @@
+import { HelixStream } from "twitch-api-client"
+
+// Extended stream type for runnerwatcher service
+// Combines HelixStream data with custom properties added by our service
+export interface WatchedTwitchStream {
+  // Core HelixStream properties (made mutable for our service)
+  id: string
+  userId: string
+  userName: string
+  userDisplayName: string
+  gameId: string
+  gameName: string
+  type: string
+  title: string
+  viewers: number
+  startDate: Date
+  language: string
+  thumbnailUrl: string
+  tags: string[]
+  isMature: boolean
+
+  // Custom properties added by runnerwatcher
+  user?: {
+    id: string
+    login: string
+    display_name: string
+    [key: string]: any
+  }
+  alert_sent_at?: Date
+  [key: string]: any // Allow additional dynamic properties
+}
+
+// Helper function to convert HelixStream to ExtendedStream
+export function helixStreamToWatchedTwitchStream(
+  helixStream: HelixStream,
+  additionalProps?: Partial<WatchedTwitchStream>
+): WatchedTwitchStream {
+  return {
+    id: helixStream.id,
+    userId: helixStream.userId,
+    userName: helixStream.userName,
+    userDisplayName: helixStream.userDisplayName,
+    gameId: helixStream.gameId,
+    gameName: helixStream.gameName,
+    type: helixStream.type,
+    title: helixStream.title,
+    viewers: helixStream.viewers,
+    startDate: helixStream.startDate,
+    language: helixStream.language,
+    thumbnailUrl: helixStream.thumbnailUrl,
+    tags: helixStream.tags,
+    isMature: helixStream.isMature,
+    ...additionalProps,
+  }
+}

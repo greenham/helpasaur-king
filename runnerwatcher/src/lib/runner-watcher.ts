@@ -1,16 +1,23 @@
 import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
 import { TwitchApiClient } from "twitch-api-client"
+import { Constants } from "../constants"
+import {
+  WatchedTwitchStream,
+  helixStreamToWatchedTwitchStream,
+} from "../types/stream"
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
-import { Constants } from "../constants"
-const { STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT, STREAM_ONLINE_TYPE_LIVE } =
-  Constants
-const DELAY_FOR_API_SECONDS = 10
-const ALERT_DELAY_SECONDS = 15 * 60
+const {
+  STREAM_ONLINE_EVENT,
+  CHANNEL_UPDATE_EVENT,
+  STREAM_ONLINE_TYPE_LIVE,
+  DELAY_FOR_API_SECONDS,
+  ALERT_DELAY_SECONDS,
+} = Constants
 
 // Maintain a cache of streams we've recently alerted
-let cachedStreams: any[] = []
+let cachedStreams: WatchedTwitchStream[] = []
 
 class RunnerWatcher extends EventEmitter {
   config: any
@@ -67,20 +74,23 @@ class RunnerWatcher extends EventEmitter {
 
       // Pull stream info from Twitch API
       let streamResult = await twitchApi.getStreams({
-        channel: user.id,
+        userId: user.id,
       })
 
       // Make sure there's actually a stream
-      if (!streamResult || !streamResult.data || !streamResult.data[0]) {
+      if (!streamResult || !streamResult[0]) {
         console.log(`No streams found for ${user.login}!`)
         return
       }
 
-      let stream: any = streamResult.data[0]
+      // Give us more control over this object
+      let stream: WatchedTwitchStream = helixStreamToWatchedTwitchStream(
+        streamResult[0]
+      )
 
       // Replace some stream data from API if this is an update event
       if (eventType === CHANNEL_UPDATE_EVENT) {
-        stream.game_id = event.category_id
+        stream.gameId = event.category_id
         stream.title = event.title
       }
 
@@ -95,7 +105,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Ensure stream is alttp
-      if (!this.config.alttpGameIds.includes(stream.game_id)) {
+      if (!this.config.alttpGameIds.includes(stream.gameId)) {
         console.log(`Not streaming configured game, skipping...`)
         return
       }
@@ -112,7 +122,7 @@ class RunnerWatcher extends EventEmitter {
 
       // See if this user has a stream in the cache already
       let cachedStreamForUser = cachedStreams.find(
-        (s) => s.user_id == stream.user_id
+        (s) => s.userId == stream.userId
       )
       console.log(
         cachedStreamForUser
@@ -182,7 +192,7 @@ class RunnerWatcher extends EventEmitter {
       this.emit("streamEvent", stream)
 
       // Remove any cached stream data for this user
-      cachedStreams = cachedStreams.filter((s) => s.user_id !== stream.user_id)
+      cachedStreams = cachedStreams.filter((s) => s.userId !== stream.userId)
 
       // Cache it
       stream.lastAlertedAt = Date.now()

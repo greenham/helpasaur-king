@@ -14,6 +14,9 @@ export const Constants = Object.freeze({
   STREAM_ONLINE_EVENT: "stream.online",
   CHANNEL_UPDATE_EVENT: "channel.update",
   STREAM_ONLINE_TYPE_LIVE: "live",
+
+  DELAY_FOR_API_SECONDS: 10,
+  ALERT_DELAY_SECONDS: 15 * 60,
 } as const)
 
 export type ConstantsType = typeof Constants
