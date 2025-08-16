@@ -33,6 +33,10 @@ export class TwitchEventListener extends EventEmitter {
     // Need raw body for verification
     this.app.use(express.raw({ type: "application/json" }))
 
+    this.app.post("/eventsub", (req: Request, res: Response) => {
+      this.handleWebhook(req, res)
+    })
+
     // Health check endpoint
     this.app.get("/health", (_req: Request, res: Response) => {
       try {
@@ -56,10 +60,6 @@ export class TwitchEventListener extends EventEmitter {
           error: error.message,
         })
       }
-    })
-
-    this.app.post("/eventsub", (req: Request, res: Response) => {
-      this.handleWebhook(req, res)
     })
   }
 

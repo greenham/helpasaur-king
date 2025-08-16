@@ -15,6 +15,12 @@ import {
 export const STREAM_ONLINE_EVENT = "stream.online"
 export const CHANNEL_UPDATE_EVENT = "channel.update"
 
+// Helper function to serialize @twurple class instances to plain objects
+function serializeTwurpleObject<T>(obj: T | null): T | null {
+  if (!obj) return null
+  return JSON.parse(JSON.stringify(obj)) as T
+}
+
 export interface SubscriptionData {
   channel: string
   userId: string
@@ -153,7 +159,8 @@ export class TwitchApiClient {
   ): Promise<HelixStream[]> {
     try {
       const streams = await this.apiClient.streams.getStreams(filter)
-      return streams.data
+      // Convert HelixStream class instances to serializable plain objects
+      return streams.data.map((stream) => serializeTwurpleObject(stream)!)
     } catch (error) {
       console.error(`Failed to get streams:`, error)
       return []
@@ -175,7 +182,7 @@ export class TwitchApiClient {
         tokenInfo.userId,
         withEmail
       )
-      return user
+      return serializeTwurpleObject(user)!
     } catch (error) {
       console.error(`Failed to get current user:`, error)
       throw error
@@ -185,7 +192,9 @@ export class TwitchApiClient {
   async getUserByName(name: string): Promise<HelixUser | null> {
     try {
       const user = await this.apiClient.users.getUserByName(name)
-      return user
+      if (!user) return null
+
+      return serializeTwurpleObject(user)
     } catch (error) {
       console.error(`Failed to get user by name ${name}:`, error)
       throw error
@@ -195,7 +204,9 @@ export class TwitchApiClient {
   async getUserById(id: string): Promise<HelixUser | null> {
     try {
       const user = await this.apiClient.users.getUserById(id)
-      return user
+      if (!user) return null
+
+      return serializeTwurpleObject(user)
     } catch (error) {
       console.error(`Failed to get user by id ${id}:`, error)
       throw error

@@ -83,6 +83,7 @@ router.post(
       // Query Twitch API for the user info by their login name
       const userData: HelixUser | null =
         await twitchApiClient.getUserByName(channel)
+
       if (!userData) {
         return {
           status: "error",

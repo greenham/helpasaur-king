@@ -26,26 +26,7 @@ router.get("/live", async (req: Request, res: Response) => {
 
   try {
     const streams = await twitchApiClient.getStreams(filter)
-
-    // Convert HelixStream objects to plain objects for JSON serialization
-    const serializedStreams = streams.map((stream) => ({
-      id: stream.id,
-      userId: stream.userId,
-      userName: stream.userName,
-      userDisplayName: stream.userDisplayName,
-      gameId: stream.gameId,
-      gameName: stream.gameName,
-      type: stream.type,
-      title: stream.title,
-      viewers: stream.viewers,
-      startDate: stream.startDate,
-      language: stream.language,
-      thumbnailUrl: stream.thumbnailUrl,
-      tags: stream.tags,
-      isMature: stream.isMature,
-    }))
-
-    res.status(200).json(serializedStreams)
+    res.status(200).json(streams)
   } catch (err: any) {
     res.status(500).json({ message: err.message })
   }
