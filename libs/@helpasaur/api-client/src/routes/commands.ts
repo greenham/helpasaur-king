@@ -52,7 +52,9 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails or service is not authenticated
    */
   async findCommand(query: string): Promise<Command | null> {
-    return this.apiPost<Command | null>("/api/commands/find", query)
+    return this.apiPost<Command | null>("/api/commands/find", {
+      command: query,
+    })
   }
 
   /**

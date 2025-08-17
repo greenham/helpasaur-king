@@ -24,9 +24,6 @@ export async function getCachedCommand(
     !cachedCommand ||
     (cachedCommand && Date.now() > cachedCommand.staleAfter)
   ) {
-    console.log(
-      `[CommandCache] Cache miss or expired for '${commandName}', fetching from API`
-    )
     try {
       const findCommandResult =
         await apiClient.commands.findCommand(commandName)
@@ -37,20 +34,12 @@ export async function getCachedCommand(
           staleAfter: Date.now() + cacheTimeoutMinutes * 60 * 1000,
         }
         cache.set(commandName, resolvedCommand)
-        console.log(
-          `[CommandCache] Cached '${commandName}' for ${cacheTimeoutMinutes} minutes`
-        )
-      } else {
-        console.log(`[CommandCache] Command '${commandName}' not found`)
       }
     } catch (err) {
-      console.error(
-        `[CommandCache] Error while fetching command '${commandName}': ${err}`
-      )
+      console.error(`Error while fetching command: ${err}`)
       return null
     }
   } else {
-    console.log(`[CommandCache] Cache hit for '${commandName}'`)
     resolvedCommand = cachedCommand
   }
 
