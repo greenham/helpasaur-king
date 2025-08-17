@@ -10,14 +10,16 @@ FROM node:20-alpine as builder
 # Install common global packages
 RUN npm install -g pnpm@8 nodemon
 
-# Set up common working directory
-WORKDIR /app
-
 # Install common system dependencies for debugging and health checks
 RUN apk add --no-cache curl wget
 
+# Set up common working directory
+WORKDIR /app
+
 # Copy package management configuration and root TypeScript config
 COPY pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
+
+# Copy service packages
 COPY api/package.json ./api/
 COPY discord/package.json ./discord/
 COPY twitch/package.json ./twitch/
@@ -26,19 +28,21 @@ COPY ws-relay/package.json ./ws-relay/
 COPY racebot/package.json ./racebot/
 COPY web/package.json ./web/
 
-# Copy and build library packages
-COPY libs/@helpasaur/api-client ./libs/@helpasaur/api-client
-COPY libs/twitch-api-client ./libs/twitch-api-client
+# Copy library packages
+COPY libs/@helpasaur/api-client/package.json ./libs/@helpasaur/api-client/
+COPY libs/twitch-api-client/package.json ./libs/twitch-api-client/
+
+# Install ALL workspace dependencies
+RUN pnpm install --frozen-lockfile
 
 # Build @helpasaur/api-client
 WORKDIR /app/libs/@helpasaur/api-client
-RUN pnpm install --ignore-workspace --prod=false && pnpm build
+COPY libs/@helpasaur/api-client/src ./src
+COPY libs/@helpasaur/api-client/tsconfig.json ./
+RUN pnpm build
 
 # Build twitch-api-client
 WORKDIR /app/libs/twitch-api-client
-RUN pnpm install --ignore-workspace --prod=false && pnpm build
-
-# Install ALL workspace dependencies in base image for development
-# This creates a shared node_modules that all services can use
-WORKDIR /app
-RUN pnpm install --frozen-lockfile
+COPY libs/twitch-api-client/src ./src
+COPY libs/twitch-api-client/tsconfig.json ./
+RUN pnpm build
