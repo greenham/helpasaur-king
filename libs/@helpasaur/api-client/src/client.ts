@@ -1,11 +1,7 @@
 import axios, { AxiosInstance, AxiosError } from "axios"
 import axiosRetry from "axios-retry"
-import { ApiResult } from "@helpasaur/types"
-import {
-  ServiceConfigOptions,
-  ServiceConfig,
-  ServiceName,
-} from "./types/services"
+import { ApiResult, ServiceConfig } from "@helpasaur/types"
+import { ClientOptions, ServiceName } from "./types/services"
 import { CommandRoutes } from "./routes/commands"
 import { TwitchRoutes } from "./routes/twitch"
 import { DiscordRoutes } from "./routes/discord"
@@ -41,7 +37,7 @@ export class HelpaApi {
    * @param options - The options for configuring the HelpaApi instance.
    * @throws {Error} If any of the required constructor values are missing.
    */
-  constructor(options: ServiceConfigOptions) {
+  constructor(options: ClientOptions) {
     const { apiHost, apiKey, serviceName, webMode = false } = options
 
     this.apiHost = apiHost

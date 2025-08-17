@@ -9,23 +9,14 @@ export type ServiceName =
   | "ws-relay"
 
 // Service configuration options for API client
-export interface ServiceConfigOptions {
+export interface ClientOptions {
   apiHost: string
   apiKey?: string
   serviceName: ServiceName
   webMode?: boolean
 }
 
-// Service Authorization
 export interface ServiceAuthResponse {
   token: string
   expiresIn?: string
-}
-
-// Service Config (generic config returned from API)
-export interface ServiceConfig {
-  id?: string
-  config: {
-    [key: string]: any
-  }
 }
