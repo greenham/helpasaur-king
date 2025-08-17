@@ -1,6 +1,6 @@
-import axios, { AxiosInstance, AxiosError } from "axios"
+import axios, { AxiosInstance, AxiosError, AxiosResponse } from "axios"
 import axiosRetry from "axios-retry"
-import { ApiResult } from "@helpasaur/types"
+import { ApiResult, ApiResponse } from "@helpasaur/types"
 import {
   ServiceConfigOptions,
   ServiceConfig,
@@ -78,6 +78,71 @@ export class HelpaApi {
   }
 
   /**
+   * Helper function to handle API responses
+   * @param response - The axios response object
+   * @returns The data from the response or void
+   * @throws Error if the response indicates an error
+   */
+  private handleResponse<T>(response: AxiosResponse<ApiResponse<T>>): T {
+    if (response.data.result === ApiResult.ERROR) {
+      throw new Error(response.data.message || "API request failed")
+    }
+
+    if (response.data.result === ApiResult.SUCCESS) {
+      return response.data.data as T
+    }
+
+    // NOOP is treated as success
+    return response.data.data as T
+  }
+
+  /**
+   * Helper function to execute GET requests
+   * @param endpoint - The API endpoint to call
+   * @returns Promise with the data from the response
+   */
+  private async apiGet<T>(endpoint: string): Promise<T> {
+    const response = await this.api.get(endpoint)
+    return this.handleResponse(response)
+  }
+
+  /**
+   * Helper function to execute POST requests
+   * @param endpoint - The API endpoint to call
+   * @param data - The data to send in the request body
+   * @returns Promise with the data from the response or void
+   */
+  private async apiPost<T = void>(endpoint: string, data: any): Promise<T> {
+    const response = await this.api.post(endpoint, data)
+    return this.handleResponse(response)
+  }
+
+  /**
+   * Helper function to execute PATCH requests
+   * @param endpoint - The API endpoint to call
+   * @param data - The data to send in the request body
+   * @returns Promise with the data from the response or void
+   */
+  private async apiPatch<T = void>(endpoint: string, data: any): Promise<T> {
+    const response = await this.api.patch(endpoint, data)
+    return this.handleResponse(response)
+  }
+
+  /**
+   * Helper function to execute DELETE requests
+   * @param endpoint - The API endpoint to call
+   * @param data - Optional data to send in the request body
+   * @returns Promise with void
+   */
+  private async apiDelete(endpoint: string, data?: any): Promise<void> {
+    const response = await this.api.delete(
+      endpoint,
+      data ? { data } : undefined
+    )
+    return this.handleResponse(response)
+  }
+
+  /**
    * Authorizes the service with the API using the provided API key
    * In web mode, this method always returns true as user auth is handled by cookies
    * @returns Promise resolving to true if service is authorized successfully, false otherwise
@@ -152,18 +217,7 @@ export class HelpaApi {
    * @throws Error if the API request fails
    */
   async getCommands(): Promise<Command[]> {
-    try {
-      const response = await this.api.get("/api/commands")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get commands")
-    } catch (err: any) {
-      throw new Error(`Failed to get commands: ${err.message}`)
-    }
+    return this.apiGet("/api/commands")
   }
 
   /**
@@ -172,18 +226,7 @@ export class HelpaApi {
    * @throws Error if the API request fails
    */
   async getLivestreams(): Promise<TwitchStream[]> {
-    try {
-      const response = await this.api.get("/api/streams/live")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get livestreams")
-    } catch (err: any) {
-      throw new Error(`Failed to get livestreams: ${err.message}`)
-    }
+    return this.apiGet("/api/streams/live")
   }
 
   /**
@@ -192,18 +235,7 @@ export class HelpaApi {
    * @throws Error if the API request fails
    */
   async getWebConfig(): Promise<WebConfig> {
-    try {
-      const response = await this.api.get("/api/web/config")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get web config")
-    } catch (err: any) {
-      throw new Error(`Failed to get web config: ${err.message}`)
-    }
+    return this.apiGet("/api/web/config")
   }
 
   /**
@@ -212,18 +244,7 @@ export class HelpaApi {
    * @throws Error if the API request fails
    */
   async getDiscordJoinUrl(): Promise<DiscordJoinUrl> {
-    try {
-      const response = await this.api.get("/api/discord/joinUrl")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get Discord join URL")
-    } catch (err: any) {
-      throw new Error(`Failed to get Discord join URL: ${err.message}`)
-    }
+    return this.apiGet("/api/discord/joinUrl")
   }
 
   // User-authenticated endpoints (require cookies in web mode)
@@ -234,18 +255,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async getCurrentUser(): Promise<ApiUser> {
-    try {
-      const response = await this.api.get("/api/me")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get current user")
-    } catch (err: any) {
-      throw new Error(`Failed to get current user: ${err.message}`)
-    }
+    return this.apiGet("/api/me")
   }
 
   /**
@@ -254,20 +264,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async getTwitchBotConfig(): Promise<TwitchBotConfig> {
-    try {
-      const response = await this.api.get("/api/me/twitch")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(
-        response.data.message || "Failed to get Twitch bot config"
-      )
-    } catch (err: any) {
-      throw new Error(`Failed to get Twitch bot config: ${err.message}`)
-    }
+    return this.apiGet("/api/me/twitch")
   }
 
   /**
@@ -277,17 +274,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async updateTwitchBotConfig(config: ConfigUpdatePayload): Promise<void> {
-    try {
-      const response = await this.api.patch("/api/twitch/config", config)
-      if (response.data.result !== "success") {
-        throw new Error(
-          response.data.message || "Failed to update Twitch bot config"
-        )
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to update Twitch bot config: ${err.message}`)
-    }
+    return this.apiPatch("/api/twitch/config", config)
   }
 
   /**
@@ -299,19 +286,8 @@ export class HelpaApi {
   async joinTwitchChannel(
     twitchUsername?: string
   ): Promise<TwitchBotChannelData> {
-    try {
-      const body = twitchUsername ? { channel: twitchUsername } : {}
-      const response = await this.api.post("/api/twitch/join", body)
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to join Twitch channel")
-    } catch (err: any) {
-      throw new Error(`Failed to join Twitch channel: ${err.message}`)
-    }
+    const body = twitchUsername ? { channel: twitchUsername } : {}
+    return this.apiPost<TwitchBotChannelData>("/api/twitch/join", body)
   }
 
   /**
@@ -323,19 +299,8 @@ export class HelpaApi {
   async leaveTwitchChannel(
     twitchUsername?: string
   ): Promise<TwitchBotChannelData> {
-    try {
-      const body = twitchUsername ? { channel: twitchUsername } : {}
-      const response = await this.api.post("/api/twitch/leave", body)
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to leave Twitch channel")
-    } catch (err: any) {
-      throw new Error(`Failed to leave Twitch channel: ${err.message}`)
-    }
+    const body = twitchUsername ? { channel: twitchUsername } : {}
+    return this.apiPost<TwitchBotChannelData>("/api/twitch/leave", body)
   }
 
   /**
@@ -344,20 +309,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async getTwitchBotChannels(): Promise<string[]> {
-    try {
-      const response = await this.api.get("/api/twitch/channels")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(
-        response.data.message || "Failed to get Twitch bot channels"
-      )
-    } catch (err: any) {
-      throw new Error(`Failed to get Twitch bot channels: ${err.message}`)
-    }
+    return this.apiGet("/api/twitch/channels")
   }
 
   /**
@@ -367,14 +319,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async createCommand(command: Partial<Command>): Promise<void> {
-    try {
-      const response = await this.api.post("/api/commands", command)
-      if (response.data.result === ApiResult.ERROR) {
-        throw new Error(response.data.message || "Failed to create command")
-      }
-    } catch (err: any) {
-      throw new Error(`Failed to create command: ${err.message}`)
-    }
+    return this.apiPost("/api/commands", command)
   }
 
   /**
@@ -384,17 +329,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async updateCommand(command: Command): Promise<void> {
-    try {
-      const response = await this.api.patch(
-        `/api/commands/${command._id}`,
-        command
-      )
-      if (response.data.result === ApiResult.ERROR) {
-        throw new Error(response.data.message || "Failed to update command")
-      }
-    } catch (err: any) {
-      throw new Error(`Failed to update command: ${err.message}`)
-    }
+    return this.apiPatch(`/api/commands/${command._id}`, command)
   }
 
   /**
@@ -404,17 +339,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async deleteCommand(command: Command): Promise<void> {
-    try {
-      const response = await this.api.delete(`/api/commands/${command._id}`, {
-        data: command,
-      })
-      if (response.data.result !== "success") {
-        throw new Error(response.data.message || "Failed to delete command")
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to delete command: ${err.message}`)
-    }
+    return this.apiDelete(`/api/commands/${command._id}`, command)
   }
 
   /**
@@ -423,20 +348,7 @@ export class HelpaApi {
    * @throws Error if the API request fails
    */
   async getStreamAlertsChannels(): Promise<StreamAlertsChannel[]> {
-    try {
-      const response = await this.api.get("/api/streamAlerts/channels")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(
-        response.data.message || "Failed to get stream alerts channels"
-      )
-    } catch (err: any) {
-      throw new Error(`Failed to get stream alerts channels: ${err.message}`)
-    }
+    return this.apiGet("/api/streamAlerts/channels")
   }
 
   /**
@@ -446,19 +358,9 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async addChannelToStreamAlerts(twitchUsername: string): Promise<void> {
-    try {
-      const response = await this.api.post("/api/streamAlerts/channels", {
-        channels: [twitchUsername],
-      })
-      if (response.data.result !== "success") {
-        throw new Error(
-          response.data.message || "Failed to add channel to stream alerts"
-        )
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to add channel to stream alerts: ${err.message}`)
-    }
+    return this.apiPost("/api/streamAlerts/channels", {
+      channels: [twitchUsername],
+    })
   }
 
   /**
@@ -468,21 +370,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or user is not authenticated
    */
   async removeChannelFromStreamAlerts(twitchUserId: string): Promise<void> {
-    try {
-      const response = await this.api.delete(
-        `/api/streamAlerts/channels/${twitchUserId}`
-      )
-      if (response.data.result !== "success") {
-        throw new Error(
-          response.data.message || "Failed to remove channel from stream alerts"
-        )
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(
-        `Failed to remove channel from stream alerts: ${err.message}`
-      )
-    }
+    return this.apiDelete(`/api/streamAlerts/channels/${twitchUserId}`)
   }
 
   /**
@@ -491,18 +379,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or service is not authenticated
    */
   async getActiveChannels(): Promise<ActiveChannel[]> {
-    try {
-      const response = await this.api.get("/api/configs/twitch/activeChannels")
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get active channels")
-    } catch (err: any) {
-      throw new Error(`Failed to get active channels: ${err.message}`)
-    }
+    return this.apiGet("/api/configs/twitch/activeChannels")
   }
 
   /**
@@ -514,18 +391,7 @@ export class HelpaApi {
   async findCommand(
     request: CommandFindRequest
   ): Promise<{ command?: Command }> {
-    try {
-      const response = await this.api.post("/api/commands/find", request)
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to find command")
-    } catch (err: any) {
-      throw new Error(`Failed to find command: ${err.message}`)
-    }
+    return this.apiPost<{ command?: Command }>("/api/commands/find", request)
   }
 
   /**
@@ -535,15 +401,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or service is not authenticated
    */
   async logCommandUsage(logData: CommandLogRequest): Promise<void> {
-    try {
-      const response = await this.api.post("/api/commands/logs", logData)
-      if (response.data.result !== "success") {
-        throw new Error(response.data.message || "Failed to log command usage")
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to log command usage: ${err.message}`)
-    }
+    return this.apiPost("/api/commands/logs", logData)
   }
 
   /**
@@ -553,18 +411,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or command is not found
    */
   async getCommandById(commandId: string): Promise<Command> {
-    try {
-      const response = await this.api.get(`/api/commands/${commandId}`)
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get command by ID")
-    } catch (err: any) {
-      throw new Error(`Failed to get command by ID: ${err.message}`)
-    }
+    return this.apiGet(`/api/commands/${commandId}`)
   }
 
   /**
@@ -574,17 +421,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or command is not found
    */
   async deleteCommandById(commandId: string): Promise<void> {
-    try {
-      const response = await this.api.delete(`/api/commands/${commandId}`)
-      if (response.data.result !== "success") {
-        throw new Error(
-          response.data.message || "Failed to delete command by ID"
-        )
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to delete command by ID: ${err.message}`)
-    }
+    return this.apiDelete(`/api/commands/${commandId}`)
   }
 
   /**
@@ -594,18 +431,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or service is not authenticated
    */
   async createGuildConfig(guildConfig: GuildConfig): Promise<GuildConfigData> {
-    try {
-      const response = await this.api.post("/api/discord/guild", guildConfig)
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to create guild config")
-    } catch (err: any) {
-      throw new Error(`Failed to create guild config: ${err.message}`)
-    }
+    return this.apiPost<GuildConfigData>("/api/discord/guild", guildConfig)
   }
 
   /**
@@ -619,21 +445,10 @@ export class HelpaApi {
     guildId: string,
     updates: GuildConfigUpdate
   ): Promise<GuildConfigData> {
-    try {
-      const response = await this.api.patch(
-        `/api/discord/guild/${guildId}`,
-        updates
-      )
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to update guild config")
-    } catch (err: any) {
-      throw new Error(`Failed to update guild config: ${err.message}`)
-    }
+    return this.apiPatch<GuildConfigData>(
+      `/api/discord/guild/${guildId}`,
+      updates
+    )
   }
 
   // Practice list endpoints
@@ -651,20 +466,9 @@ export class HelpaApi {
     listName: string,
     entry: string
   ): Promise<void> {
-    try {
-      const response = await this.api.post(
-        `/api/prac/${targetUser}/lists/${listName}/entries`,
-        { entry }
-      )
-      if (response.data.result !== "success") {
-        throw new Error(
-          response.data.message || "Failed to add practice list entry"
-        )
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to add practice list entry: ${err.message}`)
-    }
+    return this.apiPost(`/api/prac/${targetUser}/lists/${listName}/entries`, {
+      entry,
+    })
   }
 
   /**
@@ -678,20 +482,7 @@ export class HelpaApi {
     targetUser: string,
     listName: string
   ): Promise<{ entries: string[] }> {
-    try {
-      const response = await this.api.get(
-        `/api/prac/${targetUser}/lists/${listName}`
-      )
-      if (
-        response.data.result === "success" &&
-        response.data.data !== undefined
-      ) {
-        return response.data.data
-      }
-      throw new Error(response.data.message || "Failed to get practice list")
-    } catch (err: any) {
-      throw new Error(`Failed to get practice list: ${err.message}`)
-    }
+    return this.apiGet(`/api/prac/${targetUser}/lists/${listName}`)
   }
 
   /**
@@ -707,19 +498,9 @@ export class HelpaApi {
     listName: string,
     entryId: number
   ): Promise<void> {
-    try {
-      const response = await this.api.delete(
-        `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
-      )
-      if (response.data.result !== "success") {
-        throw new Error(
-          response.data.message || "Failed to delete practice list entry"
-        )
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to delete practice list entry: ${err.message}`)
-    }
+    return this.apiDelete(
+      `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
+    )
   }
 
   /**
@@ -730,19 +511,7 @@ export class HelpaApi {
    * @throws Error if the API request fails or practice list is not found
    */
   async clearPracticeList(targetUser: string, listName: string): Promise<void> {
-    try {
-      const response = await this.api.delete(
-        `/api/prac/${targetUser}/lists/${listName}`
-      )
-      if (response.data.result !== "success") {
-        throw new Error(
-          response.data.message || "Failed to clear practice list"
-        )
-      }
-      // Return void on success
-    } catch (err: any) {
-      throw new Error(`Failed to clear practice list: ${err.message}`)
-    }
+    return this.apiDelete(`/api/prac/${targetUser}/lists/${listName}`)
   }
 }
 
