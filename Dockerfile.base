@@ -46,3 +46,7 @@ WORKDIR /app/libs/twitch-api-client
 COPY libs/twitch-api-client/src ./src
 COPY libs/twitch-api-client/tsconfig.json ./
 RUN pnpm build
+
+# Re-link workspace dependencies after library builds to ensure proper module resolution
+WORKDIR /app
+RUN pnpm install --frozen-lockfile
