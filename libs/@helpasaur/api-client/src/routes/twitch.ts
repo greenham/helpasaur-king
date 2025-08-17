@@ -4,7 +4,7 @@ import {
   TwitchBotChannelData,
   ConfigUpdatePayload,
   ActiveChannel,
-} from "../types"
+} from "@helpasaur/types"
 
 /**
  * API routes for Twitch bot management

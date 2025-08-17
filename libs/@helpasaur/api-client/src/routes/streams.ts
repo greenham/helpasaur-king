@@ -1,5 +1,5 @@
 import { ApiBase } from "../base"
-import { TwitchStream } from "../types"
+import { TwitchStream } from "@helpasaur/types"
 
 /**
  * API routes for stream management

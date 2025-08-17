@@ -1,5 +1,5 @@
 import { ApiBase } from "../base"
-import { ApiUser } from "../types"
+import { ApiUser } from "@helpasaur/types"
 
 /**
  * API routes for user management

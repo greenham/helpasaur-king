@@ -9,7 +9,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@helpasaur/api-client": "workspace:*"
+    "@helpasaur/api-client": "workspace:*",
+    "@helpasaur/types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.8.10",

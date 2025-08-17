@@ -1,5 +1,5 @@
 import { ApiBase } from "../base"
-import { WebConfig } from "../types"
+import { WebConfig } from "@helpasaur/types"
 
 /**
  * API routes for web application configuration

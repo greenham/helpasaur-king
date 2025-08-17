@@ -1,4 +1,5 @@
-import { Command, HelpaApi } from "@helpasaur/api-client"
+import { Command } from "@helpasaur/types"
+import { HelpaApi } from "@helpasaur/api-client"
 
 export type CachableCommand = Command & { staleAfter: number }
 

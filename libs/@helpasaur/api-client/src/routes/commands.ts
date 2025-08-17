@@ -1,5 +1,5 @@
 import { ApiBase } from "../base"
-import { Command, CommandLogRequest } from "../types"
+import { Command, CommandLogRequest } from "@helpasaur/types"
 
 /**
  * API routes for bot command management

@@ -1,7 +1,11 @@
 import axios, { AxiosInstance, AxiosError } from "axios"
 import axiosRetry from "axios-retry"
 import { ApiResult } from "@helpasaur/types"
-import { ServiceConfigOptions, ServiceConfig, ServiceName } from "./types"
+import {
+  ServiceConfigOptions,
+  ServiceConfig,
+  ServiceName,
+} from "./types/services"
 import { CommandRoutes } from "./routes/commands"
 import { TwitchRoutes } from "./routes/twitch"
 import { DiscordRoutes } from "./routes/discord"

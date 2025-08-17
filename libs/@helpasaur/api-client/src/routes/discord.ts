@@ -4,7 +4,7 @@ import {
   GuildConfig,
   GuildConfigData,
   GuildConfigUpdate,
-} from "../types"
+} from "@helpasaur/types"
 
 /**
  * API routes for Discord bot management

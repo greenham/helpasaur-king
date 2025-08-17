@@ -1,5 +1,5 @@
 import { ApiBase } from "../base"
-import { StreamAlertsChannel } from "../types"
+import { StreamAlertsChannel } from "@helpasaur/types"
 
 /**
  * API routes for stream alerts management
