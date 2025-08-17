@@ -2,6 +2,7 @@ import express, { Request, Response, Router } from "express"
 import { HelixPaginatedStreamFilter } from "twitch-api-client"
 import Config from "../../models/config"
 import { getTwitchApiClient } from "../../lib/utils"
+import { sendSuccess, handleRouteError } from "../../lib/responseHelpers"
 
 const router: Router = express.Router()
 
@@ -26,9 +27,9 @@ router.get("/live", async (req: Request, res: Response) => {
 
   try {
     const streams = await twitchApiClient.getStreams(filter)
-    res.status(200).json(streams)
+    sendSuccess(res, streams)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get live streams")
   }
 })
 

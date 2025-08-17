@@ -1,6 +1,11 @@
 import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import { requireJwtToken } from "../../lib/utils"
+import {
+  sendSuccess,
+  sendError,
+  handleRouteError,
+} from "../../lib/responseHelpers"
 import Config from "../../models/config"
 
 const router: Router = express.Router()
@@ -13,17 +18,15 @@ const permissionGuard = guard()
 router.get("/joinUrl", async (req: Request, res: Response) => {
   try {
     const discordConfig: any = await Config.findOne({ id: "discord" })
-    res.status(200).json({
-      result: "success",
-      message: "OK",
-      url: `https://discord.com/api/oauth2/authorize?client_id=${
-        discordConfig.config.clientId
-      }&permissions=${
-        discordConfig.config.oauth.permissions
-      }&scope=${discordConfig.config.oauth.scopes.join("%20")}`,
-    })
+    const joinUrl = `https://discord.com/api/oauth2/authorize?client_id=${
+      discordConfig.config.clientId
+    }&permissions=${
+      discordConfig.config.oauth.permissions
+    }&scope=${discordConfig.config.oauth.scopes.join("%20")}`
+
+    sendSuccess(res, { url: joinUrl })
   } catch (err: any) {
-    res.status(500).json({ result: "error", message: err.message })
+    handleRouteError(res, err, "get Discord join URL")
   }
 })
 

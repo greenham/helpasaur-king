@@ -1,5 +1,6 @@
 import express, { Request, Response, Router } from "express"
 import User from "../../models/user"
+import { sendSuccess, handleRouteError } from "../../lib/responseHelpers"
 
 const router: Router = express.Router()
 
@@ -9,9 +10,9 @@ const router: Router = express.Router()
 router.get("/", async (req: Request, res: Response) => {
   try {
     const user = await User.findById((req as any).user?.sub)
-    res.status(200).json(user)
+    sendSuccess(res, user)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get current user")
   }
 })
 
@@ -19,9 +20,9 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/twitch", async (req: Request, res: Response) => {
   try {
     const user: any = await User.findById((req as any).user?.sub)
-    res.status(200).json({ ...user.twitchBotConfig })
+    sendSuccess(res, user.twitchBotConfig)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get user Twitch config")
   }
 })
 

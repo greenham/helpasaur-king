@@ -2,6 +2,11 @@ import express, { Request, Response, Router } from "express"
 import Command from "../../models/command"
 import CommandLog from "../../models/commandLog"
 import { requireJwtToken } from "../../lib/utils"
+import {
+  sendSuccess,
+  sendError,
+  handleRouteError,
+} from "../../lib/responseHelpers"
 import guard from "express-jwt-permissions"
 
 const router: Router = express.Router()
@@ -14,9 +19,9 @@ const permissionGuard = guard()
 router.get("/", async (req: Request, res: Response) => {
   try {
     const commands = await Command.find({ deleted: { $ne: true } })
-    res.status(200).json(commands)
+    sendSuccess(res, commands)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get commands")
   }
 })
 
@@ -24,9 +29,9 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const command = await Command.findById(req.params.id)
-    res.status(200).json(command)
+    sendSuccess(res, command)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get command by ID")
   }
 })
 
@@ -34,9 +39,9 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.post("/find", async (req: Request, res: Response) => {
   try {
     const command = await Command.findByNameOrAlias(req.body.command)
-    res.status(200).json(command)
+    sendSuccess(res, { command })
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "find command")
   }
 })
 
@@ -56,15 +61,17 @@ router.post(
         req.body.aliases
       )
       if (!isUnique) {
-        return res.status(409).json({
-          message: `The command name or one of the aliases provided is already in use!`,
-        })
+        return sendError(
+          res,
+          "The command name or one of the aliases provided is already in use!",
+          409
+        )
       }
 
       const command = await Command.create(req.body)
-      res.status(201).json(command)
+      sendSuccess(res, command, "Command created successfully", 201)
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "create command")
     }
   }
 )
@@ -78,7 +85,7 @@ router.patch(
     try {
       const command = await Command.findById(req.params.id)
       if (!command) {
-        return res.sendStatus(404)
+        return sendError(res, "Command not found", 404)
       }
 
       for (const key in req.body) {
@@ -86,9 +93,9 @@ router.patch(
       }
       await command.save()
 
-      res.status(200).json(command)
+      sendSuccess(res, command, "Command updated successfully")
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "update command")
     }
   }
 )
@@ -101,10 +108,10 @@ router.delete(
   async (req: Request, res: Response) => {
     try {
       // @TODO: Make this a soft delete?
-      const command = await Command.deleteOne({ _id: req.params.id })
-      res.status(200).json(command)
+      const result = await Command.deleteOne({ _id: req.params.id })
+      sendSuccess(res, undefined, "Command deleted successfully")
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "delete command")
     }
   }
 )
@@ -117,9 +124,9 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const commandLog = await CommandLog.create(req.body)
-      res.status(200).json(commandLog)
+      sendSuccess(res, undefined, "Command usage logged")
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "log command usage")
     }
   }
 )
