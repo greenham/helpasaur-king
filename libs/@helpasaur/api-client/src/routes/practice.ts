@@ -1,4 +1,4 @@
-import { ApiBase } from "../base/ApiBase"
+import { ApiBase } from "../base"
 
 /**
  * API routes for practice list management

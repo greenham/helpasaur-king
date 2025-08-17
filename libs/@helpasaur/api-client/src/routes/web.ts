@@ -1,4 +1,4 @@
-import { ApiBase } from "../base/ApiBase"
+import { ApiBase } from "../base"
 import { WebConfig } from "../types"
 
 /**

@@ -10,7 +10,7 @@ export { PracticeRoutes } from "./routes/practice"
 export { StreamRoutes } from "./routes/streams"
 export { WebRoutes } from "./routes/web"
 export { UserRoutes } from "./routes/user"
-export { ApiBase } from "./base/ApiBase"
+export { ApiBase } from "./base"
 
 // Export all types for convenience
 export * from "./types"

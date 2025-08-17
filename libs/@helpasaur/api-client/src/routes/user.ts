@@ -1,4 +1,4 @@
-import { ApiBase } from "../base/ApiBase"
+import { ApiBase } from "../base"
 import { ApiUser } from "../types"
 
 /**
