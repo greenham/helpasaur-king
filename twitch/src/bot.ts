@@ -754,7 +754,7 @@ export class TwitchBot {
   }
 
   refreshActiveChannels() {
-    this.helpaApi
+    this.helpaApi.twitch
       .getActiveChannels()
       .then((response) => {
         if (!response) {
