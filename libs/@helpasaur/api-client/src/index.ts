@@ -1,5 +1,5 @@
 // Export the main HelpaApi class
-export { HelpaApi } from "./HelpaApi"
+export { HelpaApi } from "./client"
 
 // Export route classes for advanced usage
 export { CommandRoutes } from "./routes/commands"
