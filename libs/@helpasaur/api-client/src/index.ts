@@ -155,21 +155,27 @@ export class HelpaApi {
     }
 
     try {
-      const result = await this.api.get(`${this.apiHost}/auth/service`, {
+      const response = await this.api.get(`${this.apiHost}/auth/service`, {
         headers: { Authorization: this.apiKey },
       })
-      console.log(`✅ Service authorized with API!`)
 
-      // Handle standardized API response format from server
-      if (result.data.result === "success" && result.data.data?.token) {
-        const token = result.data.data.token
-        this.accessToken = token
+      if (response.data.result === ApiResult.ERROR) {
+        throw new Error(response.data.message || "Authorization failed")
+      }
+
+      if (
+        response.data.result === ApiResult.SUCCESS &&
+        response.data.data?.token
+      ) {
+        this.accessToken = response.data.data.token
         // Use JWT for all subsequent calls
-        this.api.defaults.headers.common["Authorization"] = `Bearer ${token}`
+        this.api.defaults.headers.common["Authorization"] =
+          `Bearer ${this.accessToken}`
+        console.log(`✅ Service authorized with API!`)
         return true
       }
 
-      throw new Error(result.data.message || "Authorization failed")
+      throw new Error(response.data.message || "Authorization failed")
     } catch (err: any) {
       console.error(`🔴 Error authorizing service: ${err.message}`)
       return false
@@ -194,16 +200,7 @@ export class HelpaApi {
         throw new Error(`🔴 Unable to authorize service with API!`)
       }
 
-      const response = await this.api.get(
-        `${this.apiHost}/api/configs/${this.serviceName}`
-      )
-
-      // Handle standardized API response format
-      if (response.data.result === "success" && response.data.data) {
-        return response.data.data
-      }
-
-      throw new Error(response.data.message || "Failed to get service config")
+      return this.apiGet(`/api/configs/${this.serviceName}`)
     } catch (err: any) {
       throw new Error(`🔴 Error fetching service config: ${err.message}`)
     }
