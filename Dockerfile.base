@@ -32,10 +32,13 @@ COPY libs/twitch-api-client ./libs/twitch-api-client
 
 # Build @helpasaur/api-client
 WORKDIR /app/libs/@helpasaur/api-client
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --ignore-workspace --prod=false && pnpm build
+RUN pnpm install --ignore-workspace --prod=false && pnpm build
 
 # Build twitch-api-client
 WORKDIR /app/libs/twitch-api-client
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --ignore-workspace --prod=false && pnpm build
+RUN pnpm install --ignore-workspace --prod=false && pnpm build
+
+# Install ALL workspace dependencies in base image for development
+# This creates a shared node_modules that all services can use
+WORKDIR /app
+RUN pnpm install --frozen-lockfile

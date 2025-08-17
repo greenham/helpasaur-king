@@ -3,12 +3,10 @@
 ARG VERSION=dev
 FROM helpa-base:${VERSION} as base
 
-# Copy source and install all dependencies
+# Copy source
 FROM base as app
 ARG SERVICE
 WORKDIR /app/${SERVICE}
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
 COPY ${SERVICE}/tsconfig.json ./
 COPY ${SERVICE}/src ./src
 

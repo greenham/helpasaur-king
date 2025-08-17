@@ -752,14 +752,14 @@ export class TwitchBot {
   }
 
   refreshActiveChannels() {
-    this.helpaApi.api
-      .get("/api/configs/twitch/activeChannels")
+    this.helpaApi
+      .getActiveChannels()
       .then((response) => {
         if (!response) {
           throw new Error(`Unable to refresh active channel list from API!`)
         }
 
-        this.setActiveChannels(response.data)
+        this.setActiveChannels(response)
       })
       .catch((error) => {
         console.error("🛑 Error refreshing active channel list:", error)
