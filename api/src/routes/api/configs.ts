@@ -1,6 +1,11 @@
 import express, { Request, Response, Router } from "express"
 import Config from "../../models/config"
 import User from "../../models/user"
+import {
+  sendSuccess,
+  sendError,
+  handleRouteError,
+} from "../../lib/responseHelpers"
 
 const router: Router = express.Router()
 
@@ -10,9 +15,9 @@ const router: Router = express.Router()
 router.get("/", async (req: Request, res: Response) => {
   try {
     const configs = await Config.find()
-    res.status(200).json(configs)
+    sendSuccess(res, configs)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get configs")
   }
 })
 
@@ -20,16 +25,16 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const result = await Config.findOne({ id: req.params.id })
-    res.status(200).json(result)
+    sendSuccess(res, result)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get config by ID")
   }
 })
 
 // GET /twitch/activeChannels -> returns active channels to be joined by the Twitch bot
 router.get("/twitch/activeChannels", async (req: Request, res: Response) => {
   if ((req as any).user?.sub !== "twitch") {
-    return res.status(401).json({ message: "Unauthorized" })
+    return sendError(res, "Unauthorized", 401)
   }
 
   try {
@@ -44,9 +49,9 @@ router.get("/twitch/activeChannels", async (req: Request, res: Response) => {
         u.twitchBotConfig
       )
     )
-    res.status(200).json(channels)
+    sendSuccess(res, channels)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get active channels")
   }
 })
 

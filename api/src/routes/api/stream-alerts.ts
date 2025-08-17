@@ -5,6 +5,7 @@ import { getTwitchApiClient } from "../../lib/utils"
 import {
   sendSuccess,
   sendError,
+  sendNoop,
   handleRouteError,
 } from "../../lib/responseHelpers"
 import { HelixUser } from "twitch-api-client"
@@ -50,19 +51,19 @@ router.post(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     if (!req.body.hasOwnProperty("channels")) {
-      return res.status(400).json({
-        message: "Missing payload property 'channels' (Array<String>)",
-      })
+      return sendError(
+        res,
+        "Missing payload property 'channels' (Array<String>)",
+        400
+      )
     }
 
     if (!Array.isArray(req.body.channels)) {
-      return res
-        .status(400)
-        .json({ message: "'channels' must be an Array of usernames" })
+      return sendError(res, "'channels' must be an Array of usernames", 400)
     }
 
     if (req.body.channels.length === 0) {
-      return res.status(400).json({ message: "No channels provided in Array" })
+      return sendError(res, "No channels provided in Array", 400)
     }
 
     const streamAlertsConfig: any = await Config.findOne({ id: "streamAlerts" })
@@ -131,17 +132,17 @@ router.delete(
 
       // Ensure this channel is in the list already
       if (!streamAlertsConfig || !streamAlertsConfig.config) {
-        return res.status(500).json({ error: "Configuration not found" })
+        return sendError(res, "Configuration not found")
       }
       const channelIndex = streamAlertsConfig.config.channels.findIndex(
         (c: any) => c.id == req.params.id
       )
       if (channelIndex === undefined) {
         console.log(`${req.params.id} is not in the stream alerts list!`)
-        return res.status(200).json({
-          result: "noop",
-          message: `${req.params.id} is not in the stream alerts list!`,
-        })
+        return sendNoop(
+          res,
+          `${req.params.id} is not in the stream alerts list!`
+        )
       }
 
       // Delete event subscriptions
@@ -182,9 +183,9 @@ router.get(
     try {
       const twitchApiClient = getTwitchApiClient()
       const results = await twitchApiClient.getSubscriptions(req.query)
-      res.status(200).json(results)
-    } catch (err) {
-      res.status(500).json({ success: false, error: err })
+      sendSuccess(res, results)
+    } catch (err: any) {
+      handleRouteError(res, err, "get subscriptions")
     }
   }
 )
@@ -194,15 +195,13 @@ router.delete(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     const twitchApiClient = getTwitchApiClient()
-    twitchApiClient
-      .clearSubscriptions()
-      .then((results) => {
-        res.status(200).json(results)
-      })
-      .catch((err) => {
-        console.error("error from clearSubscriptions")
-        res.status(500).json({ success: false, error: err })
-      })
+    try {
+      const results = await twitchApiClient.clearSubscriptions()
+      sendSuccess(res, results)
+    } catch (err: any) {
+      console.error("error from clearSubscriptions")
+      handleRouteError(res, err, "clear subscriptions")
+    }
   }
 )
 
@@ -212,19 +211,19 @@ router.post(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     if (!req.body.hasOwnProperty("channels")) {
-      return res.status(400).json({
-        message: "Missing payload property 'channels' (Array<String>)",
-      })
+      return sendError(
+        res,
+        "Missing payload property 'channels' (Array<String>)",
+        400
+      )
     }
 
     if (!Array.isArray(req.body.channels)) {
-      return res
-        .status(400)
-        .json({ message: "'channels' must be an Array of usernames" })
+      return sendError(res, "'channels' must be an Array of usernames", 400)
     }
 
     if (req.body.channels.length === 0) {
-      return res.status(400).json({ message: "No channels provided in Array" })
+      return sendError(res, "No channels provided in Array", 400)
     }
 
     const streamAlertsConfig: any = await Config.findOne({ id: "streamAlerts" })
@@ -263,7 +262,7 @@ router.post(
     })
 
     Promise.allSettled(results).then(async (channelResults) => {
-      res.status(200).json({ success: true, data: channelResults })
+      sendSuccess(res, channelResults, "Channels added to blacklist")
     })
   }
 )

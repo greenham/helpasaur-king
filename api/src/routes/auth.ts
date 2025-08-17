@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken"
 import ms from "ms"
 import User from "../models/user"
 import { requireAuthKey, getUserTwitchApiClient } from "../lib/utils"
+import { sendSuccess, sendError } from "../lib/responseHelpers"
 
 const {
   CLIENT_POST_AUTH_REDIRECT_URL,
@@ -135,10 +136,10 @@ router.get(`/service`, requireAuthKey, async (req: Request, res: Response) => {
   // Validate service name
   const serviceName = (req.headers["x-service-name"] as string) || false
   if (!serviceName) {
-    return res.status(400).send({ message: "Missing service name" })
+    return sendError(res, "Missing service name", 400)
   }
   if (!ALLOWED_SERVICES?.includes(serviceName)) {
-    return res.status(400).send({ message: "Invalid service name" })
+    return sendError(res, "Invalid service name", 400)
   }
 
   // Issue a long-running JWT with the "service" permission and the service name as the subject
@@ -149,7 +150,7 @@ router.get(`/service`, requireAuthKey, async (req: Request, res: Response) => {
 
   console.log(`Generated ID token for service: ${serviceName}`)
 
-  res.status(200).send({ token: idToken })
+  sendSuccess(res, { token: idToken })
 })
 
 // Endpoint: GET /auth/logout

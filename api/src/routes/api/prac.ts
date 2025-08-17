@@ -2,6 +2,11 @@ import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import PracLists from "../../models/pracLists"
 import { requireJwtToken } from "../../lib/utils"
+import {
+  sendSuccess,
+  sendError,
+  handleRouteError,
+} from "../../lib/responseHelpers"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -18,8 +23,7 @@ router.post(
   async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
-      res.status(400).json({ message: "Missing twitchUserId!" })
-      return
+      return sendError(res, "Missing twitchUserId!", 400)
     }
 
     const listName = req.params.listName ?? "default"
@@ -27,8 +31,7 @@ router.post(
     // @TODO sanitize and validate the entry (char limit, etc.)
     const entry = req.body.entry.trim() ?? false
     if (!entry) {
-      res.status(400).json({ message: "Missing entry!" })
-      return
+      return sendError(res, "Missing entry!", 400)
     }
 
     try {
@@ -56,11 +59,14 @@ router.post(
         newId = 1
       }
 
-      res.status(201).json({
-        message: `Added entry #${newId} to ${listName} practice list.`,
-      })
+      sendSuccess(
+        res,
+        { newId },
+        `Added entry #${newId} to ${listName} practice list.`,
+        201
+      )
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "add practice list entry")
     }
   }
 )
@@ -73,8 +79,7 @@ router.get(
   async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
-      res.status(400).json({ message: "Missing twitchUserId!" })
-      return
+      return sendError(res, "Missing twitchUserId!", 400)
     }
 
     const listName = req.params.listName ?? "default"
@@ -88,18 +93,20 @@ router.get(
         name: listName,
       })
       if (!result || result.entries.length === 0) {
-        res.status(404).json({ message: `${listName} practice list is empty!` })
-        return
+        return sendError(res, `${listName} practice list is empty!`, 404)
       }
       const randomIndex = Math.floor(Math.random() * result.entries.length)
       const randomEntry = result.entries[randomIndex]
-      res.status(200).json({
-        message: `Practice this: ${randomEntry} [${randomIndex + 1}]`,
-        id: randomIndex,
-        entry: randomEntry,
-      })
+      sendSuccess(
+        res,
+        {
+          id: randomIndex,
+          entry: randomEntry,
+        },
+        `Practice this: ${randomEntry} [${randomIndex + 1}]`
+      )
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "get random practice list entry")
     }
   }
 )
@@ -112,8 +119,7 @@ router.delete(
   async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
-      res.status(400).json({ message: "Missing twitchUserId!" })
-      return
+      return sendError(res, "Missing twitchUserId!", 400)
     }
 
     const listName = req.params.listName ?? "default"
@@ -124,22 +130,22 @@ router.delete(
         name: listName,
       })
       if (!result) {
-        res.status(404).json({ message: "No practice list found!" })
-        return
+        return sendError(res, "No practice list found!", 404)
       }
       const entryId = parseInt(req.params.entryId)
       if (entryId < 1 || entryId > result.entries.length) {
-        res.status(400).json({ message: "Invalid entry ID!" })
-        return
+        return sendError(res, "Invalid entry ID!", 400)
       }
       result.entries.splice(entryId - 1, 1)
       result.markModified("entries")
       await result.save()
-      res.status(200).json({
-        message: `Deleted entry #${entryId} from ${listName} practice list!`,
-      })
+      sendSuccess(
+        res,
+        null,
+        `Deleted entry #${entryId} from ${listName} practice list!`
+      )
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "delete practice list entry")
     }
   }
 )
@@ -152,8 +158,7 @@ router.get(
   async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
-      res.status(400).json({ message: "Missing twitchUserId!" })
-      return
+      return sendError(res, "Missing twitchUserId!", 400)
     }
 
     const listName = req.params.listName ?? "default"
@@ -164,17 +169,17 @@ router.get(
         name: listName,
       })
       if (!result) {
-        res.status(404).json({ message: "No practice list found!" })
-        return
+        return sendError(res, "No practice list found!", 404)
       }
-      res.status(200).json({
-        entries: result.entries,
-        message: result.entries
-          .map((e, idx) => `[${idx + 1}] ${e}`)
-          .join(" | "),
-      })
+      sendSuccess(
+        res,
+        {
+          entries: result.entries,
+        },
+        result.entries.map((e, idx) => `[${idx + 1}] ${e}`).join(" | ")
+      )
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "get practice list")
     }
   }
 )
@@ -187,8 +192,7 @@ router.delete(
   async (req: Request, res: Response) => {
     const twitchUserId = req.params.twitchUserId ?? false
     if (!twitchUserId) {
-      res.status(400).json({ message: "Missing twitchUserId!" })
-      return
+      return sendError(res, "Missing twitchUserId!", 400)
     }
 
     const listName = req.params.listName ?? "default"
@@ -200,13 +204,12 @@ router.delete(
       })
 
       if (!result) {
-        res.status(404).json({ message: "No matching practice list found!" })
-        return
+        return sendError(res, "No matching practice list found!", 404)
       }
 
-      res.status(200).json({ message: `Practice list cleared!` })
+      sendSuccess(res, null, "Practice list cleared!")
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "clear practice list")
     }
   }
 )

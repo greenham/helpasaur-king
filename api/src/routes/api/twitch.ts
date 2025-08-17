@@ -2,6 +2,12 @@ import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import User from "../../models/user"
 import { getRequestedChannel, getTwitchApiClient } from "../../lib/utils"
+import {
+  sendSuccess,
+  sendError,
+  sendNoop,
+  handleRouteError,
+} from "../../lib/responseHelpers"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
 import { HelixUser } from "twitch-api-client"
 
@@ -16,9 +22,9 @@ router.get(
     try {
       const users = await User.find({ "twitchBotConfig.active": true })
       const channels = users.map((u: any) => u.twitchUserData.login).sort()
-      res.status(200).json(channels)
+      sendSuccess(res, channels)
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "get channels")
     }
   }
 )
@@ -39,9 +45,7 @@ router.post("/join", async (req: Request, res: Response) => {
     // otherwise, extract the requested channel from the service or admin request
     const requestedChannel = await getRequestedChannel(req)
     if (!requestedChannel) {
-      return res
-        .status(400)
-        .json({ result: "error", message: "Invalid channel provided" })
+      return sendError(res, "Invalid channel provided", 400)
     }
 
     try {
@@ -50,10 +54,7 @@ router.post("/join", async (req: Request, res: Response) => {
       })
       if (user) {
         if (user.twitchBotConfig?.active) {
-          return res.status(200).json({
-            result: "noop",
-            message: `Already joined ${requestedChannel}!`,
-          })
+          return sendNoop(res, `Already joined ${requestedChannel}!`)
         }
 
         user.twitchBotConfig.active = true
@@ -78,10 +79,10 @@ router.post("/join", async (req: Request, res: Response) => {
             `Error fetching user data for ${requestedChannel} from Twitch!`,
             err
           )
-          return res.status(500).json({
-            result: "error",
-            message: `Unable to fetch twitch user data for ${requestedChannel}!`,
-          })
+          return sendError(
+            res,
+            `Unable to fetch twitch user data for ${requestedChannel}!`
+          )
         }
 
         try {
@@ -92,14 +93,14 @@ router.post("/join", async (req: Request, res: Response) => {
           })
         } catch (err) {
           console.error(`Error creating new user for ${requestedChannel}!`, err)
-          return res.status(500).json({
-            result: "error",
-            message: `Unable to create new user for ${requestedChannel}!`,
-          })
+          return sendError(
+            res,
+            `Unable to create new user for ${requestedChannel}!`
+          )
         }
       }
     } catch (err: any) {
-      return res.status(500).json({ result: "error", message: err.message })
+      return handleRouteError(res, err, "join channel")
     }
   }
 
@@ -113,8 +114,7 @@ router.post("/join", async (req: Request, res: Response) => {
     })
   }
 
-  res.status(200).json({
-    result: "success",
+  sendSuccess(res, {
     twitchBotConfig: {
       roomId: user.twitchUserData.id,
       ...user.twitchBotConfig,
@@ -126,9 +126,7 @@ router.post("/join", async (req: Request, res: Response) => {
 router.post("/leave", async (req: Request, res: Response) => {
   const requestedChannel = await getRequestedChannel(req)
   if (!requestedChannel) {
-    return res
-      .status(400)
-      .json({ result: "error", message: "Invalid channel provided" })
+    return sendError(res, "Invalid channel provided", 400)
   }
 
   try {
@@ -136,9 +134,7 @@ router.post("/leave", async (req: Request, res: Response) => {
       "twitchUserData.login": requestedChannel,
     })
     if (!user) {
-      return res
-        .status(200)
-        .json({ result: "noop", message: `Not in ${requestedChannel}!` })
+      return sendNoop(res, `Not in ${requestedChannel}!`)
     }
 
     if (user.twitchBotConfig) {
@@ -155,9 +151,9 @@ router.post("/leave", async (req: Request, res: Response) => {
       ;(req as any).app.wsRelay.emit("leaveChannel", requestedChannel)
     }
 
-    res.status(200).json({ result: "success" })
+    sendSuccess(res)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "leave channel")
   }
 })
 
@@ -165,9 +161,7 @@ router.post("/leave", async (req: Request, res: Response) => {
 router.patch("/config", async (req: Request, res: Response) => {
   const requestedChannel = await getRequestedChannel(req)
   if (!requestedChannel) {
-    return res
-      .status(400)
-      .json({ result: "error", message: "Invalid channel provided" })
+    return sendError(res, "Invalid channel provided", 400)
   }
 
   // Validate that only allowed config fields are being updated
@@ -188,20 +182,22 @@ router.patch("/config", async (req: Request, res: Response) => {
       // Validate commandPrefix if provided
       if (field === "commandPrefix") {
         if (typeof value !== "string" || value.length !== 1) {
-          return res.status(400).json({
-            result: "error",
-            message: "Command prefix must be exactly one character",
-          })
+          return sendError(
+            res,
+            "Command prefix must be exactly one character",
+            400
+          )
         }
         if (
           !ALLOWED_COMMAND_PREFIXES.includes(
             value as (typeof ALLOWED_COMMAND_PREFIXES)[number]
           )
         ) {
-          return res.status(400).json({
-            result: "error",
-            message: `Invalid command prefix. Allowed: ${ALLOWED_COMMAND_PREFIXES.join(", ")}`,
-          })
+          return sendError(
+            res,
+            `Invalid command prefix. Allowed: ${ALLOWED_COMMAND_PREFIXES.join(", ")}`,
+            400
+          )
         }
       }
 
@@ -210,9 +206,7 @@ router.patch("/config", async (req: Request, res: Response) => {
   }
 
   if (Object.keys(updates).length === 0) {
-    return res
-      .status(400)
-      .json({ result: "error", message: "No valid fields to update" })
+    return sendError(res, "No valid fields to update", 400)
   }
 
   try {
@@ -221,10 +215,7 @@ router.patch("/config", async (req: Request, res: Response) => {
     })
 
     if (!user) {
-      return res.status(404).json({
-        result: "error",
-        message: `User ${requestedChannel} not found`,
-      })
+      return sendError(res, `User ${requestedChannel} not found`, 404)
     }
 
     // Apply updates
@@ -258,15 +249,14 @@ router.patch("/config", async (req: Request, res: Response) => {
       }
     }
 
-    res.status(200).json({
-      result: "success",
+    sendSuccess(res, {
       twitchBotConfig: {
         roomId: user.twitchUserData?.id,
         ...user.twitchBotConfig,
       },
     })
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "update config")
   }
 })
 

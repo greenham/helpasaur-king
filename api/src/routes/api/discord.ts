@@ -4,6 +4,7 @@ import { requireJwtToken } from "../../lib/utils"
 import {
   sendSuccess,
   sendError,
+  sendNoop,
   handleRouteError,
 } from "../../lib/responseHelpers"
 import Config from "../../models/config"
@@ -42,19 +43,19 @@ router.post(
       // add this to config for discord (guilds array)
       const discordConfig: any = await Config.findOne({ id: "discord" })
       if (discordConfig.config.guilds.find((g: any) => g.id === req.body.id)) {
-        return res.status(200).json({
-          result: "noop",
-          message: `Already joined guild: ${req.body.name} (${req.body.id})!`,
-        })
+        return sendNoop(
+          res,
+          `Already joined guild: ${req.body.name} (${req.body.id})!`
+        )
       }
 
       discordConfig.config.guilds.push(req.body)
       discordConfig.markModified("config")
       await discordConfig.save()
 
-      res.status(201).json({ result: "success", message: "OK" })
+      sendSuccess(res, null, "OK", 201)
     } catch (err: any) {
-      res.status(500).json({ result: "error", message: err.message })
+      handleRouteError(res, err, "create guild")
     }
   }
 )
@@ -67,10 +68,7 @@ router.patch(
   permissionGuard.check(["service"]),
   async (req: Request, res: Response) => {
     if (!req.params.id || !req.params.id.match(/\d+/)) {
-      return res.status(400).json({
-        result: "error",
-        message: `Invalid guild id provided!`,
-      })
+      return sendError(res, "Invalid guild id provided!", 400)
     }
 
     try {
@@ -81,10 +79,7 @@ router.patch(
         (g: any) => g.id === req.params.id
       )
       if (index === -1) {
-        return res.status(404).json({
-          result: "error",
-          message: `Guild not found: ${req.params.id}`,
-        })
+        return sendError(res, `Guild not found: ${req.params.id}`, 404)
       }
 
       discordConfig.config.guilds[index] = Object.assign(
@@ -94,9 +89,9 @@ router.patch(
       discordConfig.markModified("config")
       await discordConfig.save()
 
-      res.status(200).json({ result: "success", message: "OK" })
+      sendSuccess(res, null, "OK")
     } catch (err: any) {
-      res.status(500).json({ result: "error", message: err.message })
+      handleRouteError(res, err, "update guild")
     }
   }
 )
