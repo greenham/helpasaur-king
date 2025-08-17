@@ -113,3 +113,38 @@ $list-group-border-width: "1px";
     }
   }
 }
+
+// Custom toast styles
+.toast-custom {
+  font-size: 0.875rem;
+  min-width: auto;
+  max-width: 350px;
+
+  .toast-close-btn {
+    font-size: 1.2rem;
+    background: none;
+    border: none;
+    opacity: 0.8;
+    line-height: 1;
+    min-width: 24px;
+    min-height: 24px;
+
+    &.toast-close-dark {
+      color: #000;
+    }
+
+    &.toast-close-light {
+      color: #fff;
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .toast-body-custom {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.3;
+  }
+}
