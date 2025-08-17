@@ -148,22 +148,6 @@ export interface CommandLogRequest {
   roomId?: string
 }
 
-// DEPRECATED: These type aliases are deprecated and should no longer be used.
-// The API client now returns the data directly instead of wrapped in ApiResponse.
-// These are kept temporarily for backward compatibility and will be removed in a future version.
-/**
- * @deprecated Use Promise<ActiveChannel[]> directly from getActiveChannels()
- */
-export type ActiveChannelsResponse = ApiResponse<ActiveChannel[]>
-/**
- * @deprecated Use Promise<{ command?: Command }> directly from findCommand()
- */
-export type CommandFindResponse = ApiResponse<CommandFindData>
-/**
- * @deprecated Use Promise<void> directly from logCommandUsage()
- */
-export type CommandLogResponse = ApiResponse<{}>
-
 // Discord Guild Configuration Types
 export interface GuildConfig {
   _id?: string
