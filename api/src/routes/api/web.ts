@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from "express"
 import Config from "../../models/config"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
+import { sendSuccess, handleRouteError } from "../../lib/responseHelpers"
 
 const router: Router = express.Router()
 
@@ -8,22 +9,24 @@ const router: Router = express.Router()
 
 // GET /config -> returns frontend configuration for web
 router.get("/config", async (req: Request, res: Response) => {
-  const { config: streamAlertsConfig }: any = await Config.findOne({
-    id: "streamAlerts",
-  })
-  const { channels, statusFilters, blacklistedUsers } = streamAlertsConfig
-
   try {
-    res.status(200).json({
+    const { config: streamAlertsConfig }: any = await Config.findOne({
+      id: "streamAlerts",
+    })
+    const { channels, statusFilters, blacklistedUsers } = streamAlertsConfig
+
+    const webConfig = {
       channels,
       statusFilters,
       blacklistedUsers,
       twitch: {
         commandPrefixes: ALLOWED_COMMAND_PREFIXES,
       },
-    })
+    }
+
+    sendSuccess(res, webConfig)
   } catch (err: any) {
-    res.status(500).json({ message: err.message })
+    handleRouteError(res, err, "get web config")
   }
 })
 
