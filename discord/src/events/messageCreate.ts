@@ -55,8 +55,8 @@ const messageCreateEvent: DiscordEvent = {
           command: commandNoPrefix,
         })
 
-        if (response?.result === "success") {
-          command = response.data?.command
+        if (response?.command) {
+          command = response.command
 
           if (command) {
             // Cache it for 10 minutes

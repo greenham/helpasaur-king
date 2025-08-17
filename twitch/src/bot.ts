@@ -139,14 +139,11 @@ export class TwitchBot {
           try {
             const result = await this.helpaApi.joinTwitchChannel(channelToJoin)
 
-            if (
-              result.result === "success" &&
-              result.data?.twitchBotConfig?.roomId
-            ) {
+            if (result.twitchBotConfig?.roomId) {
               // update the local map with the new channel config
               this.channelMap.set(
-                result.data.twitchBotConfig.roomId,
-                result.data.twitchBotConfig
+                result.twitchBotConfig.roomId,
+                result.twitchBotConfig
               )
             }
 
@@ -299,11 +296,11 @@ export class TwitchBot {
               listName,
               entryName
             )
-            if (response.result === "success") {
-              const message = response.message || "Entry added successfully!"
-              console.log(message)
-              this.bot.say(channel, message).catch(console.error)
-            }
+            // addPracticeListEntry now returns void and throws on error
+            console.log("Entry added successfully!")
+            this.bot
+              .say(channel, "Entry added successfully!")
+              .catch(console.error)
             return
           } catch (err) {
             this.handleApiError(
@@ -325,13 +322,7 @@ export class TwitchBot {
               targetUser,
               listName
             )
-            if (response.result !== "success" || !response.data?.entries) {
-              this.bot
-                .say(channel, "No entries found in practice list")
-                .catch(console.error)
-              return
-            }
-            const entries = response.data.entries
+            const entries = response.entries
 
             // choose a random entry
             let randomIndex = Math.floor(Math.random() * entries.length)
@@ -385,11 +376,9 @@ export class TwitchBot {
               listName,
               entryId
             )
-            if (response.result === "success") {
-              const message = response.message || "Entry deleted successfully!"
-              console.log(message)
-              this.bot.say(channel, message).catch(console.error)
-            }
+            const message = "Entry deleted successfully!"
+            console.log(message)
+            this.bot.say(channel, message).catch(console.error)
             return
           } catch (err) {
             this.handleApiError(
@@ -409,11 +398,11 @@ export class TwitchBot {
               targetUser,
               listName
             )
-            if (response.result === "success" && response.data?.entries) {
+            if (response.entries && response.entries.length > 0) {
               this.bot
                 .say(
                   channel,
-                  response.data.entries
+                  response.entries
                     .map((e, idx) => `[${idx + 1}] ${e}`)
                     .join(" | ")
                 )
@@ -459,11 +448,8 @@ export class TwitchBot {
               targetUser,
               listName
             )
-            if (response.result === "success") {
-              const message =
-                response.message || "Practice list cleared successfully!"
-              this.bot.say(channel, message).catch(console.error)
-            }
+            const message = "Practice list cleared successfully!"
+            this.bot.say(channel, message).catch(console.error)
             return
           } catch (err) {
             this.handleApiError(
@@ -503,8 +489,8 @@ export class TwitchBot {
           command: commandNoPrefix,
         })
 
-        if (response.result === "success") {
-          command = response.data?.command
+        if (response.command) {
+          command = response.command
 
           if (command) {
             command.staleAfter = Date.now() + 10 * 60 * 1000
@@ -645,22 +631,20 @@ export class TwitchBot {
       console.log(`[${channel}] Enabling ${toggleConfig.featureName}...`)
 
       try {
-        const result = await this.helpaApi.updateTwitchBotConfig({
+        await this.helpaApi.updateTwitchBotConfig({
           [toggleConfig.configField]: true,
         })
 
-        if (result.result === "success") {
-          // Update local config
-          channelConfig[toggleConfig.configField] = true
-          this.channelMap.set(tags["room-id"], channelConfig)
+        // Update local config
+        channelConfig[toggleConfig.configField] = true
+        this.channelMap.set(tags["room-id"], channelConfig)
 
-          this.bot
-            .say(
-              channel,
-              `@${tags["display-name"]} >> ${toggleConfig.enabledMessage()}`
-            )
-            .catch(console.error)
-        }
+        this.bot
+          .say(
+            channel,
+            `@${tags["display-name"]} >> ${toggleConfig.enabledMessage()}`
+          )
+          .catch(console.error)
       } catch (err) {
         this.handleApiError(
           err,
@@ -686,22 +670,20 @@ export class TwitchBot {
       console.log(`[${channel}] Disabling ${toggleConfig.featureName}...`)
 
       try {
-        const result = await this.helpaApi.updateTwitchBotConfig({
+        await this.helpaApi.updateTwitchBotConfig({
           [toggleConfig.configField]: false,
         })
 
-        if (result.result === "success") {
-          // Update local config
-          channelConfig[toggleConfig.configField] = false
-          this.channelMap.set(tags["room-id"], channelConfig)
+        // Update local config
+        channelConfig[toggleConfig.configField] = false
+        this.channelMap.set(tags["room-id"], channelConfig)
 
-          this.bot
-            .say(
-              channel,
-              `@${tags["display-name"]} >> ${toggleConfig.disabledMessage()}`
-            )
-            .catch(console.error)
-        }
+        this.bot
+          .say(
+            channel,
+            `@${tags["display-name"]} >> ${toggleConfig.disabledMessage()}`
+          )
+          .catch(console.error)
       } catch (err) {
         this.handleApiError(
           err,

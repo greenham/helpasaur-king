@@ -20,25 +20,8 @@ import {
 } from "@helpasaur/api-client"
 import { useToast } from "./useToast"
 
-// Web-specific response types for React Query mutations
-type MutationResponse = ApiResponse<{}>
-
-/**
- * Helper function to extract data from ApiResponse<T> or throw an error
- * @param response - The API response to extract data from
- * @param operation - The operation name for error messages
- * @returns The extracted data
- * @throws Error if the response indicates failure or has no data
- */
-function extractApiResponseData<T>(
-  response: ApiResponse<T>,
-  operation: string
-): T {
-  if (response.result === "success" && response.data !== undefined) {
-    return response.data
-  }
-  throw new Error(response.message || `Failed to ${operation}`)
-}
+// Note: MutationResponse no longer needed since API client handles responses internally
+// Mutations that don't return data now return void and throw errors
 
 // Extended mutation options with toast control
 interface MutationOptionsWithToast<TData, TError, TVariables>
@@ -77,10 +60,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["config"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getWebConfig()
-          return extractApiResponseData(response, "get config")
-        },
+        queryFn: () => helpaApiClient.getWebConfig(),
         staleTime: 60 * 60 * 1000, // 1 hour
         ...options,
       }),
@@ -93,10 +73,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["user"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getCurrentUser()
-          return extractApiResponseData(response, "get user")
-        },
+        queryFn: () => helpaApiClient.getCurrentUser(),
         retry: 0,
         ...options,
       }),
@@ -109,10 +86,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["commands"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getCommands()
-          return extractApiResponseData(response, "get commands")
-        },
+        queryFn: () => helpaApiClient.getCommands(),
         ...options,
       }),
 
@@ -127,10 +101,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["livestreams"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getLivestreams()
-          return extractApiResponseData(response, "get livestreams")
-        },
+        queryFn: () => helpaApiClient.getLivestreams(),
         refetchInterval: 1000 * 60, // 1 minute
         ...options,
       }),
@@ -146,10 +117,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["discordJoinUrl"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getDiscordJoinUrl()
-          return extractApiResponseData(response, "get Discord join URL")
-        },
+        queryFn: () => helpaApiClient.getDiscordJoinUrl(),
         ...options,
       }),
 
@@ -164,10 +132,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["twitchBotConfig"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getTwitchBotConfig()
-          return extractApiResponseData(response, "get Twitch bot config")
-        },
+        queryFn: () => helpaApiClient.getTwitchBotConfig(),
         retry: 0,
         ...options,
       }),
@@ -180,10 +145,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["twitchBotChannels"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getTwitchBotChannels()
-          return extractApiResponseData(response, "get Twitch bot channels")
-        },
+        queryFn: () => helpaApiClient.getTwitchBotChannels(),
         ...options,
       }),
 
@@ -198,10 +160,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["streamAlertsChannels"],
-        queryFn: async () => {
-          const response = await helpaApiClient.getStreamAlertsChannels()
-          return extractApiResponseData(response, "get stream alerts channels")
-        },
+        queryFn: () => helpaApiClient.getStreamAlertsChannels(),
         ...options,
       }),
   }
@@ -212,11 +171,7 @@ export const useHelpaApi = () => {
      * Update Twitch bot configuration
      */
     useUpdateTwitchBotConfig: (
-      options?: MutationOptionsWithToast<
-        MutationResponse,
-        Error,
-        ConfigUpdatePayload
-      >
+      options?: MutationOptionsWithToast<void, Error, ConfigUpdatePayload>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -244,7 +199,7 @@ export const useHelpaApi = () => {
      */
     useJoinTwitchChannel: (
       options?: MutationOptionsWithToast<
-        ApiResponse<TwitchBotChannelData>,
+        TwitchBotChannelData,
         Error,
         string | undefined
       >
@@ -255,12 +210,8 @@ export const useHelpaApi = () => {
           helpaApiClient.joinTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
-          if (showToast && data.result === "success") {
-            toast.success(
-              data.message || `Joined channel: ${variables || "your channel"}`
-            )
-          } else if (showToast && data.result === "noop") {
-            toast.info(data.message || "Already in channel")
+          if (showToast) {
+            toast.success(`Joined channel: ${variables || "your channel"}`)
           }
           mutationOptions.onSuccess?.(data, variables, context)
         },
@@ -279,7 +230,7 @@ export const useHelpaApi = () => {
      */
     useLeaveTwitchChannel: (
       options?: MutationOptionsWithToast<
-        ApiResponse<TwitchBotChannelData>,
+        TwitchBotChannelData,
         Error,
         string | undefined
       >
@@ -290,12 +241,8 @@ export const useHelpaApi = () => {
           helpaApiClient.leaveTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
-          if (showToast && data.result === "success") {
-            toast.success(
-              data.message || `Left channel: ${variables || "your channel"}`
-            )
-          } else if (showToast && data.result === "noop") {
-            toast.info(data.message || "Not in channel")
+          if (showToast) {
+            toast.success(`Left channel: ${variables || "your channel"}`)
           }
           mutationOptions.onSuccess?.(data, variables, context)
         },
@@ -313,11 +260,7 @@ export const useHelpaApi = () => {
      * Create command
      */
     useCreateCommand: (
-      options?: MutationOptionsWithToast<
-        MutationResponse,
-        Error,
-        Partial<Command>
-      >
+      options?: MutationOptionsWithToast<void, Error, Partial<Command>>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -344,7 +287,7 @@ export const useHelpaApi = () => {
      * Update command
      */
     useUpdateCommand: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
+      options?: MutationOptionsWithToast<void, Error, Command>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -370,7 +313,7 @@ export const useHelpaApi = () => {
      * Delete command
      */
     useDeleteCommand: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, Command>
+      options?: MutationOptionsWithToast<void, Error, Command>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -396,7 +339,7 @@ export const useHelpaApi = () => {
      * Add channel to stream alerts
      */
     useAddChannelToStreamAlerts: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, string>
+      options?: MutationOptionsWithToast<void, Error, string>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
@@ -425,7 +368,7 @@ export const useHelpaApi = () => {
      * Remove channel from stream alerts
      */
     useRemoveChannelFromStreamAlerts: (
-      options?: MutationOptionsWithToast<MutationResponse, Error, string>
+      options?: MutationOptionsWithToast<void, Error, string>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
