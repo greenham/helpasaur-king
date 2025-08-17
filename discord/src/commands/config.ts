@@ -246,7 +246,10 @@ const configCommand: DiscordCommand = {
     guildUpdate[guildConfigKey] = newValue
     currentGuildConfig[guildConfigKey] = newValue
 
-    await this.helpaApi?.updateGuildConfig(interaction.guildId!, guildUpdate)
+    await this.helpaApi?.discord.updateGuildConfig(
+      interaction.guildId!,
+      guildUpdate
+    )
     await interaction.editReply({
       content: `Updated ${inlineCode(subcommand)} to ${inlineCode(String(newValue))}!`,
     })

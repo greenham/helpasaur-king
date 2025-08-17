@@ -137,7 +137,8 @@ export class TwitchBot {
           this.channelList.push(channelToJoin)
 
           try {
-            const result = await this.helpaApi.joinTwitchChannel(channelToJoin)
+            const result =
+              await this.helpaApi.twitch.joinTwitchChannel(channelToJoin)
 
             if (result.twitchBotConfig?.roomId) {
               // update the local map with the new channel config
@@ -189,7 +190,7 @@ export class TwitchBot {
 
           try {
             const result =
-              await this.helpaApi.leaveTwitchChannel(channelToLeave)
+              await this.helpaApi.twitch.leaveTwitchChannel(channelToLeave)
 
             console.log(
               `Result of /api/twitch/leave: ${JSON.stringify(result)}`
@@ -291,7 +292,7 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.addPracticeListEntry(
+            const response = await this.helpaApi.practice.addPracticeListEntry(
               targetUser,
               listName,
               entryName
@@ -318,7 +319,7 @@ export class TwitchBot {
 
           try {
             // get their list
-            const response = await this.helpaApi.getPracticeList(
+            const response = await this.helpaApi.practice.getPracticeList(
               targetUser,
               listName
             )
@@ -371,11 +372,12 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry ID: ${entryId}`
           )
           try {
-            const response = await this.helpaApi.deletePracticeListEntry(
-              targetUser,
-              listName,
-              entryId
-            )
+            const response =
+              await this.helpaApi.practice.deletePracticeListEntry(
+                targetUser,
+                listName,
+                entryId
+              )
             const message = "Entry deleted successfully!"
             console.log(message)
             this.bot.say(channel, message).catch(console.error)
@@ -394,7 +396,7 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
           )
           try {
-            const response = await this.helpaApi.getPracticeList(
+            const response = await this.helpaApi.practice.getPracticeList(
               targetUser,
               listName
             )
@@ -444,7 +446,7 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.clearPracticeList(
+            const response = await this.helpaApi.practice.clearPracticeList(
               targetUser,
               listName
             )
@@ -485,7 +487,7 @@ export class TwitchBot {
 
     if (refreshCache) {
       try {
-        const response = await this.helpaApi.findCommand({
+        const response = await this.helpaApi.commands.findCommand({
           command: commandNoPrefix,
         })
 
@@ -534,7 +536,7 @@ export class TwitchBot {
     }
 
     try {
-      await this.helpaApi.logCommandUsage({
+      await this.helpaApi.commands.logCommandUsage({
         command: command.command,
         user: tags.username || "unknown",
         channel: channel,
@@ -631,7 +633,7 @@ export class TwitchBot {
       console.log(`[${channel}] Enabling ${toggleConfig.featureName}...`)
 
       try {
-        await this.helpaApi.updateTwitchBotConfig({
+        await this.helpaApi.twitch.updateTwitchBotConfig({
           [toggleConfig.configField]: true,
         })
 
@@ -670,7 +672,7 @@ export class TwitchBot {
       console.log(`[${channel}] Disabling ${toggleConfig.featureName}...`)
 
       try {
-        await this.helpaApi.updateTwitchBotConfig({
+        await this.helpaApi.twitch.updateTwitchBotConfig({
           [toggleConfig.configField]: false,
         })
 

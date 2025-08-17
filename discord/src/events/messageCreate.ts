@@ -51,7 +51,7 @@ const messageCreateEvent: DiscordEvent = {
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
-        const response = await this.helpaApi?.findCommand({
+        const response = await this.helpaApi?.commands.findCommand({
           command: commandNoPrefix,
         })
 
@@ -131,7 +131,7 @@ const messageCreateEvent: DiscordEvent = {
     cooldowns.set(cooldownKey, Date.now())
 
     // Log command use
-    await this.helpaApi?.logCommandUsage({
+    await this.helpaApi?.commands.logCommandUsage({
       command: command.command,
       user: author.username,
       channel: guildConfig.name,

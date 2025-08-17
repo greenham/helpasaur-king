@@ -22,7 +22,7 @@ const guildDeleteEvent: DiscordEvent = {
 
     // De-activate this guild via the API
     try {
-      await this.helpaApi?.updateGuildConfig(guild.id, {
+      await this.helpaApi?.discord.updateGuildConfig(guild.id, {
         active: false,
       })
 
