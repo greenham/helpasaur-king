@@ -13,15 +13,26 @@ interface CommandFormModalProps {
 const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
   props
 ) => {
-  const [command, setCommand] = React.useState({ ...props.command })
+  const [command, setCommand] = React.useState(() => ({
+    command: props.command.command || "",
+    response: props.command.response || "",
+    aliases: props.command.aliases || [],
+    aliasesText: props.command.aliases ? props.command.aliases.join(", ") : "",
+    ...props.command,
+  }))
   const { show, onHide, onSubmit } = props
 
   React.useEffect(() => {
-    setCommand((prev) => ({
-      ...prev,
-      aliasesText: command.aliases.join(", "),
-    }))
-  }, [])
+    setCommand({
+      command: props.command.command || "",
+      response: props.command.response || "",
+      aliases: props.command.aliases || [],
+      aliasesText: props.command.aliases
+        ? props.command.aliases.join(", ")
+        : "",
+      ...props.command,
+    })
+  }, [props.command])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const key = e.target.name
@@ -58,7 +69,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
             type="text"
             placeholder="obaeb"
             name="command"
-            value={command.command}
+            value={command.command || ""}
             onChange={handleChange}
           />
         </FloatingLabel>
@@ -72,7 +83,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
             placeholder="Stop! Don't shoot fire stick in space canoe! Cause explosive decompression! You can crush me but you can't crush my spirit! Why, those are the Grunka-Lunkas! They work here in the Slurm factory. If rubbin' frozen dirt in your crotch is wrong, hey I don't wanna be right."
             style={{ height: "200px" }}
             name="response"
-            value={command.response}
+            value={command.response || ""}
             onChange={handleChange}
           />
         </FloatingLabel>
@@ -85,7 +96,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
             type="text"
             placeholder="alias1, alias2, etc."
             name="aliasesText"
-            value={command.aliasesText}
+            value={command.aliasesText || ""}
             onChange={handleChange}
           />
         </FloatingLabel>
