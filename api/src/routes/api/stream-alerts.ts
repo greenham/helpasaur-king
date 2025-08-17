@@ -2,6 +2,11 @@ import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import Config from "../../models/config"
 import { getTwitchApiClient } from "../../lib/utils"
+import {
+  sendSuccess,
+  sendError,
+  handleRouteError,
+} from "../../lib/responseHelpers"
 import { HelixUser } from "twitch-api-client"
 
 const router: Router = express.Router()
@@ -27,9 +32,9 @@ router.get(
         }
         return 0
       })
-      res.status(200).json(streamAlertsConfig.config.channels)
+      sendSuccess(res, streamAlertsConfig.config.channels)
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "get stream alerts channels")
     }
   }
 )
@@ -108,7 +113,7 @@ router.post(
     })
 
     Promise.allSettled(results).then(async (channelResults) => {
-      res.status(200).json({ success: true, data: channelResults })
+      sendSuccess(res, channelResults, "Channels added to stream alerts")
     })
   }
 )
@@ -162,9 +167,9 @@ router.delete(
       streamAlertsConfig.markModified("config")
       await streamAlertsConfig.save()
 
-      res.status(200).json({ result: "success" })
+      sendSuccess(res, undefined, "Channel removed from stream alerts")
     } catch (err: any) {
-      res.status(500).json({ message: err.message })
+      handleRouteError(res, err, "remove channel from stream alerts")
     }
   }
 )
