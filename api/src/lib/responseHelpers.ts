@@ -1,14 +1,5 @@
 import { Response } from "express"
-
-/**
- * Standardized API response format for the server
- * Uses the same structure as the client's ApiResponse<T> but with server-side types
- */
-interface ServerApiResponse<T = any> {
-  result: "success" | "error" | "noop"
-  message?: string
-  data?: T
-}
+import { ApiResult, ApiResponse } from "@helpasaur/types"
 
 /**
  * Send a successful API response with optional data
@@ -23,8 +14,8 @@ export const sendSuccess = <T>(
   message?: string,
   statusCode = 200
 ): void => {
-  const response: ServerApiResponse<T> = {
-    result: "success",
+  const response: ApiResponse<T> = {
+    result: ApiResult.SUCCESS,
     ...(message && { message }),
     ...(data !== undefined && { data }),
   }
@@ -42,8 +33,8 @@ export const sendError = (
   message: string,
   statusCode = 500
 ): void => {
-  const response: ServerApiResponse<null> = {
-    result: "error",
+  const response: ApiResponse<null> = {
+    result: ApiResult.ERROR,
     message,
   }
   res.status(statusCode).json(response)
@@ -60,8 +51,8 @@ export const sendNoop = (
   message?: string,
   statusCode = 200
 ): void => {
-  const response: ServerApiResponse<null> = {
-    result: "noop",
+  const response: ApiResponse<null> = {
+    result: ApiResult.NOOP,
     ...(message && { message }),
   }
   res.status(statusCode).json(response)

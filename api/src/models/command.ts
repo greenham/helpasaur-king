@@ -2,9 +2,9 @@ import mongoose, { Schema } from "mongoose"
 import { ICommandDocument, ICommandModel } from "../types/models"
 
 const CommandSchema = new Schema<ICommandDocument>({
-  command: String,
+  command: { type: String, required: true, trim: true },
   aliases: [String],
-  response: String,
+  response: { type: String, required: true, trim: true },
   category: String,
   enabled: Boolean,
   deleted: Boolean,

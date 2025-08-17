@@ -15,13 +15,14 @@
     "express": "^4.20.0",
     "express-jwt": "^8.4.1",
     "express-jwt-permissions": "^1.3.7",
+    "@helpasaur/types": "workspace:*",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
     "mongoose": "^8.9.5",
     "morgan": "^1.10.0",
     "ms": "^2.1.3",
     "socket.io-client": "^4.7.2",
-    "twitch-api-client": "file:../libs/twitch-api-client"
+    "twitch-api-client": "workspace:*"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.7",

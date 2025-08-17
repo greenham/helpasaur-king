@@ -55,6 +55,14 @@ router.post(
     try {
       delete req.body._id
 
+      // Check for validation errors before uniqueness check
+      if (!req.body.command || !req.body.command.trim()) {
+        return sendError(res, "Command name is required", 400)
+      }
+      if (!req.body.response || !req.body.response.trim()) {
+        return sendError(res, "Command response is required", 400)
+      }
+
       // Ensure command name and alias uniqueness
       const isUnique = await Command.isUnique(
         req.body.command,
@@ -71,6 +79,19 @@ router.post(
       const command = await Command.create(req.body)
       sendSuccess(res, command, "Command created successfully", 201)
     } catch (err: any) {
+      // Handle MongoDB validation errors
+      if (err.name === "ValidationError") {
+        const validationErrors = Object.values(err.errors).map((error: any) => {
+          if (error.path === "command") {
+            return "Command name is required"
+          }
+          if (error.path === "response") {
+            return "Command response is required"
+          }
+          return error.message
+        })
+        return sendError(res, validationErrors.join(", "), 400)
+      }
       handleRouteError(res, err, "create command")
     }
   }
@@ -88,6 +109,20 @@ router.patch(
         return sendError(res, "Command not found", 404)
       }
 
+      // Check for validation errors before updating
+      if (
+        req.body.command !== undefined &&
+        (!req.body.command || !req.body.command.trim())
+      ) {
+        return sendError(res, "Command name is required", 400)
+      }
+      if (
+        req.body.response !== undefined &&
+        (!req.body.response || !req.body.response.trim())
+      ) {
+        return sendError(res, "Command response is required", 400)
+      }
+
       for (const key in req.body) {
         ;(command as any)[key] = req.body[key]
       }
@@ -95,6 +130,19 @@ router.patch(
 
       sendSuccess(res, command, "Command updated successfully")
     } catch (err: any) {
+      // Handle MongoDB validation errors
+      if (err.name === "ValidationError") {
+        const validationErrors = Object.values(err.errors).map((error: any) => {
+          if (error.path === "command") {
+            return "Command name is required"
+          }
+          if (error.path === "response") {
+            return "Command response is required"
+          }
+          return error.message
+        })
+        return sendError(res, validationErrors.join(", "), 400)
+      }
       handleRouteError(res, err, "update command")
     }
   }
