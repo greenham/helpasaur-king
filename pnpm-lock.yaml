@@ -17,6 +17,9 @@ importers:
 
   api:
     dependencies:
+      '@helpasaur/types':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/types
       axios:
         specifier: ^1.8.2
         version: 1.11.0
@@ -54,8 +57,8 @@ importers:
         specifier: ^4.7.2
         version: 4.8.1
       twitch-api-client:
-        specifier: file:../libs/twitch-api-client
-        version: file:libs/twitch-api-client
+        specifier: workspace:*
+        version: link:../libs/twitch-api-client
     devDependencies:
       '@types/cookie-parser':
         specifier: ^1.4.7
@@ -91,8 +94,8 @@ importers:
   discord:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../libs/@helpasaur/api-client
-        version: file:libs/@helpasaur/api-client
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/api-client
       discord.js:
         specifier: ^14.14.1
         version: 14.21.0
@@ -136,12 +139,24 @@ importers:
 
   libs/@helpasaur/api-client:
     dependencies:
+      '@helpasaur/types':
+        specifier: workspace:*
+        version: link:../types
       axios:
         specifier: ^1.8.2
         version: 1.11.0
       axios-retry:
         specifier: ^4.5.0
         version: 4.5.0(axios@1.11.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.19.10
+      typescript:
+        specifier: ^5.2.2
+        version: 5.9.2
+
+  libs/@helpasaur/types:
     devDependencies:
       '@types/node':
         specifier: ^20.8.10
@@ -227,8 +242,8 @@ importers:
   runnerwatcher:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../libs/@helpasaur/api-client
-        version: file:libs/@helpasaur/api-client
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/api-client
       express:
         specifier: ^4.19.2
         version: 4.21.2
@@ -239,8 +254,8 @@ importers:
         specifier: ^4.7.2
         version: 4.8.1
       twitch-api-client:
-        specifier: file:../libs/twitch-api-client
-        version: file:libs/twitch-api-client
+        specifier: workspace:*
+        version: link:../libs/twitch-api-client
     devDependencies:
       '@types/express':
         specifier: ^4.17.21
@@ -264,8 +279,8 @@ importers:
   twitch:
     dependencies:
       '@helpasaur/api-client':
-        specifier: file:../libs/@helpasaur/api-client
-        version: file:libs/@helpasaur/api-client
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/api-client
       express:
         specifier: ^4.19.2
         version: 4.21.2
@@ -304,8 +319,8 @@ importers:
   web:
     dependencies:
       '@helpasaur/api-client':
-        specifier: ../../../libs/@helpasaur/api-client
-        version: link:../../../libs/@helpasaur/api-client
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/api-client
       '@popperjs/core':
         specifier: ^2.11.8
         version: 2.11.8
@@ -4538,23 +4553,3 @@ packages:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
     engines: {node: '>=6'}
     dev: true
-
-  file:libs/@helpasaur/api-client:
-    resolution: {directory: libs/@helpasaur/api-client, type: directory}
-    name: '@helpasaur/api-client'
-    dependencies:
-      axios: 1.11.0
-      axios-retry: 4.5.0(axios@1.11.0)
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  file:libs/twitch-api-client:
-    resolution: {directory: libs/twitch-api-client, type: directory}
-    name: twitch-api-client
-    dependencies:
-      '@twurple/api': 7.4.0(@twurple/auth@7.4.0)
-      '@twurple/auth': 7.4.0
-    transitivePeerDependencies:
-      - encoding
-    dev: false

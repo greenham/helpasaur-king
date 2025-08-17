@@ -1,5 +1,5 @@
 {
-  "name": "@helpasaur/api-client",
+  "name": "@helpasaur/types",
   "version": "1.13.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,11 +8,6 @@
     "build:watch": "tsc --watch"
   },
   "license": "MIT",
-  "dependencies": {
-    "axios": "^1.8.2",
-    "axios-retry": "^4.5.0",
-    "@helpasaur/types": "workspace:*"
-  },
   "devDependencies": {
     "@types/node": "^20.8.10",
     "typescript": "^5.2.2"

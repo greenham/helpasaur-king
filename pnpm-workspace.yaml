@@ -9,6 +9,7 @@ packages:
   - "ws-relay"
   # Shared libraries
   - "libs/@helpasaur/api-client"
+  - "libs/@helpasaur/types"
   - "libs/twitch-api-client"
   # Monitoring utilities
   - "monitoring"

@@ -30,10 +30,17 @@ COPY web/package.json ./web/
 
 # Copy library packages
 COPY libs/@helpasaur/api-client/package.json ./libs/@helpasaur/api-client/
+COPY libs/@helpasaur/types/package.json ./libs/@helpasaur/types/
 COPY libs/twitch-api-client/package.json ./libs/twitch-api-client/
 
 # Install ALL workspace dependencies
 RUN pnpm install --frozen-lockfile
+
+# Build @helpasaur/types FIRST (other libs depend on it)
+WORKDIR /app/libs/@helpasaur/types
+COPY libs/@helpasaur/types/src ./src
+COPY libs/@helpasaur/types/tsconfig.json ./
+RUN pnpm build
 
 # Build @helpasaur/api-client
 WORKDIR /app/libs/@helpasaur/api-client

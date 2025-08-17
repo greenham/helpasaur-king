@@ -1,12 +1,7 @@
 // API Response Types for Helpasaur King
 // These types define the structure of responses from the API server
 
-// Base API Response wrapper
-export interface ApiResponse<T = any> {
-  result: "success" | "error" | "noop"
-  message?: string
-  data?: T
-}
+import { ApiResponse } from "@helpasaur/types"
 
 // Command Types
 export interface Command {

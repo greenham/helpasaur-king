@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosError } from "axios"
 import axiosRetry from "axios-retry"
+import { ApiResult } from "@helpasaur/types"
 import {
   ServiceConfigOptions,
   ServiceConfig,
@@ -61,6 +62,7 @@ export class HelpaApi {
       baseURL: this.apiHost,
       headers: { "X-Service-Name": serviceName },
       withCredentials: this.webMode, // Include cookies for web mode
+      validateStatus: () => true, // Don't throw on any HTTP status code
     })
 
     axiosRetry(this.api, {
@@ -367,10 +369,9 @@ export class HelpaApi {
   async createCommand(command: Partial<Command>): Promise<void> {
     try {
       const response = await this.api.post("/api/commands", command)
-      if (response.data.result !== "success") {
+      if (response.data.result === ApiResult.ERROR) {
         throw new Error(response.data.message || "Failed to create command")
       }
-      // Return void on success
     } catch (err: any) {
       throw new Error(`Failed to create command: ${err.message}`)
     }
@@ -388,10 +389,9 @@ export class HelpaApi {
         `/api/commands/${command._id}`,
         command
       )
-      if (response.data.result !== "success") {
+      if (response.data.result === ApiResult.ERROR) {
         throw new Error(response.data.message || "Failed to update command")
       }
-      // Return void on success
     } catch (err: any) {
       throw new Error(`Failed to update command: ${err.message}`)
     }
