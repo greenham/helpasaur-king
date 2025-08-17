@@ -1,5 +1,5 @@
 import { ApiBase } from "../base"
-import { Command, CommandFindRequest, CommandLogRequest } from "../types"
+import { Command, CommandLogRequest } from "../types"
 
 /**
  * API routes for bot command management
@@ -47,14 +47,12 @@ export class CommandRoutes extends ApiBase {
 
   /**
    * Find a specific bot command by name
-   * @param request - The command search request containing command name
+   * @param query - The command search request containing command name
    * @returns Promise resolving to the found command data (if any)
    * @throws Error if the API request fails or service is not authenticated
    */
-  async findCommand(
-    request: CommandFindRequest
-  ): Promise<{ command?: Command }> {
-    return this.apiPost<{ command?: Command }>("/api/commands/find", request)
+  async findCommand(query: string): Promise<Command | null> {
+    return this.apiPost<Command | null>("/api/commands/find", query)
   }
 
   /**

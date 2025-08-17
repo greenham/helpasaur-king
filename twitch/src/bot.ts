@@ -1,17 +1,19 @@
 import { io, Socket } from "socket.io-client"
 import * as tmi from "tmi.js"
 import * as crypto from "crypto"
-import { HelpaApi } from "@helpasaur/api-client"
+import { Command, HelpaApi } from "@helpasaur/api-client"
 import { TwitchBotConfig } from "./types"
 import { version as packageVersion, name as packageName } from "../package.json"
 import { DEFAULT_COMMAND_PREFIX } from "."
 const { WEBSOCKET_RELAY_SERVER } = process.env
 
+export type CachableCommand = Command & { staleAfter: number }
+
 export class TwitchBot {
   config: TwitchBotConfig
   helpaApi: HelpaApi
   cooldowns: Map<string, number>
-  cachedCommands: Map<string, any | null>
+  cachedCommands: Map<string, CachableCommand>
   bot: tmi.Client
   wsRelay: Socket
   messages: { onJoin: string; onLeave: string }
@@ -476,39 +478,39 @@ export class TwitchBot {
       return
     }
 
-    let command: any = this.cachedCommands.get(commandNoPrefix)
-    let refreshCache = true
-
-    if (command && command.staleAfter && Date.now() > command.staleAfter) {
-      refreshCache = false
-    }
-
     console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`)
 
-    if (refreshCache) {
+    let resolvedCommand: CachableCommand | null = null
+
+    const cachedCommand = this.cachedCommands.get(commandNoPrefix)
+    if (
+      !cachedCommand ||
+      (cachedCommand && Date.now() > cachedCommand.staleAfter)
+    ) {
+      // no cache or cache expiration
       try {
-        const response = await this.helpaApi.commands.findCommand({
-          command: commandNoPrefix,
-        })
+        const findCommandResult =
+          await this.helpaApi.commands.findCommand(commandNoPrefix)
 
-        if (response.command) {
-          command = response.command
-
-          if (command) {
-            command.staleAfter = Date.now() + 10 * 60 * 1000
-            this.cachedCommands.set(commandNoPrefix, command)
+        if (findCommandResult) {
+          resolvedCommand = {
+            ...findCommandResult,
+            staleAfter: Date.now() + 10 * 60 * 1000,
           }
+          this.cachedCommands.set(commandNoPrefix, resolvedCommand)
         }
       } catch (err) {
         console.error(`Error while fetching command: ${err}`)
         return
       }
+    } else {
+      resolvedCommand = cachedCommand
     }
 
-    if (!command) return
+    if (!resolvedCommand) return
 
     let onCooldown = false
-    let cooldownKey = command.command + channel
+    let cooldownKey = resolvedCommand.command + channel
     let timeUsed = this.cooldowns.get(cooldownKey)
     if (timeUsed) {
       let now = Date.now()
@@ -522,22 +524,22 @@ export class TwitchBot {
       return
     }
 
-    this.bot.say(channel, command.response).catch(console.error)
+    this.bot.say(channel, resolvedCommand.response).catch(console.error)
 
     this.cooldowns.set(cooldownKey, Date.now())
 
     let aliasUsed = ""
     if (
-      command.aliases &&
-      command.aliases.length > 0 &&
-      command.aliases.includes(commandNoPrefix)
+      resolvedCommand.aliases &&
+      resolvedCommand.aliases.length > 0 &&
+      resolvedCommand.aliases.includes(commandNoPrefix)
     ) {
       aliasUsed = commandNoPrefix
     }
 
     try {
       await this.helpaApi.commands.logCommandUsage({
-        command: command.command,
+        command: resolvedCommand.command,
         user: tags.username || "unknown",
         channel: channel,
         platform: "twitch",

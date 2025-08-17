@@ -51,18 +51,15 @@ const messageCreateEvent: DiscordEvent = {
     if (!cachedCommand) {
       // Not cached, try to find the command in the database
       try {
-        const response = await this.helpaApi?.commands.findCommand({
-          command: commandNoPrefix,
-        })
+        const response =
+          await this.helpaApi?.commands.findCommand(commandNoPrefix)
 
-        if (response?.command) {
-          command = response.command
-
-          if (command) {
-            // Cache it for 10 minutes
-            command.staleAfter = Date.now() + 10 * 60 * 1000
-            cachedCommands.set(commandNoPrefix, command)
+        if (response) {
+          command = {
+            ...response,
+            staleAfter: Date.now() + 10 * 60 * 1000,
           }
+          cachedCommands.set(commandNoPrefix, command)
         }
       } catch (err) {
         console.error(`Error while fetching command: ${err}`)

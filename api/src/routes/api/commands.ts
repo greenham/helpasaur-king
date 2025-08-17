@@ -38,8 +38,8 @@ router.get("/:id", async (req: Request, res: Response) => {
 // POST /find -> find command by name or alias
 router.post("/find", async (req: Request, res: Response) => {
   try {
-    const command = await Command.findByNameOrAlias(req.body.command)
-    sendSuccess(res, { command })
+    const command = await Command.findByNameOrAlias(req.body)
+    sendSuccess(res, command)
   } catch (err: any) {
     handleRouteError(res, err, "find command")
   }
