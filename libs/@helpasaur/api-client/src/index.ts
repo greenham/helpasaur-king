@@ -2,14 +2,14 @@
 export { HelpaApi } from "./HelpaApi"
 
 // Export route classes for advanced usage
-export { CommandRoutes } from "./routes/CommandRoutes"
-export { TwitchRoutes } from "./routes/TwitchRoutes"
-export { DiscordRoutes } from "./routes/DiscordRoutes"
-export { StreamAlertsRoutes } from "./routes/StreamAlertsRoutes"
-export { PracticeRoutes } from "./routes/PracticeRoutes"
-export { StreamRoutes } from "./routes/StreamRoutes"
-export { WebRoutes } from "./routes/WebRoutes"
-export { UserRoutes } from "./routes/UserRoutes"
+export { CommandRoutes } from "./routes/commands"
+export { TwitchRoutes } from "./routes/twitch"
+export { DiscordRoutes } from "./routes/discord"
+export { StreamAlertsRoutes } from "./routes/stream-alerts"
+export { PracticeRoutes } from "./routes/practice"
+export { StreamRoutes } from "./routes/streams"
+export { WebRoutes } from "./routes/web"
+export { UserRoutes } from "./routes/user"
 export { ApiBase } from "./base/ApiBase"
 
 // Export all types for convenience
