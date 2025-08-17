@@ -1,8 +1,3 @@
-// API Response Types for Helpasaur King
-// These types define the structure of responses from the API server
-
-import { ApiResponse } from "@helpasaur/types"
-
 // Command Types
 export interface Command {
   _id: string
