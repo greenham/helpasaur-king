@@ -1,13 +1,12 @@
 import { io, Socket } from "socket.io-client"
 import * as tmi from "tmi.js"
 import * as crypto from "crypto"
-import { Command, HelpaApi } from "@helpasaur/api-client"
+import { HelpaApi } from "@helpasaur/api-client"
+import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
 import { TwitchBotConfig } from "./types"
 import { version as packageVersion, name as packageName } from "../package.json"
 import { DEFAULT_COMMAND_PREFIX } from "."
 const { WEBSOCKET_RELAY_SERVER } = process.env
-
-export type CachableCommand = Command & { staleAfter: number }
 
 export class TwitchBot {
   config: TwitchBotConfig
@@ -480,37 +479,16 @@ export class TwitchBot {
 
     console.log(`[${channel}] ${tags["display-name"]}: ${commandNoPrefix}`)
 
-    let resolvedCommand: CachableCommand | null = null
+    const command = await getCachedCommand(
+      commandNoPrefix,
+      this.cachedCommands,
+      this.helpaApi
+    )
 
-    const cachedCommand = this.cachedCommands.get(commandNoPrefix)
-    if (
-      !cachedCommand ||
-      (cachedCommand && Date.now() > cachedCommand.staleAfter)
-    ) {
-      // no cache or cache expiration
-      try {
-        const findCommandResult =
-          await this.helpaApi.commands.findCommand(commandNoPrefix)
-
-        if (findCommandResult) {
-          resolvedCommand = {
-            ...findCommandResult,
-            staleAfter: Date.now() + 10 * 60 * 1000,
-          }
-          this.cachedCommands.set(commandNoPrefix, resolvedCommand)
-        }
-      } catch (err) {
-        console.error(`Error while fetching command: ${err}`)
-        return
-      }
-    } else {
-      resolvedCommand = cachedCommand
-    }
-
-    if (!resolvedCommand) return
+    if (!command) return
 
     let onCooldown = false
-    let cooldownKey = resolvedCommand.command + channel
+    let cooldownKey = command.command + channel
     let timeUsed = this.cooldowns.get(cooldownKey)
     if (timeUsed) {
       let now = Date.now()
@@ -524,22 +502,22 @@ export class TwitchBot {
       return
     }
 
-    this.bot.say(channel, resolvedCommand.response).catch(console.error)
+    this.bot.say(channel, command.response).catch(console.error)
 
     this.cooldowns.set(cooldownKey, Date.now())
 
     let aliasUsed = ""
     if (
-      resolvedCommand.aliases &&
-      resolvedCommand.aliases.length > 0 &&
-      resolvedCommand.aliases.includes(commandNoPrefix)
+      command.aliases &&
+      command.aliases.length > 0 &&
+      command.aliases.includes(commandNoPrefix)
     ) {
       aliasUsed = commandNoPrefix
     }
 
     try {
       await this.helpaApi.commands.logCommandUsage({
-        command: resolvedCommand.command,
+        command: command.command,
         user: tags.username || "unknown",
         channel: channel,
         platform: "twitch",

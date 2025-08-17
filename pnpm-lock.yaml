@@ -96,6 +96,9 @@ importers:
       '@helpasaur/api-client':
         specifier: workspace:*
         version: link:../libs/@helpasaur/api-client
+      '@helpasaur/bot-common':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/bot-common
       discord.js:
         specifier: ^14.14.1
         version: 14.21.0
@@ -148,6 +151,19 @@ importers:
       axios-retry:
         specifier: ^4.5.0
         version: 4.5.0(axios@1.11.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.19.10
+      typescript:
+        specifier: ^5.2.2
+        version: 5.9.2
+
+  libs/@helpasaur/bot-common:
+    dependencies:
+      '@helpasaur/api-client':
+        specifier: workspace:*
+        version: link:../api-client
     devDependencies:
       '@types/node':
         specifier: ^20.8.10
@@ -281,6 +297,9 @@ importers:
       '@helpasaur/api-client':
         specifier: workspace:*
         version: link:../libs/@helpasaur/api-client
+      '@helpasaur/bot-common':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/bot-common
       express:
         specifier: ^4.19.2
         version: 4.21.2

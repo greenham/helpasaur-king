@@ -30,6 +30,7 @@ COPY web/package.json ./web/
 
 # Copy library packages
 COPY libs/@helpasaur/api-client/package.json ./libs/@helpasaur/api-client/
+COPY libs/@helpasaur/bot-common/package.json ./libs/@helpasaur/bot-common/
 COPY libs/@helpasaur/types/package.json ./libs/@helpasaur/types/
 COPY libs/twitch-api-client/package.json ./libs/twitch-api-client/
 
@@ -46,6 +47,12 @@ RUN pnpm build
 WORKDIR /app/libs/@helpasaur/api-client
 COPY libs/@helpasaur/api-client/src ./src
 COPY libs/@helpasaur/api-client/tsconfig.json ./
+RUN pnpm build
+
+# Build @helpasaur/bot-common (depends on types and api-client)
+WORKDIR /app/libs/@helpasaur/bot-common
+COPY libs/@helpasaur/bot-common/src ./src
+COPY libs/@helpasaur/bot-common/tsconfig.json ./
 RUN pnpm build
 
 # Build twitch-api-client

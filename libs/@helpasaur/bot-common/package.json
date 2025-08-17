@@ -1,0 +1,18 @@
+{
+  "name": "@helpasaur/bot-common",
+  "version": "1.13.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@helpasaur/api-client": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2"
+  }
+}

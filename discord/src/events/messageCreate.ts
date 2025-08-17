@@ -1,10 +1,11 @@
-import { EmbedBuilder, Collection, Message, MessageFlags } from "discord.js"
+import { EmbedBuilder, Message, MessageFlags } from "discord.js"
+import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
 import { defaultGuildConfig } from "../constants"
 import { DiscordEvent } from "../types/events"
 
 let aliasList: string[] | undefined
-let cachedCommands = new Collection<string, any>()
-let cooldowns = new Collection<string, number>()
+let cachedCommands = new Map<string, CachableCommand>()
+let cooldowns = new Map<string, number>()
 
 const messageCreateEvent: DiscordEvent = {
   name: "messageCreate",
@@ -39,38 +40,12 @@ const messageCreateEvent: DiscordEvent = {
       return
     }
 
-    // Try to find the command in the cache
-    let cachedCommand = cachedCommands.get(commandNoPrefix)
+    const command = await getCachedCommand(
+      commandNoPrefix,
+      cachedCommands,
+      this.helpaApi!
+    )
 
-    // If it's cached, make sure it's not too stale
-    if (cachedCommand && Date.now() > cachedCommand.staleAfter) {
-      cachedCommand = false
-    }
-
-    let command: any = false
-    if (!cachedCommand) {
-      // Not cached, try to find the command in the database
-      try {
-        const response =
-          await this.helpaApi?.commands.findCommand(commandNoPrefix)
-
-        if (response) {
-          command = {
-            ...response,
-            staleAfter: Date.now() + 10 * 60 * 1000,
-          }
-          cachedCommands.set(commandNoPrefix, command)
-        }
-      } catch (err) {
-        console.error(`Error while fetching command: ${err}`)
-        return
-      }
-    } else {
-      // Use cached version
-      command = cachedCommand
-    }
-
-    // Handle command not found
     if (!command) return
 
     // @TODO: Make sure the user is permitted to use commands
