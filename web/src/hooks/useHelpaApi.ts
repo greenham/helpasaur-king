@@ -283,11 +283,15 @@ export const useHelpaApi = () => {
      * Update command
      */
     useUpdateCommand: (
-      options?: MutationOptionsWithToast<void, Error, Command>
+      options?: MutationOptionsWithToast<
+        void,
+        Error,
+        Partial<Command> & { _id: string }
+      >
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
-        mutationFn: (command: Command) =>
+        mutationFn: (command: Partial<Command> & { _id: string }) =>
           helpaApiClient.commands.updateCommand(command),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })

@@ -27,11 +27,13 @@ export class CommandRoutes extends ApiBase {
 
   /**
    * Update an existing bot command
-   * @param command - The complete command object with updates
+   * @param command - The command object with updates (must include _id)
    * @returns Promise resolving when command update is complete
    * @throws Error if the API request fails or user is not authenticated
    */
-  async updateCommand(command: Command): Promise<void> {
+  async updateCommand(
+    command: Partial<Command> & { _id: string }
+  ): Promise<void> {
     return this.apiPatch(`/api/commands/${command._id}`, command)
   }
 

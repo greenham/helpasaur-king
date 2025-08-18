@@ -51,7 +51,7 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
 
       {!commandsError && !commandsLoading && (
         <CommandsList
-          commands={sortCommandsAlpha(commands)}
+          commands={sortCommandsAlpha(commands || [])}
           userCanEdit={user ? user.permissions.includes("admin") : false}
           createCommandMutation={createCommandMutation}
           updateCommandMutation={updateCommandMutation}

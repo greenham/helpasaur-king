@@ -23,9 +23,19 @@ import CommandFormModal from "./CommandFormModal"
 interface CommandsListProps {
   commands: Command[]
   userCanEdit: boolean
-  createCommandMutation: UseMutationResult<any, any, Partial<Command>, any>
-  updateCommandMutation: UseMutationResult<any, any, Partial<Command>, any>
-  deleteCommandMutation: UseMutationResult<any, any, Command, any>
+  createCommandMutation: UseMutationResult<
+    void,
+    Error,
+    Partial<Command>,
+    unknown
+  >
+  updateCommandMutation: UseMutationResult<
+    void,
+    Error,
+    Partial<Command> & { _id: string },
+    unknown
+  >
+  deleteCommandMutation: UseMutationResult<void, Error, Command, unknown>
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
@@ -90,7 +100,9 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   const saveCommand = async (command: Partial<Command>) => {
     if (command._id !== "") {
-      updateCommandMutation.mutate(command)
+      updateCommandMutation.mutate(
+        command as Partial<Command> & { _id: string }
+      )
     } else {
       createCommandMutation.mutate(command)
     }
@@ -255,11 +267,13 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                 >
                   <td className="align-middle text-end">
                     <code className="fs-3">{displayCommand.command}</code>
-                    <CommandAliasesStack aliases={displayCommand.aliases} />
+                    <CommandAliasesStack
+                      aliases={displayCommand.aliases || []}
+                    />
                   </td>
                   <td className="align-middle">
                     <div className="lead">
-                      <LinkifyText text={displayCommand.response} />
+                      <LinkifyText text={displayCommand.response || ""} />
                     </div>
                   </td>
                   {userCanEdit && (
@@ -299,13 +313,13 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                       {createCommandMutation.variables.command}
                     </code>
                     <CommandAliasesStack
-                      aliases={createCommandMutation.variables.aliases}
+                      aliases={createCommandMutation.variables.aliases || []}
                     />
                   </td>
                   <td className="align-middle">
                     <div className="lead">
                       <LinkifyText
-                        text={createCommandMutation.variables.response}
+                        text={createCommandMutation.variables.response || ""}
                       />
                     </div>
                   </td>
