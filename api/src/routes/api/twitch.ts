@@ -9,7 +9,7 @@ import {
   handleRouteError,
 } from "../../lib/responseHelpers"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
-import { HelixUser } from "twitch-api-client"
+import { TwitchUserData } from "@helpasaur/types"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -64,9 +64,9 @@ router.post("/join", async (req: Request, res: Response) => {
         // Get user data from Twitch
         const twitchApiClient = getTwitchApiClient()
 
-        let twitchUserData: HelixUser | null = null
+        let twitchUserData: TwitchUserData | null = null
         try {
-          const response: HelixUser | null =
+          const response: TwitchUserData | null =
             await twitchApiClient.getUserByName(requestedChannel)
           if (!response) {
             throw new Error(
