@@ -1,5 +1,5 @@
 {
-  "name": "ws-relay",
+  "name": "helpa-ws-relay",
   "version": "1.13.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

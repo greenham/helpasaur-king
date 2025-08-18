@@ -264,3 +264,4 @@ Each service has a `.env.sample` file showing required variables. Key ones:
 - `TWITCH_APP_CLIENT_ID`: Twitch client ID for web app (required at build time)
 
 **Important**: Use pnpm for all package operations and update CLAUDE.md when package.json scripts are modified.
+- Before running a package.json script, ensure you are in the root directory of the project.

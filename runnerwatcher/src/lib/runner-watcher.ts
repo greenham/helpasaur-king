@@ -4,7 +4,7 @@ import { TwitchApiClient } from "twitch-api-client"
 import { Constants } from "../constants"
 import {
   WatchedTwitchStream,
-  helixStreamToWatchedTwitchStream,
+  twitchStreamDataToWatchedTwitchStream,
 } from "../types/stream"
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
@@ -84,7 +84,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Give us more control over this object
-      const stream: WatchedTwitchStream = helixStreamToWatchedTwitchStream(
+      const stream: WatchedTwitchStream = twitchStreamDataToWatchedTwitchStream(
         streamResult[0]
       )
 

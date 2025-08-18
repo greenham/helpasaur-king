@@ -21,13 +21,19 @@ ARG SERVICE
 ENV NODE_ENV=production
 WORKDIR /app/${SERVICE}
 RUN pnpm build
-# Deploy from workspace root with filter using package name
+# Create clean production deployment with only this service's dependencies
 WORKDIR /app
 RUN pnpm --filter helpa-${SERVICE} --prod deploy /prod/${SERVICE}
 
-# Production runtime stage - minimal image
+# Production runtime stage - minimal image with only essentials
 FROM node:20-alpine as prod
 ARG SERVICE
 WORKDIR /app
-COPY --from=prod-build /prod/${SERVICE} ./
+# Copy only what's needed for runtime:
+# 1. Compiled JavaScript only (no source files)
+COPY --from=prod-build /app/${SERVICE}/dist ./dist
+# 2. Service-specific production dependencies only  
+COPY --from=prod-build /prod/${SERVICE}/node_modules ./node_modules
+# 3. Package.json for metadata
+COPY --from=prod-build /prod/${SERVICE}/package.json ./package.json
 CMD ["node", "dist/index.js"]
