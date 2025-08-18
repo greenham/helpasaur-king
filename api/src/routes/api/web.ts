@@ -16,9 +16,11 @@ router.get("/config", async (req: Request, res: Response) => {
     const { channels, statusFilters, blacklistedUsers } = streamAlertsConfig
 
     const webConfig = {
-      channels,
-      statusFilters,
-      blacklistedUsers,
+      streams: {
+        channels,
+        statusFilters,
+        blacklistedUsers,
+      },
       twitch: {
         commandPrefixes: ALLOWED_COMMAND_PREFIXES,
       },

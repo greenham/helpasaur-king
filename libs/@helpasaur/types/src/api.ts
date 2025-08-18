@@ -69,10 +69,14 @@ export interface ApiUser {
 }
 
 // Web Configuration Types
-export interface WebConfig {
+export interface StreamFilterConfig {
+  blacklistedUsers: string[]
   channels: TwitchUserData[]
   statusFilters: string
-  blacklistedUsers: string[]
+}
+
+export interface WebConfig {
+  streams: StreamFilterConfig
   twitch: {
     commandPrefixes: string[]
   }

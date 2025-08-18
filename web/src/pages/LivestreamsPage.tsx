@@ -4,7 +4,7 @@ import { Alert, Badge, Container, Spinner } from "react-bootstrap"
 import { filterStreams } from "../utils/utils"
 import LivestreamsList from "../components/LivestreamsList"
 import { useHelpaApi } from "../hooks/useHelpaApi"
-import { TwitchStream } from "@helpasaur/types"
+import { TwitchStream, StreamFilterConfig } from "@helpasaur/types"
 
 interface LivestreamsPageProps {}
 interface FilteredStreams {
@@ -29,9 +29,15 @@ const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
   const [mergedStreams, setMergedStreams] = useState<Array<TwitchStream>>([])
 
   useEffect(() => {
+    const streamFilterConfig: StreamFilterConfig = webConfig?.streams || {
+      blacklistedUsers: [],
+      channels: [],
+      statusFilters: "",
+    }
+
     const filteredStreams: FilteredStreams = filterStreams(
-      allStreams,
-      webConfig
+      allStreams || [],
+      streamFilterConfig
     )
     setMergedStreams(filteredStreams.featured.concat(filteredStreams.other))
   }, [allStreams])

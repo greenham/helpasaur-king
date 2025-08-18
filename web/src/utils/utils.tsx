@@ -1,4 +1,4 @@
-import { Command, TwitchStream, WebConfig } from "@helpasaur/types"
+import { Command, TwitchStream, StreamFilterConfig } from "@helpasaur/types"
 
 export const sizeStreamThumbnail = (
   url: string,
@@ -32,12 +32,15 @@ export const getTwitchLoginUrl = () => {
   return `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`
 }
 
-export const filterStreams = (streams: TwitchStream[], config: WebConfig) => {
+export const filterStreams = (
+  streams: TwitchStream[],
+  config: StreamFilterConfig
+) => {
   if (streams && streams.length > 0) {
     const { blacklistedUsers, channels, statusFilters } = config
     const speedrunTester = new RegExp(statusFilters, "i")
     const alertUserIds = channels.map((c) => c.id)
-    let filteredAndOrderedStreams
+    let filteredAndOrderedStreams: TwitchStream[]
 
     // 1. remove streams from users on the blacklist
     filteredAndOrderedStreams = streams.filter(
