@@ -157,7 +157,7 @@ const scheduleWeeklyRace = () => {
           const raceRoomMessage: Racetime.IncomingMessage = JSON.parse(data)
 
           switch (raceRoomMessage.type) {
-            case Racetime.CHAT_MESSAGE_TYPE:
+            case Racetime.CHAT_MESSAGE_TYPE: {
               // Type assertion to specify that raceRoomMessage is of type ChatMessageMessage
               const raceChatMessage =
                 raceRoomMessage as Racetime.ChatMessageMessage
@@ -169,8 +169,9 @@ const scheduleWeeklyRace = () => {
 
               // @TODO: Respond to the usual prefixed commands
               break
+            }
 
-            case Racetime.RACE_DATA_TYPE:
+            case Racetime.RACE_DATA_TYPE: {
               // Type assertion to specify that raceRoomMessage is of type RaceDataMessage
               const raceDataMessage =
                 raceRoomMessage as Racetime.RaceDataMessage
@@ -188,6 +189,7 @@ const scheduleWeeklyRace = () => {
               }
 
               break
+            }
           }
         })
 

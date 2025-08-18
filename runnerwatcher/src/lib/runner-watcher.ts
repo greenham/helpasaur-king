@@ -1,6 +1,6 @@
 import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
-import { TwitchApiClient, HelixUser } from "twitch-api-client"
+import { TwitchApiClient } from "twitch-api-client"
 import { Constants } from "../constants"
 import {
   WatchedTwitchStream,
@@ -122,7 +122,7 @@ class RunnerWatcher extends EventEmitter {
 
       // See if this user has a stream in the cache already
       const cachedStreamForUser = cachedStreams.find(
-        (s) => s.userId == stream.userId
+        (s) => s.userId === stream.userId
       )
       console.log(
         cachedStreamForUser
@@ -153,8 +153,8 @@ class RunnerWatcher extends EventEmitter {
           )
           eventType = STREAM_ONLINE_EVENT
         } else if (
-          cachedStreamForUser.title == event.title &&
-          cachedStreamForUser.game_id == event.category_id
+          cachedStreamForUser.title === event.title &&
+          cachedStreamForUser.game_id === event.category_id
         ) {
           console.log(`Title or game has not changed, skipping...`)
           return
@@ -162,7 +162,7 @@ class RunnerWatcher extends EventEmitter {
       } else if (
         eventType === STREAM_ONLINE_EVENT &&
         cachedStreamForUser &&
-        cachedStreamForUser.id == stream.id
+        cachedStreamForUser.id === stream.id
       ) {
         // This handles a weird scenario where:
         // - CHANNEL_UPDATE_EVENT gets fired

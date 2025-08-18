@@ -165,11 +165,10 @@ export interface CommandFindRequest {
 
 export interface CommandLogRequest {
   command: string
-  user: string
-  channel: string
-  platform: "discord" | "twitch"
-  guildId?: string
-  roomId?: string
+  alias: string
+  source: "discord" | "twitch"
+  username: string
+  metadata: any
 }
 
 // Discord Guild Configuration Types

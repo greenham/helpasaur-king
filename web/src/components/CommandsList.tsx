@@ -137,7 +137,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               onKeyUp={(e) => {
                 if (e.key === "Escape") {
                   setSearchQuery("")
-                } else if (e.key == "Enter") {
+                } else if (e.key === "Enter") {
                   e.currentTarget.blur()
                 }
               }}

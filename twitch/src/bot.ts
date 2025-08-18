@@ -107,7 +107,7 @@ export class TwitchBot {
       const args = message.slice(1).split(" ")
       const commandNoPrefix = args.shift().toLowerCase()
       switch (commandNoPrefix) {
-        case "join":
+        case "join": {
           let channelToJoin = tags.username
 
           if (args[0] && tags.mod) {
@@ -154,8 +154,9 @@ export class TwitchBot {
             console.error(`Error calling /api/twitch/join: ${err.message}`)
           }
           break
+        }
 
-        case "leave":
+        case "leave": {
           let channelToLeave = tags.username
 
           if (args[0] && tags.mod) {
@@ -200,6 +201,7 @@ export class TwitchBot {
             console.error(`Error calling /api/twitch/leave: ${err.message}`)
           }
           break
+        }
       }
 
       return
@@ -276,7 +278,7 @@ export class TwitchBot {
       const listName = "default"
 
       switch (commandNoPrefix) {
-        case "pracadd":
+        case "pracadd": {
           if (args.length === 0) {
             this.bot
               .say(
@@ -293,12 +295,11 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.practice.addPracticeListEntry(
+            await this.helpaApi.practice.addPracticeListEntry(
               targetUser,
               listName,
               entryName
             )
-            // addPracticeListEntry now returns void and throws on error
             console.log("Entry added successfully!")
             this.bot
               .say(channel, "Entry added successfully!")
@@ -313,7 +314,8 @@ export class TwitchBot {
             )
             return
           }
-        case "pracrand":
+        }
+        case "pracrand": {
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
           )
@@ -367,18 +369,18 @@ export class TwitchBot {
             )
             return
           }
-        case "pracdel":
+        }
+        case "pracdel": {
           const entryId = parseInt(args[0])
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry ID: ${entryId}`
           )
           try {
-            const response =
-              await this.helpaApi.practice.deletePracticeListEntry(
-                targetUser,
-                listName,
-                entryId
-              )
+            await this.helpaApi.practice.deletePracticeListEntry(
+              targetUser,
+              listName,
+              entryId
+            )
             const message = "Entry deleted successfully!"
             console.log(message)
             this.bot.say(channel, message).catch(console.error)
@@ -392,7 +394,8 @@ export class TwitchBot {
             )
             return
           }
-        case "praclist":
+        }
+        case "praclist": {
           console.log(
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
           )
@@ -431,7 +434,8 @@ export class TwitchBot {
             )
             return
           }
-        case "pracclear":
+        }
+        case "pracclear": {
           if (targetUser !== tags["user-id"]) {
             this.bot
               .say(
@@ -447,10 +451,7 @@ export class TwitchBot {
           )
 
           try {
-            const response = await this.helpaApi.practice.clearPracticeList(
-              targetUser,
-              listName
-            )
+            await this.helpaApi.practice.clearPracticeList(targetUser, listName)
             const message = "Practice list cleared successfully!"
             this.bot.say(channel, message).catch(console.error)
             return
@@ -466,6 +467,7 @@ export class TwitchBot {
             )
             return
           }
+        }
       }
     }
 
@@ -518,10 +520,13 @@ export class TwitchBot {
     try {
       await this.helpaApi.commands.logCommandUsage({
         command: command.command,
-        user: tags.username || "unknown",
-        channel,
-        platform: "twitch",
-        roomId: tags["room-id"],
+        alias: aliasUsed,
+        source: "twitch",
+        username: tags.username,
+        metadata: {
+          channel,
+          tags,
+        },
       })
     } catch (err) {
       console.error(`Error while logging command: ${err}`)

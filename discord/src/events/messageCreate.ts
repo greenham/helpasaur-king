@@ -105,10 +105,13 @@ const messageCreateEvent: DiscordEvent = {
     // Log command use
     await this.helpaApi?.commands.logCommandUsage({
       command: command.command,
-      user: author.username,
-      channel: guildConfig.name,
-      platform: "discord",
-      guildId: interaction.guildId || undefined,
+      alias: aliasUsed,
+      source: "discord",
+      username: author.username,
+      metadata: {
+        guild: guildConfig.name,
+        author,
+      },
     })
   },
 }

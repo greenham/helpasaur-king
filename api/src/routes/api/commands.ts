@@ -156,7 +156,7 @@ router.delete(
   async (req: Request, res: Response) => {
     try {
       // @TODO: Make this a soft delete?
-      const result = await Command.deleteOne({ _id: req.params.id })
+      await Command.deleteOne({ _id: req.params.id })
       sendSuccess(res, undefined, "Command deleted successfully")
     } catch (err: any) {
       handleRouteError(res, err, "delete command")
@@ -171,7 +171,7 @@ router.post(
   permissionGuard.check("service"),
   async (req: Request, res: Response) => {
     try {
-      const commandLog = await CommandLog.create(req.body)
+      await CommandLog.create(req.body)
       sendSuccess(res, undefined, "Command usage logged")
     } catch (err: any) {
       handleRouteError(res, err, "log command usage")
