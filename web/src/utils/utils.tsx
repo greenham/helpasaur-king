@@ -1,4 +1,4 @@
-import { Command, TwitchStream, WebConfig } from "@helpasaur/api-client"
+import { Command, TwitchStream, WebConfig } from "@helpasaur/types"
 
 export const sizeStreamThumbnail = (
   url: string,

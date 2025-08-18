@@ -10,7 +10,7 @@ import {
   Button,
   Badge,
 } from "react-bootstrap"
-import { TwitchUserData } from "@helpasaur/api-client"
+import { TwitchUserData } from "@helpasaur/types"
 
 interface ManageStreamAlertsProps {}
 const ManageStreamAlerts: React.FunctionComponent<

@@ -5,8 +5,8 @@ import {
   UseQueryOptions,
   UseMutationOptions,
 } from "@tanstack/react-query"
+import { HelpaApi } from "@helpasaur/api-client"
 import {
-  HelpaApi,
   Command,
   ApiUser,
   WebConfig,
@@ -16,7 +16,7 @@ import {
   DiscordJoinUrl,
   TwitchBotChannelData,
   StreamAlertsChannel,
-} from "@helpasaur/api-client"
+} from "@helpasaur/types"
 import { useToast } from "./useToast"
 
 // Extended mutation options with toast control

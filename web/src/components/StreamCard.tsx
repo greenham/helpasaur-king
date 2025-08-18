@@ -1,5 +1,5 @@
 import * as React from "react"
-import { TwitchStream } from "@helpasaur/api-client"
+import { TwitchStream } from "@helpasaur/types"
 import Card from "react-bootstrap/Card"
 import Badge from "react-bootstrap/Badge"
 import Button from "react-bootstrap/Button"
@@ -17,6 +17,7 @@ function StreamCard(props: StreamCardProps) {
   const { stream } = props
   const thumbnailWidth = props.thumbnailWidth || 320
   const thumbnailHeight = props.thumbnailHeight || 180
+  const twitchUrl = getTwitchUrl(stream.user_login)
   return (
     <Card
       className="rounded h-100"
@@ -25,7 +26,7 @@ function StreamCard(props: StreamCardProps) {
       <Card.Header className="d-grid p-0">
         <Button
           variant={stream.isOnAlertsList ? "secondary" : "primary"}
-          href={getTwitchUrl(stream.user_login)}
+          href={twitchUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="py-3"
@@ -35,11 +36,7 @@ function StreamCard(props: StreamCardProps) {
           </h5>
         </Button>
       </Card.Header>
-      <a
-        href={getTwitchUrl(stream.userName)}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <a href={twitchUrl} target="_blank" rel="noopener noreferrer">
         <Card.Img
           variant="top"
           src={sizeStreamThumbnail(
@@ -53,7 +50,7 @@ function StreamCard(props: StreamCardProps) {
         <Card.Title>
           <p className="py-2 fw-bold">
             <a
-              href={getTwitchUrl(stream.user_login)}
+              href={twitchUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={`text-decoration-none link-light`}

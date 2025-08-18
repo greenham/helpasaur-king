@@ -4,7 +4,7 @@ import { Alert, Badge, Container, Spinner } from "react-bootstrap"
 import { filterStreams } from "../utils/utils"
 import LivestreamsList from "../components/LivestreamsList"
 import { useHelpaApi } from "../hooks/useHelpaApi"
-import { TwitchStream } from "@helpasaur/api-client"
+import { TwitchStream } from "@helpasaur/types"
 
 interface LivestreamsPageProps {}
 interface FilteredStreams {

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap"
-import { Command } from "@helpasaur/api-client"
+import { Command } from "@helpasaur/types"
 type CommandFormModel = Partial<Command> & { aliasesText?: string }
 
 interface CommandFormModalProps {

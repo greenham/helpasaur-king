@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useState } from "react"
 import Carousel from "react-bootstrap/Carousel"
-import { TwitchStream } from "@helpasaur/api-client"
+import { TwitchStream } from "@helpasaur/types"
 import StreamCard from "./StreamCard"
 
 interface StreamCarouselProps {

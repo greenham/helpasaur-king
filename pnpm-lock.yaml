@@ -343,6 +343,9 @@ importers:
       '@helpasaur/api-client':
         specifier: workspace:*
         version: link:../libs/@helpasaur/api-client
+      '@helpasaur/types':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/types
       '@popperjs/core':
         specifier: ^2.11.8
         version: 2.11.8

@@ -16,6 +16,7 @@
     "bootstrap": "^5.3.2",
     "bootswatch": "^5.3.2",
     "@helpasaur/api-client": "workspace:*",
+    "@helpasaur/types": "workspace:*",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",

@@ -13,7 +13,7 @@ import { useEffect, useState, useMemo } from "react"
 import { useToast } from "../hooks/useToast"
 import { getTwitchLoginUrl } from "../utils/utils"
 import { useHelpaApi } from "../hooks/useHelpaApi"
-import { ApiUser, TwitchBotConfig } from "@helpasaur/api-client"
+import { ApiUser, TwitchBotConfig } from "@helpasaur/types"
 
 interface TwitchBotPageProps {}
 

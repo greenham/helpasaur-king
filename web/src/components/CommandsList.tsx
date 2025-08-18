@@ -17,7 +17,7 @@ import {
   Table,
 } from "react-bootstrap"
 import LinkifyText from "./LinkifyText"
-import { Command } from "@helpasaur/api-client"
+import { Command } from "@helpasaur/types"
 import CommandFormModal from "./CommandFormModal"
 
 interface CommandsListProps {
