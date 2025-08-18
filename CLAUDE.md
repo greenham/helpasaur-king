@@ -15,7 +15,11 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 - **Race Bot** (`/racebot/`): TypeScript service for weekly racetime.gg race creation (Sundays 11:30 AM PT)
 - **Runner Watcher** (`/runnerwatcher/`): Stream monitoring via Twitch EventSub
 - **WebSocket Relay** (`/ws-relay/`): Socket.io hub for inter-service communication
-- **Shared Library** (`/libs/api-client/`): Common Axios-based API client (@helpasaur/api-client)
+- **Shared Libraries** (`/libs/`):
+  - `@helpasaur/api-client`: Common Axios-based API client for all services
+  - `@helpasaur/types`: Shared TypeScript types and interfaces
+  - `@helpasaur/bot-common`: Common bot functionality and utilities
+  - `twitch-api-client`: Twitch API client wrapper
 - **Monitoring** (`/monitoring/`): Uptime Kuma monitoring stack (separate from main application)
 
 ## Essential Development Commands
@@ -35,9 +39,12 @@ pnpm logs:all           # View all Docker service logs (including mongo/mongo-ex
 pnpm boom               # Full rebuild and restart (stop, build, start, logs)
 pnpm version:bump       # Bump version in all package.json files
 
-# Code Formatting
+# Code Quality & Formatting
 pnpm format             # Format all code with Prettier
 pnpm format:check       # Check code formatting without making changes
+pnpm lint               # Check code for ESLint issues
+pnpm lint:fix           # Auto-fix ESLint issues where possible
+pnpm lint:check         # Check ESLint with zero tolerance for warnings
 
 # Monitoring Stack Commands (local development only)
 pnpm monitor:start      # Start Uptime Kuma monitoring locally
@@ -113,6 +120,17 @@ graph TD
     class web,nginx frontend
 ```
 
+## Code Quality & Linting
+
+- **ESLint**: Comprehensive linting with TypeScript support (`eslint.config.js`)
+  - Service-specific rules for Node.js backend services vs React web app
+  - TypeScript rules: prevents `any` types, enforces proper variable usage
+  - Code quality rules: prefer-const, strict equality, template literals
+  - Browser globals support for web components
+  - Prettier integration for consistent formatting
+- **Prettier**: Code formatting with project-wide configuration
+- **TypeScript**: Strict type checking across all services and libraries
+
 ## Database & Infrastructure
 
 - **MongoDB 7**: Main database, accessed via Mongoose ODM
@@ -131,6 +149,8 @@ graph TD
 ### API Communication
 
 - Services communicate via the shared `@helpasaur/api-client` library
+- Common types are shared via `@helpasaur/types` across all services
+- Bot services use `@helpasaur/bot-common` for shared functionality
 - WebSocket relay broadcasts real-time events between services
 - API uses JWT tokens for authentication (Twitch OAuth integration)
 
@@ -162,6 +182,23 @@ graph TD
   - Builds and pushes images to ghcr.io on release
   - Manual deployment trigger via workflow_dispatch
 - Production URLs: helpasaur.com (GitHub Pages), api.helpasaur.com, rw.helpasaur.com
+
+## Development Workflow
+
+### Code Quality Process
+
+1. **Before committing**: Run `pnpm lint:fix` to auto-fix common issues
+2. **Code review**: Use `pnpm lint:check` to ensure zero warnings/errors
+3. **Formatting**: Run `pnpm format` to ensure consistent code style
+4. **Type checking**: ESLint enforces TypeScript best practices across all services
+
+### Recommended Development Flow
+
+1. Make code changes
+2. Run `pnpm lint:fix` to auto-fix issues
+3. Run `pnpm format` to ensure consistent formatting
+4. Test changes locally with `pnpm start` and `pnpm start:web`
+5. Commit and push changes
 
 ## Common Tasks
 
@@ -211,6 +248,5 @@ Each service has a `.env.sample` file showing required variables. Key ones:
 - `RACETIME_TOKEN`: racetime.gg API token
 - `API_HOST`: API URL for web app (required at build time)
 - `TWITCH_APP_CLIENT_ID`: Twitch client ID for web app (required at build time)
-- Update @CLAUDE.md anytime modifications are made to the package.json scripts.
 
-- Use pnpm for all package operations
+**Important**: Use pnpm for all package operations and update CLAUDE.md when package.json scripts are modified.
