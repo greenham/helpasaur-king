@@ -76,7 +76,7 @@ router.post(
       // Ensure this isn't in the channel list already
       if (
         streamAlertsConfig.config.channels.find(
-          (c: any) => c.login == channel.toLowerCase()
+          (c: any) => c.login === channel.toLowerCase()
         ) !== undefined
       ) {
         return {
@@ -135,7 +135,7 @@ router.delete(
         return sendError(res, "Configuration not found")
       }
       const channelIndex = streamAlertsConfig.config.channels.findIndex(
-        (c: any) => c.id == req.params.id
+        (c: any) => c.id === req.params.id
       )
       if (channelIndex === undefined) {
         console.log(`${req.params.id} is not in the stream alerts list!`)

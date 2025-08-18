@@ -90,7 +90,7 @@ const readyEvent: DiscordEvent = {
             console.log(`-> Sent!`)
 
             // special message for reze in the alttp discord :)
-            if (channel.guild.id == ALTTP_GUILD_ID) {
+            if (channel.guild.id === ALTTP_GUILD_ID) {
               const ljSmile = channel.guild.emojis.cache.find(
                 (emoji) => emoji.name === LJ_SMILE_NAME
               )

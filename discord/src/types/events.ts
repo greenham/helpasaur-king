@@ -1,10 +1,4 @@
-import {
-  Client,
-  Guild,
-  Message,
-  SlashCommandBuilder,
-  ChatInputCommandInteraction,
-} from "discord.js"
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js"
 import { HelpaApi } from "@helpasaur/api-client"
 
 export interface DiscordEvent {

@@ -84,9 +84,6 @@ router.get(
 
     const listName = req.params.listName ?? "default"
 
-    // check query params for exclude
-    const exclude = req.query.exclude ?? false
-
     try {
       const result = await PracLists.findOne({
         twitchUserId,

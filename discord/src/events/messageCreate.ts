@@ -84,7 +84,7 @@ const messageCreateEvent: DiscordEvent = {
       // Determine if the original command or an alias was used
       if (command.aliases.includes(commandNoPrefix)) {
         // Alias was used, remove it from the list, and add the original command
-        aliasList = aliasList.filter((a: string) => a != commandNoPrefix)
+        aliasList = aliasList.filter((a: string) => a !== commandNoPrefix)
         aliasList.push(command.command)
         aliasUsed = commandNoPrefix
       }
