@@ -48,7 +48,7 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
         service: "ws-relay",
         version: packageJson.version,
         uptime: ms(uptimeMs, { long: true }),
-        uptimeMs: uptimeMs,
+        uptimeMs,
         connections: {
           current: currentConnections,
           total: totalConnections,

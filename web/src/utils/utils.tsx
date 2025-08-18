@@ -27,7 +27,7 @@ export const getTwitchLoginUrl = () => {
   }
   const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID
   const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
-    String(process.env.API_HOST + "/auth/twitch")
+    String(`${process.env.API_HOST}/auth/twitch`)
   )
   return `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`
 }
@@ -62,8 +62,8 @@ export const filterStreams = (
     })
 
     // 4. now create a merged list, with priorityStreams first, then anything in livestreams that isn't in topStreams
-    let otherStreams = filteredAndOrderedStreams.filter((stream) => {
-      let matchIndex = featuredStreams.findIndex((s) => {
+    const otherStreams = filteredAndOrderedStreams.filter((stream) => {
+      const matchIndex = featuredStreams.findIndex((s) => {
         return s.id === stream.id
       })
       return matchIndex === -1

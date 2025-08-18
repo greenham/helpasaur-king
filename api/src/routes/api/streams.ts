@@ -15,7 +15,7 @@ router.get("/live", async (req: Request, res: Response) => {
   })
   const twitchApiClient = getTwitchApiClient()
 
-  let filter: HelixPaginatedStreamFilter = {
+  const filter: HelixPaginatedStreamFilter = {
     type: "live",
     limit: 100,
     game: streamAlertsConfig.alttpGameIds,

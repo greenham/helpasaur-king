@@ -4,8 +4,8 @@ import { defaultGuildConfig } from "../constants"
 import { DiscordEvent } from "../types/events"
 
 let aliasList: string[] | undefined
-let cachedCommands = new Map<string, CachableCommand>()
-let cooldowns = new Map<string, number>()
+const cachedCommands = new Map<string, CachableCommand>()
+const cooldowns = new Map<string, number>()
 
 const messageCreateEvent: DiscordEvent = {
   name: "messageCreate",
@@ -52,10 +52,10 @@ const messageCreateEvent: DiscordEvent = {
 
     // Make sure the command isn't on cooldown in this guild
     let onCooldown: number | false = false
-    let cooldownKey = command.command + guildId
-    let timeUsed = cooldowns.get(cooldownKey)
+    const cooldownKey = command.command + guildId
+    const timeUsed = cooldowns.get(cooldownKey)
     if (timeUsed) {
-      let now = Date.now()
+      const now = Date.now()
       // Command was recently used, check timestamp to see if it's on cooldown
       if (now - timeUsed <= textCmdCooldown * 1000) {
         // Calculate how much longer it's on cooldown

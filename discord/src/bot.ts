@@ -47,7 +47,7 @@ export class DiscordBot {
       const activities = (this.discordClient.config as any).activities || []
       if (activities.length === 0) return
 
-      let activity = activities[Math.floor(Math.random() * activities.length)]
+      const activity = activities[Math.floor(Math.random() * activities.length)]
       console.log(`Setting Discord activity to: ${activity}`)
       this.discordClient.user!.setActivity(activity, {
         type: ActivityType.Streaming,

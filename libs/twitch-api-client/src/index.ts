@@ -179,7 +179,7 @@ export class TwitchApiClient {
     try {
       const tokenInfo = await getTokenInfo(accessToken)
       if (!tokenInfo || !tokenInfo.userId) {
-        let error = `Failed to get current user: no valid token found!`
+        const error = `Failed to get current user: no valid token found!`
         console.error(error)
         throw error
       }

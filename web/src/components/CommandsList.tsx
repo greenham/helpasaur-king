@@ -72,7 +72,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   useEffect(() => {
     setSearchResults(filterCommands(commands, debouncedSearchQuery))
-    window.location.replace("#" + debouncedSearchQuery)
+    window.location.replace(`#${debouncedSearchQuery}`)
   }, [debouncedSearchQuery, commands])
 
   const freshCommand = {

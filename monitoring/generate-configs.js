@@ -160,7 +160,7 @@ function createMonitor(service, env) {
   const monitor = {
     name: `${service.icon} ${envConfig.displayName || service.name}`,
     type: service.type || envConfig.type || "http",
-    url: url,
+    url,
     method: "GET",
     hostname: null,
     port: null,

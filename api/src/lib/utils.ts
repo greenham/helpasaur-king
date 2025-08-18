@@ -93,6 +93,6 @@ export const getUserTwitchApiClient = (
     client_id: TWITCH_APP_CLIENT_ID!,
     client_secret: TWITCH_APP_CLIENT_SECRET!,
     access_token: accessToken,
-    scopes: scopes,
+    scopes,
   })
 }

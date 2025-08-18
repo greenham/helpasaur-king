@@ -15,7 +15,7 @@ CommandSchema.index({ aliases: 1 })
 
 CommandSchema.statics.findByNameOrAlias = async function (command: string) {
   return await this.findOne({
-    $or: [{ command: command }, { aliases: command }],
+    $or: [{ command }, { aliases: command }],
     deleted: { $ne: true },
   })
 }

@@ -138,7 +138,7 @@ const configCommand: DiscordCommand = {
     const { guildId, client } = interaction as any
 
     // See if there's an internal configuration for this guild
-    let currentGuildConfig = client.config.guilds.find(
+    const currentGuildConfig = client.config.guilds.find(
       (g: any) => g.id === guildId
     )
     if (!currentGuildConfig) {
@@ -219,7 +219,7 @@ const configCommand: DiscordCommand = {
       ],
     ])
 
-    let guildUpdate: any = {}
+    const guildUpdate: any = {}
     const commandConfig = subcommandMap.get(subcommand)
     if (!commandConfig) {
       await interaction.editReply({

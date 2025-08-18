@@ -73,7 +73,7 @@ class RunnerWatcher extends EventEmitter {
       })
 
       // Pull stream info from Twitch API
-      let streamResult = await twitchApi.getStreams({
+      const streamResult = await twitchApi.getStreams({
         userId: user.id,
       })
 
@@ -84,7 +84,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Give us more control over this object
-      let stream: WatchedTwitchStream = helixStreamToWatchedTwitchStream(
+      const stream: WatchedTwitchStream = helixStreamToWatchedTwitchStream(
         streamResult[0]
       )
 
@@ -121,7 +121,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // See if this user has a stream in the cache already
-      let cachedStreamForUser = cachedStreams.find(
+      const cachedStreamForUser = cachedStreams.find(
         (s) => s.userId == stream.userId
       )
       console.log(

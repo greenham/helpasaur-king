@@ -156,7 +156,7 @@ function TopNav() {
                     src={user.twitchUserData.profile_image_url}
                     roundedCircle
                     className="bg-dark ml-3"
-                    alt={"Logged in as " + user.twitchUserData.display_name}
+                    alt={`Logged in as ${user.twitchUserData.display_name}`}
                     width={32}
                     height={32}
                   />
@@ -164,11 +164,11 @@ function TopNav() {
                 id="user-dropdown"
               >
                 <NavDropdown.Item
-                  href={
-                    process.env.API_HOST +
-                    "/auth/logout?redirect=" +
-                    encodeURIComponent(location.pathname)
-                  }
+                  href={`${
+                    process.env.API_HOST
+                  }/auth/logout?redirect=${encodeURIComponent(
+                    location.pathname
+                  )}`}
                   rel="noopener noreferrer"
                 >
                   <i className="fa-solid fa-arrow-right-from-bracket"></i>

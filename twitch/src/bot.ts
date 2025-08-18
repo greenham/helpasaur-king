@@ -332,7 +332,7 @@ export class TwitchBot {
 
             // if they have more than 2 entries, make sure we don't get the same one twice in a row
             if (entries.length > 2) {
-              let lastRandomEntry = this.lastRandomRoomMap.get(channel)
+              const lastRandomEntry = this.lastRandomRoomMap.get(channel)
               while (
                 crypto.createHash("md5").update(randomEntry).digest("hex") ===
                 lastRandomEntry
@@ -488,10 +488,10 @@ export class TwitchBot {
     if (!command) return
 
     let onCooldown = false
-    let cooldownKey = command.command + channel
-    let timeUsed = this.cooldowns.get(cooldownKey)
+    const cooldownKey = command.command + channel
+    const timeUsed = this.cooldowns.get(cooldownKey)
     if (timeUsed) {
-      let now = Date.now()
+      const now = Date.now()
       if (now - timeUsed <= channelConfig.textCommandCooldown * 1000) {
         onCooldown =
           channelConfig.textCommandCooldown * 1000 - (now - timeUsed) > 0
@@ -519,7 +519,7 @@ export class TwitchBot {
       await this.helpaApi.commands.logCommandUsage({
         command: command.command,
         user: tags.username || "unknown",
-        channel: channel,
+        channel,
         platform: "twitch",
         roomId: tags["room-id"],
       })

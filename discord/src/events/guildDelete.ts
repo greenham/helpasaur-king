@@ -10,7 +10,7 @@ const guildDeleteEvent: DiscordEvent = {
     const { client } = guild as any // TODO: Type the extended client properly
 
     // See if there's an existing configuration for this guild
-    let guildConfigIndex = client.config.guilds.findIndex(
+    const guildConfigIndex = client.config.guilds.findIndex(
       (g: any) => g.id === guild.id
     )
     if (guildConfigIndex === -1) {

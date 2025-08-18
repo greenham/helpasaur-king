@@ -47,7 +47,7 @@ export class TwitchEventListener extends EventEmitter {
           version: packageVersion,
           port: this.listeningPort || "not started",
           uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
-          uptimeMs: uptimeMs, // keep raw ms for monitoring tools
+          uptimeMs, // keep raw ms for monitoring tools
           eventsReceived: this.eventsReceived,
           environment: process.env.NODE_ENV || "development",
           webhookConfigured: !!process.env.TWITCH_EVENTSUB_WEBHOOK_URL, // just boolean, not the actual URL

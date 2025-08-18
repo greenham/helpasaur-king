@@ -28,11 +28,11 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   // Validate authorization code from Twitch
   const authCode = (req.query.code as string) || false
   if (!authCode) {
-    return res.redirect(redirectUrl + "?error=missing_code")
+    return res.redirect(`${redirectUrl}?error=missing_code`)
   }
 
   if (!/^[a-z0-9]{30}$/.test(authCode)) {
-    return res.redirect(redirectUrl + "?error=bad_code_format")
+    return res.redirect(`${redirectUrl}?error=bad_code_format`)
   }
 
   // Get access and ID tokens from Twitch
@@ -42,7 +42,7 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
     `&client_secret=${TWITCH_APP_CLIENT_SECRET}` +
     `&code=${authCode}` +
     "&grant_type=authorization_code" +
-    `&redirect_uri=${API_HOST + "/auth/twitch"}`
+    `&redirect_uri=${`${API_HOST}/auth/twitch`}`
 
   const response = await axios.post(requestUrl)
 
@@ -51,7 +51,7 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
     !response.data ||
     !response.data.access_token
   ) {
-    return res.redirect(redirectUrl + "?error=bad_response")
+    return res.redirect(`${redirectUrl}?error=bad_response`)
   }
 
   const twitchAuthData = response.data

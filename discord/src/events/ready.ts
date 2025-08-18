@@ -38,7 +38,7 @@ const readyEvent: DiscordEvent = {
     })
 
     // 1. Set up weekly alerts
-    let timeToSchedule = {
+    const timeToSchedule = {
       dayOfWeek: 0,
       hour: 11,
       minute: 0,
@@ -55,7 +55,7 @@ const readyEvent: DiscordEvent = {
       console.log(`Sending weekly alerts!`)
 
       // Look up which guilds/channels/roles should be alerted
-      let alerts = (client as any).config.guilds
+      const alerts = (client as any).config.guilds
         .filter(
           (g: any) =>
             g.active && g.enableWeeklyRaceAlert && g.weeklyRaceAlertChannelId
@@ -68,18 +68,21 @@ const readyEvent: DiscordEvent = {
         })
 
       alerts.forEach((a: any) => {
-        let channel = client.channels.cache.get(a.channelId) as TextChannel
+        const channel = client.channels.cache.get(a.channelId) as TextChannel
         if (!channel) return
 
         console.log(
           `Sending alert to to ${channel.guild.name} (#${channel.name})`
         )
 
-        let notify = a.roleId ? `<@&${a.roleId}> ` : ""
-        let startsIn = `<t:${Math.floor(
+        const notify = a.roleId ? `<@&${a.roleId}> ` : ""
+        const startsIn = `<t:${Math.floor(
           (Date.now() + WEEKLY_ALERT_OFFSET_MINUTES * 60 * 1000) / 1000
         )}:R>`
-        let alertMessage = WEEKLY_ALERT_MESSAGE.replace("#startsIn#", startsIn)
+        const alertMessage = WEEKLY_ALERT_MESSAGE.replace(
+          "#startsIn#",
+          startsIn
+        )
 
         channel
           .send(notify + alertMessage)
@@ -88,7 +91,7 @@ const readyEvent: DiscordEvent = {
 
             // special message for reze in the alttp discord :)
             if (channel.guild.id == ALTTP_GUILD_ID) {
-              let ljSmile = channel.guild.emojis.cache.find(
+              const ljSmile = channel.guild.emojis.cache.find(
                 (emoji) => emoji.name === LJ_SMILE_NAME
               )
               channel.send(`<@${REZE_ID}> happy weekly ${ljSmile}`)
@@ -127,7 +130,7 @@ const readyEvent: DiscordEvent = {
       console.log("Received stream alert:", stream.eventType)
 
       // Get a list of guilds that have stream alerts enabled
-      let alerts = (client as any).config.guilds
+      const alerts = (client as any).config.guilds
         .filter(
           (g: any) =>
             g.active && g.enableStreamAlerts && g.streamAlertsChannelId
@@ -140,14 +143,14 @@ const readyEvent: DiscordEvent = {
 
       // Post a message to the configured channels with the stream event
       alerts.forEach((a: any) => {
-        let channel = client.channels.cache.get(a.channelId) as TextChannel
+        const channel = client.channels.cache.get(a.channelId) as TextChannel
         if (!channel) return
 
         console.log(
           `Sending stream alert for ${stream.user.login} to ${channel.guild.name} (#${channel.name})`
         )
 
-        let streamAlertEmbed = new EmbedBuilder()
+        const streamAlertEmbed = new EmbedBuilder()
           .setColor(0x6441a5)
           .setTitle(`Now live on Twitch!`)
           .setURL(`https://twitch.tv/${stream.user.login}`)
@@ -192,7 +195,7 @@ const readyEvent: DiscordEvent = {
         console.log("Received weekly race room event:", raceData)
 
         // Get a list of guilds that have race room alerts enabled
-        let alerts = (client as any).config.guilds
+        const alerts = (client as any).config.guilds
           .filter(
             (g: any) =>
               g.active &&
@@ -210,18 +213,18 @@ const readyEvent: DiscordEvent = {
 
         // Post a message to the configured channels with the race details
         alerts.forEach((a: any) => {
-          let channel = client.channels.cache.get(a.channelId) as TextChannel
+          const channel = client.channels.cache.get(a.channelId) as TextChannel
           if (!channel) return
 
           console.log(
             `Sending weekly race room alert to ${channel.guild.name} (#${channel.name})`
           )
 
-          let notify = a.roleId ? `<@&${a.roleId}> ` : ""
-          let startsIn = `<t:${raceData.startTimestamp}:R>`
-          let raceRoomUrl = raceData.raceRoomUrl
+          const notify = a.roleId ? `<@&${a.roleId}> ` : ""
+          const startsIn = `<t:${raceData.startTimestamp}:R>`
+          const raceRoomUrl = raceData.raceRoomUrl
 
-          let weeklyRaceAlertEmbed = new EmbedBuilder()
+          const weeklyRaceAlertEmbed = new EmbedBuilder()
             .setColor(0x379c6f)
             .setTitle(`Weekly race room has been created!`)
             .setDescription(`Starts ${startsIn}`)

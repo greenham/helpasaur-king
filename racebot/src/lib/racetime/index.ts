@@ -109,7 +109,7 @@ class RacetimeBot {
           const raceRoomWebsocketUrl = `${RACETIME_WSS_URL}${raceData.websocket_bot_url}`
           console.log("Connecting to websocket:", raceRoomWebsocketUrl)
           const wsRaceRoom: WebSocket = new WebSocket(
-            raceRoomWebsocketUrl + `?token=${this.accessToken}`
+            `${raceRoomWebsocketUrl}?token=${this.accessToken}`
           )
           wsRaceRoom.on("error", console.error)
           wsRaceRoom.on("close", (code: number, reason: Buffer) => {

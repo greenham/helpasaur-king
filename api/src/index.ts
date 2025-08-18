@@ -96,9 +96,9 @@ app.get("/health", async (req: Request, res: Response) => {
       service: "api",
       version: packageVersion,
       uptime: ms(uptimeMs, { long: true }),
-      uptimeMs: uptimeMs,
-      requestCount: requestCount,
-      errorCount: errorCount,
+      uptimeMs,
+      requestCount,
+      errorCount,
       errorRate:
         requestCount > 0
           ? `${((errorCount / requestCount) * 100).toFixed(2)}%`
@@ -122,7 +122,7 @@ app.use(routes)
 
 app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
   if (err.name === "UnauthorizedError") {
-    res.status(401).json({ error: err.name + ": " + err.message })
+    res.status(401).json({ error: `${err.name}: ${err.message}` })
   } else if (err.code === "permission_denied") {
     res.status(403).send("Forbidden")
   } else {
