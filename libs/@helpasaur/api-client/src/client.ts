@@ -1,15 +1,17 @@
 import axios, { AxiosInstance, AxiosError } from "axios"
 import axiosRetry from "axios-retry"
 import { ApiResult, ServiceConfig } from "@helpasaur/types"
-import { ClientOptions, ServiceName } from "./types/services"
-import { CommandRoutes } from "./routes/commands"
-import { TwitchRoutes } from "./routes/twitch"
-import { DiscordRoutes } from "./routes/discord"
-import { StreamAlertsRoutes } from "./routes/stream-alerts"
-import { PracticeRoutes } from "./routes/practice"
-import { StreamRoutes } from "./routes/streams"
-import { WebRoutes } from "./routes/web"
-import { UserRoutes } from "./routes/user"
+import { ClientOptions, ServiceName } from "./types"
+import {
+  CommandRoutes,
+  DiscordRoutes,
+  PracticeRoutes,
+  StreamAlertsRoutes,
+  StreamRoutes,
+  TwitchRoutes,
+  UserRoutes,
+  WebRoutes,
+} from "./routes"
 
 /**
  * Helps external clients and internal services use the Helpa API

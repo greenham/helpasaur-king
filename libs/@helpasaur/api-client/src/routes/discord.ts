@@ -5,6 +5,7 @@ import {
   GuildConfigData,
   GuildConfigUpdate,
 } from "@helpasaur/types"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for Discord bot management
@@ -17,7 +18,7 @@ export class DiscordRoutes extends ApiBase {
    * @throws Error if the API request fails
    */
   async getDiscordJoinUrl(): Promise<DiscordJoinUrl> {
-    return this.apiGet("/api/discord/joinUrl")
+    return this.apiGet(`${ROUTES.DISCORD}/joinUrl`)
   }
 
   /**
@@ -27,7 +28,7 @@ export class DiscordRoutes extends ApiBase {
    * @throws Error if the API request fails or service is not authenticated
    */
   async createGuildConfig(guildConfig: GuildConfig): Promise<GuildConfigData> {
-    return this.apiPost<GuildConfigData>("/api/discord/guild", guildConfig)
+    return this.apiPost<GuildConfigData>(`${ROUTES.DISCORD}/guild`, guildConfig)
   }
 
   /**
@@ -42,7 +43,7 @@ export class DiscordRoutes extends ApiBase {
     updates: GuildConfigUpdate
   ): Promise<GuildConfigData> {
     return this.apiPatch<GuildConfigData>(
-      `/api/discord/guild/${guildId}`,
+      `${ROUTES.DISCORD}/guild/${guildId}`,
       updates
     )
   }

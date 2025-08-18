@@ -1,5 +1,6 @@
 import { ApiBase } from "../base"
 import { Command, CommandLogRequest } from "@helpasaur/types"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for bot command management
@@ -12,7 +13,7 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails
    */
   async getCommands(): Promise<Command[]> {
-    return this.apiGet("/api/commands")
+    return this.apiGet(ROUTES.COMMANDS)
   }
 
   /**
@@ -22,7 +23,7 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async createCommand(command: Partial<Command>): Promise<void> {
-    return this.apiPost("/api/commands", command)
+    return this.apiPost(ROUTES.COMMANDS, command)
   }
 
   /**
@@ -34,7 +35,7 @@ export class CommandRoutes extends ApiBase {
   async updateCommand(
     command: Partial<Command> & { _id: string }
   ): Promise<void> {
-    return this.apiPatch(`/api/commands/${command._id}`, command)
+    return this.apiPatch(`${ROUTES.COMMANDS}/${command._id}`, command)
   }
 
   /**
@@ -44,7 +45,7 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async deleteCommand(command: Command): Promise<void> {
-    return this.apiDelete(`/api/commands/${command._id}`, command)
+    return this.apiDelete(`${ROUTES.COMMANDS}/${command._id}`, command)
   }
 
   /**
@@ -54,7 +55,7 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails or service is not authenticated
    */
   async findCommand(query: string): Promise<Command | null> {
-    return this.apiPost<Command | null>("/api/commands/find", {
+    return this.apiPost<Command | null>(`${ROUTES.COMMANDS}/find`, {
       command: query,
     })
   }
@@ -66,7 +67,7 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails or service is not authenticated
    */
   async logCommandUsage(logData: CommandLogRequest): Promise<void> {
-    return this.apiPost("/api/commands/logs", logData)
+    return this.apiPost(`${ROUTES.COMMANDS}/logs`, logData)
   }
 
   /**
@@ -76,7 +77,7 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails or command is not found
    */
   async getCommandById(commandId: string): Promise<Command> {
-    return this.apiGet(`/api/commands/${commandId}`)
+    return this.apiGet(`${ROUTES.COMMANDS}/${commandId}`)
   }
 
   /**
@@ -86,6 +87,6 @@ export class CommandRoutes extends ApiBase {
    * @throws Error if the API request fails or command is not found
    */
   async deleteCommandById(commandId: string): Promise<void> {
-    return this.apiDelete(`/api/commands/${commandId}`)
+    return this.apiDelete(`${ROUTES.COMMANDS}/${commandId}`)
   }
 }

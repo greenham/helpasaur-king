@@ -1,5 +1,6 @@
 import { ApiBase } from "../base"
 import { TwitchStream } from "@helpasaur/types"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for stream management
@@ -12,6 +13,6 @@ export class StreamRoutes extends ApiBase {
    * @throws Error if the API request fails
    */
   async getLivestreams(): Promise<TwitchStream[]> {
-    return this.apiGet("/api/streams/live")
+    return this.apiGet(`${ROUTES.STREAMS}/live`)
   }
 }

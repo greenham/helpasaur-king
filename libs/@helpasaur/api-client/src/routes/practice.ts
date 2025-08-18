@@ -1,4 +1,5 @@
 import { ApiBase } from "../base"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for practice list management
@@ -18,9 +19,12 @@ export class PracticeRoutes extends ApiBase {
     listName: string,
     entry: string
   ): Promise<void> {
-    return this.apiPost(`/api/prac/${targetUser}/lists/${listName}/entries`, {
-      entry,
-    })
+    return this.apiPost(
+      `${ROUTES.PRAC}/${targetUser}/lists/${listName}/entries`,
+      {
+        entry,
+      }
+    )
   }
 
   /**
@@ -34,7 +38,7 @@ export class PracticeRoutes extends ApiBase {
     targetUser: string,
     listName: string
   ): Promise<{ entries: string[] }> {
-    return this.apiGet(`/api/prac/${targetUser}/lists/${listName}`)
+    return this.apiGet(`${ROUTES.PRAC}/${targetUser}/lists/${listName}`)
   }
 
   /**
@@ -51,7 +55,7 @@ export class PracticeRoutes extends ApiBase {
     entryId: number
   ): Promise<void> {
     return this.apiDelete(
-      `/api/prac/${targetUser}/lists/${listName}/entries/${entryId}`
+      `${ROUTES.PRAC}/${targetUser}/lists/${listName}/entries/${entryId}`
     )
   }
 
@@ -63,6 +67,6 @@ export class PracticeRoutes extends ApiBase {
    * @throws Error if the API request fails or practice list is not found
    */
   async clearPracticeList(targetUser: string, listName: string): Promise<void> {
-    return this.apiDelete(`/api/prac/${targetUser}/lists/${listName}`)
+    return this.apiDelete(`${ROUTES.PRAC}/${targetUser}/lists/${listName}`)
   }
 }

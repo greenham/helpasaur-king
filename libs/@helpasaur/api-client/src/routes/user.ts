@@ -1,5 +1,6 @@
 import { ApiBase } from "../base"
 import { ApiUser } from "@helpasaur/types"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for user management
@@ -12,6 +13,6 @@ export class UserRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async getCurrentUser(): Promise<ApiUser> {
-    return this.apiGet("/api/me")
+    return this.apiGet(ROUTES.ME)
   }
 }

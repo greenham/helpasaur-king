@@ -1,5 +1,6 @@
 import { ApiBase } from "../base"
 import { StreamAlertsChannel } from "@helpasaur/types"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for stream alerts management
@@ -12,7 +13,7 @@ export class StreamAlertsRoutes extends ApiBase {
    * @throws Error if the API request fails
    */
   async getStreamAlertsChannels(): Promise<StreamAlertsChannel[]> {
-    return this.apiGet("/api/streamAlerts/channels")
+    return this.apiGet(`${ROUTES.STREAM_ALERTS}/channels`)
   }
 
   /**
@@ -22,7 +23,7 @@ export class StreamAlertsRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async addChannelToStreamAlerts(twitchUsername: string): Promise<void> {
-    return this.apiPost("/api/streamAlerts/channels", {
+    return this.apiPost(`${ROUTES.STREAM_ALERTS}/channels`, {
       channels: [twitchUsername],
     })
   }
@@ -34,6 +35,6 @@ export class StreamAlertsRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async removeChannelFromStreamAlerts(twitchUserId: string): Promise<void> {
-    return this.apiDelete(`/api/streamAlerts/channels/${twitchUserId}`)
+    return this.apiDelete(`${ROUTES.STREAM_ALERTS}/channels/${twitchUserId}`)
   }
 }

@@ -5,6 +5,7 @@ import {
   ConfigUpdatePayload,
   ActiveChannel,
 } from "@helpasaur/types"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for Twitch bot management
@@ -17,7 +18,7 @@ export class TwitchRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async getTwitchBotConfig(): Promise<TwitchBotConfig> {
-    return this.apiGet("/api/me/twitch")
+    return this.apiGet(`${ROUTES.ME}/twitch`)
   }
 
   /**
@@ -27,7 +28,7 @@ export class TwitchRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async updateTwitchBotConfig(config: ConfigUpdatePayload): Promise<void> {
-    return this.apiPatch("/api/twitch/config", config)
+    return this.apiPatch(`${ROUTES.TWITCH}/config`, config)
   }
 
   /**
@@ -40,7 +41,7 @@ export class TwitchRoutes extends ApiBase {
     twitchUsername?: string
   ): Promise<TwitchBotChannelData> {
     const body = twitchUsername ? { channel: twitchUsername } : {}
-    return this.apiPost<TwitchBotChannelData>("/api/twitch/join", body)
+    return this.apiPost<TwitchBotChannelData>(`${ROUTES.TWITCH}/join`, body)
   }
 
   /**
@@ -53,7 +54,7 @@ export class TwitchRoutes extends ApiBase {
     twitchUsername?: string
   ): Promise<TwitchBotChannelData> {
     const body = twitchUsername ? { channel: twitchUsername } : {}
-    return this.apiPost<TwitchBotChannelData>("/api/twitch/leave", body)
+    return this.apiPost<TwitchBotChannelData>(`${ROUTES.TWITCH}/leave`, body)
   }
 
   /**
@@ -62,7 +63,7 @@ export class TwitchRoutes extends ApiBase {
    * @throws Error if the API request fails or user is not authenticated
    */
   async getTwitchBotChannels(): Promise<string[]> {
-    return this.apiGet("/api/twitch/channels")
+    return this.apiGet(`${ROUTES.TWITCH}/channels`)
   }
 
   /**
@@ -71,6 +72,6 @@ export class TwitchRoutes extends ApiBase {
    * @throws Error if the API request fails or service is not authenticated
    */
   async getActiveChannels(): Promise<ActiveChannel[]> {
-    return this.apiGet("/api/configs/twitch/activeChannels")
+    return this.apiGet(`${ROUTES.CONFIGS}/twitch/activeChannels`)
   }
 }

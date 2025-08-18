@@ -1,5 +1,6 @@
 import { ApiBase } from "../base"
 import { WebConfig } from "@helpasaur/types"
+import { ROUTES } from "../constants"
 
 /**
  * API routes for web application configuration
@@ -12,6 +13,6 @@ export class WebRoutes extends ApiBase {
    * @throws Error if the API request fails
    */
   async getWebConfig(): Promise<WebConfig> {
-    return this.apiGet("/api/web/config")
+    return this.apiGet(`${ROUTES.WEB}/config`)
   }
 }
