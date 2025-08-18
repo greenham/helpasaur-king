@@ -176,7 +176,7 @@ router.patch("/config", async (req: Request, res: Response) => {
 
   const updates: any = {}
   for (const field of allowedFields) {
-    if (req.body.hasOwnProperty(field)) {
+    if (Object.prototype.hasOwnProperty.call(req.body, field)) {
       const value = req.body[field]
 
       // Validate commandPrefix if provided

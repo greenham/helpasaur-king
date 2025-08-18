@@ -50,7 +50,7 @@ router.post(
   "/channels",
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
-    if (!req.body.hasOwnProperty("channels")) {
+    if (Object.prototype.hasOwnProperty.call(req.body, "channels")) {
       return sendError(
         res,
         "Missing payload property 'channels' (Array<String>)",
@@ -210,7 +210,7 @@ router.post(
   "/channels/blacklist",
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
-    if (!req.body.hasOwnProperty("channels")) {
+    if (Object.prototype.hasOwnProperty.call(req.body, "channels")) {
       return sendError(
         res,
         "Missing payload property 'channels' (Array<String>)",
