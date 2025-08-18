@@ -8,6 +8,7 @@
     "build:push": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build --push",
     "start": "docker compose up -d",
     "start:web": "cd web && pnpm start",
+    "start:libs": "pnpm dev:libs",
     "stop": "docker compose down",
     "logs": "pnpm logs:all api-server discord-bot twitch-bot runnerwatcher racebot ws-relay",
     "logs:all": "docker compose logs -f --tail 1000",
@@ -23,7 +24,9 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,html}\" --ignore-path .prettierignore",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:check": "eslint . --max-warnings 0"
+    "lint:check": "eslint . --max-warnings 0",
+    "dev:libs": "concurrently \"pnpm --filter @helpasaur/types run build:watch\" \"pnpm --filter @helpasaur/api-client run build:watch\" \"pnpm --filter @helpasaur/bot-common run build:watch\" \"pnpm --filter twitch-api-client run build:watch\"",
+    "dev": "concurrently --names \"LIBS,DOCKER\" --prefix-colors \"cyan,green\" \"pnpm dev:libs\" \"pnpm start\""
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
@@ -31,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.1",
     "buffer": "^5.5.0||^6.0.0",
+    "concurrently": "^9.2.0",
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

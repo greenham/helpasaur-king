@@ -30,6 +30,8 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 # Development (from root)
 pnpm start              # Start all services (uses docker-compose.yml + override.yml automatically)
 pnpm start:web          # Start web dev server (run in separate terminal)
+pnpm start:libs         # Start all shared library watch builds for hot reloading
+pnpm dev                # Start everything: libraries + services (full dev environment)
 pnpm stop               # Stop all Docker services
 pnpm build              # Build all Docker images locally (docker-compose.build.yml)
 pnpm build:prod         # Build production images with registry tags (docker-compose.build.prod.yml)
@@ -55,7 +57,9 @@ pnpm monitor:generate   # Generate monitoring configs from template
 pnpm monitor:import     # Import configs to Uptime Kuma via API
 ```
 
-**Note**: Web app runs locally on your host machine (not in Docker). Start backend services with `pnpm start`, then run `pnpm start:web` in a separate terminal for the web dev server on port 3000.
+**Note**: Web app runs locally on your host machine (not in Docker). For full development:
+1. `pnpm dev` - Starts libraries + Docker services (recommended for active development)
+2. OR manually: `pnpm start:libs` + `pnpm start` + `pnpm start:web` in separate terminals
 
 ## Production Scripts
 
@@ -194,11 +198,21 @@ graph TD
 
 ### Recommended Development Flow
 
-1. Make code changes
-2. Run `pnpm lint:fix` to auto-fix issues
-3. Run `pnpm format` to ensure consistent formatting
-4. Test changes locally with `pnpm start` and `pnpm start:web`
-5. Commit and push changes
+**For active shared library development:**
+1. Run `pnpm dev` - starts all library watchers + Docker services
+2. Run `pnpm start:web` in separate terminal for web app
+3. Make changes to shared libraries - they auto-rebuild and containers restart
+4. Test changes across all services with hot reloading
+
+**For regular development:**
+1. Run `pnpm start` for Docker services
+2. Run `pnpm start:web` for web app  
+3. Make code changes and test
+
+**Before committing:**
+1. Run `pnpm lint:fix` to auto-fix issues
+2. Run `pnpm format` to ensure consistent formatting
+3. Commit and push changes
 
 ## Common Tasks
 

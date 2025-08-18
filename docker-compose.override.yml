@@ -6,41 +6,29 @@ services:
   api-server:
     volumes:
       - ./api:/app/api
-      - ./libs/@helpasaur/api-client:/app/libs/@helpasaur/api-client
-      - ./libs/twitch-api-client:/app/libs/twitch-api-client
-      - /app/api/node_modules
-      - /app/libs/@helpasaur/api-client/node_modules
-      - /app/libs/twitch-api-client/node_modules
+      - ./libs:/app/libs
 
   discord-bot:
     volumes:
       - ./discord:/app/discord
-      - ./libs/@helpasaur/api-client:/app/libs/@helpasaur/api-client
-      - /app/discord/node_modules
-      - /app/libs/@helpasaur/api-client/node_modules
+      - ./libs:/app/libs
 
   twitch-bot:
     volumes:
       - ./twitch:/app/twitch
-      - ./libs/@helpasaur/api-client:/app/libs/@helpasaur/api-client
-      - /app/twitch/node_modules
-      - /app/libs/@helpasaur/api-client/node_modules
+      - ./libs:/app/libs
 
   runnerwatcher:
     volumes:
       - ./runnerwatcher:/app/runnerwatcher
-      - ./libs/@helpasaur/api-client:/app/libs/@helpasaur/api-client
-      - ./libs/twitch-api-client:/app/libs/twitch-api-client
-      - /app/runnerwatcher/node_modules
-      - /app/libs/@helpasaur/api-client/node_modules
-      - /app/libs/twitch-api-client/node_modules
+      - ./libs:/app/libs
 
   racebot:
     volumes:
       - ./racebot:/app/racebot
-      - /app/racebot/node_modules
+      - ./libs:/app/libs
 
   ws-relay:
     volumes:
       - ./ws-relay:/app/ws-relay
-      - /app/ws-relay/node_modules
+      - ./libs:/app/libs
