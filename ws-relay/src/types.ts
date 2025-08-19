@@ -21,11 +21,6 @@ export interface CustomSocket extends Socket {
   }
 }
 
-// WebSocket client connection options
-export interface WebSocketClientOptions {
-  clientId: string
-}
-
 // WebSocket server health/statistics
 export interface WebSocketServerStats {
   status: "healthy" | "unhealthy"
