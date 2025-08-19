@@ -2,10 +2,7 @@ import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
 import { TwitchApiClient } from "twitch-api-client"
 import { Constants } from "../constants"
-import {
-  WatchedTwitchStream,
-  twitchStreamDataToWatchedTwitchStream,
-} from "../types/stream"
+import { WatchedTwitchStream } from "../types/stream"
 
 const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
 const {
@@ -84,13 +81,13 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Give us more control over this object
-      const stream: WatchedTwitchStream = twitchStreamDataToWatchedTwitchStream(
-        streamResult[0]
-      )
+      const stream: WatchedTwitchStream = {
+        ...streamResult[0],
+      }
 
       // Replace some stream data from API if this is an update event
       if (eventType === CHANNEL_UPDATE_EVENT) {
-        stream.gameId = event.category_id
+        stream.game_id = event.category_id
         stream.title = event.title
       }
 
@@ -105,7 +102,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Ensure stream is alttp
-      if (!this.config.alttpGameIds.includes(stream.gameId)) {
+      if (!this.config.alttpGameIds.includes(stream.game_id)) {
         console.log(`Not streaming configured game, skipping...`)
         return
       }
@@ -122,7 +119,7 @@ class RunnerWatcher extends EventEmitter {
 
       // See if this user has a stream in the cache already
       const cachedStreamForUser = cachedStreams.find(
-        (s) => s.userId === stream.userId
+        (s) => s.user_id === stream.user_id
       )
       console.log(
         cachedStreamForUser
@@ -131,7 +128,7 @@ class RunnerWatcher extends EventEmitter {
       )
 
       // Make sure it's been long enough since the last alert for this user
-      if (cachedStreamForUser) {
+      if (cachedStreamForUser && cachedStreamForUser.lastAlertedAt) {
         const secondsSinceLastAlert = Math.floor(
           (Date.now() - cachedStreamForUser.lastAlertedAt) / 1000
         )
@@ -192,7 +189,7 @@ class RunnerWatcher extends EventEmitter {
       this.emit("streamEvent", stream)
 
       // Remove any cached stream data for this user
-      cachedStreams = cachedStreams.filter((s) => s.userId !== stream.userId)
+      cachedStreams = cachedStreams.filter((s) => s.user_id !== stream.user_id)
 
       // Cache it
       stream.lastAlertedAt = Date.now()

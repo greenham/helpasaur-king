@@ -167,7 +167,7 @@ const readyEvent: DiscordEvent = {
             iconURL: "https://static.helpasaur.com/img/TwitchGlitchPurple.png",
           })
 
-        if (stream.eventType === STREAM_ONLINE_EVENT) {
+        if (stream.eventType === STREAM_ONLINE_EVENT && stream.thumbnail_url) {
           streamAlertEmbed.setImage(
             stream.thumbnail_url
               .replace("{width}", "1280")
