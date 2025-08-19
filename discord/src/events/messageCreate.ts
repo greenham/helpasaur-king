@@ -1,7 +1,7 @@
 import { EmbedBuilder, Message, MessageFlags } from "discord.js"
 import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
 import { defaultGuildConfig } from "../constants"
-import { DiscordEvent } from "../types/events"
+import { DiscordEvent } from "../types"
 
 let aliasList: string[] | undefined
 const cachedCommands = new Map<string, CachableCommand>()

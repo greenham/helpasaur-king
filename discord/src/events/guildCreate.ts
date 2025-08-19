@@ -1,6 +1,6 @@
 import { Guild } from "discord.js"
 import { defaultGuildConfig } from "../constants"
-import { DiscordEvent } from "../types/events"
+import { DiscordEvent } from "../types"
 
 const guildCreateEvent: DiscordEvent = {
   name: "guildCreate",

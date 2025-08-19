@@ -1,5 +1,11 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js"
+import {
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
+  Collection,
+  Client,
+} from "discord.js"
 import { HelpaApi } from "@helpasaur/api-client"
+import { DiscordConfig } from "./config"
 
 export interface DiscordEvent {
   name: string
@@ -12,4 +18,10 @@ export interface DiscordCommand {
   data: SlashCommandBuilder | any
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
   helpaApi?: HelpaApi
+}
+
+export interface ExtendedClient extends Client {
+  config: DiscordConfig
+  commands: Collection<string, DiscordCommand>
+  setRandomActivity: () => void
 }

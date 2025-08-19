@@ -1,5 +1,5 @@
 import { Guild } from "discord.js"
-import { DiscordEvent } from "../types/events"
+import { DiscordEvent } from "../types"
 
 const guildDeleteEvent: DiscordEvent = {
   name: "guildDelete",

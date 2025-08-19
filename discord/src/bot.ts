@@ -5,26 +5,13 @@ import {
   Events,
   GatewayIntentBits,
   Partials,
-  ChatInputCommandInteraction,
-  SlashCommandBuilder,
   MessageFlags,
 } from "discord.js"
 import * as fs from "node:fs"
 import * as path from "node:path"
 import { HelpaApi } from "@helpasaur/api-client"
 import { DiscordConfig } from "./types/config"
-
-interface DiscordCommand {
-  data: SlashCommandBuilder | any
-  execute: (interaction: ChatInputCommandInteraction) => Promise<void>
-  helpaApi?: HelpaApi
-}
-
-interface ExtendedClient extends Client {
-  config: DiscordConfig
-  commands: Collection<string, DiscordCommand>
-  setRandomActivity: () => void
-}
+import { DiscordCommand, ExtendedClient } from "./types"
 
 export class DiscordBot {
   public discordClient: ExtendedClient

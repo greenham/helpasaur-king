@@ -5,7 +5,7 @@ import {
   ChatInputCommandInteraction,
   MessageFlags,
 } from "discord.js"
-import { DiscordCommand } from "../types/events"
+import { DiscordCommand } from "../types"
 
 interface CommandConfig {
   typeFn: string

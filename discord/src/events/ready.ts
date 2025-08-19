@@ -1,12 +1,15 @@
-import { EmbedBuilder, Client, TextChannel } from "discord.js"
+import { EmbedBuilder, TextChannel } from "discord.js"
 import * as schedule from "node-schedule"
 import { io, Socket } from "socket.io-client"
-import { DiscordEvent } from "../types/events"
+import { DiscordEvent, ExtendedClient } from "../types"
+import {
+  name as packageName,
+  version as packageVersion,
+} from "../../package.json"
 
 const { WEBSOCKET_RELAY_SERVER } = process.env
 const STREAM_ONLINE_EVENT = "stream.online"
 const CHANNEL_UPDATE_EVENT = "channel.update"
-const packageJson = require("../../package.json")
 
 // @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304"
@@ -19,12 +22,12 @@ const WEEKLY_ALERT_MESSAGE =
 const readyEvent: DiscordEvent = {
   name: "ready",
   once: true,
-  execute(client: Client) {
+  execute(client: ExtendedClient) {
     console.log(`✅ Success! Logged in as ${client.user?.tag}`)
 
     // Connect to websocket relay to listen for events like stream alerts and race rooms
     const wsRelay: Socket = io(WEBSOCKET_RELAY_SERVER!, {
-      query: { clientId: `${packageJson.name} v${packageJson.version}` },
+      query: { clientId: `${packageName} v${packageVersion}` },
     })
     console.log(
       `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
@@ -110,9 +113,9 @@ const readyEvent: DiscordEvent = {
     ///////////////////////////////////////////////////////////////////////////
 
     // 2. Rotate activity
-    ;(client as any).setRandomActivity()
+    client.setRandomActivity()
     const activityRotateJob = schedule.scheduleJob({ minute: 0 }, () => {
-      ;(client as any).setRandomActivity()
+      client.setRandomActivity()
     })
     console.log(
       `Activity rotation scheduled for: ${activityRotateJob.nextInvocation()}`
