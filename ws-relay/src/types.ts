@@ -1,11 +1,12 @@
 import { Socket } from "socket.io"
 
 // WebSocket Relay Event Types
-export type RelayEvent =
-  | "streamAlert"
-  | "weeklyRaceRoomCreated"
-  | "joinChannel"
-  | "leaveChannel"
+export enum RelayEvent {
+  STREAM_ALERT = "streamAlert",
+  WEEKLY_RACE_ROOM_CREATED = "weeklyRaceRoomCreated",
+  JOIN_CHANNEL = "joinChannel",
+  LEAVE_CHANNEL = "leaveChannel",
+}
 
 // Relay Data structure for all events
 export interface RelayData<T = any> {

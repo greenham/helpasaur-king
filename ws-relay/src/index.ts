@@ -70,12 +70,6 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
 })
 
 const wss = new Server(httpServer)
-const relayEvents: RelayEvent[] = [
-  "streamAlert",
-  "weeklyRaceRoomCreated",
-  "joinChannel",
-  "leaveChannel",
-]
 
 wss.on("connection", (socket: Socket) => {
   const customSocket = socket as CustomSocket
@@ -91,7 +85,7 @@ wss.on("connection", (socket: Socket) => {
     )
   })
 
-  relayEvents.forEach((event) => {
+  Object.values(RelayEvent).forEach((event) => {
     socket.on(event, (data: any) => {
       console.log(`Received ${event} event:`, data)
       messagesRelayed++
