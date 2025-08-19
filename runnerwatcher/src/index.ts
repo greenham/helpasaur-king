@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client"
 import { HelpaApi, ServiceName } from "@helpasaur/api-client"
 import { RunnerWatcher } from "./lib/runner-watcher"
-import { RunnerWatcherConfig, StreamAlertPayload } from "./types"
+import { RunnerWatcherConfig, WatchedTwitchStream } from "./types"
 import { name as packageName, version as packageVersion } from "../package.json"
 
 const { WEBSOCKET_RELAY_SERVER } = process.env
@@ -32,7 +32,7 @@ async function init(): Promise<void> {
       console.log(`Connected! Socket ID: ${wsRelay.id}`)
     })
 
-    runnerwatcher.on("streamEvent", (data: StreamAlertPayload) => {
+    runnerwatcher.on("streamEvent", (data: WatchedTwitchStream) => {
       wsRelay.emit("streamAlert", data)
     })
   } catch (err) {
