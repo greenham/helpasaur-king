@@ -1,12 +1,14 @@
 import { Server, Socket } from "socket.io"
 import { createServer, IncomingMessage, ServerResponse } from "http"
 import ms from "ms"
-import { WebSocketRelayEvent, RelayData, WebSocketServerStats } from "./types"
-
-// Re-export types for other services to use
-export * from "./types"
-const packageJson = require("../package.json")
-const { WEBSOCKET_RELAY_SERVER_PORT } = process.env
+import {
+  RelayEvent,
+  RelayData,
+  WebSocketServerStats,
+  CustomSocket,
+} from "./types"
+import { version as packageVersion } from "../package.json"
+const { WEBSOCKET_RELAY_SERVER_PORT, SERVICE_NAME } = process.env
 
 // Track relay stats
 const startTime = Date.now()
@@ -14,13 +16,6 @@ let totalConnections = 0
 let currentConnections = 0
 let messagesRelayed = 0
 const eventCounts: Record<string, number> = {}
-
-// Extended Socket type to include custom data
-interface CustomSocket extends Socket {
-  data: {
-    clientId: string
-  }
-}
 
 // Create main WebSocket server with health endpoint
 const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -45,8 +40,8 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
     } else {
       const stats: WebSocketServerStats = {
         status: "healthy",
-        service: "ws-relay",
-        version: packageJson.version,
+        service: SERVICE_NAME || "ws-relay",
+        version: packageVersion,
         uptime: ms(uptimeMs, { long: true }),
         uptimeMs,
         connections: {
@@ -63,9 +58,7 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
               : "0/min",
         },
         port: WEBSOCKET_RELAY_SERVER_PORT || "3001",
-        environment:
-          (process.env.NODE_ENV as WebSocketServerStats["environment"]) ||
-          "development",
+        environment: process.env.NODE_ENV || "development",
       }
       res.end(JSON.stringify(stats))
     }
@@ -77,7 +70,7 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
 })
 
 const wss = new Server(httpServer)
-const relayEvents: WebSocketRelayEvent[] = [
+const relayEvents: RelayEvent[] = [
   "streamAlert",
   "weeklyRaceRoomCreated",
   "joinChannel",

@@ -1,5 +1,7 @@
+import { Socket } from "socket.io"
+
 // WebSocket Relay Event Types
-export type WebSocketRelayEvent =
+export type RelayEvent =
   | "streamAlert"
   | "weeklyRaceRoomCreated"
   | "joinChannel"
@@ -11,12 +13,19 @@ export interface RelayData<T = any> {
   source: string
 }
 
+// Extended Socket type to include custom data
+export interface CustomSocket extends Socket {
+  data: {
+    clientId: string
+  }
+}
+
 // WebSocket client connection options
 export interface WebSocketClientOptions {
   clientId: string
 }
 
-// WebSocket server statistics
+// WebSocket server health/statistics
 export interface WebSocketServerStats {
   status: "healthy" | "unhealthy"
   service: string
