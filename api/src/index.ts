@@ -6,13 +6,16 @@ import { io, Socket } from "socket.io-client"
 import cookieParser from "cookie-parser"
 import ms from "ms"
 import routes from "./routes"
-import { name as packageName, version as packageVersion } from "../package.json"
+import { config } from "./config"
 const {
-  MONGODB_URL,
-  PORT,
-  API_CORS_ORIGINS_WHITELIST,
-  WEBSOCKET_RELAY_SERVER,
-} = process.env
+  mongodbUrl,
+  port,
+  corsOriginsWhitelist,
+  websocketRelayServer,
+  nodeEnv,
+  packageName,
+  packageVersion,
+} = config
 
 // Track API stats
 const startTime = Date.now()
@@ -42,7 +45,7 @@ declare global {
   }
 }
 
-mongoose.connect(MONGODB_URL!)
+mongoose.connect(mongodbUrl)
 const database = mongoose.connection
 
 database.on("error", (error: Error) => {
@@ -54,11 +57,11 @@ database.once("connected", () => {
 })
 
 // Connect to websocket relay to communicate with other services
-const wsRelay = io(WEBSOCKET_RELAY_SERVER!, {
+const wsRelay = io(websocketRelayServer, {
   query: { clientId: `${packageName} v${packageVersion}` },
 })
 console.log(
-  `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
+  `Connecting to websocket relay server on port ${websocketRelayServer}...`
 )
 wsRelay.on("connect_error", (err: Error) => {
   console.log(`Connection error!`)
@@ -71,8 +74,7 @@ wsRelay.on("connect", () => {
 const app = express()
 
 // Only allow requests from whitelisted origins
-const originWhitelist = API_CORS_ORIGINS_WHITELIST!.split(",")
-app.use(cors({ origin: originWhitelist, credentials: true }))
+app.use(cors({ origin: corsOriginsWhitelist, credentials: true }))
 
 // Set up logging
 app.use(logger("short"))
@@ -105,7 +107,7 @@ app.get("/health", async (req: Request, res: Response) => {
           : "0%",
       dbConnected: database.readyState === 1,
       websocketConnected: wsRelay.connected,
-      environment: process.env.NODE_ENV || "development",
+      environment: nodeEnv,
     })
   } catch (error: any) {
     console.error("Health check error:", error)
@@ -130,8 +132,8 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
   }
 })
 
-app.listen(PORT, () => {
-  console.log(`Helpasaur API Server Started at ${PORT}`)
+app.listen(port, () => {
+  console.log(`Helpasaur API Server Started at ${port}`)
 })
 
 process.on("unhandledRejection", (error) => {

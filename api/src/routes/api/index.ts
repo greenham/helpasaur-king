@@ -4,7 +4,6 @@ import { requireJwtToken } from "../../lib/utils"
 import commandsRoutes from "./commands"
 import streamsRoutes from "./streams"
 import webRoutes from "./web"
-import publicRoutes from "./public"
 import meRoutes from "./me"
 import twitchRoutes from "./twitch"
 import discordRoutes from "./discord"
@@ -21,7 +20,6 @@ router.use(express.json())
 router.use("/commands", commandsRoutes)
 router.use("/streams", streamsRoutes)
 router.use("/web", webRoutes)
-router.use("/public", publicRoutes)
 
 // Authorized Endpoints
 router.use("/me", requireJwtToken, meRoutes)

@@ -5,44 +5,41 @@ import ms from "ms"
 import User from "../models/user"
 import { requireAuthKey, getUserTwitchApiClient } from "../lib/utils"
 import { sendSuccess, sendError } from "../lib/responseHelpers"
-
+import { config } from "../config"
 const {
-  CLIENT_POST_AUTH_REDIRECT_URL,
-  JWT_SECRET_KEY,
-  JWT_HEADER_COOKIE_NAME,
-  JWT_FOOTER_COOKIE_NAME,
-  API_HOST,
-  ALLOWED_SERVICES,
-  TWITCH_APP_CLIENT_ID,
-  TWITCH_APP_CLIENT_SECRET,
-} = process.env
+  clientPostAuthRedirectUrl,
+  jwtSecretKey,
+  jwtHeaderCookieName,
+  jwtFooterCookieName,
+  apiHost,
+  allowedServices,
+  twitchAppClientId,
+  twitchAppClientSecret,
+} = config
 
 const loginExpirationLength = "7d"
 const router: Router = express.Router()
 
 // Endpoint: GET /auth/twitch
 router.get(`/twitch`, async (req: Request, res: Response) => {
-  //const redirectPath = req.query.redirect || "/";
-  const redirectUrl = CLIENT_POST_AUTH_REDIRECT_URL // + redirectPath;
-
   // Validate authorization code from Twitch
   const authCode = (req.query.code as string) || false
   if (!authCode) {
-    return res.redirect(`${redirectUrl}?error=missing_code`)
+    return res.redirect(`${clientPostAuthRedirectUrl}?error=missing_code`)
   }
 
   if (!/^[a-z0-9]{30}$/.test(authCode)) {
-    return res.redirect(`${redirectUrl}?error=bad_code_format`)
+    return res.redirect(`${clientPostAuthRedirectUrl}?error=bad_code_format`)
   }
 
   // Get access and ID tokens from Twitch
   const requestUrl =
     "https://id.twitch.tv/oauth2/token" +
-    `?client_id=${TWITCH_APP_CLIENT_ID}` +
-    `&client_secret=${TWITCH_APP_CLIENT_SECRET}` +
+    `?client_id=${twitchAppClientId}` +
+    `&client_secret=${twitchAppClientSecret}` +
     `&code=${authCode}` +
     "&grant_type=authorization_code" +
-    `&redirect_uri=${`${API_HOST}/auth/twitch`}`
+    `&redirect_uri=${`${apiHost}/auth/twitch`}`
 
   const response = await axios.post(requestUrl)
 
@@ -51,7 +48,7 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
     !response.data ||
     !response.data.access_token
   ) {
-    return res.redirect(`${redirectUrl}?error=bad_response`)
+    return res.redirect(`${clientPostAuthRedirectUrl}?error=bad_response`)
   }
 
   const twitchAuthData = response.data
@@ -100,7 +97,7 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   // Issue a JWT with the user's permissions and ID
   const idToken = jwt.sign(
     { permissions: localUser.permissions },
-    JWT_SECRET_KEY!,
+    jwtSecretKey,
     {
       expiresIn: loginExpirationLength,
       subject: localUser._id.toString(),
@@ -117,16 +114,16 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   const signature = idParts[2]
   const maxAge = ms(loginExpirationLength)
 
-  res.cookie(JWT_HEADER_COOKIE_NAME!, headerAndPayload, {
+  res.cookie(jwtHeaderCookieName, headerAndPayload, {
     httpOnly: false,
     maxAge,
   })
-  res.cookie(JWT_FOOTER_COOKIE_NAME!, signature, {
+  res.cookie(jwtFooterCookieName, signature, {
     maxAge,
   })
 
   // Redirect to client
-  res.redirect(redirectUrl!)
+  res.redirect(clientPostAuthRedirectUrl)
 })
 
 // Endpoint: GET /auth/service
@@ -138,12 +135,12 @@ router.get(`/service`, requireAuthKey, async (req: Request, res: Response) => {
   if (!serviceName) {
     return sendError(res, "Missing service name", 400)
   }
-  if (!ALLOWED_SERVICES?.includes(serviceName)) {
+  if (!allowedServices.includes(serviceName)) {
     return sendError(res, "Invalid service name", 400)
   }
 
   // Issue a long-running JWT with the "service" permission and the service name as the subject
-  const idToken = jwt.sign({ permissions: ["service"] }, JWT_SECRET_KEY!, {
+  const idToken = jwt.sign({ permissions: ["service"] }, jwtSecretKey, {
     expiresIn: "365d",
     subject: serviceName,
   })
@@ -156,13 +153,13 @@ router.get(`/service`, requireAuthKey, async (req: Request, res: Response) => {
 // Endpoint: GET /auth/logout
 router.get(`/logout`, async (req: Request, res: Response) => {
   // Clear cookies
-  res.cookie(JWT_HEADER_COOKIE_NAME!, "")
-  res.cookie(JWT_FOOTER_COOKIE_NAME!, "")
+  res.cookie(jwtHeaderCookieName, "")
+  res.cookie(jwtFooterCookieName, "")
 
   const redirectPath = req.query.redirect || "/"
 
   // Redirect to client
-  res.redirect((CLIENT_POST_AUTH_REDIRECT_URL || "/") + redirectPath)
+  res.redirect((clientPostAuthRedirectUrl || "/") + redirectPath)
 })
 
 export default router

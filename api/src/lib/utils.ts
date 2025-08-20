@@ -2,17 +2,17 @@ import { Request, Response, NextFunction, RequestHandler } from "express"
 import { expressjwt as jwt } from "express-jwt"
 import User from "../models/user"
 import TwitchApiClient from "twitch-api-client"
-
+import { config } from "../config"
 const {
-  API_KEY,
-  JWT_SECRET_KEY,
-  JWT_HEADER_COOKIE_NAME,
-  JWT_FOOTER_COOKIE_NAME,
-  TWITCH_APP_CLIENT_ID,
-  TWITCH_APP_CLIENT_SECRET,
-  TWITCH_EVENTSUB_SECRET_KEY,
-  TWITCH_EVENTSUB_WEBHOOK_URL,
-} = process.env
+  apiKey,
+  jwtSecretKey,
+  jwtHeaderCookieName,
+  jwtFooterCookieName,
+  twitchAppClientId,
+  twitchAppClientSecret,
+  twitchEventsubSecretKey,
+  twitchEventsubWebhookUrl,
+} = config
 
 interface AuthenticatedRequest extends Request {
   user?: any
@@ -23,13 +23,13 @@ export const requireAuthKey = (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.get("Authorization") || req.get("Authorization") !== API_KEY)
+  if (!req.get("Authorization") || req.get("Authorization") !== apiKey)
     return res.sendStatus(401)
   next()
 }
 
 export const requireJwtToken: RequestHandler = jwt({
-  secret: JWT_SECRET_KEY!,
+  secret: jwtSecretKey!,
   algorithms: ["HS256"],
   getToken: (req: any) => {
     // check Authorization header for Bearer token first
@@ -38,8 +38,8 @@ export const requireJwtToken: RequestHandler = jwt({
       return authorizationHeader.split(" ")[1]
     } else {
       // try to re-form id token from cookies
-      const header = req.cookies[JWT_HEADER_COOKIE_NAME!]
-      const footer = req.cookies[JWT_FOOTER_COOKIE_NAME!]
+      const header = req.cookies[jwtHeaderCookieName]
+      const footer = req.cookies[jwtFooterCookieName]
       return [header, footer].join(".")
     }
   },
@@ -73,13 +73,13 @@ export const getRequestedChannel = async (
 
 export const getTwitchApiClient = () => {
   return new TwitchApiClient({
-    client_id: TWITCH_APP_CLIENT_ID!,
-    client_secret: TWITCH_APP_CLIENT_SECRET!,
+    client_id: twitchAppClientId,
+    client_secret: twitchAppClientSecret,
     eventSub:
-      TWITCH_EVENTSUB_SECRET_KEY && TWITCH_EVENTSUB_WEBHOOK_URL
+      twitchEventsubSecretKey && twitchEventsubWebhookUrl
         ? {
-            secret: TWITCH_EVENTSUB_SECRET_KEY,
-            webhookUrl: TWITCH_EVENTSUB_WEBHOOK_URL,
+            secret: twitchEventsubSecretKey,
+            webhookUrl: twitchEventsubWebhookUrl,
           }
         : undefined,
   })
@@ -90,8 +90,8 @@ export const getUserTwitchApiClient = (
   scopes: string[]
 ) => {
   return new TwitchApiClient({
-    client_id: TWITCH_APP_CLIENT_ID!,
-    client_secret: TWITCH_APP_CLIENT_SECRET!,
+    client_id: twitchAppClientId,
+    client_secret: twitchAppClientSecret,
     access_token: accessToken,
     scopes,
   })
