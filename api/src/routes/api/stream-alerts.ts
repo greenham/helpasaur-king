@@ -8,10 +8,7 @@ import {
   sendNoop,
   handleRouteError,
 } from "../../lib/responseHelpers"
-import {
-  TwitchUserData,
-  GetSubscriptionOptions,
-} from "twitch-api-client/src/types"
+import { TwitchUserData, GetSubscriptionOptions } from "twitch-api-client"
 
 const router: Router = express.Router()
 const permissionGuard = guard()

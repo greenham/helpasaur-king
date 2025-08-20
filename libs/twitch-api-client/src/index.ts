@@ -228,7 +228,9 @@ export class TwitchApiClient {
   }
 }
 
-// Re-export all types from @twurple/api
-export * from "@twurple/api"
-
+export {
+  HelixEventSubSubscriptionStatus,
+  HelixPaginatedStreamFilter,
+} from "@twurple/api"
+export * from "./types/index"
 export default TwitchApiClient
