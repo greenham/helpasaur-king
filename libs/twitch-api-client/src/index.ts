@@ -54,25 +54,34 @@ export class TwitchApiClient {
   async getSubscriptions(
     params?: GetSubscriptionOptions
   ): Promise<HelixEventSubSubscription[]> {
-    const subscriptions = await this.apiClient.eventSub.getSubscriptions()
+    let subscriptions
+
+    // Use the appropriate Twurple method based on params
+    if (params?.status) {
+      // Use getSubscriptionsForStatus when filtering by status
+      subscriptions = await this.apiClient.eventSub.getSubscriptionsForStatus(
+        params.status
+      )
+    } else if (params?.type) {
+      // Use getSubscriptionsForType when filtering by type
+      subscriptions = await this.apiClient.eventSub.getSubscriptionsForType(
+        params.type
+      )
+    } else if (params?.user_id) {
+      // Use getSubscriptionsForUser when filtering by user
+      subscriptions = await this.apiClient.eventSub.getSubscriptionsForUser(
+        params.user_id
+      )
+    } else {
+      // Get all subscriptions when no filters
+      subscriptions = await this.apiClient.eventSub.getSubscriptions()
+    }
+
     if (!subscriptions || !subscriptions.data) {
       return []
     }
 
-    // Filter based on params if provided
-    let subscriptionsData = subscriptions.data
-    if (params && params.status) {
-      subscriptionsData = subscriptionsData.filter(
-        (sub: HelixEventSubSubscription) => sub.status === params.status
-      )
-    }
-    if (params && params.type) {
-      subscriptionsData = subscriptionsData.filter(
-        (sub: HelixEventSubSubscription) => sub.type === params.type
-      )
-    }
-
-    return subscriptionsData
+    return subscriptions
   }
 
   async createSubscription(

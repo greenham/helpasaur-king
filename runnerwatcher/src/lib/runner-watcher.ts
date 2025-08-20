@@ -84,6 +84,7 @@ class RunnerWatcher extends EventEmitter {
       // Give us more control over this object
       const stream: WatchedTwitchStream = {
         ...streamResult[0],
+        eventType,
       }
 
       // Replace some stream data from API if this is an update event

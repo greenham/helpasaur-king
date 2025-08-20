@@ -54,6 +54,7 @@ export interface TwitchApiConfig {
 }
 
 export interface GetSubscriptionOptions {
-  status: HelixEventSubSubscriptionStatus
-  type: string
+  status?: HelixEventSubSubscriptionStatus
+  type?: string
+  user_id?: string
 }

@@ -8,7 +8,10 @@ import {
   sendNoop,
   handleRouteError,
 } from "../../lib/responseHelpers"
-import { HelixUser } from "twitch-api-client"
+import {
+  TwitchUserData,
+  GetSubscriptionOptions,
+} from "twitch-api-client/src/types"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -87,7 +90,7 @@ router.post(
       }
 
       // Query Twitch API for the user info by their login name
-      const userData: HelixUser | null =
+      const userData: TwitchUserData | null =
         await twitchApiClient.getUserByName(channel)
 
       if (!userData) {
@@ -182,7 +185,15 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const twitchApiClient = getTwitchApiClient()
-      const results = await twitchApiClient.getSubscriptions(req.query)
+      // Build options from query params
+      const options: GetSubscriptionOptions = {}
+      if (req.query.status) options.status = req.query.status as any
+      if (req.query.type) options.type = req.query.type as string
+      if (req.query.user_id) options.user_id = req.query.user_id as string
+
+      const results = await twitchApiClient.getSubscriptions(
+        Object.keys(options).length > 0 ? options : undefined
+      )
       sendSuccess(res, results)
     } catch (err: any) {
       handleRouteError(res, err, "get subscriptions")
@@ -234,7 +245,7 @@ router.post(
 
     const results = req.body.channels.map(async (channel: string) => {
       // Query Twitch API for the user info by their login name
-      const userData: HelixUser | null =
+      const userData: TwitchUserData | null =
         await twitchApiClient.getUserByName(channel)
       if (!userData) {
         return {
