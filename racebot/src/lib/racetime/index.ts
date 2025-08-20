@@ -1,7 +1,9 @@
 import axios, { AxiosError } from "axios"
 import WebSocket from "ws"
 import { NewRaceData } from "./types"
-const { RACETIME_BASE_URL, RACETIME_WSS_URL } = process.env
+import { config } from "../../config"
+
+const { racetimeBaseUrl, racetimeWssUrl } = config
 
 class RacetimeBot {
   accessToken: string
@@ -17,7 +19,7 @@ class RacetimeBot {
     console.log(`Requesting access token...`)
     const response = await axios({
       method: "POST",
-      url: `${RACETIME_BASE_URL}/o/token`,
+      url: `${racetimeBaseUrl}/o/token`,
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       data: {
         client_id: clientId,
@@ -33,7 +35,7 @@ class RacetimeBot {
     return new Promise((resolve, reject) => {
       const startRaceRequest = {
         method: "POST",
-        url: `${RACETIME_BASE_URL}/o/${gameCategorySlug}/startrace`,
+        url: `${racetimeBaseUrl}/o/${gameCategorySlug}/startrace`,
         data: raceData,
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
@@ -97,7 +99,7 @@ class RacetimeBot {
       // get websocket bot url via API
       console.log("Fetching race details...")
       axios
-        .get(`${RACETIME_BASE_URL}${raceRoomSlug}/data`)
+        .get(`${racetimeBaseUrl}${raceRoomSlug}/data`)
         .then((response) => {
           console.log("Race details:", response.data)
           const raceData = response.data
@@ -106,7 +108,7 @@ class RacetimeBot {
             reject("No websocket bot URL in response data")
           }
 
-          const raceRoomWebsocketUrl = `${RACETIME_WSS_URL}${raceData.websocket_bot_url}`
+          const raceRoomWebsocketUrl = `${racetimeWssUrl}${raceData.websocket_bot_url}`
           console.log("Connecting to websocket:", raceRoomWebsocketUrl)
           const wsRaceRoom: WebSocket = new WebSocket(
             `${raceRoomWebsocketUrl}?token=${this.accessToken}`

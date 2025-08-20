@@ -3,12 +3,15 @@ import ms from "ms"
 import { HelpaApi, ServiceName } from "@helpasaur/api-client"
 import { DiscordBot } from "./bot"
 import { DiscordConfig } from "./types/config"
-import { version as packageVersion } from "../package.json"
+import { config } from "./config"
+
+const { apiHost, apiKey, serviceName, discordHealthPort, packageVersion } =
+  config
 
 const helpaApiClient = new HelpaApi({
-  apiHost: process.env.API_HOST!,
-  apiKey: process.env.API_KEY!,
-  serviceName: process.env.SERVICE_NAME as ServiceName,
+  apiHost,
+  apiKey,
+  serviceName: serviceName as ServiceName,
 })
 
 async function init() {
@@ -29,7 +32,6 @@ async function init() {
     bot.discordClient.once("ready", () => {
       // Start health check server after bot is ready
       const healthApp = express()
-      const healthPort = process.env.DISCORD_HEALTH_PORT || 3010
 
       healthApp.get(
         "/health",
@@ -65,8 +67,10 @@ async function init() {
         }
       )
 
-      healthApp.listen(healthPort, () => {
-        console.log(`Health check endpoint available on port ${healthPort}`)
+      healthApp.listen(discordHealthPort, () => {
+        console.log(
+          `Health check endpoint available on port ${discordHealthPort}`
+        )
       })
     })
 

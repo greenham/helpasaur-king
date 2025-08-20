@@ -2,14 +2,21 @@ import { io, Socket } from "socket.io-client"
 import { HelpaApi, ServiceName } from "@helpasaur/api-client"
 import { RunnerWatcher } from "./lib/runner-watcher"
 import { RunnerWatcherConfig, WatchedTwitchStream } from "./types"
-import { name as packageName, version as packageVersion } from "../package.json"
+import { config } from "./config"
 
-const { WEBSOCKET_RELAY_SERVER } = process.env
+const {
+  apiHost,
+  apiKey,
+  serviceName,
+  websocketRelayServer,
+  packageName,
+  packageVersion,
+} = config
 
 const helpaApi = new HelpaApi({
-  apiHost: process.env.API_HOST!,
-  apiKey: process.env.API_KEY!,
-  serviceName: process.env.SERVICE_NAME as ServiceName,
+  apiHost,
+  apiKey,
+  serviceName: serviceName as ServiceName,
 })
 
 async function init(): Promise<void> {
@@ -17,12 +24,12 @@ async function init(): Promise<void> {
     const config = await helpaApi.getServiceConfig()
     const runnerWatcherConfig = config.config as RunnerWatcherConfig
     const runnerwatcher = new RunnerWatcher(runnerWatcherConfig)
-    const wsRelay: Socket = io(WEBSOCKET_RELAY_SERVER!, {
+    const wsRelay: Socket = io(websocketRelayServer, {
       query: { clientId: `${packageName} v${packageVersion}` },
     })
 
     console.log(
-      `Connecting to websocket relay server: ${WEBSOCKET_RELAY_SERVER}...`
+      `Connecting to websocket relay server: ${websocketRelayServer}...`
     )
     wsRelay.on("connect_error", (err: Error) => {
       console.log(`Connection error!`)

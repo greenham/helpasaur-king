@@ -3,8 +3,9 @@ import { TwitchEventListener } from "./twitch-event-listener"
 import { TwitchApiClient } from "twitch-api-client"
 import { Constants } from "../constants"
 import { WatchedTwitchStream } from "../types/stream"
+import { config } from "../config"
 
-const { TWITCH_WEBHOOK_LISTENER_PORT } = process.env
+const { twitchWebhookListenerPort } = config
 const {
   STREAM_ONLINE_EVENT,
   CHANNEL_UPDATE_EVENT,
@@ -37,7 +38,7 @@ class RunnerWatcher extends EventEmitter {
   }
 
   init(): void {
-    this.listener.listen(parseInt(TWITCH_WEBHOOK_LISTENER_PORT || "3010", 10))
+    this.listener.listen(twitchWebhookListenerPort)
 
     this.listener.on("notification", async (notification: any) => {
       console.log("\r\n-------------------------------------\r\n")

@@ -2,12 +2,21 @@ import express from "express"
 import { HelpaApi, ServiceName } from "@helpasaur/api-client"
 import { TwitchBotConfig } from "./types"
 import { TwitchBot } from "./bot"
-import { version as packageVersion } from "../package.json"
+import { config } from "./config"
+
+const {
+  apiHost,
+  apiKey,
+  serviceName,
+  twitchHealthPort,
+  packageVersion,
+  nodeEnv,
+} = config
 
 const helpaApiClient = new HelpaApi({
-  apiHost: process.env.API_HOST!,
-  apiKey: process.env.API_KEY!,
-  serviceName: process.env.SERVICE_NAME as ServiceName,
+  apiHost,
+  apiKey,
+  serviceName: serviceName as ServiceName,
 })
 
 export const DEFAULT_COMMAND_PREFIX = "!"
@@ -33,7 +42,6 @@ async function init() {
 
     // Start health check server
     const healthApp = express()
-    const healthPort = process.env.TWITCH_HEALTH_PORT || 3011
 
     healthApp.get("/health", (_req: express.Request, res: express.Response) => {
       try {
@@ -44,7 +52,7 @@ async function init() {
           channelCount: bot.channelList ? bot.channelList.length : 0,
           commandPrefix: bot.config?.cmdPrefix || DEFAULT_COMMAND_PREFIX,
           username: bot.config.username || "unknown",
-          environment: process.env.NODE_ENV || "development",
+          environment: nodeEnv,
         })
       } catch (error: any) {
         console.error("Health check error:", error)
@@ -56,8 +64,8 @@ async function init() {
       }
     })
 
-    healthApp.listen(healthPort, () => {
-      console.log(`Health check endpoint available on port ${healthPort}`)
+    healthApp.listen(twitchHealthPort, () => {
+      console.log(`Health check endpoint available on port ${twitchHealthPort}`)
     })
   } catch (error: any) {
     console.error("🛑 Error starting Twitch bot:", error.message)

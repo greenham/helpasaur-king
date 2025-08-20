@@ -7,8 +7,10 @@ import {
   WebSocketServerStats,
   CustomSocket,
 } from "./types"
-import { version as packageVersion } from "../package.json"
-const { WEBSOCKET_RELAY_SERVER_PORT, SERVICE_NAME } = process.env
+import { config } from "./config"
+
+const { websocketRelayServerPort, serviceName, packageVersion, nodeEnv } =
+  config
 
 // Track relay stats
 const startTime = Date.now()
@@ -40,7 +42,7 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
     } else {
       const stats: WebSocketServerStats = {
         status: "healthy",
-        service: SERVICE_NAME || "ws-relay",
+        service: serviceName,
         version: packageVersion,
         uptime: ms(uptimeMs, { long: true }),
         uptimeMs,
@@ -57,8 +59,8 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
               ? `${(messagesRelayed / (uptimeMs / 1000 / 60)).toFixed(2)}/min`
               : "0/min",
         },
-        port: WEBSOCKET_RELAY_SERVER_PORT || "3001",
-        environment: process.env.NODE_ENV || "development",
+        port: websocketRelayServerPort,
+        environment: nodeEnv,
       }
       res.end(JSON.stringify(stats))
     }
@@ -99,7 +101,7 @@ wss.on("connection", (socket: Socket) => {
   })
 })
 
-const port = WEBSOCKET_RELAY_SERVER_PORT || 3001
+const port = websocketRelayServerPort
 httpServer.listen(port)
 
 console.log(`Websocket relay server listening on port ${port}`)

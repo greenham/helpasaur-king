@@ -5,27 +5,21 @@ import WebSocket from "ws"
 import express from "express"
 import RacetimeBot from "./lib/racetime"
 import * as Racetime from "./lib/racetime/types"
-import packageJson from "../package.json"
+import { config } from "./config"
 
-const requiredEnvVariables = [
-  "WEBSOCKET_RELAY_SERVER",
-  "RACETIME_BASE_URL",
-  "RACETIME_WSS_URL",
-  "RACETIME_BOT_CLIENT_ID",
-  "RACETIME_BOT_CLIENT_SECRET",
-  "RACETIME_GAME_CATEGORY_SLUG_Z3",
-]
-
-const config: { [key: string]: any } = {}
-
-// Extract values from process.env and check for existence
-requiredEnvVariables.forEach((variable) => {
-  if (!process.env[variable]) {
-    console.error(`Required environment variable ${variable} is not set!`)
-    process.exit(1)
-  }
-  config[variable] = process.env[variable]
-})
+const {
+  packageName,
+  packageVersion,
+  websocketRelayServer,
+  racetimeBaseUrl,
+  racetimeWssUrl,
+  racetimeBotClientId,
+  racetimeBotClientSecret,
+  racetimeGameCategorySlugZ3,
+  racebotHealthPort,
+  nodeEnv,
+  isProduction,
+} = config
 
 const nmgGoal = "Any% NMG"
 const weeklyRaceInfoUser = "Weekly Community Race - Starts at 3PM Eastern"
@@ -49,11 +43,10 @@ const timeToSchedule = {
 ////////////////////////////
 
 // Connect to websocket relay so we can forward events to other services and listen for commands
-const wsRelayServer = String(config.WEBSOCKET_RELAY_SERVER)
-const wsRelay = io(wsRelayServer, {
-  query: { clientId: `${packageJson.name} ${packageJson.version}` },
+const wsRelay = io(websocketRelayServer, {
+  query: { clientId: `${packageName} ${packageVersion}` },
 })
-console.log(`Connecting to websocket relay server: ${wsRelayServer}...`)
+console.log(`Connecting to websocket relay server: ${websocketRelayServer}...`)
 wsRelay.on("connect_error", (err) => {
   console.log(`Connection error!`)
   console.log(err)
@@ -82,10 +75,7 @@ const createRaceRoom = (
   raceData: Racetime.NewRaceData
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    RacetimeBot.initialize(
-      config.RACETIME_BOT_CLIENT_ID,
-      config.RACETIME_BOT_CLIENT_SECRET
-    )
+    RacetimeBot.initialize(racetimeBotClientId, racetimeBotClientSecret)
       .then((racebot) => racebot.startRace(game, raceData))
       .then(resolve)
       .catch((error: any) => {
@@ -97,10 +87,7 @@ const createRaceRoom = (
 
 const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
   return new Promise((resolve, reject) => {
-    RacetimeBot.initialize(
-      config.RACETIME_BOT_CLIENT_ID,
-      config.RACETIME_BOT_CLIENT_SECRET
-    )
+    RacetimeBot.initialize(racetimeBotClientId, racetimeBotClientSecret)
       .then((racebot) => racebot.connectToRaceRoom(raceRoomSlug))
       .then(resolve)
       .catch((error) => {
@@ -112,7 +99,7 @@ const listenToRaceRoom = (raceRoomSlug: string): Promise<WebSocket> => {
 
 const scheduleWeeklyRace = () => {
   const weeklyRaceJob = schedule.scheduleJob(timeToSchedule, () => {
-    if (process.env.NODE_ENV !== "production") {
+    if (!isProduction) {
       console.log(
         `[${new Date().toISOString()}] Weekly race job triggered - skipping race room creation in non-production environment`
       )
@@ -122,12 +109,12 @@ const scheduleWeeklyRace = () => {
     let weeklyRaceRoomSlug = ""
 
     console.log(`Creating weekly race room...`)
-    createRaceRoom(config.RACETIME_GAME_CATEGORY_SLUG_Z3, weeklyRaceData)
+    createRaceRoom(racetimeGameCategorySlugZ3, weeklyRaceData)
       .then((slug) => {
         weeklyRaceRoomSlug = slug
         // Assemble event data to push to the relay (for discord, etc.)
         const raceData = {
-          raceRoomUrl: `${config.RACETIME_BASE_URL}${slug}`,
+          raceRoomUrl: `${racetimeBaseUrl}${slug}`,
           startTimestamp: Math.floor(
             (Date.now() + weeklyRaceStartOffsetSeconds * 1000) / 1000
           ),
@@ -216,16 +203,14 @@ const scheduleWeeklyRace = () => {
 
   // Start health check server
   const healthApp = express()
-  const healthPort = process.env.RACEBOT_HEALTH_PORT || 3012
-
   healthApp.get("/health", (_req, res) => {
     try {
       res.status(200).json({
         status: "healthy",
         service: "racebot",
-        version: packageJson.version,
+        version: packageVersion,
         wsRelayConnected: wsRelay.connected,
-        environment: process.env.NODE_ENV,
+        environment: nodeEnv,
         schedulerActive: weeklyRaceJob !== null,
         nextRace: weeklyRaceJob?.nextInvocation() || null,
       })
@@ -239,8 +224,8 @@ const scheduleWeeklyRace = () => {
     }
   })
 
-  healthApp.listen(healthPort, () => {
-    console.log(`Health check endpoint available on port ${healthPort}`)
+  healthApp.listen(racebotHealthPort, () => {
+    console.log(`Health check endpoint available on port ${racebotHealthPort}`)
   })
 }
 

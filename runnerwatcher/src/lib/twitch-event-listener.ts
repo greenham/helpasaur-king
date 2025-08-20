@@ -3,9 +3,14 @@ import * as crypto from "crypto"
 import { EventEmitter } from "events"
 import ms from "ms"
 import { Constants } from "../constants"
-import { version as packageVersion } from "../../package.json"
+import { config } from "../config"
 
-const { TWITCH_EVENTSUB_SECRET_KEY } = process.env
+const {
+  twitchEventsubSecretKey,
+  packageVersion,
+  nodeEnv,
+  twitchEventsubWebhookUrl,
+} = config
 
 const {
   TWITCH_MESSAGE_ID,
@@ -49,8 +54,8 @@ export class TwitchEventListener extends EventEmitter {
           uptime: uptimeMs ? ms(uptimeMs, { long: true }) : "0 ms",
           uptimeMs, // keep raw ms for monitoring tools
           eventsReceived: this.eventsReceived,
-          environment: process.env.NODE_ENV || "development",
-          webhookConfigured: !!process.env.TWITCH_EVENTSUB_WEBHOOK_URL, // just boolean, not the actual URL
+          environment: nodeEnv,
+          webhookConfigured: !!twitchEventsubWebhookUrl, // just boolean, not the actual URL
         })
       } catch (error: any) {
         console.error("Health check error:", error)
@@ -120,7 +125,7 @@ export class TwitchEventListener extends EventEmitter {
   ): string {
     const message = messageId + messageTimestamp + body
     const signature = crypto
-      .createHmac("sha256", TWITCH_EVENTSUB_SECRET_KEY!)
+      .createHmac("sha256", twitchEventsubSecretKey)
       .update(message)
       .digest("hex")
     return `sha256=${signature}`

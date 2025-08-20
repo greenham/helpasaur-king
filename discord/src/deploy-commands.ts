@@ -2,11 +2,14 @@ import { REST, Routes } from "discord.js"
 import * as fs from "node:fs"
 import * as path from "node:path"
 import { HelpaApi, ServiceName } from "@helpasaur/api-client"
+import { config } from "./config"
+
+const { apiHost, apiKey, serviceName } = config
 
 const helpaApiClient = new HelpaApi({
-  apiHost: process.env.API_HOST!,
-  apiKey: process.env.API_KEY!,
-  serviceName: process.env.SERVICE_NAME as ServiceName,
+  apiHost,
+  apiKey,
+  serviceName: serviceName as ServiceName,
 })
 
 helpaApiClient

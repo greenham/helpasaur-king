@@ -38,6 +38,6 @@ export interface WebSocketServerStats {
     byEvent: Record<string, number>
     rate: string
   }
-  port: string
+  port: number
   environment: string
 }
