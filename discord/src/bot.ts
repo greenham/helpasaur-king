@@ -84,11 +84,16 @@ export class DiscordBot {
     for (const file of eventFiles) {
       const filePath = path.join(eventsPath, file)
       const event: any = require(filePath)
-      event.helpaApi = this.helpaApi
-      if (event.once) {
-        this.discordClient.once(event.name, (...args) => event.execute(...args))
+      // Create a new object with helpaApi instead of mutating the imported one
+      const eventWithApi = { ...event, helpaApi: this.helpaApi }
+      if (eventWithApi.once) {
+        this.discordClient.once(eventWithApi.name, (...args) =>
+          eventWithApi.execute(...args)
+        )
       } else {
-        this.discordClient.on(event.name, (...args) => event.execute(...args))
+        this.discordClient.on(eventWithApi.name, (...args) =>
+          eventWithApi.execute(...args)
+        )
       }
     }
   }
@@ -103,10 +108,14 @@ export class DiscordBot {
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file)
       const command: DiscordCommand = require(filePath)
-      command.helpaApi = this.helpaApi
+      // Create a new object with helpaApi instead of mutating the imported one
+      const commandWithApi = { ...command, helpaApi: this.helpaApi }
       // Set a new item in the Collection with the key as the command name and the value as the exported module
-      if ("data" in command && "execute" in command) {
-        this.discordClient.commands.set(command.data.name, command)
+      if ("data" in commandWithApi && "execute" in commandWithApi) {
+        this.discordClient.commands.set(
+          commandWithApi.data.name,
+          commandWithApi
+        )
       } else {
         console.log(
           `⚠ The command at ${filePath} is missing a required "data" or "execute" property.`
