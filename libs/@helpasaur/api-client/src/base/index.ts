@@ -62,7 +62,10 @@ export abstract class ApiBase {
    * @param data - The data to send in the request body
    * @returns Promise with the data from the response or void
    */
-  protected async apiPost<T = void>(endpoint: string, data: any): Promise<T> {
+  protected async apiPost<T = void>(
+    endpoint: string,
+    data: unknown
+  ): Promise<T> {
     const response = await this.api.post(endpoint, data)
     return this.handleResponse(response)
   }
@@ -73,7 +76,10 @@ export abstract class ApiBase {
    * @param data - The data to send in the request body
    * @returns Promise with the data from the response or void
    */
-  protected async apiPatch<T = void>(endpoint: string, data: any): Promise<T> {
+  protected async apiPatch<T = void>(
+    endpoint: string,
+    data: unknown
+  ): Promise<T> {
     const response = await this.api.patch(endpoint, data)
     return this.handleResponse(response)
   }
@@ -84,7 +90,7 @@ export abstract class ApiBase {
    * @param data - Optional data to send in the request body
    * @returns Promise with void
    */
-  protected async apiDelete(endpoint: string, data?: any): Promise<void> {
+  protected async apiDelete(endpoint: string, data?: unknown): Promise<void> {
     const response = await this.api.delete(
       endpoint,
       data ? { data } : undefined

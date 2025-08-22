@@ -43,10 +43,15 @@ const messageCreateEvent: DiscordEvent<"messageCreate"> = {
       return
     }
 
+    if (!this.helpaApi) {
+      console.error("helpaApi not initialized in messageCreate event")
+      return
+    }
+
     const command = await getCachedCommand(
       commandNoPrefix,
       cachedCommands,
-      this.helpaApi!
+      this.helpaApi
     )
 
     if (!command) return

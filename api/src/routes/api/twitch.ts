@@ -27,7 +27,8 @@ router.get(
       })) as IUserDocument[]
       const channels = users
         .filter((u) => u.twitchUserData?.login)
-        .map((u) => u.twitchUserData!.login)
+        .map((u) => u.twitchUserData?.login)
+        .filter((login): login is string => login !== undefined)
         .sort()
       sendSuccess(res, channels)
     } catch (err) {

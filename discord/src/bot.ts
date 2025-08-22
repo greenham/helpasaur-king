@@ -38,10 +38,12 @@ export class DiscordBot {
 
       const activity = activities[Math.floor(Math.random() * activities.length)]
       console.log(`Setting Discord activity to: ${activity}`)
-      this.discordClient.user!.setActivity(activity, {
-        type: ActivityType.Streaming,
-        url: `https://twitch.tv/helpasaurking`,
-      })
+      if (this.discordClient.user) {
+        this.discordClient.user.setActivity(activity, {
+          type: ActivityType.Streaming,
+          url: `https://twitch.tv/helpasaurking`,
+        })
+      }
     }
 
     this.helpaApi = helpaApi
@@ -64,14 +66,14 @@ export class DiscordBot {
   refreshConfig(): void {
     this.helpaApi
       .getServiceConfig()
-      .then((config: any) => {
+      .then((config) => {
         if (!config || !config.config) {
           throw new Error(`Unable to refresh service config from API!`)
         }
 
-        this.discordClient.config = config.config as DiscordConfig
+        this.discordClient.config = config.config as unknown as DiscordConfig
       })
-      .catch((error: any) => {
+      .catch((error: Error) => {
         console.error("🛑 Error refreshing service config:", error)
       })
   }
@@ -85,7 +87,11 @@ export class DiscordBot {
 
     for (const file of eventFiles) {
       const filePath = path.join(eventsPath, file)
-      const event: any = require(filePath)
+      const event = require(filePath) as {
+        name: string
+        once?: boolean
+        execute: (...args: unknown[]) => void | Promise<void>
+      }
       // Create a new object with helpaApi instead of mutating the imported one
       const eventWithApi = { ...event, helpaApi: this.helpaApi }
       if (eventWithApi.once) {

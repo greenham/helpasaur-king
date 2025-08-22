@@ -69,7 +69,7 @@ export class HelpaApi {
     axiosRetry(this.api, {
       retries: 20,
       retryDelay: () => 10000,
-      onRetry: (retryCount: number, error: AxiosError, requestConfig: any) => {
+      onRetry: (retryCount: number, error: AxiosError, requestConfig) => {
         console.log(`🔴 API Request Error:`, error.toString())
         console.log(
           `🔁 Retrying call to ${requestConfig.url} (attempt #${retryCount})`
@@ -122,8 +122,9 @@ export class HelpaApi {
       }
 
       throw new Error(response.data.message || "Authorization failed")
-    } catch (err: any) {
-      console.error(`🔴 Error authorizing service: ${err.message}`)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error"
+      console.error(`🔴 Error authorizing service: ${errorMessage}`)
       return false
     }
   }
@@ -157,8 +158,9 @@ export class HelpaApi {
       }
 
       throw new Error(response.data.message || "Failed to get service config")
-    } catch (err: any) {
-      throw new Error(`🔴 Error fetching service config: ${err.message}`)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error"
+      throw new Error(`🔴 Error fetching service config: ${errorMessage}`)
     }
   }
 }

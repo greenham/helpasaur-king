@@ -1,8 +1,10 @@
 import { io, Socket } from "socket.io-client"
 import * as tmi from "tmi.js"
 import * as crypto from "crypto"
+import { AxiosError } from "axios"
 import { HelpaApi } from "@helpasaur/api-client"
 import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
+import { ActiveChannel } from "@helpasaur/types"
 import { TwitchBotConfig } from "./types"
 import { version as packageVersion, name as packageName } from "../package.json"
 import { DEFAULT_COMMAND_PREFIX } from "."
@@ -18,8 +20,8 @@ export class TwitchBot {
   messages: { onJoin: string; onLeave: string }
   lastRandomRoomMap: Map<string, string>
   channelList: string[] = []
-  activeChannels: any[] = []
-  channelMap: Map<string, any> = new Map()
+  activeChannels: ActiveChannel[] = []
+  channelMap: Map<string, ActiveChannel> = new Map()
   constructor(config: TwitchBotConfig, helpaApi: HelpaApi, channels: string[]) {
     this.config = config
     this.helpaApi = helpaApi
@@ -43,7 +45,7 @@ export class TwitchBot {
         password: this.config.oauth,
       },
       channels: this.channelList,
-    } as any)
+    })
 
     this.wsRelay = this.connectToRelay()
   }
@@ -142,16 +144,21 @@ export class TwitchBot {
               await this.helpaApi.twitch.joinTwitchChannel(channelToJoin)
 
             if (result.twitchBotConfig?.roomId) {
+              // Create an ActiveChannel object with the channel info we have
+              const activeChannel: ActiveChannel = {
+                ...result.twitchBotConfig,
+                roomId: result.twitchBotConfig.roomId,
+                channelName: channelToJoin,
+                displayName: channelToJoin, // We don't have the display name, so use the channel name
+              }
               // update the local map with the new channel config
-              this.channelMap.set(
-                result.twitchBotConfig.roomId,
-                result.twitchBotConfig
-              )
+              this.channelMap.set(result.twitchBotConfig.roomId, activeChannel)
             }
 
             console.log(`Result of /api/twitch/join: ${JSON.stringify(result)}`)
-          } catch (err: any) {
-            console.error(`Error calling /api/twitch/join: ${err.message}`)
+          } catch (err) {
+            const error = err as Error
+            console.error(`Error calling /api/twitch/join: ${error.message}`)
           }
           break
         }
@@ -197,8 +204,9 @@ export class TwitchBot {
             console.log(
               `Result of /api/twitch/leave: ${JSON.stringify(result)}`
             )
-          } catch (err: any) {
-            console.error(`Error calling /api/twitch/leave: ${err.message}`)
+          } catch (err) {
+            const error = err as Error
+            console.error(`Error calling /api/twitch/leave: ${error.message}`)
           }
           break
         }
@@ -692,34 +700,35 @@ export class TwitchBot {
   }
 
   handleApiError(
-    err: any,
+    err: unknown,
     errorMessageBase: string,
     channel: string,
-    tags: any,
+    tags: Record<string, unknown>,
     statusErrors: { [key: number]: string } | null = null
   ) {
     console.error(errorMessageBase)
-    if (err.response) {
+    const error = err as AxiosError<{ message: string }>
+    if (error.response) {
       console.error(
-        `${err.response.status} Error: ${err.response.data.message}`
+        `${error.response.status} Error: ${error.response.data.message}`
       )
 
-      if (statusErrors && statusErrors[err.response.status]) {
+      if (statusErrors && statusErrors[error.response.status]) {
         this.bot
           .say(
             channel,
-            `@${tags["display-name"]} >> ${statusErrors[err.response.status]}`
+            `@${tags["display-name"]} >> ${statusErrors[error.response.status]}`
           )
           .catch(console.error)
       } else {
         this.bot
           .say(
             channel,
-            `@${tags["display-name"]} >> ${err.response.status} ${errorMessageBase}: ${err.response.data.message}`
+            `@${tags["display-name"]} >> ${error.response.status} ${errorMessageBase}: ${error.response.data.message}`
           )
           .catch(console.error)
       }
-    } else if (err.request) {
+    } else if (error.request) {
       console.error("No response received from API!")
       this.bot
         .say(
@@ -728,11 +737,11 @@ export class TwitchBot {
         )
         .catch(console.error)
     } else {
-      console.error(`Error during request setup: ${err.message}`)
+      console.error(`Error during request setup: ${error.message}`)
       this.bot
         .say(
           channel,
-          `@${tags["display-name"]} >> ${errorMessageBase}: ${err.message}`
+          `@${tags["display-name"]} >> ${errorMessageBase}: ${error.message}`
         )
         .catch(console.error)
     }

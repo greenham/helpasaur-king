@@ -331,6 +331,9 @@ importers:
       '@helpasaur/bot-common':
         specifier: workspace:*
         version: link:../libs/@helpasaur/bot-common
+      '@helpasaur/types':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/types
       express:
         specifier: ^4.19.2
         version: 4.21.2

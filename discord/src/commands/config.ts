@@ -263,8 +263,15 @@ const configCommand: DiscordCommand = {
       guildConfigKey
     ] = newValue
 
+    if (!interaction.guildId) {
+      await interaction.editReply({
+        content: "This command can only be used in a guild!",
+      })
+      return
+    }
+
     await this.helpaApi?.discord.updateGuildConfig(
-      interaction.guildId!,
+      interaction.guildId,
       guildUpdate
     )
     await interaction.editReply({

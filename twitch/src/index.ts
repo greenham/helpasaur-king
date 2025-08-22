@@ -54,12 +54,12 @@ async function init() {
           username: bot.config.username || "unknown",
           environment: nodeEnv,
         })
-      } catch (error: any) {
+      } catch (error) {
         console.error("Health check error:", error)
         res.status(503).json({
           status: "unhealthy",
           service: "twitch",
-          error: error.message,
+          error: error instanceof Error ? error.message : "Unknown error",
         })
       }
     })
@@ -67,8 +67,10 @@ async function init() {
     healthApp.listen(twitchHealthPort, () => {
       console.log(`Health check endpoint available on port ${twitchHealthPort}`)
     })
-  } catch (error: any) {
-    console.error("🛑 Error starting Twitch bot:", error.message)
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error"
+    console.error("🛑 Error starting Twitch bot:", errorMessage)
     process.exit(1)
   }
 }
