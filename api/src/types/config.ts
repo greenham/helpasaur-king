@@ -69,15 +69,18 @@ export function isValidConfigDoc<K extends ConfigTypeKey>(
 ): configDoc is {
   config: ConfigTypeMap[K]
   markModified: (path: string) => void
-  save: () => Promise<any>
+  save: () => Promise<unknown>
 } {
-  return (
-    typeof configDoc === "object" &&
-    configDoc !== null &&
-    "config" in configDoc &&
-    typeof (configDoc as any).config === "object" &&
-    (configDoc as any).config !== null
-  )
+  if (
+    typeof configDoc !== "object" ||
+    configDoc === null ||
+    !("config" in configDoc)
+  ) {
+    return false
+  }
+
+  const doc = configDoc as Record<string, unknown>
+  return typeof doc.config === "object" && doc.config !== null
 }
 
 // Generic config fetcher that handles DB lookup, validation, and extraction
@@ -93,10 +96,16 @@ export async function getConfig<K extends ConfigTypeKey>(
   return configDoc.config as ConfigTypeMap[K]
 }
 
+// Document interface for config documents
+interface ConfigDoc {
+  markModified: (path: string) => void
+  save: () => Promise<unknown>
+}
+
 // Get config with document for cases where we need to save changes
 export async function getConfigWithDoc<K extends ConfigTypeKey>(
   configId: K
-): Promise<{ config: ConfigTypeMap[K]; doc: any } | null> {
+): Promise<{ config: ConfigTypeMap[K]; doc: ConfigDoc } | null> {
   const configDoc = await Config.findOne({ id: configId })
 
   if (!isValidConfigDoc<K>(configDoc)) {

@@ -84,20 +84,23 @@ router.post(
         err &&
         typeof err === "object" &&
         "name" in err &&
-        err.name === "ValidationError"
+        err.name === "ValidationError" &&
+        "errors" in err
       ) {
-        const mongoErr = err as any // MongoDB validation error
-        const validationErrors = Object.values(mongoErr.errors).map(
-          (error: any) => {
-            if (error.path === "command") {
-              return "Command name is required"
-            }
-            if (error.path === "response") {
-              return "Command response is required"
-            }
-            return error.message
+        interface ValidationError {
+          path: string
+          message: string
+        }
+        const mongoErr = err as { errors: Record<string, ValidationError> }
+        const validationErrors = Object.values(mongoErr.errors).map((error) => {
+          if (error.path === "command") {
+            return "Command name is required"
           }
-        )
+          if (error.path === "response") {
+            return "Command response is required"
+          }
+          return error.message
+        })
         return sendError(res, validationErrors.join(", "), 400)
       }
       handleRouteError(res, err, "create command")
@@ -143,20 +146,23 @@ router.patch(
         err &&
         typeof err === "object" &&
         "name" in err &&
-        err.name === "ValidationError"
+        err.name === "ValidationError" &&
+        "errors" in err
       ) {
-        const mongoErr = err as any // MongoDB validation error
-        const validationErrors = Object.values(mongoErr.errors).map(
-          (error: any) => {
-            if (error.path === "command") {
-              return "Command name is required"
-            }
-            if (error.path === "response") {
-              return "Command response is required"
-            }
-            return error.message
+        interface ValidationError {
+          path: string
+          message: string
+        }
+        const mongoErr = err as { errors: Record<string, ValidationError> }
+        const validationErrors = Object.values(mongoErr.errors).map((error) => {
+          if (error.path === "command") {
+            return "Command name is required"
           }
-        )
+          if (error.path === "response") {
+            return "Command response is required"
+          }
+          return error.message
+        })
         return sendError(res, validationErrors.join(", "), 400)
       }
       handleRouteError(res, err, "update command")

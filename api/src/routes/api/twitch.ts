@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import User from "../../models/user"
+import { IUserDocument } from "../../types/models"
 import { getRequestedChannel, getTwitchApiClient } from "../../lib/utils"
 import {
   sendSuccess,
@@ -20,8 +21,13 @@ router.get(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     try {
-      const users = await User.find({ "twitchBotConfig.active": true })
-      const channels = users.map((u: any) => u.twitchUserData.login).sort()
+      const users = (await User.find({
+        "twitchBotConfig.active": true,
+      })) as IUserDocument[]
+      const channels = users
+        .filter((u) => u.twitchUserData?.login)
+        .map((u) => u.twitchUserData!.login)
+        .sort()
       sendSuccess(res, channels)
     } catch (err) {
       handleRouteError(res, err, "get channels")

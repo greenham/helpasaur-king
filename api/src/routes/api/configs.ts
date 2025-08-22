@@ -1,11 +1,19 @@
 import express, { Request, Response, Router } from "express"
 import Config from "../../models/config"
 import User from "../../models/user"
+import { IUserDocument } from "../../types/models"
 import {
   sendSuccess,
   sendError,
   handleRouteError,
 } from "../../lib/responseHelpers"
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    sub?: string
+    permissions?: string[]
+  }
+}
 
 const router: Router = express.Router()
 
@@ -32,27 +40,34 @@ router.get("/:id", async (req: Request, res: Response) => {
 })
 
 // GET /twitch/activeChannels -> returns active channels to be joined by the Twitch bot
-router.get("/twitch/activeChannels", async (req: Request, res: Response) => {
-  if ((req as any).user?.sub !== "twitch") {
-    return sendError(res, "Unauthorized", 401)
-  }
+router.get(
+  "/twitch/activeChannels",
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (req.user?.sub !== "twitch") {
+      return sendError(res, "Unauthorized", 401)
+    }
 
-  try {
-    const users = await User.find({ "twitchBotConfig.active": true })
-    const channels = users.map((u: any) =>
-      Object.assign(
-        {
-          roomId: u.twitchUserData.id,
-          channelName: u.twitchUserData.login,
-          displayName: u.twitchUserData.display_name,
-        },
-        u.twitchBotConfig
-      )
-    )
-    sendSuccess(res, channels)
-  } catch (err) {
-    handleRouteError(res, err, "get active channels")
+    try {
+      const users = (await User.find({
+        "twitchBotConfig.active": true,
+      })) as IUserDocument[]
+      const channels = users
+        .filter((u) => u.twitchUserData?.id && u.twitchUserData?.login)
+        .map((u) =>
+          Object.assign(
+            {
+              roomId: u.twitchUserData!.id,
+              channelName: u.twitchUserData!.login,
+              displayName: u.twitchUserData!.display_name,
+            },
+            u.twitchBotConfig
+          )
+        )
+      sendSuccess(res, channels)
+    } catch (err) {
+      handleRouteError(res, err, "get active channels")
+    }
   }
-})
+)
 
 export default router
