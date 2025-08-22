@@ -7,12 +7,7 @@ import {
   StreamAlertPayload,
   WeeklyRacePayload,
 } from "@helpasaur/types"
-import {
-  name as packageName,
-  version as packageVersion,
-} from "../../package.json"
-
-const { WEBSOCKET_RELAY_SERVER } = process.env
+import { config } from "../config"
 const STREAM_ONLINE_EVENT = "stream.online"
 const CHANNEL_UPDATE_EVENT = "channel.update"
 
@@ -32,11 +27,11 @@ const readyEvent: DiscordEvent<"ready"> = {
     console.log(`✅ Success! Logged in as ${extClient.user?.tag}`)
 
     // Connect to websocket relay to listen for events like stream alerts and race rooms
-    const wsRelay: Socket = io(WEBSOCKET_RELAY_SERVER!, {
-      query: { clientId: `${packageName} v${packageVersion}` },
+    const wsRelay: Socket = io(config.websocketRelayServer, {
+      query: { clientId: `${config.packageName} v${config.packageVersion}` },
     })
     console.log(
-      `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
+      `Connecting to websocket relay server on port ${config.websocketRelayServer}...`
     )
     wsRelay.on("connect_error", (err: Error) => {
       console.log(`Connection error!`)

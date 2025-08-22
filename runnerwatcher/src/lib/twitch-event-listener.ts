@@ -82,10 +82,18 @@ export class TwitchEventListener extends EventEmitter {
     const messageSignature = req.header(TWITCH_MESSAGE_SIGNATURE)
     const messageType = req.header(MESSAGE_TYPE)
 
+    if (!messageId || !messageTimestamp) {
+      console.log(
+        `Invalid message Id or Timestamp on Twitch EventSub notification!`
+      )
+      res.status(403).send("Forbidden")
+      return
+    }
+
     // Check signature
     const computedSignature = this.computeSignature(
-      messageId!,
-      messageTimestamp!,
+      messageId,
+      messageTimestamp,
       req.body
     )
     if (messageSignature !== computedSignature) {

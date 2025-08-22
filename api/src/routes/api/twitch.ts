@@ -1,4 +1,4 @@
-import express, { Request, Response, Router } from "express"
+import express, { Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import User from "../../models/user"
 import { IUserDocument } from "../../types/models"
