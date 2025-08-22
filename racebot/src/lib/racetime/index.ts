@@ -63,7 +63,7 @@ class RacetimeBot {
             reject(false)
           }
         })
-        .catch((error: any) => {
+        .catch((error) => {
           if (error instanceof AxiosError) {
             if (error.response) {
               if (error.response.status === 422) {

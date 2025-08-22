@@ -32,7 +32,11 @@ export const toastReducer = (
         toasts: updatedToasts,
       }
     }
-    default:
-      throw new Error(`Unhandled action type: ${(action as any).type}`)
+    default: {
+      const exhaustiveCheck: never = action
+      throw new Error(
+        `Unhandled action type: ${(exhaustiveCheck as ToastAction).type}`
+      )
+    }
   }
 }

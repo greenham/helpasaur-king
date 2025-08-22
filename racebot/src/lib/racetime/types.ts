@@ -66,7 +66,7 @@ export type OutgoingActionType =
 interface OutgoingMessageActionData {
   message: string
   pinned?: boolean
-  actions?: Record<string, any> | null
+  actions?: Record<string, unknown> | null
   direct_to?: string | null
   guid: string
 }

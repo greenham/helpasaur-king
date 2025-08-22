@@ -178,10 +178,10 @@ const TwitchUserBotManagement: React.FunctionComponent<
         onSuccess: () => {
           toast.success(successMessage)
         },
-        onError: (error: any) => {
-          toast.error(
-            `Failed to update configuration: ${error?.message || "Unknown error"}`
-          )
+        onError: (error) => {
+          const errorMessage =
+            error instanceof Error ? error.message : "Unknown error"
+          toast.error(`Failed to update configuration: ${errorMessage}`)
         },
       }
     )
@@ -198,10 +198,10 @@ const TwitchUserBotManagement: React.FunctionComponent<
         onSuccess: () => {
           toast.success(`Command prefix changed to "${newPrefix}"`)
         },
-        onError: (error: any) => {
-          toast.error(
-            `Failed to update prefix: ${error?.message || "Unknown error"}`
-          )
+        onError: (error) => {
+          const errorMessage =
+            error instanceof Error ? error.message : "Unknown error"
+          toast.error(`Failed to update prefix: ${errorMessage}`)
         },
       }
     )
