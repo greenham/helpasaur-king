@@ -115,7 +115,9 @@ class RacetimeBot {
           )
           wsRaceRoom.on("error", console.error)
           wsRaceRoom.on("close", (code: number, reason: Buffer) => {
-            console.log(`Disconnected from ${raceRoomSlug}, reason: ${reason}`)
+            console.log(
+              `Disconnected from ${raceRoomSlug} reason: ${reason} (code: ${code})`
+            )
           })
 
           wsRaceRoom.on("open", () => {
