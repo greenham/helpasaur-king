@@ -66,7 +66,8 @@ jobs:
           BUILD_DATE: ${{ steps.metadata.outputs.BUILD_DATE }}
           DOCKER_BUILDKIT: 1
         run: |
-          docker compose -f docker-compose.build.prod.yml build --push helpa-base
+          docker compose -f docker-compose.build.prod.yml build helpa-base
+          docker push ${{ env.REGISTRY }}/helpa-base:${{ steps.version.outputs.VERSION }}
       
       - name: Build and push service images
         env:
