@@ -27,7 +27,7 @@ export const requireAuthKey = (
 }
 
 export const requireJwtToken: RequestHandler = jwt({
-  secret: jwtSecretKey!,
+  secret: jwtSecretKey,
   algorithms: ["HS256"],
   getToken: (req: Request) => {
     // check Authorization header for Bearer token first

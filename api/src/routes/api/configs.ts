@@ -44,19 +44,30 @@ router.get(
     try {
       const users = (await User.find({
         "twitchBotConfig.active": true,
+        "twitchUserData.id": { $exists: true },
+        "twitchUserData.login": { $exists: true },
+        "twitchUserData.display_name": { $exists: true },
       })) as IUserDocument[]
+
       const channels = users
-        .filter((u) => u.twitchUserData?.id && u.twitchUserData?.login)
-        .map((u) =>
-          Object.assign(
+        .map((u) => {
+          // TypeScript now knows these fields exist due to our query
+          const { id, login, display_name } = u.twitchUserData || {}
+          if (!id || !login || !display_name) {
+            // This should never happen due to our query, but satisfies TypeScript
+            return null
+          }
+
+          return Object.assign(
             {
-              roomId: u.twitchUserData!.id,
-              channelName: u.twitchUserData!.login,
-              displayName: u.twitchUserData!.display_name,
+              roomId: id,
+              channelName: login,
+              displayName: display_name,
             },
             u.twitchBotConfig
           )
-        )
+        })
+        .filter(Boolean)
       sendSuccess(res, channels)
     } catch (err) {
       handleRouteError(res, err, "get active channels")
