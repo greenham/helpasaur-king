@@ -9,7 +9,7 @@ import {
 } from "../../lib/responseHelpers"
 import Config from "../../models/config"
 import { GuildConfig } from "@helpasaur/types"
-import { DiscordServiceConfig, isDiscordConfig } from "../../types/config"
+import { isDiscordConfig } from "../../types/config"
 
 const router: Router = express.Router()
 const permissionGuard = guard()

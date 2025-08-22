@@ -12,7 +12,6 @@ const {
   packageVersion,
   websocketRelayServer,
   racetimeBaseUrl,
-  racetimeWssUrl,
   racetimeBotClientId,
   racetimeBotClientSecret,
   racetimeGameCategorySlugZ3,

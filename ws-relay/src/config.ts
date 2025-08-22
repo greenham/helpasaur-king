@@ -4,7 +4,7 @@ import { name as packageName, version as packageVersion } from "../package.json"
  * Validates and returns a required environment variable
  * Throws an error if the variable is not set
  */
-function getRequiredEnv(key: string): string {
+function _getRequiredEnv(key: string): string {
   const value = process.env[key]
   if (!value) {
     throw new Error(`Missing required environment variable: ${key}`)
