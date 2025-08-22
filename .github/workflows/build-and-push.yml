@@ -58,7 +58,7 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"
 
-      - name: Build and push all images
+      - name: Build and push base image
         env:
           REGISTRY: ${{ env.REGISTRY }}
           VERSION: ${{ steps.version.outputs.VERSION }}
@@ -66,4 +66,14 @@ jobs:
           BUILD_DATE: ${{ steps.metadata.outputs.BUILD_DATE }}
           DOCKER_BUILDKIT: 1
         run: |
-          docker compose -f docker-compose.build.prod.yml build --push
+          docker compose -f docker-compose.build.prod.yml build --push helpa-base
+      
+      - name: Build and push service images
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          GIT_COMMIT: ${{ steps.metadata.outputs.GIT_COMMIT }}
+          BUILD_DATE: ${{ steps.metadata.outputs.BUILD_DATE }}
+          DOCKER_BUILDKIT: 1
+        run: |
+          docker compose -f docker-compose.build.prod.yml build --push api-server discord-bot twitch-bot runnerwatcher racebot ws-relay
