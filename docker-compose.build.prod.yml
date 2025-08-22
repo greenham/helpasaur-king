@@ -7,7 +7,7 @@ name: "helpa-build-prod"
 
 services:
   helpa-base:
-    image: helpa-base:${VERSION:-latest}
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./Dockerfile.base
@@ -28,7 +28,7 @@ services:
       target: prod
       args:
         SERVICE: api
-        VERSION: ${VERSION:-latest}
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
       cache_from:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-api:latest
       labels:
@@ -46,7 +46,7 @@ services:
       target: prod
       args:
         SERVICE: discord
-        VERSION: ${VERSION:-latest}
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
       cache_from:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-discord:latest
       labels:
@@ -64,7 +64,7 @@ services:
       target: prod
       args:
         SERVICE: twitch
-        VERSION: ${VERSION:-latest}
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
       cache_from:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-twitch:latest
       labels:
@@ -82,7 +82,7 @@ services:
       target: prod
       args:
         SERVICE: runnerwatcher
-        VERSION: ${VERSION:-latest}
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
       cache_from:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-runnerwatcher:latest
       labels:
@@ -100,7 +100,7 @@ services:
       target: prod
       args:
         SERVICE: racebot
-        VERSION: ${VERSION:-latest}
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
       cache_from:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-racebot:latest
       labels:
@@ -118,7 +118,7 @@ services:
       target: prod
       args:
         SERVICE: ws-relay
-        VERSION: ${VERSION:-latest}
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
       cache_from:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-ws-relay:latest
       labels:
