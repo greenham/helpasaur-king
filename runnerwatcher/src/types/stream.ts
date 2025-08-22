@@ -1,4 +1,4 @@
-import { TwitchStreamData, TwitchUserData } from "twitch-api-client/src/types"
+import { TwitchStreamData, TwitchUserData } from "twitch-api-client"
 
 export interface WatchedTwitchStream extends TwitchStreamData {
   lastAlertedAt?: number

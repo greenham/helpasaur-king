@@ -115,12 +115,8 @@ export interface TwitchStream {
 }
 
 // Stream Alerts Types
-export interface StreamAlertsChannel {
-  id: string
-  login: string
-  display_name: string
-  profile_image_url?: string
-}
+// StreamAlertsChannel is just a TwitchUserData (channels in stream alerts are full user objects)
+export type StreamAlertsChannel = TwitchUserData
 
 // Concrete data types for API responses
 export interface DiscordJoinUrl {

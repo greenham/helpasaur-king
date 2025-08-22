@@ -10,7 +10,7 @@ import {
   Button,
   Badge,
 } from "react-bootstrap"
-import { TwitchUserData } from "@helpasaur/types"
+import { StreamAlertsChannel } from "@helpasaur/types"
 
 interface ManageStreamAlertsProps {}
 const ManageStreamAlerts: React.FunctionComponent<
@@ -113,7 +113,7 @@ const ManageStreamAlerts: React.FunctionComponent<
                 onChange={handleChannelToRemoveInputChange}
               >
                 <option>-</option>
-                {streamAlertsChannels?.map((channel: TwitchUserData) => (
+                {streamAlertsChannels?.map((channel: StreamAlertsChannel) => (
                   <option key={channel.id} value={channel.id}>
                     {channel.display_name}
                   </option>

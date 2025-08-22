@@ -2,6 +2,7 @@ interface Toast {
   id: string | number
   message?: string
   type?: string
+  variant?: string
 }
 
 interface ToastState {
