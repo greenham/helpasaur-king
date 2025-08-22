@@ -110,7 +110,7 @@ services:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-racebot:latest
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
-        - "org.opencontainers.image.description=Automated racetime.gg race creation for weekly ALttP community races (Sundays 11:30 AM PT)"
+        - "org.opencontainers.image.description=Automated racetime.gg race creation for weekly ALttP community races"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "service.name=racebot"
 
