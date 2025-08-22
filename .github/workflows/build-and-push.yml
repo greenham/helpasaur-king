@@ -60,6 +60,7 @@ jobs:
 
       - name: Build and push all images
         env:
+          REGISTRY: ${{ env.REGISTRY }}
           VERSION: ${{ steps.version.outputs.VERSION }}
           GIT_COMMIT: ${{ steps.metadata.outputs.GIT_COMMIT }}
           BUILD_DATE: ${{ steps.metadata.outputs.BUILD_DATE }}
