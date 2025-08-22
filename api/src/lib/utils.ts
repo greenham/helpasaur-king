@@ -3,6 +3,8 @@ import { expressjwt as jwt } from "express-jwt"
 import User from "../models/user"
 import TwitchApiClient from "twitch-api-client"
 import { config } from "../config"
+import { AuthenticatedRequest } from "../types/express"
+
 const {
   apiKey,
   jwtSecretKey,
@@ -13,10 +15,6 @@ const {
   twitchEventsubSecretKey,
   twitchEventsubWebhookUrl,
 } = config
-
-interface AuthenticatedRequest extends Request {
-  user?: any
-}
 
 export const requireAuthKey = (
   req: Request,
@@ -31,7 +29,7 @@ export const requireAuthKey = (
 export const requireJwtToken: RequestHandler = jwt({
   secret: jwtSecretKey!,
   algorithms: ["HS256"],
-  getToken: (req: any) => {
+  getToken: (req: Request) => {
     // check Authorization header for Bearer token first
     const authorizationHeader = req.get("Authorization")
     if (authorizationHeader && authorizationHeader.split(" ")[0] === "Bearer") {
@@ -53,16 +51,16 @@ export const getRequestedChannel = async (
   // if it's a user, then the channel is the user's twitch login
   // -- unless it's an admin, in which case they can specify a channel in the body -- if none is specified, then use the admin's twitch channel
   let requestedChannel: string
-  if (req.user.permissions.includes("service")) {
+  if (req.user?.permissions?.includes("service")) {
     if (!req.body.channel) {
       return false
     }
     requestedChannel = req.body.channel
   } else {
-    if (req.user.permissions.includes("admin") && req.body.channel) {
+    if (req.user?.permissions?.includes("admin") && req.body.channel) {
       requestedChannel = req.body.channel
     } else {
-      const user = await User.findById(req.user.sub)
+      const user = await User.findById(req.user?.sub)
       if (!user || !user.twitchUserData) return false
       requestedChannel = user.twitchUserData.login
     }

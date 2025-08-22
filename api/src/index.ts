@@ -109,12 +109,12 @@ app.get("/health", async (req: Request, res: Response) => {
       websocketConnected: wsRelay.connected,
       environment: nodeEnv,
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error("Health check error:", error)
     res.status(503).json({
       status: "unhealthy",
       service: "api",
-      error: error.message,
+      error: error instanceof Error ? error.message : "Unknown error",
     })
   }
 })
@@ -122,7 +122,16 @@ app.get("/health", async (req: Request, res: Response) => {
 // Set up routes
 app.use(routes)
 
-app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
+interface ExpressError extends Error {
+  code?: string
+}
+
+app.use(function (
+  err: ExpressError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   if (err.name === "UnauthorizedError") {
     res.status(401).json({ error: `${err.name}: ${err.message}` })
   } else if (err.code === "permission_denied") {

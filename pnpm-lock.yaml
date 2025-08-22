@@ -197,6 +197,10 @@ importers:
         version: 5.9.2
 
   libs/@helpasaur/types:
+    dependencies:
+      twitch-api-client:
+        specifier: workspace:*
+        version: link:../../twitch-api-client
     devDependencies:
       '@types/node':
         specifier: ^20.8.10

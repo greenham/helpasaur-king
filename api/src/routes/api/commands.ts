@@ -135,7 +135,7 @@ router.patch(
       }
 
       for (const key in req.body) {
-        ;(command as any)[key] = req.body[key]
+        ;(command as unknown as Record<string, unknown>)[key] = req.body[key]
       }
       await command.save()
 

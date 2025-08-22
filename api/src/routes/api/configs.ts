@@ -2,18 +2,12 @@ import express, { Request, Response, Router } from "express"
 import Config from "../../models/config"
 import User from "../../models/user"
 import { IUserDocument } from "../../types/models"
+import { AuthenticatedRequest } from "../../types/express"
 import {
   sendSuccess,
   sendError,
   handleRouteError,
 } from "../../lib/responseHelpers"
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    sub?: string
-    permissions?: string[]
-  }
-}
 
 const router: Router = express.Router()
 

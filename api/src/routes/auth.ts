@@ -90,22 +90,22 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
     if (localUser) {
       // Update existing user
       localUser.lastLogin = new Date()
-      // Store twitchUserData with created_at as Date for DB
-      const userDataForDb = {
+      // Store twitchUserData with type conversion for the database
+      localUser.twitchUserData = {
         ...twitchUserData,
         created_at: new Date(twitchUserData.created_at),
+        auth: twitchUserData.auth,
       }
-      localUser.twitchUserData = userDataForDb as any
       localUser.markModified("twitchUserData")
       localUser = await localUser.save()
     } else {
-      // Create new user
-      const userDataForDb = {
-        ...twitchUserData,
-        created_at: new Date(twitchUserData.created_at),
-      }
+      // Create new user with type conversion for the database
       localUser = (await User.create({
-        twitchUserData: userDataForDb,
+        twitchUserData: {
+          ...twitchUserData,
+          created_at: new Date(twitchUserData.created_at),
+          auth: twitchUserData.auth,
+        },
       })) as IUserDocument
     }
   } catch (err) {
@@ -123,7 +123,7 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
     jwtSecretKey,
     {
       expiresIn: loginExpirationLength,
-      subject: localUser._id.toString(),
+      subject: String(localUser._id),
     }
   )
 

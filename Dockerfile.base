@@ -37,7 +37,13 @@ COPY libs/twitch-api-client/package.json ./libs/twitch-api-client/
 # Install ALL workspace dependencies
 RUN pnpm install --frozen-lockfile
 
-# Build @helpasaur/types FIRST (other libs depend on it)
+# Build twitch-api-client FIRST (types now depends on it)
+WORKDIR /app/libs/twitch-api-client
+COPY libs/twitch-api-client/src ./src
+COPY libs/twitch-api-client/tsconfig.json ./
+RUN pnpm build
+
+# Build @helpasaur/types (depends on twitch-api-client)
 WORKDIR /app/libs/@helpasaur/types
 COPY libs/@helpasaur/types/src ./src
 COPY libs/@helpasaur/types/tsconfig.json ./
@@ -53,12 +59,6 @@ RUN pnpm build
 WORKDIR /app/libs/@helpasaur/bot-common
 COPY libs/@helpasaur/bot-common/src ./src
 COPY libs/@helpasaur/bot-common/tsconfig.json ./
-RUN pnpm build
-
-# Build twitch-api-client
-WORKDIR /app/libs/twitch-api-client
-COPY libs/twitch-api-client/src ./src
-COPY libs/twitch-api-client/tsconfig.json ./
 RUN pnpm build
 
 # Re-link workspace dependencies after library builds to ensure proper module resolution

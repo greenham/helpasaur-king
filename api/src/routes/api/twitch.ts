@@ -2,6 +2,7 @@ import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
 import User from "../../models/user"
 import { IUserDocument } from "../../types/models"
+import { AuthenticatedRequest } from "../../types/express"
 import { getRequestedChannel, getTwitchApiClient } from "../../lib/utils"
 import {
   sendSuccess,
@@ -19,7 +20,7 @@ const permissionGuard = guard()
 router.get(
   "/channels",
   permissionGuard.check("admin"),
-  async (req: Request, res: Response) => {
+  async (req: AuthenticatedRequest, res: Response) => {
     try {
       const users = (await User.find({
         "twitchBotConfig.active": true,
@@ -36,14 +37,20 @@ router.get(
 )
 
 // POST /join -> adds requested or logged-in user to join list for twitch bot
-router.post("/join", async (req: Request, res: Response) => {
-  let user: any
+router.post("/join", async (req: AuthenticatedRequest, res: Response) => {
+  let user: IUserDocument | null
   // check for a logged-in user requesting the bot to join the channel
   if (
-    !(req as any).user?.permissions.includes("service") &&
-    (!(req as any).user?.permissions.includes("admin") || !req.body.channel)
+    !req.user?.permissions?.includes("service") &&
+    (!req.user?.permissions?.includes("admin") || !req.body.channel)
   ) {
-    user = await User.findById((req as any).user?.sub)
+    user = await User.findById(req.user?.sub)
+    if (!user) {
+      return sendError(res, "User not found", 404)
+    }
+    if (!user.twitchBotConfig) {
+      user.twitchBotConfig = {}
+    }
     user.twitchBotConfig.active = true
     user.markModified("twitchBotConfig")
     await user.save()
@@ -63,6 +70,9 @@ router.post("/join", async (req: Request, res: Response) => {
           return sendNoop(res, `Already joined ${requestedChannel}!`)
         }
 
+        if (!user.twitchBotConfig) {
+          user.twitchBotConfig = {}
+        }
         user.twitchBotConfig.active = true
         user.markModified("twitchBotConfig")
         await user.save()
@@ -112,24 +122,24 @@ router.post("/join", async (req: Request, res: Response) => {
 
   // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
   if (
-    !(req as any).user?.permissions.includes("service") ||
-    (req as any).user?.sub !== "twitch"
+    !req.user?.permissions?.includes("service") ||
+    req.user?.sub !== "twitch"
   ) {
-    ;(req as any).app.wsRelay.emit("joinChannel", {
-      channel: user.twitchUserData.login,
+    req.app.wsRelay.emit("joinChannel", {
+      channel: user.twitchUserData?.login,
     })
   }
 
   sendSuccess(res, {
     twitchBotConfig: {
-      roomId: user.twitchUserData.id,
+      roomId: user.twitchUserData?.id,
       ...user.twitchBotConfig,
     },
   })
 })
 
 // POST /leave -> removes requested or logged-in user from join list for twitch bot
-router.post("/leave", async (req: Request, res: Response) => {
+router.post("/leave", async (req: AuthenticatedRequest, res: Response) => {
   const requestedChannel = await getRequestedChannel(req)
   if (!requestedChannel) {
     return sendError(res, "Invalid channel provided", 400)
@@ -151,10 +161,10 @@ router.post("/leave", async (req: Request, res: Response) => {
 
     // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
     if (
-      !(req as any).user?.permissions.includes("service") ||
-      (req as any).user?.sub !== "twitch"
+      !req.user?.permissions?.includes("service") ||
+      req.user?.sub !== "twitch"
     ) {
-      ;(req as any).app.wsRelay.emit("leaveChannel", requestedChannel)
+      req.app.wsRelay.emit("leaveChannel", requestedChannel)
     }
 
     sendSuccess(res)
@@ -164,7 +174,7 @@ router.post("/leave", async (req: Request, res: Response) => {
 })
 
 // PATCH /config -> updates twitch bot configuration for a channel
-router.patch("/config", async (req: Request, res: Response) => {
+router.patch("/config", async (req: AuthenticatedRequest, res: Response) => {
   const requestedChannel = await getRequestedChannel(req)
   if (!requestedChannel) {
     return sendError(res, "Invalid channel provided", 400)
@@ -180,7 +190,7 @@ router.patch("/config", async (req: Request, res: Response) => {
     "weeklyRaceAlertEnabled",
   ]
 
-  const updates: any = {}
+  const updates: Record<string, unknown> = {}
   for (const field of allowedFields) {
     if (Object.prototype.hasOwnProperty.call(req.body, field)) {
       const value = req.body[field]
@@ -227,9 +237,12 @@ router.patch("/config", async (req: Request, res: Response) => {
     // Apply updates
     for (const [path, value] of Object.entries(updates)) {
       const keys = path.split(".")
-      let current: any = user
+      let current: Record<string, unknown> = user as unknown as Record<
+        string,
+        unknown
+      >
       for (let i = 0; i < keys.length - 1; i++) {
-        current = current[keys[i]]
+        current = current[keys[i]] as Record<string, unknown>
       }
       current[keys[keys.length - 1]] = value
     }
@@ -242,11 +255,11 @@ router.patch("/config", async (req: Request, res: Response) => {
 
     // Emit configuration update event to the twitch bot
     if (
-      !(req as any).user?.permissions.includes("service") ||
-      (req as any).user?.sub !== "twitch"
+      !req.user?.permissions?.includes("service") ||
+      req.user?.sub !== "twitch"
     ) {
       if (user.twitchUserData) {
-        ;(req as any).app.wsRelay.emit("configUpdate", {
+        req.app.wsRelay.emit("configUpdate", {
           roomId: user.twitchUserData.id,
           channelName: user.twitchUserData.login,
           displayName: user.twitchUserData.display_name,

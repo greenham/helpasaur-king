@@ -53,7 +53,7 @@ export interface IUser {
 }
 
 export interface IUserDocument extends IUser, Document {
-  _id: any // Mongoose ObjectId
+  _id: unknown // Mongoose ObjectId
 }
 
 // Account Model
@@ -71,7 +71,7 @@ export interface IAccountDocument extends IAccount, Document {}
 // Configuration Model (for generic configs)
 export interface IConfig {
   key: string
-  value: any
+  value: unknown
   service?: string
   description?: string
 }
@@ -80,7 +80,7 @@ export interface IConfigDocument extends IConfig, Document {}
 
 // Configuration Model (for specific configs like stream alerts)
 export interface IConfiguration {
-  config?: any
+  config?: Record<string, unknown>
 }
 
 export interface IConfigurationDocument extends IConfiguration, Document {}
@@ -92,7 +92,7 @@ export interface ICommandLog {
   alias?: string
   source: string
   username: string
-  metadata?: any
+  metadata?: Record<string, unknown>
 }
 
 export interface ICommandLogDocument extends ICommandLog, Document {}
