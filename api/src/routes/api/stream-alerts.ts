@@ -9,7 +9,11 @@ import {
   handleRouteError,
 } from "../../lib/responseHelpers"
 import { isStreamAlertsConfig } from "../../types/config"
-import { TwitchUserData, GetSubscriptionOptions } from "twitch-api-client"
+import {
+  TwitchUserData,
+  GetSubscriptionOptions,
+  HelixEventSubSubscriptionStatus,
+} from "twitch-api-client"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -27,7 +31,7 @@ router.get(
       }
       const streamAlertsConfig = configDoc.config
       // Put this list of strings in alphabetical order before returning
-      streamAlertsConfig.config.channels.sort((a: any, b: any) => {
+      streamAlertsConfig.channels.sort((a, b) => {
         if (a.login < b.login) {
           return -1
         }
@@ -36,7 +40,7 @@ router.get(
         }
         return 0
       })
-      sendSuccess(res, streamAlertsConfig.config.channels)
+      sendSuccess(res, streamAlertsConfig.channels)
     } catch (err) {
       handleRouteError(res, err, "get stream alerts channels")
     }
@@ -53,7 +57,7 @@ router.post(
   "/channels",
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
-    if (Object.prototype.hasOwnProperty.call(req.body, "channels")) {
+    if (!Object.prototype.hasOwnProperty.call(req.body, "channels")) {
       return sendError(
         res,
         "Missing payload property 'channels' (Array<String>)",
@@ -82,8 +86,8 @@ router.post(
     const results = req.body.channels.map(async (channel: string) => {
       // Ensure this isn't in the channel list already
       if (
-        streamAlertsConfig.config.channels.find(
-          (c: any) => c.login === channel.toLowerCase()
+        streamAlertsConfig.channels.find(
+          (c) => c.login === channel.toLowerCase()
         ) !== undefined
       ) {
         return {
@@ -112,9 +116,9 @@ router.post(
         }
       )
 
-      streamAlertsConfig.config.channels.push(userData)
-      streamAlertsConfig.markModified("config")
-      await streamAlertsConfig.save()
+      streamAlertsConfig.channels.push(userData)
+      configDoc.markModified("config")
+      await configDoc.save()
       console.log(`Added ${channel} to stream alerts list`)
 
       return { status: "success", channel, subscriptionResults }
@@ -132,17 +136,18 @@ router.delete(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     try {
-      const streamAlertsConfig = await Config.findOne({ id: "streamAlerts" })
+      const configDoc = await Config.findOne({ id: "streamAlerts" })
       console.log(
         `Received request to remove ${req.params.id} from stream alerts`
       )
 
       // Ensure this channel is in the list already
-      if (!streamAlertsConfig || !streamAlertsConfig.config) {
+      if (!configDoc || !isStreamAlertsConfig(configDoc)) {
         return sendError(res, "Configuration not found")
       }
-      const channelIndex = streamAlertsConfig.config.channels.findIndex(
-        (c: any) => c.id === req.params.id
+      const streamAlertsConfig = configDoc.config
+      const channelIndex = streamAlertsConfig.channels.findIndex(
+        (c) => c.id === req.params.id
       )
       if (channelIndex === undefined) {
         console.log(`${req.params.id} is not in the stream alerts list!`)
@@ -155,7 +160,7 @@ router.delete(
       // Delete event subscriptions
       const twitchApiClient = getTwitchApiClient()
       console.log(
-        `Removing event subscriptions for ${streamAlertsConfig.config.channels[channelIndex].login}`
+        `Removing event subscriptions for ${streamAlertsConfig.channels[channelIndex].login}`
       )
 
       // Do a lookup to get event subscriptions for this user, then delete them one-by-one
@@ -163,7 +168,7 @@ router.delete(
         user_id: req.params.id,
       })
       if (subscriptions && subscriptions.length > 0) {
-        subscriptions.forEach(async (subscription: any) => {
+        subscriptions.forEach(async (subscription) => {
           await twitchApiClient.deleteSubscription(subscription.id)
           console.log(`Deleted subscription ${subscription.id}`)
         })
@@ -171,9 +176,9 @@ router.delete(
 
       // Remove from list of channels in config
       console.log(`Removing from list...`)
-      streamAlertsConfig.config.channels.splice(channelIndex, 1)
-      streamAlertsConfig.markModified("config")
-      await streamAlertsConfig.save()
+      streamAlertsConfig.channels.splice(channelIndex, 1)
+      configDoc.markModified("config")
+      await configDoc.save()
 
       sendSuccess(res, undefined, "Channel removed from stream alerts")
     } catch (err) {
@@ -191,7 +196,8 @@ router.get(
       const twitchApiClient = getTwitchApiClient()
       // Build options from query params
       const options: GetSubscriptionOptions = {}
-      if (req.query.status) options.status = req.query.status as any
+      if (req.query.status)
+        options.status = req.query.status as HelixEventSubSubscriptionStatus
       if (req.query.type) options.type = req.query.type as string
       if (req.query.user_id) options.user_id = req.query.user_id as string
 
@@ -225,7 +231,7 @@ router.post(
   "/channels/blacklist",
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
-    if (Object.prototype.hasOwnProperty.call(req.body, "channels")) {
+    if (!Object.prototype.hasOwnProperty.call(req.body, "channels")) {
       return sendError(
         res,
         "Missing payload property 'channels' (Array<String>)",
@@ -264,7 +270,7 @@ router.post(
       }
 
       // Ensure this user isn't in the blacklist already
-      if (streamAlertsConfig.config.blacklistedUsers.includes(userData.id)) {
+      if (streamAlertsConfig.blacklistedUsers.includes(userData.id)) {
         return {
           status: "error",
           channel,
@@ -272,9 +278,9 @@ router.post(
         }
       }
 
-      streamAlertsConfig.config.blacklistedUsers.push(userData.id)
-      streamAlertsConfig.markModified("config")
-      await streamAlertsConfig.save()
+      streamAlertsConfig.blacklistedUsers.push(userData.id)
+      configDoc.markModified("config")
+      await configDoc.save()
       console.log(`Added ${channel} to blacklisted users`)
 
       return { success: true, channel }
