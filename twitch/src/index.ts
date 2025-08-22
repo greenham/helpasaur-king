@@ -34,10 +34,9 @@ async function init() {
 
     // Get the initial list of active channels the bot should join
     const activeChannels = await helpaApiClient.twitch.getActiveChannels()
-    const channels = activeChannels.map((channel) => channel.channelName)
 
     // Start the bot
-    const bot = new TwitchBot(twitchConfig, helpaApiClient, channels)
+    const bot = new TwitchBot(twitchConfig, helpaApiClient, activeChannels)
     bot.start()
 
     // Start health check server

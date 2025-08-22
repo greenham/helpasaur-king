@@ -1,8 +1,7 @@
 import { io, Socket } from "socket.io-client"
 import * as tmi from "tmi.js"
 import * as crypto from "crypto"
-import { AxiosError } from "axios"
-import { HelpaApi } from "@helpasaur/api-client"
+import { HelpaApi, ApiError } from "@helpasaur/api-client"
 import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
 import { ActiveChannel } from "@helpasaur/types"
 import { TwitchBotConfig } from "./types"
@@ -22,7 +21,11 @@ export class TwitchBot {
   channelList: string[] = []
   activeChannels: ActiveChannel[] = []
   channelMap: Map<string, ActiveChannel> = new Map()
-  constructor(config: TwitchBotConfig, helpaApi: HelpaApi, channels: string[]) {
+  constructor(
+    config: TwitchBotConfig,
+    helpaApi: HelpaApi,
+    channels: ActiveChannel[]
+  ) {
     this.config = config
     this.helpaApi = helpaApi
     this.cooldowns = new Map()
@@ -707,7 +710,7 @@ export class TwitchBot {
     statusErrors: { [key: number]: string } | null = null
   ) {
     console.error(errorMessageBase)
-    const error = err as AxiosError<{ message: string }>
+    const error = err as ApiError<{ message: string }>
     if (error.response) {
       console.error(
         `${error.response.status} Error: ${error.response.data.message}`
