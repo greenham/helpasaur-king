@@ -4,13 +4,13 @@ import { name as packageName, version as packageVersion } from "../package.json"
  * Validates and returns a required environment variable
  * Throws an error if the variable is not set
  */
-function _getRequiredEnv(key: string): string {
-  const value = process.env[key]
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`)
-  }
-  return value
-}
+// function getRequiredEnv(key: string): string {
+//   const value = process.env[key]
+//   if (!value) {
+//     throw new Error(`Missing required environment variable: ${key}`)
+//   }
+//   return value
+// }
 
 /**
  * Returns an optional environment variable with a default value
