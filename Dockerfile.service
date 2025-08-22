@@ -1,22 +1,22 @@
 # Generic service Dockerfile template for a TypeScript project
 # Usage: docker build --build-arg SERVICE=<service-name> -f Dockerfile.service .
 ARG BASE_IMAGE=helpa-base:dev
-FROM ${BASE_IMAGE} as base
+FROM ${BASE_IMAGE} AS base
 
 # Copy source
-FROM base as app
+FROM base AS app
 ARG SERVICE
 WORKDIR /app/${SERVICE}
 COPY ${SERVICE}/tsconfig.json ./
 COPY ${SERVICE}/src ./src
 
 # Development stage
-FROM app as dev
+FROM app AS dev
 ENV NODE_ENV=development
 CMD ["pnpm", "start:dev"]
 
 # Production build stage
-FROM app as prod-build
+FROM app AS prod-build
 ARG SERVICE
 ENV NODE_ENV=production
 WORKDIR /app/${SERVICE}
@@ -26,7 +26,7 @@ WORKDIR /app
 RUN pnpm --filter helpa-${SERVICE} --prod deploy /prod/${SERVICE}
 
 # Production runtime stage - minimal image with only essentials
-FROM node:20-alpine as prod
+FROM node:20-alpine AS prod
 ARG SERVICE
 WORKDIR /app
 # Copy only what's needed for runtime:
