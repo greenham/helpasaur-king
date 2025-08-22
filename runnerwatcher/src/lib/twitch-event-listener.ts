@@ -57,12 +57,12 @@ export class TwitchEventListener extends EventEmitter {
           environment: nodeEnv,
           webhookConfigured: !!twitchEventsubWebhookUrl, // just boolean, not the actual URL
         })
-      } catch (error: any) {
+      } catch (error) {
         console.error("Health check error:", error)
         res.status(503).json({
           status: "unhealthy",
           service: "runnerwatcher",
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         })
       }
     })

@@ -8,6 +8,8 @@ import {
   handleRouteError,
 } from "../../lib/responseHelpers"
 import Config from "../../models/config"
+import { GuildConfig } from "@helpasaur/types"
+import { DiscordServiceConfig, isDiscordConfig } from "../../types/config"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -18,7 +20,10 @@ const permissionGuard = guard()
 // - Returns the URL to join the bot to a guild
 router.get("/joinUrl", async (req: Request, res: Response) => {
   try {
-    const discordConfig: any = await Config.findOne({ id: "discord" })
+    const discordConfig = await Config.findOne({ id: "discord" })
+    if (!discordConfig || !isDiscordConfig(discordConfig)) {
+      throw new Error("Discord configuration not found")
+    }
     const joinUrl = `https://discord.com/api/oauth2/authorize?client_id=${
       discordConfig.config.clientId
     }&permissions=${
@@ -26,7 +31,7 @@ router.get("/joinUrl", async (req: Request, res: Response) => {
     }&scope=${discordConfig.config.oauth.scopes.join("%20")}`
 
     sendSuccess(res, { url: joinUrl })
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get Discord join URL")
   }
 })
@@ -41,8 +46,15 @@ router.post(
     try {
       // assume req.body contains a valid guild object
       // add this to config for discord (guilds array)
-      const discordConfig: any = await Config.findOne({ id: "discord" })
-      if (discordConfig.config.guilds.find((g: any) => g.id === req.body.id)) {
+      const discordConfig = await Config.findOne({ id: "discord" })
+      if (!discordConfig || !isDiscordConfig(discordConfig)) {
+        throw new Error("Discord configuration not found")
+      }
+      if (
+        discordConfig.config.guilds.find(
+          (g: GuildConfig) => g.id === req.body.id
+        )
+      ) {
         return sendNoop(
           res,
           `Already joined guild: ${req.body.name} (${req.body.id})!`
@@ -54,7 +66,7 @@ router.post(
       await discordConfig.save()
 
       sendSuccess(res, null, "OK", 201)
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "create guild")
     }
   }
@@ -74,9 +86,12 @@ router.patch(
     try {
       // assume req.body contains a valid patch for a guild object
       // update this in config for discord (guilds array)
-      const discordConfig: any = await Config.findOne({ id: "discord" })
+      const discordConfig = await Config.findOne({ id: "discord" })
+      if (!discordConfig || !isDiscordConfig(discordConfig)) {
+        throw new Error("Discord configuration not found")
+      }
       const index = discordConfig.config.guilds.findIndex(
-        (g: any) => g.id === req.params.id
+        (g: GuildConfig) => g.id === req.params.id
       )
       if (index === -1) {
         return sendError(res, `Guild not found: ${req.params.id}`, 404)
@@ -90,7 +105,7 @@ router.patch(
       await discordConfig.save()
 
       sendSuccess(res, null, "OK")
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "update guild")
     }
   }

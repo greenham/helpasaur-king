@@ -8,6 +8,7 @@ import {
   sendNoop,
   handleRouteError,
 } from "../../lib/responseHelpers"
+import { isStreamAlertsConfig } from "../../types/config"
 import { TwitchUserData, GetSubscriptionOptions } from "twitch-api-client"
 
 const router: Router = express.Router()
@@ -20,9 +21,11 @@ router.get(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     try {
-      const streamAlertsConfig: any = await Config.findOne({
-        id: "streamAlerts",
-      })
+      const configDoc = await Config.findOne({ id: "streamAlerts" })
+      if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+        throw new Error("Stream alerts configuration not found")
+      }
+      const streamAlertsConfig = configDoc.config
       // Put this list of strings in alphabetical order before returning
       streamAlertsConfig.config.channels.sort((a: any, b: any) => {
         if (a.login < b.login) {
@@ -34,7 +37,7 @@ router.get(
         return 0
       })
       sendSuccess(res, streamAlertsConfig.config.channels)
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "get stream alerts channels")
     }
   }
@@ -66,7 +69,11 @@ router.post(
       return sendError(res, "No channels provided in Array", 400)
     }
 
-    const streamAlertsConfig: any = await Config.findOne({ id: "streamAlerts" })
+    const configDoc = await Config.findOne({ id: "streamAlerts" })
+    if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+      throw new Error("Stream alerts configuration not found")
+    }
+    const streamAlertsConfig = configDoc.config
     const twitchApiClient = getTwitchApiClient()
     console.log(
       `Adding ${req.body.channels.length} channels to stream alerts...`
@@ -169,7 +176,7 @@ router.delete(
       await streamAlertsConfig.save()
 
       sendSuccess(res, undefined, "Channel removed from stream alerts")
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "remove channel from stream alerts")
     }
   }
@@ -192,7 +199,7 @@ router.get(
         Object.keys(options).length > 0 ? options : undefined
       )
       sendSuccess(res, results)
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "get subscriptions")
     }
   }
@@ -206,7 +213,7 @@ router.delete(
     try {
       const results = await twitchApiClient.clearSubscriptions()
       sendSuccess(res, results)
-    } catch (err: any) {
+    } catch (err) {
       console.error("error from clearSubscriptions")
       handleRouteError(res, err, "clear subscriptions")
     }
@@ -234,7 +241,11 @@ router.post(
       return sendError(res, "No channels provided in Array", 400)
     }
 
-    const streamAlertsConfig: any = await Config.findOne({ id: "streamAlerts" })
+    const configDoc = await Config.findOne({ id: "streamAlerts" })
+    if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+      throw new Error("Stream alerts configuration not found")
+    }
+    const streamAlertsConfig = configDoc.config
     const twitchApiClient = getTwitchApiClient()
     console.log(
       `Blacklisting ${req.body.channels.length} channels from stream directory...`

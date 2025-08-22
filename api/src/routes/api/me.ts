@@ -11,7 +11,7 @@ router.get("/", async (req: Request, res: Response) => {
   try {
     const user = await User.findById((req as any).user?.sub)
     sendSuccess(res, user)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get current user")
   }
 })
@@ -21,7 +21,7 @@ router.get("/twitch", async (req: Request, res: Response) => {
   try {
     const user: any = await User.findById((req as any).user?.sub)
     sendSuccess(res, user.twitchBotConfig)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get user Twitch config")
   }
 })

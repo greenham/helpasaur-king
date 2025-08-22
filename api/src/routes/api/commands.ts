@@ -20,7 +20,7 @@ router.get("/", async (req: Request, res: Response) => {
   try {
     const commands = await Command.find({ deleted: { $ne: true } })
     sendSuccess(res, commands)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get commands")
   }
 })
@@ -30,7 +30,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   try {
     const command = await Command.findById(req.params.id)
     sendSuccess(res, command)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get command by ID")
   }
 })
@@ -40,7 +40,7 @@ router.post("/find", async (req: Request, res: Response) => {
   try {
     const command = await Command.findByNameOrAlias(req.body.command)
     sendSuccess(res, command)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "find command")
   }
 })
@@ -78,18 +78,26 @@ router.post(
 
       const command = await Command.create(req.body)
       sendSuccess(res, command, "Command created successfully", 201)
-    } catch (err: any) {
+    } catch (err) {
       // Handle MongoDB validation errors
-      if (err.name === "ValidationError") {
-        const validationErrors = Object.values(err.errors).map((error: any) => {
-          if (error.path === "command") {
-            return "Command name is required"
+      if (
+        err &&
+        typeof err === "object" &&
+        "name" in err &&
+        err.name === "ValidationError"
+      ) {
+        const mongoErr = err as any // MongoDB validation error
+        const validationErrors = Object.values(mongoErr.errors).map(
+          (error: any) => {
+            if (error.path === "command") {
+              return "Command name is required"
+            }
+            if (error.path === "response") {
+              return "Command response is required"
+            }
+            return error.message
           }
-          if (error.path === "response") {
-            return "Command response is required"
-          }
-          return error.message
-        })
+        )
         return sendError(res, validationErrors.join(", "), 400)
       }
       handleRouteError(res, err, "create command")
@@ -129,18 +137,26 @@ router.patch(
       await command.save()
 
       sendSuccess(res, command, "Command updated successfully")
-    } catch (err: any) {
+    } catch (err) {
       // Handle MongoDB validation errors
-      if (err.name === "ValidationError") {
-        const validationErrors = Object.values(err.errors).map((error: any) => {
-          if (error.path === "command") {
-            return "Command name is required"
+      if (
+        err &&
+        typeof err === "object" &&
+        "name" in err &&
+        err.name === "ValidationError"
+      ) {
+        const mongoErr = err as any // MongoDB validation error
+        const validationErrors = Object.values(mongoErr.errors).map(
+          (error: any) => {
+            if (error.path === "command") {
+              return "Command name is required"
+            }
+            if (error.path === "response") {
+              return "Command response is required"
+            }
+            return error.message
           }
-          if (error.path === "response") {
-            return "Command response is required"
-          }
-          return error.message
-        })
+        )
         return sendError(res, validationErrors.join(", "), 400)
       }
       handleRouteError(res, err, "update command")
@@ -158,7 +174,7 @@ router.delete(
       // @TODO: Make this a soft delete?
       await Command.deleteOne({ _id: req.params.id })
       sendSuccess(res, undefined, "Command deleted successfully")
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "delete command")
     }
   }
@@ -173,7 +189,7 @@ router.post(
     try {
       await CommandLog.create(req.body)
       sendSuccess(res, undefined, "Command usage logged")
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "log command usage")
     }
   }

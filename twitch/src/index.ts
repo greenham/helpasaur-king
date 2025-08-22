@@ -30,7 +30,7 @@ async function init() {
     }
 
     // Cast the generic config to TwitchBotConfig
-    const twitchConfig = config.config as TwitchBotConfig
+    const twitchConfig = config.config as unknown as TwitchBotConfig
 
     // Get the initial list of active channels the bot should join
     const activeChannels = await helpaApiClient.twitch.getActiveChannels()

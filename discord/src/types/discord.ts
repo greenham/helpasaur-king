@@ -3,19 +3,33 @@ import {
   ChatInputCommandInteraction,
   Collection,
   Client,
+  ClientEvents,
+  Awaitable,
+  SlashCommandSubcommandsOnlyBuilder,
+  SlashCommandOptionsOnlyBuilder,
 } from "discord.js"
 import { HelpaApi } from "@helpasaur/api-client"
 import { DiscordConfig } from "./config"
 
-export interface DiscordEvent {
-  name: string
+// Discord Event types with proper typing for event arguments
+export interface DiscordEvent<
+  K extends keyof ClientEvents = keyof ClientEvents,
+> {
+  name: K
   once?: boolean
   helpaApi?: HelpaApi
-  execute: (...args: any[]) => Promise<void> | void
+  execute: (...args: ClientEvents[K]) => Awaitable<void>
 }
 
+// Command builder types
+export type CommandBuilder =
+  | SlashCommandBuilder
+  | SlashCommandSubcommandsOnlyBuilder
+  | SlashCommandOptionsOnlyBuilder
+  | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+
 export interface DiscordCommand {
-  data: SlashCommandBuilder | any
+  data: CommandBuilder
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
   helpaApi?: HelpaApi
 }

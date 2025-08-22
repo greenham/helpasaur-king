@@ -8,11 +8,23 @@ export enum RelayEvent {
   LEAVE_CHANNEL = "leaveChannel",
 }
 
+// Import payload types from shared types
+import type {
+  StreamAlertPayload,
+  WeeklyRacePayload,
+  ChannelEventPayload,
+} from "@helpasaur/types"
+
 // Relay Data structure for all events
-export interface RelayData<T = any> {
+export interface RelayData<T = unknown> {
   payload: T
   source: string
 }
+
+// Specific relay data types for each event
+export type StreamAlertRelayData = RelayData<StreamAlertPayload>
+export type WeeklyRaceRelayData = RelayData<WeeklyRacePayload>
+export type ChannelEventRelayData = RelayData<ChannelEventPayload>
 
 // Extended Socket type to include custom data
 export interface CustomSocket extends Socket {

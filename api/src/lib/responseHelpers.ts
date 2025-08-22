@@ -66,9 +66,11 @@ export const sendNoop = (
  */
 export const handleRouteError = (
   res: Response,
-  error: any,
+  error: unknown,
   operation: string
 ): void => {
   console.error(`Error in ${operation}:`, error)
-  sendError(res, error.message || `Failed to ${operation}`)
+  const message =
+    error instanceof Error ? error.message : `Failed to ${operation}`
+  sendError(res, message)
 }

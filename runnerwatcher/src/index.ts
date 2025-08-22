@@ -22,7 +22,7 @@ const helpaApi = new HelpaApi({
 async function init(): Promise<void> {
   try {
     const config = await helpaApi.getServiceConfig()
-    const runnerWatcherConfig = config.config as RunnerWatcherConfig
+    const runnerWatcherConfig = config.config as unknown as RunnerWatcherConfig
     const runnerwatcher = new RunnerWatcher(runnerWatcherConfig)
     const wsRelay: Socket = io(websocketRelayServer, {
       query: { clientId: `${packageName} v${packageVersion}` },

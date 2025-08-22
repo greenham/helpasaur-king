@@ -23,7 +23,7 @@ async function init() {
     }
 
     // Cast the generic config to DiscordConfig
-    const discordConfig = config.config as DiscordConfig
+    const discordConfig = config.config as unknown as DiscordConfig
 
     // Create and start the bot
     const bot = new DiscordBot(discordConfig, helpaApiClient)
@@ -56,12 +56,12 @@ async function init() {
               readyAt: bot.discordClient.readyAt, // timestamp when bot became ready
               environment: process.env.NODE_ENV || "development",
             })
-          } catch (error: any) {
+          } catch (error) {
             console.error("Health check error:", error)
             res.status(503).json({
               status: "unhealthy",
               service: "discord",
-              error: error.message,
+              error: error instanceof Error ? error.message : "Unknown error",
             })
           }
         }
@@ -75,8 +75,11 @@ async function init() {
     })
 
     bot.start()
-  } catch (error: any) {
-    console.error("🛑 Error starting Discord bot:", error.message)
+  } catch (error) {
+    console.error(
+      "🛑 Error starting Discord bot:",
+      error instanceof Error ? error.message : error
+    )
     process.exit(1)
   }
 }

@@ -9,18 +9,26 @@ export enum ApiResult {
   NOOP = "noop",
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   result: ApiResult
   message?: string
   data?: T
 }
 
+export interface ErrorResponse {
+  result: ApiResult.ERROR
+  message: string
+  error?: unknown
+  code?: string
+}
+
+// Configuration Types
+export type ConfigurationValue = Record<string, unknown>
+
 // Service Config
 export interface ServiceConfig {
   id?: string
-  config: {
-    [key: string]: any
-  }
+  config: ConfigurationValue
 }
 
 // Command Types
@@ -168,7 +176,7 @@ export interface CommandLogRequest {
   alias: string
   source: "discord" | "twitch"
   username: string
-  metadata: any
+  metadata?: Record<string, unknown>
 }
 
 // Discord Guild Configuration Types

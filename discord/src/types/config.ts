@@ -1,8 +1,16 @@
+import { GuildConfig } from "@helpasaur/types"
+
 // Discord Bot Configuration
 export interface DiscordConfig {
   token: string
   clientId: string
   guildId?: string
+  activities?: string[]
+  guilds: GuildConfig[]
+  oauth?: {
+    permissions: string
+    scopes: string[]
+  }
   channels?: {
     streamAlerts?: string
     raceAlerts?: string

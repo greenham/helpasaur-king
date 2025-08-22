@@ -10,6 +10,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@helpasaur/types": "workspace:*",
     "ms": "^2.1.3",
     "socket.io": "^4.7.2"
   },

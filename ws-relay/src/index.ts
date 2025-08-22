@@ -88,7 +88,7 @@ wss.on("connection", (socket: Socket) => {
   })
 
   Object.values(RelayEvent).forEach((event) => {
-    socket.on(event, (data: any) => {
+    socket.on(event, (data: unknown) => {
       console.log(`Received ${event} event:`, data)
       messagesRelayed++
       eventCounts[event] = (eventCounts[event] || 0) + 1

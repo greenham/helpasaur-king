@@ -65,7 +65,7 @@ router.post(
         `Added entry #${newId} to ${listName} practice list.`,
         201
       )
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "add practice list entry")
     }
   }
@@ -102,7 +102,7 @@ router.get(
         },
         `Practice this: ${randomEntry} [${randomIndex + 1}]`
       )
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "get random practice list entry")
     }
   }
@@ -141,7 +141,7 @@ router.delete(
         null,
         `Deleted entry #${entryId} from ${listName} practice list!`
       )
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "delete practice list entry")
     }
   }
@@ -175,7 +175,7 @@ router.get(
         },
         result.entries.map((e, idx) => `[${idx + 1}] ${e}`).join(" | ")
       )
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "get practice list")
     }
   }
@@ -205,7 +205,7 @@ router.delete(
       }
 
       sendSuccess(res, null, "Practice list cleared!")
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "clear practice list")
     }
   }

@@ -28,7 +28,7 @@ router.get("/live", async (req: Request, res: Response) => {
   try {
     const streams = await twitchApiClient.getStreams(filter)
     sendSuccess(res, streams)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get live streams")
   }
 })

@@ -1,19 +1,23 @@
 import { EmbedBuilder, Message, MessageFlags } from "discord.js"
 import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
 import { defaultGuildConfig } from "../constants"
-import { DiscordEvent } from "../types"
+import { DiscordEvent, ExtendedClient } from "../types"
+import { GuildConfig } from "@helpasaur/types"
 
 let aliasList: string[] | undefined
 const cachedCommands = new Map<string, CachableCommand>()
 const cooldowns = new Map<string, number>()
 
-const messageCreateEvent: DiscordEvent = {
+const messageCreateEvent: DiscordEvent<"messageCreate"> = {
   name: "messageCreate",
   async execute(interaction: Message) {
-    const { author, content, guildId, client } = interaction as any
+    const { author, content, guildId } = interaction
+    const client = interaction.client as ExtendedClient
 
     //  See if there's an internal configuration for this guild
-    let guildConfig = client.config.guilds.find((g: any) => g.id === guildId)
+    let guildConfig = client.config.guilds.find(
+      (g: GuildConfig) => g.id === guildId
+    )
     if (!guildConfig) {
       guildConfig = Object.assign({}, defaultGuildConfig)
     }
@@ -23,7 +27,7 @@ const messageCreateEvent: DiscordEvent = {
     const { cmdPrefix, textCmdCooldown } = guildConfig
 
     // Make sure the content starts with the correct prefix
-    if (!content.startsWith(cmdPrefix)) return
+    if (!cmdPrefix || !content.startsWith(cmdPrefix)) return
 
     // Sweep out everything that's not the command and make it case-insensitive
     const commandNoPrefix = content.slice(1).split(" ")[0].toLowerCase()
@@ -33,8 +37,8 @@ const messageCreateEvent: DiscordEvent = {
         content: `https://discord.com/api/oauth2/authorize?client_id=${
           client.config.clientId
         }&permissions=${
-          client.config.oauth.permissions
-        }&scope=${client.config.oauth.scopes.join("%20")}`,
+          client.config.oauth?.permissions || "0"
+        }&scope=${client.config.oauth?.scopes?.join("%20") || "bot"}`,
         flags: [MessageFlags.Ephemeral],
       } as any)
       return
@@ -57,9 +61,10 @@ const messageCreateEvent: DiscordEvent = {
     if (timeUsed) {
       const now = Date.now()
       // Command was recently used, check timestamp to see if it's on cooldown
-      if (now - timeUsed <= textCmdCooldown * 1000) {
+      const cooldownMs = (textCmdCooldown || 5) * 1000
+      if (now - timeUsed <= cooldownMs) {
         // Calculate how much longer it's on cooldown
-        onCooldown = (textCmdCooldown * 1000 - (now - timeUsed)) / 1000
+        onCooldown = (cooldownMs - (now - timeUsed)) / 1000
       }
     }
 

@@ -16,7 +16,7 @@ router.get("/", async (req: Request, res: Response) => {
   try {
     const configs = await Config.find()
     sendSuccess(res, configs)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get configs")
   }
 })
@@ -26,7 +26,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   try {
     const result = await Config.findOne({ id: req.params.id })
     sendSuccess(res, result)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get config by ID")
   }
 })
@@ -50,7 +50,7 @@ router.get("/twitch/activeChannels", async (req: Request, res: Response) => {
       )
     )
     sendSuccess(res, channels)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "get active channels")
   }
 })

@@ -11,7 +11,7 @@ This is a **massive architectural overhaul** converting the entire Helpasaur Kin
 
 ## 🚨 Critical Issues That Must Be Fixed
 
-### 1. **Dangerous Environment Variable Access (SECURITY CRITICAL)**
+<!-- ### 1. **Dangerous Environment Variable Access (SECURITY CRITICAL)**
 
 **Location:** `api/src/index.ts:13`, `api/src/index.ts:57`
 ```typescript
@@ -65,7 +65,7 @@ New system expects:
 
 **Impact:** Could break existing production deployments if scripts expect the old format
 
-**Verification Needed:** Test this with your production deployment scripts in `scripts/deploy.sh`
+**Verification Needed:** Test this with your production deployment scripts in `scripts/deploy.sh` -->
 
 ### 3. **Widespread Use of `any` Type Defeats TypeScript Purpose**
 

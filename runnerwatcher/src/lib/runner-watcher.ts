@@ -2,8 +2,14 @@ import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
 import { TwitchApiClient } from "twitch-api-client"
 import { Constants } from "../constants"
-import { WatchedTwitchStream } from "../types/stream"
+import { WatchedTwitchStream, RunnerWatcherConfig } from "../types"
 import { config } from "../config"
+import {
+  TwitchEventSubNotification,
+  StreamOnlineEvent,
+  ChannelUpdateEvent,
+  isChannelUpdateEvent,
+} from "@helpasaur/types"
 
 const { twitchWebhookListenerPort } = config
 const {
@@ -18,10 +24,10 @@ const {
 let cachedStreams: WatchedTwitchStream[] = []
 
 class RunnerWatcher extends EventEmitter {
-  config: any
+  config: RunnerWatcherConfig
   listener: TwitchEventListener
 
-  constructor(config: any) {
+  constructor(config: RunnerWatcherConfig) {
     super()
 
     this.config = config
@@ -40,22 +46,33 @@ class RunnerWatcher extends EventEmitter {
   init(): void {
     this.listener.listen(twitchWebhookListenerPort)
 
-    this.listener.on("notification", async (notification: any) => {
-      console.log("\r\n-------------------------------------\r\n")
-      console.log(
-        `Received ${notification.subscription.type} event for ${notification.event.broadcaster_user_login}`
-      )
-      console.log(notification.event)
-      console.log(`Processing event in ${DELAY_FOR_API_SECONDS} seconds...`)
+    this.listener.on(
+      "notification",
+      async (
+        notification: TwitchEventSubNotification<
+          StreamOnlineEvent | ChannelUpdateEvent
+        >
+      ) => {
+        console.log("\r\n-------------------------------------\r\n")
+        console.log(
+          `Received ${notification.subscription.type} event for ${notification.event.broadcaster_user_login}`
+        )
+        console.log(notification.event)
+        console.log(`Processing event in ${DELAY_FOR_API_SECONDS} seconds...`)
 
-      // Waiting here to ensure fresh data is available via Twitch API
-      setTimeout(() => {
-        this.processEvent(notification)
-      }, DELAY_FOR_API_SECONDS * 1000)
-    })
+        // Waiting here to ensure fresh data is available via Twitch API
+        setTimeout(() => {
+          this.processEvent(notification)
+        }, DELAY_FOR_API_SECONDS * 1000)
+      }
+    )
   }
 
-  async processEvent(notification: any): Promise<void> {
+  async processEvent(
+    notification: TwitchEventSubNotification<
+      StreamOnlineEvent | ChannelUpdateEvent
+    >
+  ): Promise<void> {
     const { subscription, event } = notification
     let eventType = subscription.type
     const user = {
@@ -88,7 +105,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Replace some stream data from API if this is an update event
-      if (eventType === CHANNEL_UPDATE_EVENT) {
+      if (eventType === CHANNEL_UPDATE_EVENT && isChannelUpdateEvent(event)) {
         stream.game_id = event.category_id
         stream.title = event.title
       }
@@ -110,7 +127,7 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // And passes filters
-      const speedrunTester = new RegExp(this.config.statusFilters, "i")
+      const speedrunTester = new RegExp(this.config.statusFilters || "", "i")
       if (
         speedrunTester.test(stream.title) ||
         speedrunTester.test(stream.title.replace(/\s/g, ""))
@@ -152,6 +169,7 @@ class RunnerWatcher extends EventEmitter {
           )
           eventType = STREAM_ONLINE_EVENT
         } else if (
+          isChannelUpdateEvent(event) &&
           cachedStreamForUser.title === event.title &&
           cachedStreamForUser.game_id === event.category_id
         ) {

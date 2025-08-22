@@ -1,16 +1,17 @@
 import { Guild } from "discord.js"
 import { defaultGuildConfig } from "../constants"
-import { DiscordEvent } from "../types"
+import { DiscordEvent, ExtendedClient } from "../types"
+import { GuildConfig } from "@helpasaur/types"
 
-const guildCreateEvent: DiscordEvent = {
+const guildCreateEvent: DiscordEvent<"guildCreate"> = {
   name: "guildCreate",
   async execute(guild: Guild) {
     console.log(`Joined guild ${guild.name} (${guild.id})`)
-    const { client } = guild as any // TODO: Type the extended client properly
+    const client = guild.client as ExtendedClient
 
     // See if there's an existing configuration for this guild
     const guildConfigIndex = client.config.guilds.findIndex(
-      (g: any) => g.id === guild.id
+      (g: GuildConfig) => g.id === guild.id
     )
     if (guildConfigIndex !== -1) {
       console.log(`Guild ${guild.name} (${guild.id}) is already configured`)
@@ -25,9 +26,10 @@ const guildCreateEvent: DiscordEvent = {
 
           // Update the local config
           client.config.guilds[guildConfigIndex].active = true
-        } catch (err: any) {
+        } catch (err) {
           console.error(
-            `Error re-activating guild ${guild.name} (${guild.id}): ${err.message}`
+            `Error re-activating guild ${guild.name} (${guild.id}):`,
+            err instanceof Error ? err.message : err
           )
         }
       } else {
@@ -56,9 +58,10 @@ const guildCreateEvent: DiscordEvent = {
 
       // Update the local config
       client.config.guilds.push(guildConfig)
-    } catch (err: any) {
+    } catch (err) {
       console.error(
-        `Error creating guild ${guild.name} (${guild.id}) via API: ${err.message}`
+        `Error creating guild ${guild.name} (${guild.id}) via API:`,
+        err instanceof Error ? err.message : err
       )
       return
     }

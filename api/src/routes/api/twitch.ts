@@ -23,7 +23,7 @@ router.get(
       const users = await User.find({ "twitchBotConfig.active": true })
       const channels = users.map((u: any) => u.twitchUserData.login).sort()
       sendSuccess(res, channels)
-    } catch (err: any) {
+    } catch (err) {
       handleRouteError(res, err, "get channels")
     }
   }
@@ -99,7 +99,7 @@ router.post("/join", async (req: Request, res: Response) => {
           )
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       return handleRouteError(res, err, "join channel")
     }
   }
@@ -152,7 +152,7 @@ router.post("/leave", async (req: Request, res: Response) => {
     }
 
     sendSuccess(res)
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "leave channel")
   }
 })
@@ -255,7 +255,7 @@ router.patch("/config", async (req: Request, res: Response) => {
         ...user.twitchBotConfig,
       },
     })
-  } catch (err: any) {
+  } catch (err) {
     handleRouteError(res, err, "update config")
   }
 })
