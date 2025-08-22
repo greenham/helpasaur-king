@@ -1,4 +1,4 @@
-import { EmbedBuilder, Message, MessageFlags } from "discord.js"
+import { EmbedBuilder, Message } from "discord.js"
 import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
 import { defaultGuildConfig } from "../constants"
 import { DiscordEvent, ExtendedClient } from "../types"
@@ -33,14 +33,13 @@ const messageCreateEvent: DiscordEvent<"messageCreate"> = {
     const commandNoPrefix = content.slice(1).split(" ")[0].toLowerCase()
 
     if (commandNoPrefix === "auth") {
-      await interaction.reply({
-        content: `https://discord.com/api/oauth2/authorize?client_id=${
+      await interaction.reply(
+        `https://discord.com/api/oauth2/authorize?client_id=${
           client.config.clientId
         }&permissions=${
           client.config.oauth?.permissions || "0"
-        }&scope=${client.config.oauth?.scopes?.join("%20") || "bot"}`,
-        flags: [MessageFlags.Ephemeral],
-      } as any)
+        }&scope=${client.config.oauth?.scopes?.join("%20") || "bot"}`
+      )
       return
     }
 

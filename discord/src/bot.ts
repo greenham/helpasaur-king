@@ -31,7 +31,9 @@ export class DiscordBot {
     this.discordClient.config = config
     this.discordClient.commands = new Collection()
     this.discordClient.setRandomActivity = () => {
-      const activities = (this.discordClient.config as any).activities || []
+      const activities =
+        (this.discordClient.config as { activities?: string[] }).activities ||
+        []
       if (activities.length === 0) return
 
       const activity = activities[Math.floor(Math.random() * activities.length)]

@@ -5,14 +5,15 @@ import {
   ChatInputCommandInteraction,
   MessageFlags,
 } from "discord.js"
-import { DiscordCommand } from "../types"
+import { DiscordCommand, ExtendedClient } from "../types"
+import { GuildConfig } from "@helpasaur/types"
 
 interface CommandConfig {
   typeFn: string
   key: string
   valueProperty?: string
   guildConfigKey: string
-  valueOnNull?: any
+  valueOnNull?: unknown
 }
 
 const configCommand: DiscordCommand = {
@@ -135,11 +136,13 @@ const configCommand: DiscordCommand = {
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] })
 
     const subcommand = interaction.options.getSubcommand()
-    const { guildId, client } = interaction as any
+    const { guildId, client } = interaction as ChatInputCommandInteraction & {
+      client: ExtendedClient
+    }
 
     // See if there's an internal configuration for this guild
     const currentGuildConfig = client.config.guilds.find(
-      (g: any) => g.id === guildId
+      (g: GuildConfig) => g.id === guildId
     )
     if (!currentGuildConfig) {
       await interaction.editReply({
@@ -219,7 +222,7 @@ const configCommand: DiscordCommand = {
       ],
     ])
 
-    const guildUpdate: any = {}
+    const guildUpdate: Partial<GuildConfig> = {}
     const commandConfig = subcommandMap.get(subcommand)
     if (!commandConfig) {
       await interaction.editReply({
@@ -229,22 +232,36 @@ const configCommand: DiscordCommand = {
     }
 
     const { typeFn, key, guildConfigKey } = commandConfig
-    let newValue: any = (interaction.options as any)[typeFn](key)
+    let newValue: unknown = (
+      interaction.options as unknown as Record<string, Function>
+    )[typeFn](key)
     if (newValue === null && commandConfig.valueOnNull !== undefined) {
       newValue = commandConfig.valueOnNull
     }
-    if (newValue !== null && commandConfig.valueProperty) {
-      newValue = newValue[commandConfig.valueProperty]
+    if (
+      newValue !== null &&
+      newValue !== undefined &&
+      commandConfig.valueProperty
+    ) {
+      newValue = (newValue as Record<string, unknown>)[
+        commandConfig.valueProperty
+      ]
     }
-    if (currentGuildConfig[guildConfigKey] === newValue) {
+    if (
+      (currentGuildConfig as unknown as Record<string, unknown>)[
+        guildConfigKey
+      ] === newValue
+    ) {
       await interaction.editReply({
         content: "That's already the value!",
       })
       return
     }
 
-    guildUpdate[guildConfigKey] = newValue
-    currentGuildConfig[guildConfigKey] = newValue
+    ;(guildUpdate as Record<string, unknown>)[guildConfigKey] = newValue
+    ;(currentGuildConfig as unknown as Record<string, unknown>)[
+      guildConfigKey
+    ] = newValue
 
     await this.helpaApi?.discord.updateGuildConfig(
       interaction.guildId!,

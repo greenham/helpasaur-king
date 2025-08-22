@@ -14,14 +14,16 @@ const helpaApiClient = new HelpaApi({
 
 helpaApiClient
   .getServiceConfig()
-  .then((config: any) => {
+  .then((config) => {
     if (!config) {
       throw new Error(`Unable to get service config from API!`)
     }
 
-    const { clientId, token } = config
+    const { clientId, token } = (
+      config as { config: { clientId: string; token: string } }
+    ).config
 
-    const commands: any[] = []
+    const commands: unknown[] = []
     const commandsPath = path.join(__dirname, "commands")
     const commandFiles = fs
       .readdirSync(commandsPath)
@@ -55,7 +57,7 @@ helpaApiClient
           // GUILD-SPECIFIC DEPLOY: Routes.applicationGuildCommands(clientId, guildId),
           Routes.applicationCommands(clientId),
           { body: commands }
-        )) as any[]
+        )) as unknown[]
 
         console.log(
           `Successfully reloaded ${data.length} application (/) commands.`
@@ -80,7 +82,7 @@ helpaApiClient
     //   }
     // })();
   })
-  .catch((error: any) => {
+  .catch((error) => {
     console.error("Error fetching service config:", error)
   })
 
