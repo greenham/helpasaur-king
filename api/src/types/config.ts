@@ -3,6 +3,7 @@
  */
 
 import { GuildConfig } from "@helpasaur/types"
+import Config from "../models/config"
 
 // Discord service configuration
 export interface DiscordServiceConfig {
@@ -24,6 +25,8 @@ export interface StreamAlertsConfig {
     display_name: string
     profile_image_url?: string
   }>
+  statusFilters?: string
+  alttpGameIds?: string[]
 }
 
 // Web service configuration
@@ -44,27 +47,83 @@ export interface ConfigDocument {
     | Record<string, unknown>
 }
 
-// Type guards
+// Config type mapping for type safety
+export const ConfigTypes = {
+  discord: "discord",
+  streamAlerts: "streamAlerts",
+  web: "web",
+} as const
+
+export type ConfigTypeKey = keyof typeof ConfigTypes
+
+// Type mapping interface
+export interface ConfigTypeMap {
+  discord: DiscordServiceConfig
+  streamAlerts: StreamAlertsConfig
+  web: WebServiceConfig
+}
+
+// Generic type guard that just validates the document structure
+export function isValidConfigDoc<K extends ConfigTypeKey>(
+  configDoc: unknown
+): configDoc is {
+  config: ConfigTypeMap[K]
+  markModified: (path: string) => void
+  save: () => Promise<any>
+} {
+  return (
+    typeof configDoc === "object" &&
+    configDoc !== null &&
+    "config" in configDoc &&
+    typeof (configDoc as any).config === "object" &&
+    (configDoc as any).config !== null
+  )
+}
+
+// Generic config fetcher that handles DB lookup, validation, and extraction
+export async function getConfig<K extends ConfigTypeKey>(
+  configId: K
+): Promise<ConfigTypeMap[K] | null> {
+  const configDoc = await Config.findOne({ id: configId })
+
+  if (!isValidConfigDoc<K>(configDoc)) {
+    return null
+  }
+
+  return configDoc.config as ConfigTypeMap[K]
+}
+
+// Get config with document for cases where we need to save changes
+export async function getConfigWithDoc<K extends ConfigTypeKey>(
+  configId: K
+): Promise<{ config: ConfigTypeMap[K]; doc: any } | null> {
+  const configDoc = await Config.findOne({ id: configId })
+
+  if (!isValidConfigDoc<K>(configDoc)) {
+    return null
+  }
+
+  return {
+    config: configDoc.config as ConfigTypeMap[K],
+    doc: configDoc,
+  }
+}
+
+// Legacy type guards for backwards compatibility (can be removed once all usage is updated)
 export function isDiscordConfig(
   config: unknown
 ): config is { config: DiscordServiceConfig } {
-  return (
-    typeof config === "object" &&
-    config !== null &&
-    "config" in config &&
-    typeof (config as any).config === "object" &&
-    "clientId" in (config as any).config
-  )
+  return isValidConfigDoc<"discord">(config)
 }
 
 export function isStreamAlertsConfig(
   config: unknown
 ): config is { config: StreamAlertsConfig } {
-  return (
-    typeof config === "object" &&
-    config !== null &&
-    "config" in config &&
-    typeof (config as any).config === "object" &&
-    "channels" in (config as any).config
-  )
+  return isValidConfigDoc<"streamAlerts">(config)
+}
+
+export function isWebServiceConfig(
+  config: unknown
+): config is { config: WebServiceConfig } {
+  return isValidConfigDoc<"web">(config)
 }

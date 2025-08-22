@@ -1,8 +1,7 @@
 import express, { Request, Response, Router } from "express"
-import Config from "../../models/config"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
 import { sendSuccess, handleRouteError } from "../../lib/responseHelpers"
-import { isStreamAlertsConfig } from "../../types/config"
+import { getConfig } from "../../types/config"
 
 const router: Router = express.Router()
 
@@ -11,11 +10,10 @@ const router: Router = express.Router()
 // GET /config -> returns frontend configuration for web
 router.get("/config", async (req: Request, res: Response) => {
   try {
-    const configDoc = await Config.findOne({ id: "streamAlerts" })
-    if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+    const streamAlertsConfig = await getConfig("streamAlerts")
+    if (!streamAlertsConfig) {
       throw new Error("Stream alerts configuration not found")
     }
-    const streamAlertsConfig = configDoc.config
     const { channels, statusFilters, blacklistedUsers } = streamAlertsConfig
 
     const webConfig = {

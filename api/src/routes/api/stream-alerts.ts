@@ -1,6 +1,5 @@
 import express, { Request, Response, Router } from "express"
 import guard from "express-jwt-permissions"
-import Config from "../../models/config"
 import { getTwitchApiClient } from "../../lib/utils"
 import {
   sendSuccess,
@@ -8,7 +7,7 @@ import {
   sendNoop,
   handleRouteError,
 } from "../../lib/responseHelpers"
-import { isStreamAlertsConfig } from "../../types/config"
+import { getConfig, getConfigWithDoc } from "../../types/config"
 import {
   TwitchUserData,
   GetSubscriptionOptions,
@@ -25,11 +24,10 @@ router.get(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     try {
-      const configDoc = await Config.findOne({ id: "streamAlerts" })
-      if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+      const streamAlertsConfig = await getConfig("streamAlerts")
+      if (!streamAlertsConfig) {
         throw new Error("Stream alerts configuration not found")
       }
-      const streamAlertsConfig = configDoc.config
       // Put this list of strings in alphabetical order before returning
       streamAlertsConfig.channels.sort((a, b) => {
         if (a.login < b.login) {
@@ -73,11 +71,11 @@ router.post(
       return sendError(res, "No channels provided in Array", 400)
     }
 
-    const configDoc = await Config.findOne({ id: "streamAlerts" })
-    if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+    const result = await getConfigWithDoc("streamAlerts")
+    if (!result) {
       throw new Error("Stream alerts configuration not found")
     }
-    const streamAlertsConfig = configDoc.config
+    const { config: streamAlertsConfig, doc: configDoc } = result
     const twitchApiClient = getTwitchApiClient()
     console.log(
       `Adding ${req.body.channels.length} channels to stream alerts...`
@@ -136,16 +134,15 @@ router.delete(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     try {
-      const configDoc = await Config.findOne({ id: "streamAlerts" })
       console.log(
         `Received request to remove ${req.params.id} from stream alerts`
       )
 
-      // Ensure this channel is in the list already
-      if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+      const result = await getConfigWithDoc("streamAlerts")
+      if (!result) {
         return sendError(res, "Configuration not found")
       }
-      const streamAlertsConfig = configDoc.config
+      const { config: streamAlertsConfig, doc: configDoc } = result
       const channelIndex = streamAlertsConfig.channels.findIndex(
         (c) => c.id === req.params.id
       )
@@ -247,11 +244,11 @@ router.post(
       return sendError(res, "No channels provided in Array", 400)
     }
 
-    const configDoc = await Config.findOne({ id: "streamAlerts" })
-    if (!configDoc || !isStreamAlertsConfig(configDoc)) {
+    const result = await getConfigWithDoc("streamAlerts")
+    if (!result) {
       throw new Error("Stream alerts configuration not found")
     }
-    const streamAlertsConfig = configDoc.config
+    const { config: streamAlertsConfig, doc: configDoc } = result
     const twitchApiClient = getTwitchApiClient()
     console.log(
       `Blacklisting ${req.body.channels.length} channels from stream directory...`
