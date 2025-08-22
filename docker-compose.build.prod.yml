@@ -14,6 +14,7 @@ services:
       target: builder
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Base image with pre-built libraries and dependencies for all Helpasaur King services"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "build.commit=${GIT_COMMIT:-unknown}"
         - "build.date=${BUILD_DATE:-unknown}"
@@ -33,6 +34,7 @@ services:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-api:latest
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=REST API server with MongoDB, JWT auth, Socket.io, and Twitch EventSub webhooks"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "service.name=api"
 
@@ -51,6 +53,7 @@ services:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-discord:latest
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Discord bot for ALttP speedrunning community - commands, go-live notifications, race announcements"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "service.name=discord"
 
@@ -69,6 +72,7 @@ services:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-twitch:latest
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Twitch chat bot for stream commands and viewer interaction"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "service.name=twitch"
 
@@ -87,6 +91,7 @@ services:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-runnerwatcher:latest
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Stream monitoring service using Twitch EventSub for ALttP stream detection and alerts"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "service.name=runnerwatcher"
 
@@ -105,6 +110,7 @@ services:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-racebot:latest
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Automated racetime.gg race creation for weekly ALttP community races (Sundays 11:30 AM PT)"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "service.name=racebot"
 
@@ -123,5 +129,6 @@ services:
         - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-ws-relay:latest
       labels:
         - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=WebSocket relay hub for real-time inter-service communication"
         - "org.opencontainers.image.version=${VERSION:-latest}"
         - "service.name=ws-relay"
