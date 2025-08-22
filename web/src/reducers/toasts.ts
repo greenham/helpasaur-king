@@ -1,4 +1,21 @@
-export const toastReducer = (state: any, action: any) => {
+interface Toast {
+  id: string | number
+  message?: string
+  type?: string
+}
+
+interface ToastState {
+  toasts: Toast[]
+}
+
+type ToastAction =
+  | { type: "ADD_TOAST"; payload: Toast }
+  | { type: "DELETE_TOAST"; payload: string | number }
+
+export const toastReducer = (
+  state: ToastState,
+  action: ToastAction
+): ToastState => {
   switch (action.type) {
     case "ADD_TOAST":
       return {
@@ -7,7 +24,7 @@ export const toastReducer = (state: any, action: any) => {
       }
     case "DELETE_TOAST": {
       const updatedToasts = state.toasts.filter(
-        (toast: any) => toast.id !== action.payload
+        (toast) => toast.id !== action.payload
       )
       return {
         ...state,
@@ -15,6 +32,6 @@ export const toastReducer = (state: any, action: any) => {
       }
     }
     default:
-      throw new Error(`Unhandled action type: ${action.type}`)
+      throw new Error(`Unhandled action type: ${(action as any).type}`)
   }
 }

@@ -3,7 +3,7 @@
  * These types define the structure of Twitch EventSub webhook notifications
  */
 
-import { TwitchUserData } from "./api"
+import { TwitchUserData } from "twitch-api-client"
 
 // Base EventSub Notification structure
 export interface TwitchEventSubNotification<T = unknown> {

@@ -52,7 +52,9 @@ export interface IUser {
   }
 }
 
-export interface IUserDocument extends IUser, Document {}
+export interface IUserDocument extends IUser, Document {
+  _id: any // Mongoose ObjectId
+}
 
 // Account Model
 export interface IAccount {

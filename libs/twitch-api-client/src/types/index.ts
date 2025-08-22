@@ -35,6 +35,9 @@ export interface TwitchPrivilegedUserData extends TwitchUserData {
   email?: string
 }
 
+// Re-export for convenience
+export type { TwitchUserData as BaseTwitchUserData }
+
 export interface SubscribeToStreamEventsOptions {
   channel: string
   userId: string

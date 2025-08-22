@@ -43,17 +43,20 @@ export interface Command {
 }
 
 // User Types
-export interface TwitchUserData {
-  id: string
-  login: string
-  display_name: string
-  broadcaster_type?: string
-  description?: string
-  profile_image_url?: string
-  offline_image_url?: string
-  view_count?: number
-  created_at?: string
-  email?: string
+import { TwitchPrivilegedUserData, TwitchUserData } from "twitch-api-client"
+
+// Re-export base types for convenience
+export type { TwitchUserData, TwitchPrivilegedUserData }
+
+// This interface extends TwitchPrivilegedUserData with our auth data
+export interface TwitchUserDataWithAuth extends TwitchPrivilegedUserData {
+  auth?: {
+    access_token: string
+    expires_at: number
+    refresh_token: string
+    scope: string[]
+    token_type: string
+  }
 }
 
 export interface TwitchBotConfig {
@@ -70,7 +73,7 @@ export interface TwitchBotConfig {
 
 export interface ApiUser {
   _id: string
-  twitchUserData: TwitchUserData
+  twitchUserData: TwitchUserDataWithAuth
   permissions: string[]
   lastLogin: Date
   twitchBotConfig?: TwitchBotConfig
@@ -79,7 +82,7 @@ export interface ApiUser {
 // Web Configuration Types
 export interface StreamFilterConfig {
   blacklistedUsers: string[]
-  channels: TwitchUserData[]
+  channels: TwitchUserDataWithAuth[]
   statusFilters: string
 }
 

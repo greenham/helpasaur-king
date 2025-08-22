@@ -10,7 +10,7 @@ import {
   handleRouteError,
 } from "../../lib/responseHelpers"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
-import { TwitchUserData } from "@helpasaur/types"
+import { TwitchUserData } from "twitch-api-client"
 
 const router: Router = express.Router()
 const permissionGuard = guard()

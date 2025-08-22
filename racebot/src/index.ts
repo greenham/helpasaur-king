@@ -77,7 +77,7 @@ const createRaceRoom = (
     RacetimeBot.initialize(racetimeBotClientId, racetimeBotClientSecret)
       .then((racebot) => racebot.startRace(game, raceData))
       .then(resolve)
-      .catch((error: any) => {
+      .catch((error) => {
         console.error(`Unable to create race room!`)
         reject(error)
       })

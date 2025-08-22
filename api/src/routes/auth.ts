@@ -2,7 +2,9 @@ import express, { Request, Response, Router } from "express"
 import axios from "axios"
 import jwt from "jsonwebtoken"
 import ms from "ms"
+import { TwitchPrivilegedUserData } from "twitch-api-client"
 import User from "../models/user"
+import { IUserDocument } from "../types/models"
 import { requireAuthKey, getUserTwitchApiClient } from "../lib/utils"
 import { sendSuccess, sendError } from "../lib/responseHelpers"
 import { config } from "../config"
@@ -63,7 +65,9 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   // Get user data from Twitch with the user's access token
   const twitchApiUser = getUserTwitchApiClient(userAccessToken, [])
 
-  let twitchUserData: any
+  let twitchUserData: TwitchPrivilegedUserData & {
+    auth?: typeof twitchAuthData
+  }
   try {
     const currentUserData =
       await twitchApiUser.getCurrentUserData(userAccessToken)
@@ -73,30 +77,49 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
     }
   } catch (err) {
     console.error(`Error fetching user data from Twitch!`, err)
+    return sendError(res, "Failed to fetch user data from Twitch", 500)
   }
 
-  let localUser: any
+  let localUser: IUserDocument | null = null
   try {
     // Fetch local user via twitch ID
-    localUser = await User.findOne({ "twitchUserData.id": twitchUserData.id })
+    localUser = (await User.findOne({
+      "twitchUserData.id": twitchUserData.id,
+    })) as IUserDocument | null
 
     if (localUser) {
       // Update existing user
-      localUser.lastLogin = Date.now()
-      localUser.twitchUserData = twitchUserData
+      localUser.lastLogin = new Date()
+      // Store twitchUserData with created_at as Date for DB
+      const userDataForDb = {
+        ...twitchUserData,
+        created_at: new Date(twitchUserData.created_at),
+      }
+      localUser.twitchUserData = userDataForDb as any
       localUser.markModified("twitchUserData")
       localUser = await localUser.save()
     } else {
       // Create new user
-      localUser = await User.create({ twitchUserData })
+      const userDataForDb = {
+        ...twitchUserData,
+        created_at: new Date(twitchUserData.created_at),
+      }
+      localUser = (await User.create({
+        twitchUserData: userDataForDb,
+      })) as IUserDocument
     }
   } catch (err) {
     console.error(`Error updating local user data!`, err)
+    return sendError(res, "Failed to update user data", 500)
+  }
+
+  if (!localUser) {
+    return sendError(res, "Failed to create or update user", 500)
   }
 
   // Issue a JWT with the user's permissions and ID
   const idToken = jwt.sign(
-    { permissions: localUser.permissions },
+    { permissions: localUser.permissions || [] },
     jwtSecretKey,
     {
       expiresIn: loginExpirationLength,
