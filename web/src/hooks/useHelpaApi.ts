@@ -202,8 +202,9 @@ export const useHelpaApi = () => {
           helpaApiClient.twitch.joinTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotChannels"] })
+          queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
           if (showToast) {
-            toast.success(`Joined channel: ${variables || "your channel"}`)
+            toast.success(`Joined ${variables || "your channel"}!`)
           }
           mutationOptions.onSuccess?.(data, variables, context)
         },
@@ -229,8 +230,9 @@ export const useHelpaApi = () => {
           helpaApiClient.twitch.leaveTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotChannels"] })
+          queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
           if (showToast) {
-            toast.success(`Left channel: ${variables || "your channel"}`)
+            toast.success(`Left ${variables || "your channel"}!`)
           }
           mutationOptions.onSuccess?.(data, variables, context)
         },
