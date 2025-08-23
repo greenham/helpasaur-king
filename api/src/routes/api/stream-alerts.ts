@@ -13,6 +13,7 @@ import {
   GetSubscriptionOptions,
   HelixEventSubSubscriptionStatus,
 } from "twitch-api-client"
+import { TwitchStreamEventType } from "@helpasaur/types"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -111,6 +112,10 @@ router.post(
         {
           channel,
           userId: userData.id,
+          events: [
+            TwitchStreamEventType.STREAM_ONLINE,
+            TwitchStreamEventType.CHANNEL_UPDATE,
+          ],
         }
       )
 

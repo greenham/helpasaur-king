@@ -19,9 +19,6 @@ import {
   GetSubscriptionOptions,
 } from "./types"
 
-export const STREAM_ONLINE_EVENT = "stream.online"
-export const CHANNEL_UPDATE_EVENT = "channel.update"
-
 // Helper function to extract raw data from @twurple class instances using official API
 export function convertTwurpleRawData<TData>(obj: DataObject<TData>): TData {
   // Use @twurple's official getRawData function
@@ -151,8 +148,7 @@ export class TwitchApiClient {
   async subscribeToStreamEvents(
     data: SubscribeToStreamEventsOptions
   ): Promise<PromiseSettledResult<HelixEventSubSubscription>[]> {
-    const events = [STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT]
-    const { channel, userId } = data
+    const { channel, userId, events } = data
 
     const subscriptions = events.map((event) => {
       console.log(`Creating ${event} event subscription for ${channel}`)

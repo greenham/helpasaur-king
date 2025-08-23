@@ -1,19 +1,15 @@
 import { Socket } from "socket.io"
 
-// WebSocket Relay Event Types
-export enum RelayEvent {
-  STREAM_ALERT = "streamAlert",
-  WEEKLY_RACE_ROOM_CREATED = "weeklyRaceRoomCreated",
-  JOIN_CHANNEL = "joinChannel",
-  LEAVE_CHANNEL = "leaveChannel",
-}
-
-// Import payload types from shared types
-import type {
+// Import event types and payload types from shared types
+import {
+  RelayEvent,
   StreamAlertPayload,
   WeeklyRacePayload,
   ChannelEventPayload,
 } from "@helpasaur/types"
+
+// Re-export for convenience
+export { RelayEvent }
 
 // Relay Data structure for all events
 export interface RelayData<T = unknown> {

@@ -9,5 +9,3 @@ export interface RunnerWatcherConfig {
   alttpGameIds: string[]
   statusFilters?: string
 }
-
-export * from "./stream"

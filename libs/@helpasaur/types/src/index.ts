@@ -4,4 +4,4 @@
  */
 
 export * from "./api"
-export * from "./twitch-events"
+export * from "twitch-api-client"

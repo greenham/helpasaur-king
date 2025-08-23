@@ -10,6 +10,7 @@ import discordRoutes from "./discord"
 import streamAlertsRoutes from "./stream-alerts"
 import configsRoutes from "./configs"
 import pracRoutes from "./prac"
+import testEventsRoutes from "./test-events"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -38,5 +39,11 @@ router.use(
   configsRoutes
 )
 router.use("/prac", pracRoutes)
+router.use(
+  "/testEvents",
+  requireJwtToken,
+  permissionGuard.check([["admin"]]),
+  testEventsRoutes
+)
 
 export default router

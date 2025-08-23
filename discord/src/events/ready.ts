@@ -6,10 +6,9 @@ import {
   GuildConfig,
   StreamAlertPayload,
   WeeklyRacePayload,
+  TwitchStreamEventType,
 } from "@helpasaur/types"
 import { config } from "../config"
-const STREAM_ONLINE_EVENT = "stream.online"
-const CHANNEL_UPDATE_EVENT = "channel.update"
 
 // @TODO: Move all of this to db.configs.discord
 const ALTTP_GUILD_ID = "138378732376162304"
@@ -142,9 +141,10 @@ const readyEvent: DiscordEvent<"ready"> = {
         source: string
       }) => {
         if (
-          ![STREAM_ONLINE_EVENT, CHANNEL_UPDATE_EVENT].includes(
-            stream.eventType
-          )
+          ![
+            TwitchStreamEventType.STREAM_ONLINE,
+            TwitchStreamEventType.CHANNEL_UPDATE,
+          ].includes(stream.eventType)
         ) {
           return
         }
@@ -194,7 +194,7 @@ const readyEvent: DiscordEvent<"ready"> = {
             })
 
           if (
-            stream.eventType === STREAM_ONLINE_EVENT &&
+            stream.eventType === TwitchStreamEventType.STREAM_ONLINE &&
             stream.thumbnail_url
           ) {
             streamAlertEmbed.setImage(
@@ -204,7 +204,7 @@ const readyEvent: DiscordEvent<"ready"> = {
             )
           }
 
-          if (stream.eventType === CHANNEL_UPDATE_EVENT) {
+          if (stream.eventType === TwitchStreamEventType.CHANNEL_UPDATE) {
             streamAlertEmbed.setTitle(`Changed title:`)
           }
 

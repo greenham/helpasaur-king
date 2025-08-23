@@ -14,4 +14,5 @@ export const ROUTES = {
   CONFIGS: `${API_BASE}/configs`,
   PRAC: `${API_BASE}/prac`,
   STREAM_ALERTS: `${API_BASE}/streamAlerts`,
+  TEST_EVENTS: `${API_BASE}/testEvents`,
 } as const

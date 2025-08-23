@@ -1,27 +1,25 @@
 import { EventEmitter } from "events"
 import { TwitchEventListener } from "./twitch-event-listener"
-import { TwitchApiClient } from "twitch-api-client"
+import { StreamAlertPayload, TwitchApiClient } from "twitch-api-client"
 import { Constants } from "../constants"
-import { WatchedTwitchStream, RunnerWatcherConfig } from "../types"
+import { RunnerWatcherConfig } from "../types"
 import { config } from "../config"
 import {
   TwitchEventSubNotification,
   StreamOnlineEvent,
+  StreamOfflineEvent,
   ChannelUpdateEvent,
   isChannelUpdateEvent,
+  TwitchStreamEventType,
+  TwitchStreamOnlineType,
+  RelayEvent,
 } from "@helpasaur/types"
 
 const { twitchWebhookListenerPort } = config
-const {
-  STREAM_ONLINE_EVENT,
-  CHANNEL_UPDATE_EVENT,
-  STREAM_ONLINE_TYPE_LIVE,
-  DELAY_FOR_API_SECONDS,
-  ALERT_DELAY_SECONDS,
-} = Constants
+const { DELAY_FOR_API_SECONDS, ALERT_DELAY_SECONDS } = Constants
 
 // Maintain a cache of streams we've recently alerted
-let cachedStreams: WatchedTwitchStream[] = []
+let cachedStreams: StreamAlertPayload[] = []
 
 class RunnerWatcher extends EventEmitter {
   config: RunnerWatcherConfig
@@ -70,11 +68,11 @@ class RunnerWatcher extends EventEmitter {
 
   async processEvent(
     notification: TwitchEventSubNotification<
-      StreamOnlineEvent | ChannelUpdateEvent
+      StreamOnlineEvent | ChannelUpdateEvent | StreamOfflineEvent
     >
   ): Promise<void> {
     const { subscription, event } = notification
-    let eventType = subscription.type
+    let eventType = subscription.type as TwitchStreamEventType
     const user = {
       id: event.broadcaster_user_id,
       login: event.broadcaster_user_login,
@@ -99,13 +97,16 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // Give us more control over this object
-      const stream: WatchedTwitchStream = {
+      const stream: StreamAlertPayload = {
         ...streamResult[0],
         eventType,
       }
 
       // Replace some stream data from API if this is an update event
-      if (eventType === CHANNEL_UPDATE_EVENT && isChannelUpdateEvent(event)) {
+      if (
+        eventType === TwitchStreamEventType.CHANNEL_UPDATE &&
+        isChannelUpdateEvent(event)
+      ) {
         stream.game_id = event.category_id
         stream.title = event.title
       }
@@ -115,7 +116,7 @@ class RunnerWatcher extends EventEmitter {
 
       // Make sure the stream is actually live
       // (we don't care about playlist, watch_party, premiere, rerun)
-      if (stream.type !== STREAM_ONLINE_TYPE_LIVE) {
+      if (stream.type !== TwitchStreamOnlineType.STREAM_LIVE) {
         console.log(`Stream is not live, skipping...`)
         return
       }
@@ -160,14 +161,14 @@ class RunnerWatcher extends EventEmitter {
       }
 
       // If this is a channel update, ensure the title or game changed
-      if (eventType === CHANNEL_UPDATE_EVENT) {
+      if (eventType === TwitchStreamEventType.CHANNEL_UPDATE) {
         // Treat this as a stream.online event:
         // - If this wasn't cached before (meaning game was not alttp or title didn't pass)
         if (!cachedStreamForUser) {
           console.log(
-            `Stream not found in cache after ${CHANNEL_UPDATE_EVENT}, treating as ${STREAM_ONLINE_EVENT}!`
+            `Stream not found in cache after ${TwitchStreamEventType.CHANNEL_UPDATE}, treating as ${TwitchStreamEventType.STREAM_ONLINE}!`
           )
-          eventType = STREAM_ONLINE_EVENT
+          eventType = TwitchStreamEventType.STREAM_ONLINE
         } else if (
           isChannelUpdateEvent(event) &&
           cachedStreamForUser.title === event.title &&
@@ -177,17 +178,17 @@ class RunnerWatcher extends EventEmitter {
           return
         }
       } else if (
-        eventType === STREAM_ONLINE_EVENT &&
+        eventType === TwitchStreamEventType.STREAM_ONLINE &&
         cachedStreamForUser &&
         cachedStreamForUser.id === stream.id
       ) {
         // This handles a weird scenario where:
-        // - CHANNEL_UPDATE_EVENT gets fired
+        // - CHANNEL_UPDATE gets fired
         // - we wait DELAY_FOR_API_SECONDS
         // - stream data is fetched via API
         // - stream comes back as live
-        // - stream is not found in cache, gets treated as STREAM_ONLINE_EVENT
-        // - the real STREAM_ONLINE_EVENT gets fired
+        // - stream is not found in cache, gets treated as STREAM_ONLINE
+        // - the real STREAM_ONLINE gets fired
         console.log(`Stream is already in the cache, skipping...`)
         return
       }
@@ -206,7 +207,7 @@ class RunnerWatcher extends EventEmitter {
 
       // Let the people know!
       stream.eventType = eventType
-      this.emit("streamEvent", stream)
+      this.emit(RelayEvent.STREAM_ALERT, stream)
 
       // Remove any cached stream data for this user
       cachedStreams = cachedStreams.filter((s) => s.user_id !== stream.user_id)

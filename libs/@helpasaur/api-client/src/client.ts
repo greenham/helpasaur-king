@@ -8,6 +8,7 @@ import {
   PracticeRoutes,
   StreamAlertsRoutes,
   StreamRoutes,
+  TestEventsRoutes,
   TwitchRoutes,
   UserRoutes,
   WebRoutes,
@@ -31,6 +32,7 @@ export class HelpaApi {
   public readonly streamAlerts: StreamAlertsRoutes
   public readonly practice: PracticeRoutes
   public readonly streams: StreamRoutes
+  public readonly testEvents: TestEventsRoutes
   public readonly web: WebRoutes
   public readonly user: UserRoutes
 
@@ -84,6 +86,7 @@ export class HelpaApi {
     this.streamAlerts = new StreamAlertsRoutes(this.api)
     this.practice = new PracticeRoutes(this.api)
     this.streams = new StreamRoutes(this.api)
+    this.testEvents = new TestEventsRoutes(this.api)
     this.web = new WebRoutes(this.api)
     this.user = new UserRoutes(this.api)
   }

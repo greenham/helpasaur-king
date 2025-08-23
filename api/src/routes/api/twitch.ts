@@ -12,6 +12,7 @@ import {
 } from "../../lib/responseHelpers"
 import { ALLOWED_COMMAND_PREFIXES } from "../../constants"
 import { TwitchUserData } from "twitch-api-client"
+import { RelayEvent } from "@helpasaur/types"
 
 const router: Router = express.Router()
 const permissionGuard = guard()
@@ -126,7 +127,7 @@ router.post("/join", async (req: AuthenticatedRequest, res: Response) => {
     !req.user?.permissions?.includes("service") ||
     req.user?.sub !== "twitch"
   ) {
-    req.app.wsRelay.emit("joinChannel", {
+    req.app.wsRelay.emit(RelayEvent.JOIN_CHANNEL, {
       channel: user.twitchUserData?.login,
     })
   }
@@ -165,7 +166,7 @@ router.post("/leave", async (req: AuthenticatedRequest, res: Response) => {
       !req.user?.permissions?.includes("service") ||
       req.user?.sub !== "twitch"
     ) {
-      req.app.wsRelay.emit("leaveChannel", requestedChannel)
+      req.app.wsRelay.emit(RelayEvent.LEAVE_CHANNEL, requestedChannel)
     }
 
     sendSuccess(res)
@@ -260,7 +261,7 @@ router.patch("/config", async (req: AuthenticatedRequest, res: Response) => {
       req.user?.sub !== "twitch"
     ) {
       if (user.twitchUserData) {
-        req.app.wsRelay.emit("configUpdate", {
+        req.app.wsRelay.emit(RelayEvent.CONFIG_UPDATE, {
           roomId: user.twitchUserData.id,
           channelName: user.twitchUserData.login,
           displayName: user.twitchUserData.display_name,

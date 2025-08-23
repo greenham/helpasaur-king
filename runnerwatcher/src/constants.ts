@@ -10,11 +10,6 @@ export const Constants = Object.freeze({
   MESSAGE_TYPE_NOTIFICATION: "notification",
   MESSAGE_TYPE_REVOCATION: "revocation",
 
-  // EventSub constants
-  STREAM_ONLINE_EVENT: "stream.online",
-  CHANNEL_UPDATE_EVENT: "channel.update",
-  STREAM_ONLINE_TYPE_LIVE: "live",
-
   DELAY_FOR_API_SECONDS: 10,
   ALERT_DELAY_SECONDS: 15 * 60,
 } as const)

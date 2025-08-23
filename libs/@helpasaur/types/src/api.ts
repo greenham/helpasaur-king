@@ -3,6 +3,9 @@
  * These types define the standardized response format used across all API endpoints
  */
 
+// User Types
+import { TwitchPrivilegedUserData, TwitchUserData } from "twitch-api-client"
+
 export enum ApiResult {
   SUCCESS = "success",
   ERROR = "error",
@@ -41,12 +44,6 @@ export interface Command {
   enabled: boolean
   deleted?: boolean
 }
-
-// User Types
-import { TwitchPrivilegedUserData, TwitchUserData } from "twitch-api-client"
-
-// Re-export base types for convenience
-export type { TwitchUserData, TwitchPrivilegedUserData }
 
 // This interface extends TwitchPrivilegedUserData with our auth data
 export interface TwitchUserDataWithAuth extends TwitchPrivilegedUserData {
@@ -93,7 +90,6 @@ export interface WebConfig {
   }
 }
 
-// Stream Types (matches HelixStreamData from @twurple/api)
 export interface TwitchStream {
   id: string
   user_id: string
@@ -114,7 +110,6 @@ export interface TwitchStream {
   isOnAlertsList?: boolean
 }
 
-// Stream Alerts Types
 // StreamAlertsChannel is just a TwitchUserData (channels in stream alerts are full user objects)
 export type StreamAlertsChannel = TwitchUserData
 
@@ -210,4 +205,19 @@ export interface GuildConfigUpdate {
   enableWeeklyRaceRoomAlert?: boolean
   weeklyRaceAlertChannelId?: string | null
   weeklyRaceAlertRoleId?: string | null
+}
+
+// WebSocket Relay Event Types
+export enum RelayEvent {
+  STREAM_ALERT = "streamAlert",
+  WEEKLY_RACE_ROOM_CREATED = "weeklyRaceRoomCreated",
+  JOIN_CHANNEL = "joinChannel",
+  LEAVE_CHANNEL = "leaveChannel",
+  CONFIG_UPDATE = "configUpdate",
+}
+
+// Test Event Payload
+export interface TestEventPayload {
+  eventType: RelayEvent
+  payload: Record<string, unknown>
 }

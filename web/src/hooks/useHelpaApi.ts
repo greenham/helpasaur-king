@@ -16,6 +16,7 @@ import {
   DiscordJoinUrl,
   TwitchBotChannelData,
   StreamAlertsChannel,
+  TestEventPayload,
 } from "@helpasaur/types"
 import { useToast } from "./useToast"
 
@@ -390,6 +391,32 @@ export const useHelpaApi = () => {
             toast.error(
               `Failed to remove ${variables} from stream alerts: ${error.message}`
             )
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
+
+    /**
+     * Trigger a test event
+     */
+    useTriggerTestEvent: (
+      options?: MutationOptionsWithToast<void, Error, TestEventPayload>
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
+        mutationFn: (payload: TestEventPayload) =>
+          helpaApiClient.testEvents.triggerTestEvent(payload),
+        onSuccess: (data, variables, context) => {
+          if (showToast) {
+            toast.success(`Test event ${variables.eventType} triggered!`)
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
+        },
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(`Failed to trigger test event: ${error.message}`)
           }
           mutationOptions.onError?.(error, variables, context)
         },
