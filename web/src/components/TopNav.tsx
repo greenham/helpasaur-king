@@ -129,6 +129,7 @@ function TopNav() {
                 </>
               }
               id="resources-dropdown"
+              align="end"
             >
               {RESOURCES.map((resource, index) =>
                 resource.divider ? (
@@ -161,6 +162,7 @@ function TopNav() {
                   />
                 }
                 id="user-dropdown"
+                align="end"
               >
                 <NavDropdown.Item
                   href={`${
