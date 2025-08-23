@@ -8,6 +8,7 @@ import {
   sendError,
   handleRouteError,
 } from "../../lib/responseHelpers"
+import { ActiveChannelList, TwitchBotConfig } from "@helpasaur/types"
 
 const router: Router = express.Router()
 
@@ -44,30 +45,22 @@ router.get(
     try {
       const users = (await User.find({
         "twitchBotConfig.active": true,
-        "twitchUserData.id": { $exists: true },
         "twitchUserData.login": { $exists: true },
-        "twitchUserData.display_name": { $exists: true },
       })) as IUserDocument[]
 
-      const channels = users
-        .map((u) => {
-          // TypeScript now knows these fields exist due to our query
-          const { id, login, display_name } = u.twitchUserData || {}
-          if (!id || !login || !display_name) {
-            // This should never happen due to our query, but satisfies TypeScript
-            return null
-          }
+      const channels: ActiveChannelList = {}
 
-          return Object.assign(
-            {
-              roomId: id,
-              channelName: login,
-              displayName: display_name,
-            },
-            u.twitchBotConfig
-          )
-        })
-        .filter(Boolean)
+      for (const user of users) {
+        const { login } = user.twitchUserData || {}
+        if (!login || !user.twitchBotConfig) {
+          continue
+        }
+
+        channels[login] = {
+          ...(user.twitchBotConfig as TwitchBotConfig),
+        }
+      }
+
       sendSuccess(res, channels)
     } catch (err) {
       handleRouteError(res, err, "get active channels")

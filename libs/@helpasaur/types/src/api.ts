@@ -135,19 +135,9 @@ export interface CommandFindData {
   command?: Command
 }
 
-export interface ActiveChannel {
-  roomId: string
-  channelName: string
-  displayName: string
-  active: boolean
-  commandsEnabled: boolean
-  commandPrefix: string
-  textCommandCooldown: number
-  practiceListsEnabled: boolean
-  allowModsToManagePracticeLists: boolean
-  weeklyRaceAlertEnabled: boolean
-  createdAt: Date
-  lastUpdated: Date
+// Map of channel name -> TwitchBotConfig
+export interface ActiveChannelList {
+  [channelName: string]: TwitchBotConfig
 }
 
 // Configuration Update Types
@@ -211,9 +201,9 @@ export interface GuildConfigUpdate {
 export enum RelayEvent {
   STREAM_ALERT = "streamAlert",
   WEEKLY_RACE_ROOM_CREATED = "weeklyRaceRoomCreated",
-  JOIN_CHANNEL = "joinChannel",
-  LEAVE_CHANNEL = "leaveChannel",
-  CONFIG_UPDATE = "configUpdate",
+  JOIN_TWITCH_CHANNEL = "joinChannel",
+  LEAVE_TWITCH_CHANNEL = "leaveChannel",
+  TWITCH_BOT_CONFIG_UPDATED = "twitchBotConfigUpdated",
 }
 
 // Test Event Payload

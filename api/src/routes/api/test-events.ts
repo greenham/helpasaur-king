@@ -5,9 +5,12 @@ import {
   TestEventPayload,
   StreamAlertPayload,
   WeeklyRacePayload,
-  ChannelEventPayload,
+  TwitchBotChannelActionType,
+  TwitchBotChannelActionPayload,
   RelayEvent,
   TwitchStreamEventType,
+  TwitchStreamOnlineType,
+  TwitchBotConfig,
 } from "@helpasaur/types"
 import { AuthenticatedRequest } from "../../types/express"
 
@@ -20,6 +23,15 @@ declare global {
     }
   }
 }
+
+const eventActionMap = new Map<RelayEvent, TwitchBotChannelActionType>([
+  [RelayEvent.JOIN_TWITCH_CHANNEL, TwitchBotChannelActionType.JOIN],
+  [RelayEvent.LEAVE_TWITCH_CHANNEL, TwitchBotChannelActionType.LEAVE],
+  [
+    RelayEvent.TWITCH_BOT_CONFIG_UPDATED,
+    TwitchBotChannelActionType.CONFIG_UPDATED,
+  ],
+])
 
 router.post("/trigger", (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -49,7 +61,6 @@ router.post("/trigger", (req: AuthenticatedRequest, res: Response) => {
       gameId: string
       gameName: string
       title: string
-      startedAt: string
       thumbnail: string
       isMature: boolean
       profileImage: string
@@ -59,42 +70,35 @@ router.post("/trigger", (req: AuthenticatedRequest, res: Response) => {
     switch (eventType) {
       case RelayEvent.STREAM_ALERT: {
         const testPayload = payload as unknown as StreamAlertTestPayload
-        // For stream alerts, check if payload specifies the specific event type
+        const currentTime = new Date().toISOString()
         const streamPayload: StreamAlertPayload = {
-          eventType: testPayload.streamEventType as TwitchStreamEventType,
+          eventType: testPayload.streamEventType,
           id: String(Date.now()),
-          user_id: (testPayload.userId as string) || "123456789",
-          user_login: (testPayload.userLogin as string) || "greenham",
-          user_name: (testPayload.displayName as string) || "greenHam",
-          game_id: (testPayload.gameId as string) || "9435",
-          game_name:
-            (testPayload.gameName as string) ||
-            "The Legend of Zelda: A Link to the Past",
-          type: "live",
-          title: (testPayload.title as string) || "Testing ALttP",
+          user_id: testPayload.userId,
+          user_login: testPayload.userLogin,
+          user_name: testPayload.displayName,
+          game_id: testPayload.gameId,
+          game_name: testPayload.gameName,
+          type: TwitchStreamOnlineType.STREAM_LIVE,
+          title: testPayload.title,
           viewer_count: 100,
-          started_at:
-            (testPayload.startedAt as string) || new Date().toISOString(),
+          started_at: currentTime,
           language: "other",
-          thumbnail_url:
-            (testPayload.thumbnail as string) ||
-            "https://placedog.net/{width}/{height}",
+          thumbnail_url: testPayload.thumbnail,
           tag_ids: [],
           tags: [],
-          is_mature: (testPayload.isMature as boolean) || false,
+          is_mature: testPayload.isMature,
           user: {
-            id: (testPayload.userId as string) || "123456789",
-            login: (testPayload.userLogin as string) || "greenham",
-            display_name: (testPayload.displayName as string) || "greenHam",
+            id: testPayload.userId,
+            login: testPayload.userLogin,
+            display_name: testPayload.displayName,
             type: "",
             broadcaster_type: "affiliate",
             description: "Test stream for Helpasaur King",
-            profile_image_url:
-              (testPayload.profileImage as string) ||
-              "https://placedog.net/300/300",
+            profile_image_url: testPayload.profileImage,
             offline_image_url: "",
             view_count: 1000,
-            created_at: new Date().toISOString(),
+            created_at: currentTime,
           },
         }
         wsRelay.emit(RelayEvent.STREAM_ALERT, streamPayload)
@@ -114,15 +118,34 @@ router.post("/trigger", (req: AuthenticatedRequest, res: Response) => {
         break
       }
 
-      case RelayEvent.JOIN_CHANNEL:
-      case RelayEvent.LEAVE_CHANNEL: {
-        const channelPayload: ChannelEventPayload = {
-          action: eventType === RelayEvent.JOIN_CHANNEL ? "join" : "leave",
-          channel: (payload.channel as string) || "#greenham",
-          userId: payload.userId as string,
-          displayName: (payload.displayName as string) || "greenHam",
+      case RelayEvent.JOIN_TWITCH_CHANNEL:
+      case RelayEvent.LEAVE_TWITCH_CHANNEL:
+      case RelayEvent.TWITCH_BOT_CONFIG_UPDATED: {
+        const action = eventActionMap.get(eventType)
+        if (!action) {
+          return res.status(400).json({
+            result: ApiResult.ERROR,
+            message: `No corresponding TwitchBotChannelActionType found for ${eventType}`,
+          })
         }
-        wsRelay.emit(eventType, channelPayload)
+        const channelPayload: TwitchBotChannelActionPayload = {
+          action,
+          channel: payload.channel as string,
+        }
+        if (eventType === RelayEvent.TWITCH_BOT_CONFIG_UPDATED) {
+          const config = {
+            ...(payload.config as Partial<TwitchBotConfig>),
+            createdAt: new Date().toISOString(),
+            lastUpdated: new Date().toISOString(),
+          }
+          const channelPayloadWithConfig = {
+            ...channelPayload,
+            config,
+          }
+          wsRelay.emit(eventType, channelPayloadWithConfig)
+        } else {
+          wsRelay.emit(eventType, channelPayload)
+        }
         break
       }
 
