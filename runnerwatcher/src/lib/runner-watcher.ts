@@ -116,7 +116,7 @@ class RunnerWatcher extends EventEmitter {
 
       // Make sure the stream is actually live
       // (we don't care about playlist, watch_party, premiere, rerun)
-      if (stream.type !== TwitchStreamOnlineType.STREAM_LIVE) {
+      if (stream.type !== TwitchStreamOnlineType.LIVE) {
         console.log(`Stream is not live, skipping...`)
         return
       }

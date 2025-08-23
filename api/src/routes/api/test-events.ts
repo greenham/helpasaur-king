@@ -79,7 +79,7 @@ router.post("/trigger", (req: AuthenticatedRequest, res: Response) => {
           user_name: testPayload.displayName,
           game_id: testPayload.gameId,
           game_name: testPayload.gameName,
-          type: TwitchStreamOnlineType.STREAM_LIVE,
+          type: TwitchStreamOnlineType.LIVE,
           title: testPayload.title,
           viewer_count: 100,
           started_at: currentTime,

@@ -42,7 +42,11 @@ export enum TwitchStreamEventType {
 }
 
 export enum TwitchStreamOnlineType {
-  STREAM_LIVE = "live",
+  LIVE = "live",
+  PLAYLIST = "playlist",
+  WATCH_PARTY = "watch_party",
+  PREMIERE = "premiere",
+  RERUN = "rerun",
 }
 
 export interface SubscribeToStreamEventsOptions {
