@@ -111,7 +111,11 @@ export class DiscordBot {
     const commandsPath = path.join(__dirname, "commands")
     const commandFiles = fs
       .readdirSync(commandsPath)
-      .filter((file) => file.endsWith(".js") || file.endsWith(".ts"))
+      .filter(
+        (file) =>
+          !file.endsWith(".d.ts") &&
+          (file.endsWith(".js") || file.endsWith(".ts"))
+      )
 
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file)
