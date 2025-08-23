@@ -5,8 +5,14 @@ import { DiscordBot } from "./bot"
 import { DiscordConfig } from "./types/config"
 import { config } from "./config"
 
-const { apiHost, apiKey, serviceName, discordHealthPort, packageVersion } =
-  config
+const {
+  apiHost,
+  apiKey,
+  serviceName,
+  discordHealthPort,
+  packageVersion,
+  nodeEnv,
+} = config
 
 const helpaApiClient = new HelpaApi({
   apiHost,
@@ -54,7 +60,7 @@ async function init() {
               channels: bot.discordClient.channels.cache.size, // cached channels
               commands: bot.discordClient.commands?.size || 0, // registered commands
               readyAt: bot.discordClient.readyAt, // timestamp when bot became ready
-              environment: process.env.NODE_ENV || "development",
+              environment: nodeEnv,
             })
           } catch (error) {
             console.error("Health check error:", error)

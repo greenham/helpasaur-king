@@ -14,7 +14,6 @@ import {
   TwitchBotConfig,
   ConfigUpdatePayload,
   DiscordJoinUrl,
-  TwitchBotChannelData,
   StreamAlertsChannel,
   TestEventPayload,
 } from "@helpasaur/types"
@@ -195,15 +194,11 @@ export const useHelpaApi = () => {
      * Join Twitch channel
      */
     useJoinTwitchChannel: (
-      options?: MutationOptionsWithToast<
-        TwitchBotChannelData,
-        Error,
-        string | undefined
-      >
+      options?: MutationOptionsWithToast<void, Error, string | undefined>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
-        mutationFn: (twitchUsername?: string) =>
+        mutationFn: (twitchUsername: string) =>
           helpaApiClient.twitch.joinTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
@@ -226,15 +221,11 @@ export const useHelpaApi = () => {
      * Leave Twitch channel
      */
     useLeaveTwitchChannel: (
-      options?: MutationOptionsWithToast<
-        TwitchBotChannelData,
-        Error,
-        string | undefined
-      >
+      options?: MutationOptionsWithToast<void, Error, string | undefined>
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
-        mutationFn: (twitchUsername?: string) =>
+        mutationFn: (twitchUsername: string) =>
           helpaApiClient.twitch.leaveTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
