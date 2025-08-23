@@ -3,31 +3,36 @@ import * as tmi from "tmi.js"
 import * as crypto from "crypto"
 import { HelpaApi, ApiError } from "@helpasaur/api-client"
 import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
-import { ActiveChannel, RelayEvent } from "@helpasaur/types"
-import { TwitchBotConfig } from "./types"
-import { version as packageVersion, name as packageName } from "../package.json"
+import {
+  ActiveChannelList,
+  RelayEvent,
+  TwitchBotChannelActionType,
+  TwitchBotConfig,
+} from "@helpasaur/types"
+import { TwitchBotServiceConfig } from "./types"
 import { DEFAULT_COMMAND_PREFIX } from "."
-const { WEBSOCKET_RELAY_SERVER } = process.env
+import { config } from "./config"
+const { packageName, packageVersion, websocketRelayServer } = config
 
 export class TwitchBot {
-  config: TwitchBotConfig
+  config: TwitchBotServiceConfig
   helpaApi: HelpaApi
+  activeChannels: ActiveChannelList
   cooldowns: Map<string, number>
   cachedCommands: Map<string, CachableCommand>
   bot: tmi.Client
   wsRelay: Socket
   messages: { onJoin: string; onLeave: string }
   lastRandomRoomMap: Map<string, string>
-  channelList: string[] = []
-  activeChannels: ActiveChannel[] = []
-  channelMap: Map<string, ActiveChannel> = new Map()
+
   constructor(
-    config: TwitchBotConfig,
+    config: TwitchBotServiceConfig,
     helpaApi: HelpaApi,
-    channels: ActiveChannel[]
+    channels: ActiveChannelList
   ) {
     this.config = config
     this.helpaApi = helpaApi
+    this.activeChannels = channels
     this.cooldowns = new Map()
     this.cachedCommands = new Map()
     this.lastRandomRoomMap = new Map()
@@ -39,32 +44,18 @@ export class TwitchBot {
       onLeave: `😭 Ok, goodbye forever. (jk, have me re-join anytime through https://helpasaur.com/twitch or my twitch chat using ${this.config.cmdPrefix || DEFAULT_COMMAND_PREFIX}join)`,
     }
 
-    this.setActiveChannels(channels)
-
     this.bot = new tmi.Client({
       options: { debug: false },
       identity: {
         username: this.config.username,
         password: this.config.oauth,
       },
-      channels: this.channelList,
+      channels: this.getActiveChannelsList(),
     })
 
     this.wsRelay = this.connectToRelay()
   }
 
-  // {
-  //    roomId: u.twitchUserData.id,
-  //    channelName: u.twitchUserData.login,
-  //    displayName: u.twitchUserData.display_name,
-  //    active: true,
-  //    commandPrefix: '!',
-  //    textCommandCooldown: 10,
-  //    practiceListsEnabled: true,
-  //    allowModsToManagePracticeLists: true,
-  //    createdAt: ISODate('2024-01-21T22:47:24.975Z'),
-  //    lastUpdated: ISODate('2024-01-21T22:47:24.975Z')
-  // }
   start() {
     this.bot.connect().catch(console.error)
 
@@ -77,12 +68,12 @@ export class TwitchBot {
   }
 
   connectToRelay(): Socket {
-    const relay = io(WEBSOCKET_RELAY_SERVER, {
+    const relay = io(websocketRelayServer, {
       query: { clientId: `${packageName} v${packageVersion}` },
     })
 
     console.log(
-      `Connecting to websocket relay server on port ${WEBSOCKET_RELAY_SERVER}...`
+      `Connecting to websocket relay server on port ${websocketRelayServer}...`
     )
 
     relay.on("connect_error", (err) => {
@@ -94,25 +85,33 @@ export class TwitchBot {
       console.log(`✅ Connected! Socket ID: ${relay?.id}`)
     })
 
-    relay.on(RelayEvent.JOIN_CHANNEL, this.handleJoinChannel.bind(this))
-    relay.on(RelayEvent.LEAVE_CHANNEL, this.handleLeaveChannel.bind(this))
-    relay.on(RelayEvent.CONFIG_UPDATE, this.handleConfigUpdate.bind(this))
+    relay.on(RelayEvent.JOIN_TWITCH_CHANNEL, this.handleJoinChannel.bind(this))
+    relay.on(
+      RelayEvent.LEAVE_TWITCH_CHANNEL,
+      this.handleLeaveChannel.bind(this)
+    )
+    relay.on(
+      RelayEvent.TWITCH_BOT_CONFIG_UPDATED,
+      this.handleConfigUpdate.bind(this)
+    )
 
     return relay
   }
 
-  async handleMessage(channel, tags, message, self) {
+  async handleMessage(channel: string, tags, message: string, self) {
     if (self) return
+
+    const userLogin = channel.replace("#", "").toLowerCase()
 
     // Handle commands in the bot's channel (using the global default command prefix)
     // - join, leave
-    if (channel === `#${this.config.username}`) {
+    if (userLogin === this.config.username.toLowerCase()) {
       if (!message.startsWith(this.config.cmdPrefix || DEFAULT_COMMAND_PREFIX))
         return
       const args = message.slice(1).split(" ")
-      const commandNoPrefix = args.shift().toLowerCase()
+      const commandNoPrefix = String(args.shift()).toLowerCase()
       switch (commandNoPrefix) {
-        case "join": {
+        case TwitchBotChannelActionType.JOIN: {
           let channelToJoin = tags.username
 
           if (args[0] && tags.mod) {
@@ -123,7 +122,7 @@ export class TwitchBot {
             `Received request from ${tags.username} to join ${channelToJoin}`
           )
 
-          if (this.channelList.includes(channelToJoin)) {
+          if (this.getActiveChannelsList().includes(channelToJoin)) {
             return this.bot
               .say(
                 channel,
@@ -139,34 +138,22 @@ export class TwitchBot {
             )
             .catch(console.error)
 
-          this.bot.join(channelToJoin)
-          this.channelList.push(channelToJoin)
-
           try {
             const result =
               await this.helpaApi.twitch.joinTwitchChannel(channelToJoin)
-
-            if (result.twitchBotConfig?.roomId) {
-              // Create an ActiveChannel object with the channel info we have
-              const activeChannel: ActiveChannel = {
-                ...result.twitchBotConfig,
-                roomId: result.twitchBotConfig.roomId,
-                channelName: channelToJoin,
-                displayName: channelToJoin, // We don't have the display name, so use the channel name
-              }
-              // update the local map with the new channel config
-              this.channelMap.set(result.twitchBotConfig.roomId, activeChannel)
-            }
-
-            console.log(`Result of /api/twitch/join: ${JSON.stringify(result)}`)
+            console.log(
+              `Result of joining #${channelToJoin}: ${JSON.stringify(result)}`
+            )
           } catch (err) {
             const error = err as Error
-            console.error(`Error calling /api/twitch/join: ${error.message}`)
+            console.error(
+              `Error attempting to join twitch channel #${channelToJoin}: ${error.message}`
+            )
           }
           break
         }
 
-        case "leave": {
+        case TwitchBotChannelActionType.LEAVE: {
           let channelToLeave = tags.username
 
           if (args[0] && tags.mod) {
@@ -177,7 +164,7 @@ export class TwitchBot {
             `Received request from ${tags.username} to leave ${channelToLeave}`
           )
 
-          if (!this.channelList.includes(channelToLeave)) {
+          if (!this.getActiveChannelsList().includes(channelToLeave)) {
             return this.bot
               .say(
                 channel,
@@ -193,23 +180,18 @@ export class TwitchBot {
             )
             .catch(console.error)
 
-          this.bot.part(channelToLeave)
-
-          this.channelList = this.channelList.filter(
-            (c) => c !== channelToLeave
-          )
-          this.channelMap.delete(tags["room-id"])
-
           try {
             const result =
               await this.helpaApi.twitch.leaveTwitchChannel(channelToLeave)
 
             console.log(
-              `Result of /api/twitch/leave: ${JSON.stringify(result)}`
+              `Result of leaving #${channelToLeave}: ${JSON.stringify(result)}`
             )
           } catch (err) {
             const error = err as Error
-            console.error(`Error calling /api/twitch/leave: ${error.message}`)
+            console.error(
+              `Error attempting to leave twitch channel #${channelToLeave}: ${error.message}`
+            )
           }
           break
         }
@@ -219,7 +201,7 @@ export class TwitchBot {
     }
 
     // Look up the config for this channel in the local cache
-    const channelConfig = this.channelMap.get(tags["room-id"])
+    const channelConfig = this.activeChannels[channel.replace("#", "")]
     if (!channelConfig) return
 
     if (!message.startsWith(channelConfig.commandPrefix)) return
@@ -232,7 +214,7 @@ export class TwitchBot {
     }
 
     const args = message.slice(1).split(" ")
-    const commandNoPrefix = args.shift().toLowerCase()
+    const commandNoPrefix = String(args.shift()).toLowerCase()
 
     // Define toggle command configurations
     const toggleCommands = {
@@ -264,7 +246,7 @@ export class TwitchBot {
 
     // Handle toggle commands - only broadcaster can toggle these settings
     const toggleConfig = toggleCommands[commandNoPrefix]
-    if (toggleConfig && channelConfig.roomId === tags["user-id"]) {
+    if (toggleConfig && userLogin === tags.username) {
       await this.handleToggleCommand(
         channel,
         tags,
@@ -282,7 +264,7 @@ export class TwitchBot {
     // - Commands will only apply to the channel in which they are issued
     if (
       channelConfig.practiceListsEnabled &&
-      (channelConfig.roomId === tags["user-id"] ||
+      (userLogin === tags.username ||
         (channelConfig.allowModsToManagePracticeLists && tags.mod === true))
     ) {
       const targetUser = tags["room-id"]
@@ -547,11 +529,12 @@ export class TwitchBot {
   handleJoinChannel({ payload }) {
     const { channel } = payload
     console.log(`Received joinChannel event for: ${channel}`)
-    if (this.channelList.includes(channel)) {
+    if (this.getActiveChannelsList().includes(channel)) {
       console.log(`Already in #${channel}`)
       return
     }
 
+    // say hello o/
     this.bot.join(channel).catch(console.error)
     this.bot.say(channel, this.messages.onJoin).catch(console.error)
 
@@ -561,14 +544,15 @@ export class TwitchBot {
     console.log(`Joined #${channel}`)
   }
 
-  handleLeaveChannel({ payload: channel }) {
+  handleLeaveChannel({ payload }) {
+    const { channel } = payload
     console.log(`Received leaveChannel event for ${channel}`)
-    if (!this.channelList.includes(channel)) {
+    if (!this.getActiveChannelsList().includes(channel)) {
       console.log(`Not in #${channel}`)
       return
     }
 
-    // say our goodbyes o/
+    // say our goodbyes o7
     this.bot.say(channel, this.messages.onLeave).catch(console.error)
     this.bot.part(channel).catch(console.error)
 
@@ -579,21 +563,23 @@ export class TwitchBot {
   }
 
   handleConfigUpdate({ payload }) {
-    console.log(`Received configUpdate event for: ${payload.channelName}`)
+    console.log(`Received config update event for: ${payload.channel}`)
+    if (!Object.hasOwnProperty.call(this.activeChannels, payload.channel)) {
+      console.error(`No active channel found matching: ${payload.channel}!`)
+      return
+    }
 
     // Update the local channel configuration
-    if (this.channelMap.has(payload.roomId)) {
-      this.channelMap.set(payload.roomId, payload)
-      console.log(`Updated configuration for #${payload.channelName}`)
-    }
+    this.activeChannels[payload.channel] = payload.config
+    console.log(`Updated configuration for #${payload.channel}`)
   }
 
   async handleToggleCommand(
-    channel,
+    channel: string,
     tags,
-    args,
-    channelConfig,
-    commandName,
+    args: string[],
+    channelConfig: TwitchBotConfig,
+    commandName: string,
     toggleConfig
   ) {
     const subCommand = args[0]?.toLowerCase()
@@ -635,7 +621,7 @@ export class TwitchBot {
 
         // Update local config
         channelConfig[toggleConfig.configField] = true
-        this.channelMap.set(tags["room-id"], channelConfig)
+        this.activeChannels[channel] = channelConfig
 
         this.bot
           .say(
@@ -674,7 +660,7 @@ export class TwitchBot {
 
         // Update local config
         channelConfig[toggleConfig.configField] = false
-        this.channelMap.set(tags["room-id"], channelConfig)
+        this.activeChannels[channel] = channelConfig
 
         this.bot
           .say(
@@ -750,30 +736,19 @@ export class TwitchBot {
     }
   }
 
-  refreshActiveChannels() {
-    this.helpaApi.twitch
+  async refreshActiveChannels() {
+    await this.helpaApi.twitch
       .getActiveChannels()
-      .then((response) => {
-        if (!response) {
-          throw new Error(`Unable to refresh active channel list from API!`)
-        }
-
-        this.setActiveChannels(response)
+      .then((activeChannels) => {
+        this.activeChannels = activeChannels
       })
       .catch((error) => {
         console.error("🛑 Error refreshing active channel list:", error)
       })
   }
 
-  setActiveChannels(channels) {
-    this.channelList = [
-      this.config.username,
-      ...channels.map((c) => c.channelName),
-    ]
-    this.channelMap = new Map()
-    // map roomId => config
-    channels.forEach((c) => {
-      this.channelMap.set(c.roomId, c)
-    })
+  getActiveChannelsList() {
+    // join the bot's own channel by default, then all the active channels
+    return [this.config.username, ...Object.keys(this.activeChannels)]
   }
 }

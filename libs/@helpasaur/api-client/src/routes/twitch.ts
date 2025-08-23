@@ -1,9 +1,8 @@
 import { ApiBase } from "../base"
 import {
   TwitchBotConfig,
-  TwitchBotChannelData,
   ConfigUpdatePayload,
-  ActiveChannel,
+  ActiveChannelList,
 } from "@helpasaur/types"
 import { ROUTES } from "../constants"
 
@@ -33,28 +32,26 @@ export class TwitchRoutes extends ApiBase {
 
   /**
    * Join a Twitch channel with the bot
-   * @param twitchUsername - The Twitch username/channel to join (optional, defaults to current user's channel)
-   * @returns Promise resolving to channel join result and bot config
+   * @param twitchUsername - The Twitch username/channel to join
+   * @returns void
    * @throws Error if the API request fails or user is not authenticated
    */
-  async joinTwitchChannel(
-    twitchUsername?: string
-  ): Promise<TwitchBotChannelData> {
-    const body = twitchUsername ? { channel: twitchUsername } : {}
-    return this.apiPost<TwitchBotChannelData>(`${ROUTES.TWITCH}/join`, body)
+  async joinTwitchChannel(twitchUsername: string): Promise<void> {
+    return this.apiPost<void>(`${ROUTES.TWITCH}/join`, {
+      channel: twitchUsername,
+    })
   }
 
   /**
    * Leave a Twitch channel with the bot
-   * @param twitchUsername - The Twitch username/channel to leave (optional, defaults to current user's channel)
-   * @returns Promise resolving to channel leave result
+   * @param twitchUsername - The Twitch username/channel to leave
+   * @returns void
    * @throws Error if the API request fails or user is not authenticated
    */
-  async leaveTwitchChannel(
-    twitchUsername?: string
-  ): Promise<TwitchBotChannelData> {
-    const body = twitchUsername ? { channel: twitchUsername } : {}
-    return this.apiPost<TwitchBotChannelData>(`${ROUTES.TWITCH}/leave`, body)
+  async leaveTwitchChannel(twitchUsername: string): Promise<void> {
+    return this.apiPost<void>(`${ROUTES.TWITCH}/leave`, {
+      channel: twitchUsername,
+    })
   }
 
   /**
@@ -71,7 +68,7 @@ export class TwitchRoutes extends ApiBase {
    * @returns Promise resolving to array of active channels
    * @throws Error if the API request fails or service is not authenticated
    */
-  async getActiveChannels(): Promise<ActiveChannel[]> {
+  async getActiveChannels(): Promise<ActiveChannelList> {
     return this.apiGet(`${ROUTES.CONFIGS}/twitch/activeChannels`)
   }
 }

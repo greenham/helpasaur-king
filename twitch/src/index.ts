@@ -1,6 +1,6 @@
 import express from "express"
 import { HelpaApi, ServiceName } from "@helpasaur/api-client"
-import { TwitchBotConfig } from "./types"
+import { TwitchBotServiceConfig } from "./types"
 import { TwitchBot } from "./bot"
 import { config } from "./config"
 
@@ -26,11 +26,10 @@ async function init() {
     // Get service config
     const config = await helpaApiClient.getServiceConfig()
     if (!config || !config.config) {
-      throw new Error(`Unable to get service config from API!`)
+      throw new Error(`Invalid service config fetched from API!`)
     }
 
-    // Cast the generic config to TwitchBotConfig
-    const twitchConfig = config.config as unknown as TwitchBotConfig
+    const twitchConfig = config.config as unknown as TwitchBotServiceConfig
 
     // Get the initial list of active channels the bot should join
     const activeChannels = await helpaApiClient.twitch.getActiveChannels()
@@ -44,11 +43,12 @@ async function init() {
 
     healthApp.get("/health", (_req: express.Request, res: express.Response) => {
       try {
+        const currentChannels = bot.getActiveChannelsList()
         res.status(200).json({
           status: "healthy",
           service: "twitch",
           version: packageVersion,
-          channelCount: bot.channelList ? bot.channelList.length : 0,
+          channelCount: currentChannels ? currentChannels.length : 0,
           commandPrefix: bot.config?.cmdPrefix || DEFAULT_COMMAND_PREFIX,
           username: bot.config.username || "unknown",
           environment: nodeEnv,

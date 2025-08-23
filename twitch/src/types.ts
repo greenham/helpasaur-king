@@ -1,5 +1,4 @@
-// Twitch Bot Configuration
-export interface TwitchBotConfig {
+export interface TwitchBotServiceConfig {
   username: string
   oauth: string
   channels: string[]

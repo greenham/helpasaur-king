@@ -149,12 +149,22 @@ export interface WeeklyRacePayload {
   startTimestamp: number
 }
 
+export enum TwitchBotChannelActionType {
+  JOIN = "join",
+  LEAVE = "leave",
+  CONFIG_UPDATED = "configUpdated",
+}
+
 // Channel Event Payload for bot coordination
-export interface ChannelEventPayload {
-  action: "join" | "leave"
+export interface TwitchBotChannelActionPayload {
+  action: TwitchBotChannelActionType
   channel: string
-  userId?: string
-  displayName?: string
+}
+
+export interface TwitchBotChannelConfigUpdatePayload
+  extends TwitchBotChannelActionPayload {
+  action: TwitchBotChannelActionType.CONFIG_UPDATED
+  config: Record<string, unknown>
 }
 
 // Type guard functions

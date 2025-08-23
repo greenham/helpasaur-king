@@ -37,11 +37,6 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
       <h1>
         <i className="fa-solid fa-user-tie"></i> Helpa Admin
       </h1>
-      <hr className="mb-5" />
-      <h2>
-        <i className="fa-solid fa-vial-circle-check"></i> Test Events
-      </h2>
-      <TestEvents />
       <hr className="my-5" />
       <h2>
         <i className="fa-brands fa-watchman-monitoring"></i> Runnerwatcher
@@ -52,6 +47,11 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
         <i className="fa-solid fa-robot"></i> Twitch Bot
       </h2>
       <ManageTwitchBot />
+      <hr className="mb-5" />
+      <h2>
+        <i className="fa-solid fa-vial-circle-check"></i> Test Events
+      </h2>
+      <TestEvents />
     </Container>
   )
 }

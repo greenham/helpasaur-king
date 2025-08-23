@@ -122,22 +122,12 @@ router.post("/join", async (req: AuthenticatedRequest, res: Response) => {
     }
   }
 
-  // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
-  if (
-    !req.user?.permissions?.includes("service") ||
-    req.user?.sub !== "twitch"
-  ) {
-    req.app.wsRelay.emit(RelayEvent.JOIN_CHANNEL, {
-      channel: user.twitchUserData?.login,
-    })
-  }
-
-  sendSuccess(res, {
-    twitchBotConfig: {
-      roomId: user.twitchUserData?.id,
-      ...user.twitchBotConfig,
-    },
+  // tell the twitch bot to do the requested thing
+  req.app.wsRelay.emit(RelayEvent.JOIN_TWITCH_CHANNEL, {
+    channel: user.twitchUserData?.login,
   })
+
+  sendSuccess(res)
 })
 
 // POST /leave -> removes requested or logged-in user from join list for twitch bot
@@ -161,13 +151,10 @@ router.post("/leave", async (req: AuthenticatedRequest, res: Response) => {
     user.markModified("twitchBotConfig")
     await user.save()
 
-    // tell the twitch bot to do the requested thing (unless this came from the twitch bot itself)
-    if (
-      !req.user?.permissions?.includes("service") ||
-      req.user?.sub !== "twitch"
-    ) {
-      req.app.wsRelay.emit(RelayEvent.LEAVE_CHANNEL, requestedChannel)
-    }
+    // tell the twitch bot to do the requested thing
+    req.app.wsRelay.emit(RelayEvent.LEAVE_TWITCH_CHANNEL, {
+      channel: requestedChannel,
+    })
 
     sendSuccess(res)
   } catch (err) {
@@ -261,11 +248,9 @@ router.patch("/config", async (req: AuthenticatedRequest, res: Response) => {
       req.user?.sub !== "twitch"
     ) {
       if (user.twitchUserData) {
-        req.app.wsRelay.emit(RelayEvent.CONFIG_UPDATE, {
-          roomId: user.twitchUserData.id,
-          channelName: user.twitchUserData.login,
-          displayName: user.twitchUserData.display_name,
-          ...user.twitchBotConfig,
+        req.app.wsRelay.emit(RelayEvent.TWITCH_BOT_CONFIG_UPDATED, {
+          channel: user.twitchUserData.login,
+          config: { ...user.twitchBotConfig },
         })
       }
     }

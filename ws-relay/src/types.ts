@@ -1,12 +1,7 @@
 import { Socket } from "socket.io"
 
 // Import event types and payload types from shared types
-import {
-  RelayEvent,
-  StreamAlertPayload,
-  WeeklyRacePayload,
-  ChannelEventPayload,
-} from "@helpasaur/types"
+import { RelayEvent } from "@helpasaur/types"
 
 // Re-export for convenience
 export { RelayEvent }
@@ -16,11 +11,6 @@ export interface RelayData<T = unknown> {
   payload: T
   source: string
 }
-
-// Specific relay data types for each event
-export type StreamAlertRelayData = RelayData<StreamAlertPayload>
-export type WeeklyRaceRelayData = RelayData<WeeklyRacePayload>
-export type ChannelEventRelayData = RelayData<ChannelEventPayload>
 
 // Extended Socket type to include custom data
 export interface CustomSocket extends Socket {
