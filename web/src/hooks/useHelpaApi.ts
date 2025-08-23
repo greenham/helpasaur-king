@@ -69,7 +69,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["user"],
-        queryFn: () => helpaApiClient.user.getCurrentUser(),
+        queryFn: () => helpaApiClient.me.getCurrentUser(),
         retry: 0,
         ...options,
       }),
@@ -118,7 +118,7 @@ export const useHelpaApi = () => {
       }),
 
     /**
-     * Get Twitch bot configuration
+     * Get user's Twitch bot configuration
      */
     useTwitchBotConfig: (
       options?: Omit<
@@ -128,7 +128,7 @@ export const useHelpaApi = () => {
     ) =>
       useQuery({
         queryKey: ["twitchBotConfig"],
-        queryFn: () => helpaApiClient.twitch.getTwitchBotConfig(),
+        queryFn: () => helpaApiClient.me.getTwitchBotConfig(),
         retry: 0,
         ...options,
       }),
@@ -198,10 +198,10 @@ export const useHelpaApi = () => {
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
-        mutationFn: (twitchUsername: string) =>
+        mutationFn: (twitchUsername: string | undefined) =>
           helpaApiClient.twitch.joinTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
-          queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
+          queryClient.invalidateQueries({ queryKey: ["twitchBotChannels"] })
           if (showToast) {
             toast.success(`Joined channel: ${variables || "your channel"}`)
           }
@@ -225,10 +225,10 @@ export const useHelpaApi = () => {
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
-        mutationFn: (twitchUsername: string) =>
+        mutationFn: (twitchUsername: string | undefined) =>
           helpaApiClient.twitch.leaveTwitchChannel(twitchUsername),
         onSuccess: (data, variables, context) => {
-          queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
+          queryClient.invalidateQueries({ queryKey: ["twitchBotChannels"] })
           if (showToast) {
             toast.success(`Left channel: ${variables || "your channel"}`)
           }

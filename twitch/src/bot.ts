@@ -288,7 +288,7 @@ export class TwitchBot {
           )
 
           try {
-            await this.helpaApi.practice.addPracticeListEntry(
+            await this.helpaApi.prac.addPracticeListEntry(
               targetUser,
               listName,
               entryName
@@ -315,7 +315,7 @@ export class TwitchBot {
 
           try {
             // get their list
-            const response = await this.helpaApi.practice.getPracticeList(
+            const response = await this.helpaApi.prac.getPracticeList(
               targetUser,
               listName
             )
@@ -369,7 +369,7 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix} with entry ID: ${entryId}`
           )
           try {
-            await this.helpaApi.practice.deletePracticeListEntry(
+            await this.helpaApi.prac.deletePracticeListEntry(
               targetUser,
               listName,
               entryId
@@ -393,7 +393,7 @@ export class TwitchBot {
             `[${channel}] ${tags["display-name"]} used ${commandNoPrefix}`
           )
           try {
-            const response = await this.helpaApi.practice.getPracticeList(
+            const response = await this.helpaApi.prac.getPracticeList(
               targetUser,
               listName
             )
@@ -444,7 +444,7 @@ export class TwitchBot {
           )
 
           try {
-            await this.helpaApi.practice.clearPracticeList(targetUser, listName)
+            await this.helpaApi.prac.clearPracticeList(targetUser, listName)
             const message = "Practice list cleared successfully!"
             this.bot.say(channel, message).catch(console.error)
             return
@@ -737,8 +737,8 @@ export class TwitchBot {
   }
 
   async refreshActiveChannels() {
-    await this.helpaApi.twitch
-      .getActiveChannels()
+    await this.helpaApi.configs
+      .getActiveTwitchBotChannels()
       .then((activeChannels) => {
         this.activeChannels = activeChannels
       })

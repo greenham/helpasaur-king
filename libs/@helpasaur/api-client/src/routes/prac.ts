@@ -5,7 +5,7 @@ import { ROUTES } from "../constants"
  * API routes for practice list management
  * Handles user practice lists for speedrunning practice rooms and other lists
  */
-export class PracticeRoutes extends ApiBase {
+export class PracRoutes extends ApiBase {
   /**
    * Add an entry to a user's practice list
    * @param targetUser - The Twitch user ID whose practice list to modify

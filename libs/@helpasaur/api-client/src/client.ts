@@ -4,15 +4,17 @@ import { ApiResult, ServiceConfig } from "@helpasaur/types"
 import { ClientOptions, ServiceName } from "./types"
 import {
   CommandRoutes,
+  ConfigsRoutes,
   DiscordRoutes,
-  PracticeRoutes,
+  MeRoutes,
+  PracRoutes,
   StreamAlertsRoutes,
   StreamRoutes,
   TestEventsRoutes,
   TwitchRoutes,
-  UserRoutes,
   WebRoutes,
 } from "./routes"
+import { ROUTES } from "./constants"
 
 /**
  * Helps external clients and internal services use the Helpa API
@@ -27,14 +29,15 @@ export class HelpaApi {
 
   // Route-specific API endpoints
   public readonly commands: CommandRoutes
-  public readonly twitch: TwitchRoutes
+  public readonly configs: ConfigsRoutes
   public readonly discord: DiscordRoutes
+  public readonly me: MeRoutes
+  public readonly prac: PracRoutes
+  public readonly twitch: TwitchRoutes
   public readonly streamAlerts: StreamAlertsRoutes
-  public readonly practice: PracticeRoutes
   public readonly streams: StreamRoutes
   public readonly testEvents: TestEventsRoutes
   public readonly web: WebRoutes
-  public readonly user: UserRoutes
 
   /**
    * Constructs a new HelpaApi instance.
@@ -81,14 +84,15 @@ export class HelpaApi {
 
     // Initialize route-specific API endpoints
     this.commands = new CommandRoutes(this.api)
-    this.twitch = new TwitchRoutes(this.api)
+    this.configs = new ConfigsRoutes(this.api)
     this.discord = new DiscordRoutes(this.api)
+    this.me = new MeRoutes(this.api)
+    this.prac = new PracRoutes(this.api)
     this.streamAlerts = new StreamAlertsRoutes(this.api)
-    this.practice = new PracticeRoutes(this.api)
     this.streams = new StreamRoutes(this.api)
     this.testEvents = new TestEventsRoutes(this.api)
+    this.twitch = new TwitchRoutes(this.api)
     this.web = new WebRoutes(this.api)
-    this.user = new UserRoutes(this.api)
   }
 
   /**
@@ -104,7 +108,7 @@ export class HelpaApi {
     }
 
     try {
-      const response = await this.api.get(`${this.apiHost}/auth/service`, {
+      const response = await this.api.get(`${ROUTES.AUTH}/service`, {
         headers: { Authorization: this.apiKey },
       })
 
@@ -150,7 +154,9 @@ export class HelpaApi {
         throw new Error(`🔴 Unable to authorize service with API!`)
       }
 
-      const response = await this.api.get(`/api/configs/${this.serviceName}`)
+      const response = await this.api.get(
+        `${ROUTES.CONFIGS}/${this.serviceName}`
+      )
 
       if (response.data.result === ApiResult.ERROR) {
         throw new Error(response.data.message || "Failed to get service config")
