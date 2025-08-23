@@ -107,9 +107,8 @@ router.post("/trigger", (req: AuthenticatedRequest, res: Response) => {
             (payload.raceRoomUrl as string) ||
             "https://racetime.gg/alttp/test-race-123",
           startTimestamp:
-            (payload.startTimestamp as number) || Date.now() + 3600000, // 1 hour from now
-          goal: (payload.goal as string) || "Beat the game",
-          participants: (payload.participants as string[]) || [],
+            (payload.startTimestamp as number) ||
+            Math.floor((Date.now() + 3600 * 1000) / 1000), // 1 hour from now
         }
         wsRelay.emit(RelayEvent.WEEKLY_RACE_ROOM_CREATED, racePayload)
         break
@@ -119,9 +118,9 @@ router.post("/trigger", (req: AuthenticatedRequest, res: Response) => {
       case RelayEvent.LEAVE_CHANNEL: {
         const channelPayload: ChannelEventPayload = {
           action: eventType === RelayEvent.JOIN_CHANNEL ? "join" : "leave",
-          channel: (payload.channel as string) || "#testchannel",
+          channel: (payload.channel as string) || "#greenham",
           userId: payload.userId as string,
-          displayName: (payload.displayName as string) || "TestChannel",
+          displayName: (payload.displayName as string) || "greenHam",
         }
         wsRelay.emit(eventType, channelPayload)
         break

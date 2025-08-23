@@ -3,7 +3,7 @@ import * as tmi from "tmi.js"
 import * as crypto from "crypto"
 import { HelpaApi, ApiError } from "@helpasaur/api-client"
 import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
-import { ActiveChannel } from "@helpasaur/types"
+import { ActiveChannel, RelayEvent } from "@helpasaur/types"
 import { TwitchBotConfig } from "./types"
 import { version as packageVersion, name as packageName } from "../package.json"
 import { DEFAULT_COMMAND_PREFIX } from "."
@@ -94,9 +94,9 @@ export class TwitchBot {
       console.log(`✅ Connected! Socket ID: ${relay?.id}`)
     })
 
-    relay.on("joinChannel", this.handleJoinChannel.bind(this))
-    relay.on("leaveChannel", this.handleLeaveChannel.bind(this))
-    relay.on("configUpdate", this.handleConfigUpdate.bind(this))
+    relay.on(RelayEvent.JOIN_CHANNEL, this.handleJoinChannel.bind(this))
+    relay.on(RelayEvent.LEAVE_CHANNEL, this.handleLeaveChannel.bind(this))
+    relay.on(RelayEvent.CONFIG_UPDATE, this.handleConfigUpdate.bind(this))
 
     return relay
   }

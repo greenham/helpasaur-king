@@ -5,6 +5,7 @@ import WebSocket from "ws"
 import express from "express"
 import RacetimeBot from "./lib/racetime"
 import * as Racetime from "./lib/racetime/types"
+import { RelayEvent, WeeklyRacePayload } from "@helpasaur/types"
 import { config } from "./config"
 
 const {
@@ -117,8 +118,8 @@ const scheduleWeeklyRace = () => {
           startTimestamp: Math.floor(
             (Date.now() + weeklyRaceStartOffsetSeconds * 1000) / 1000
           ),
-        }
-        wsRelay.emit("weeklyRaceRoomCreated", raceData)
+        } as WeeklyRacePayload
+        wsRelay.emit(RelayEvent.WEEKLY_RACE_ROOM_CREATED, raceData)
 
         // Connect to the race room so we can interact with it
         return listenToRaceRoom(slug)

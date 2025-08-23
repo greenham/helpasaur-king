@@ -7,6 +7,7 @@ import {
   StreamAlertPayload,
   WeeklyRacePayload,
   TwitchStreamEventType,
+  RelayEvent,
 } from "@helpasaur/types"
 import { config } from "../config"
 
@@ -132,7 +133,7 @@ const readyEvent: DiscordEvent<"ready"> = {
 
     // 3. Listen for stream alerts
     wsRelay.on(
-      "streamAlert",
+      RelayEvent.STREAM_ALERT,
       ({
         payload: stream,
         source,
@@ -220,7 +221,7 @@ const readyEvent: DiscordEvent<"ready"> = {
 
     // 4. Listen for weekly race room creation
     wsRelay.on(
-      "weeklyRaceRoomCreated",
+      RelayEvent.WEEKLY_RACE_ROOM_CREATED,
       ({
         payload: raceData,
         source,

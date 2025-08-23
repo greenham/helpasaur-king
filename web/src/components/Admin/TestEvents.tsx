@@ -41,29 +41,25 @@ const TestEvents: React.FunctionComponent<TestEventsProps> = () => {
       gameName: "The Legend of Zelda: A Link to the Past",
       title: "Testing ALttP",
       startedAt: new Date().toISOString(),
-      thumbnail:
-        "https://cdn.prod.website-files.com/684228174606b26ec8e3e29e/68472685a66351f053a1d10b_DevSwarm_256.png",
+      thumbnail: "https://placedog.net/{width}/{height}",
       isMature: true,
-      profileImage:
-        "https://cdn.prod.website-files.com/684228174606b26ec8e3e29e/68472685a66351f053a1d10b_DevSwarm_256.png",
+      profileImage: "https://placedog.net/300",
     },
     [RelayEvent.WEEKLY_RACE_ROOM_CREATED]: {
       raceRoomUrl: "https://racetime.gg/alttp/test-weekly-race",
-      startTimestamp: Date.now() + 3600000, // 1 hour from now
-      goal: "Beat the game",
-      participants: ["TestRunner1", "TestRunner2"],
+      startTimestamp: Math.floor((Date.now() + 3600 * 1000) / 1000), // 1 hour from now
     },
     [RelayEvent.JOIN_CHANNEL]: {
-      channel: "#testchannel",
-      displayName: "TestChannel",
+      channel: "#greenham",
+      displayName: "greenHam",
     },
     [RelayEvent.LEAVE_CHANNEL]: {
-      channel: "#testchannel",
+      channel: "#greenham",
       displayName: "TestChannel",
     },
     [RelayEvent.CONFIG_UPDATE]: {
       roomId: "123456789",
-      channelName: "testchannel",
+      channelName: "greenham",
       commandsEnabled: true,
       practiceListsEnabled: true,
     },

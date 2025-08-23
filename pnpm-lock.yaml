@@ -239,6 +239,9 @@ importers:
 
   racebot:
     dependencies:
+      '@helpasaur/types':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/types
       axios:
         specifier: ^1.7.4
         version: 1.11.0

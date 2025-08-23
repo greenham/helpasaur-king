@@ -13,7 +13,7 @@ export interface TwitchStreamData {
   started_at: string
   language: string
   thumbnail_url: string
-  tag_ids: string[]
+  tag_ids?: string[]
   tags: string[]
   is_mature: boolean
 }
@@ -147,8 +147,6 @@ export interface StreamAlertPayload extends TwitchStreamData {
 export interface WeeklyRacePayload {
   raceRoomUrl: string
   startTimestamp: number
-  goal: string
-  participants?: string[]
 }
 
 // Channel Event Payload for bot coordination
