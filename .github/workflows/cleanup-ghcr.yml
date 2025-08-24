@@ -1,0 +1,62 @@
+name: Cleanup GHCR Images
+
+on:
+  schedule:
+    # Run every Sunday at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (show what would be deleted without deleting)'
+        required: false
+        type: boolean
+        default: true
+      keep_count:
+        description: 'Number of recent images to keep per service'
+        required: false
+        type: number
+        default: 5
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    strategy:
+      matrix:
+        service: [helpa-base, helpa-api, helpa-discord, helpa-twitch, helpa-runnerwatcher, helpa-racebot, helpa-ws-relay]
+    
+    steps:
+      - name: Dry run - List packages for ${{ matrix.service }}
+        if: ${{ github.event.inputs.dry_run == true }}
+        run: |
+          echo "🔍 DRY RUN: Would delete old versions of ${{ matrix.service }}"
+          echo "Would keep most recent ${{ github.event.inputs.keep_count || 5 }} versions"
+          # Use GitHub CLI to list current versions
+          gh api repos/${{ github.repository }}/packages/container/${{ matrix.service }}/versions \
+            --jq '.[] | select(.metadata.container.tags | length == 0 or (.[0] | test("^[0-9]+\\.[0-9]+\\.[0-9]+") | not)) | "Would delete: " + .name + " (created: " + .created_at + ")"' \
+            | head -20 || echo "No versions found or error accessing package"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete old images for ${{ matrix.service }}
+        if: ${{ github.event.inputs.dry_run != true }}
+        uses: actions/delete-package-versions@v4
+        with:
+          package-name: ${{ matrix.service }}
+          package-type: 'container'
+          min-versions-to-keep: ${{ github.event.inputs.keep_count || 5 }}
+          delete-only-untagged-versions: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "🔍 DRY RUN completed for ${{ matrix.service }}"
+            echo "No images were actually deleted"
+          else
+            echo "🧹 Cleanup completed for ${{ matrix.service }}"
+            echo "Kept most recent ${{ github.event.inputs.keep_count || 5 }} versions"
+          fi
