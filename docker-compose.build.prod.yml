@@ -1,0 +1,134 @@
+version: "3.8"
+name: "helpa-build-prod"
+
+# Production/CI build configuration
+# Usage: VERSION=1.12.0 docker compose -f docker-compose.build.prod.yml build --push
+# This file builds images with registry tags for production deployment
+
+services:
+  helpa-base:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./Dockerfile.base
+      target: builder
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Base image with pre-built libraries and dependencies for all Helpasaur King services"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "build.commit=${GIT_COMMIT:-unknown}"
+        - "build.date=${BUILD_DATE:-unknown}"
+
+  api-server:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-api:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: api
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-api:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=REST API server with MongoDB, JWT auth, Socket.io, and Twitch EventSub webhooks"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=api"
+
+  discord-bot:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-discord:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: discord
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-discord:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Discord bot for ALttP speedrunning community - commands, go-live notifications, race announcements"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=discord"
+
+  twitch-bot:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-twitch:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: twitch
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-twitch:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Twitch chat bot for stream commands and viewer interaction"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=twitch"
+
+  runnerwatcher:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-runnerwatcher:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: runnerwatcher
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-runnerwatcher:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Stream monitoring service using Twitch EventSub for ALttP stream detection and alerts"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=runnerwatcher"
+
+  racebot:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-racebot:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: racebot
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-racebot:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=Automated racetime.gg race creation for weekly ALttP community races"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=racebot"
+
+  ws-relay:
+    image: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-ws-relay:${VERSION:-latest}
+    depends_on:
+      - helpa-base
+    build:
+      context: .
+      dockerfile: ./Dockerfile.service
+      target: prod
+      args:
+        SERVICE: ws-relay
+        BASE_IMAGE: ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-base:${VERSION:-latest}
+      cache_from:
+        - ${REGISTRY:-ghcr.io/greenham/helpasaur-king}/helpa-ws-relay:latest
+      labels:
+        - "org.opencontainers.image.source=https://github.com/greenham/helpasaur-king"
+        - "org.opencontainers.image.description=WebSocket relay hub for real-time inter-service communication"
+        - "org.opencontainers.image.version=${VERSION:-latest}"
+        - "service.name=ws-relay"

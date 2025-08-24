@@ -10,18 +10,10 @@ import {
   Dropdown,
 } from "react-bootstrap"
 import { useEffect, useState, useMemo } from "react"
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
-import { IUser } from "../types/users"
-import {
-  getTwitchBotConfig,
-  getPublicConfigs,
-  joinTwitchChannel,
-  leaveTwitchChannel,
-  updateTwitchBotConfig,
-} from "../utils/apiService"
 import { useToast } from "../hooks/useToast"
-import { getTwitchLoginUrl } from "../utils/utils"
-import { useUser } from "../hooks/useUser"
+import { getTwitchLoginUrl } from "../utils"
+import { useHelpaApi } from "../hooks/useHelpaApi"
+import { ApiUser, TwitchBotConfig } from "@helpasaur/types"
 
 interface TwitchBotPageProps {}
 
@@ -30,15 +22,10 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
     document.title = "Twitch Bot | Helpasaur King"
   }, [])
 
+  const { useUser, useTwitchBotConfig } = useHelpaApi()
   const { data: user, isPending: userLoading } = useUser()
-
-  const { data: twitchBotConfig, isPending: twitchBotConfigLoading } = useQuery(
-    {
-      queryKey: ["twitchBotConfig"],
-      queryFn: getTwitchBotConfig,
-      retry: 0,
-    }
-  )
+  const { data: twitchBotConfig, isPending: twitchBotConfigLoading } =
+    useTwitchBotConfig()
 
   if (userLoading || twitchBotConfigLoading)
     return (
@@ -71,7 +58,7 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
           and send <code>!join</code> or <code>!leave</code>.
         </Alert>
       )}
-      {user && (
+      {user && twitchBotConfig && (
         <TwitchUserBotManagement
           user={user}
           twitchBotConfig={twitchBotConfig}
@@ -81,20 +68,8 @@ const TwitchBotPage: React.FunctionComponent<TwitchBotPageProps> = () => {
   )
 }
 
-interface TwitchBotConfig {
-  active: boolean
-  commandsEnabled: boolean
-  commandPrefix: string
-  textCommandCooldown: number
-  practiceListsEnabled: boolean
-  allowModsToManagePracticeLists: boolean
-  weeklyRaceAlertEnabled: boolean
-  createdAt: Date
-  lastUpdated: Date
-}
-
 interface TwitchUserBotManagementProps {
-  user: IUser
+  user: ApiUser
   twitchBotConfig: TwitchBotConfig
 }
 // Custom toggle component for better UX
@@ -138,48 +113,40 @@ const TwitchUserBotManagement: React.FunctionComponent<
   TwitchUserBotManagementProps
 > = (props) => {
   const { user, twitchBotConfig } = props
-
-  const queryClient = useQueryClient()
   const toast = useToast()
   const [showLeaveModal, setShowLeaveModal] = React.useState(false)
   const handleShowLeaveModal = () => setShowLeaveModal(true)
   const handleCloseLeaveModal = () => setShowLeaveModal(false)
-
-  // State for command prefix editing
   const [showPrefixDropdown, setShowPrefixDropdown] = useState(false)
+  const {
+    useJoinTwitchChannel,
+    useLeaveTwitchChannel,
+    useUpdateTwitchBotConfig,
+    useConfig,
+  } = useHelpaApi()
 
-  // Fetch public configs from API
-  const { data: publicConfigs } = useQuery({
-    queryKey: ["publicConfigs"],
-    queryFn: getPublicConfigs,
-  })
+  // Fetch config from API
+  const { data: webConfig } = useConfig()
+
+  // Get mutation objects
+  const joinChannelMutation = useJoinTwitchChannel()
+  const leaveChannelMutation = useLeaveTwitchChannel()
+  const updateConfigMutation = useUpdateTwitchBotConfig({ showToast: false })
 
   // Memoize allowed prefixes to avoid unnecessary recalculations
   const allowedPrefixes = useMemo(() => {
-    if (!publicConfigs?.twitch?.commandPrefixes) {
+    if (!webConfig?.twitch?.commandPrefixes) {
       return []
     }
-    return publicConfigs.twitch.commandPrefixes
-  }, [publicConfigs])
+    return webConfig.twitch.commandPrefixes
+  }, [webConfig])
 
   const handleJoinRequest = async () => {
-    const joinResult = await joinTwitchChannel()
-    if (joinResult.result === "success") {
-      toast.success("Successfully joined your channel!")
-      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
-    } else {
-      toast.warning("Unable to join your channel!")
-    }
+    joinChannelMutation.mutate(undefined)
   }
 
   const handleLeaveRequest = async () => {
-    const leaveResult = await leaveTwitchChannel()
-    if (leaveResult.result === "success") {
-      toast.success("Successfully left your channel!")
-      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
-    } else {
-      toast.warning("Unable to leave your channel!")
-    }
+    leaveChannelMutation.mutate(undefined)
     handleCloseLeaveModal()
   }
 
@@ -200,26 +167,24 @@ const TwitchUserBotManagement: React.FunctionComponent<
     )
   }
 
-  const updateConfigMutation = useMutation({
-    mutationFn: updateTwitchBotConfig,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["twitchBotConfig"] })
-    },
-  })
-
   const handleToggle = async (
     field: string,
     value: boolean,
     successMessage: string
   ) => {
-    try {
-      await updateConfigMutation.mutateAsync({ [field]: value })
-      toast.success(successMessage)
-    } catch (error: any) {
-      toast.error(
-        `Failed to update configuration: ${error?.message || "Unknown error"}`
-      )
-    }
+    updateConfigMutation.mutate(
+      { [field]: value },
+      {
+        onSuccess: () => {
+          toast.success(successMessage)
+        },
+        onError: (error) => {
+          const errorMessage =
+            error instanceof Error ? error.message : "Unknown error"
+          toast.error(`Failed to update configuration: ${errorMessage}`)
+        },
+      }
+    )
   }
 
   const handlePrefixChange = async (newPrefix: string) => {
@@ -227,14 +192,19 @@ const TwitchUserBotManagement: React.FunctionComponent<
       return // No change needed or config not loaded
     }
 
-    try {
-      await updateConfigMutation.mutateAsync({ commandPrefix: newPrefix })
-      toast.success(`Command prefix changed to "${newPrefix}"`)
-    } catch (error: any) {
-      toast.error(
-        `Failed to update prefix: ${error?.message || "Unknown error"}`
-      )
-    }
+    updateConfigMutation.mutate(
+      { commandPrefix: newPrefix },
+      {
+        onSuccess: () => {
+          toast.success(`Command prefix changed to "${newPrefix}"`)
+        },
+        onError: (error) => {
+          const errorMessage =
+            error instanceof Error ? error.message : "Unknown error"
+          toast.error(`Failed to update prefix: ${errorMessage}`)
+        },
+      }
+    )
   }
 
   return (
@@ -274,7 +244,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
               <div className="ms-3">
                 <ConfigToggle
                   id="commands-switch"
-                  checked={twitchBotConfig.commandsEnabled}
+                  checked={
+                    updateConfigMutation.isPending &&
+                    updateConfigMutation.variables?.commandsEnabled !==
+                      undefined
+                      ? updateConfigMutation.variables.commandsEnabled
+                      : twitchBotConfig.commandsEnabled
+                  }
                   onChange={(checked) =>
                     handleToggle(
                       "commandsEnabled",
@@ -317,7 +293,10 @@ const TwitchUserBotManagement: React.FunctionComponent<
                         }
                       >
                         <span className="prefix-char">
-                          {twitchBotConfig?.commandPrefix || "!"}
+                          {updateConfigMutation.isPending &&
+                          updateConfigMutation.variables?.commandPrefix
+                            ? updateConfigMutation.variables.commandPrefix
+                            : twitchBotConfig?.commandPrefix || "!"}
                         </span>
                       </Dropdown.Toggle>
                       <Dropdown.Menu align="end">
@@ -368,7 +347,13 @@ const TwitchUserBotManagement: React.FunctionComponent<
               <div className="ms-3">
                 <ConfigToggle
                   id="practice-lists-switch"
-                  checked={twitchBotConfig.practiceListsEnabled}
+                  checked={
+                    updateConfigMutation.isPending &&
+                    updateConfigMutation.variables?.practiceListsEnabled !==
+                      undefined
+                      ? updateConfigMutation.variables.practiceListsEnabled
+                      : twitchBotConfig.practiceListsEnabled
+                  }
                   onChange={(checked) =>
                     handleToggle(
                       "practiceListsEnabled",
@@ -400,7 +385,14 @@ const TwitchUserBotManagement: React.FunctionComponent<
                   <div className="ms-3">
                     <ConfigToggle
                       id="mod-access-switch"
-                      checked={twitchBotConfig.allowModsToManagePracticeLists}
+                      checked={
+                        updateConfigMutation.isPending &&
+                        updateConfigMutation.variables
+                          ?.allowModsToManagePracticeLists !== undefined
+                          ? updateConfigMutation.variables
+                              .allowModsToManagePracticeLists
+                          : twitchBotConfig.allowModsToManagePracticeLists
+                      }
                       onChange={(checked) =>
                         handleToggle(
                           "allowModsToManagePracticeLists",

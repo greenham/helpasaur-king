@@ -1,11 +1,5 @@
 import * as React from "react"
-import { useToast } from "../../hooks/useToast"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import {
-  getTwitchBotChannels,
-  joinTwitchChannel,
-  leaveTwitchChannel,
-} from "../../utils/apiService"
+import { useHelpaApi } from "../../hooks/useHelpaApi"
 import {
   Container,
   Row,
@@ -19,17 +13,14 @@ import {
 
 interface ManageTwitchBotProps {}
 const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
-  const toast = useToast()
+  const { useTwitchBotChannels, useJoinTwitchChannel, useLeaveTwitchChannel } =
+    useHelpaApi()
+  const { data: twitchBotChannels } = useTwitchBotChannels()
 
-  const { data: twitchBotChannels } = useQuery({
-    queryKey: ["twitchBotChannels"],
-    queryFn: getTwitchBotChannels,
-  })
-  const queryClient = useQueryClient()
+  const joinChannelMutation = useJoinTwitchChannel()
+  const leaveChannelMutation = useLeaveTwitchChannel()
 
   const [channelToJoin, setChannelToJoin] = React.useState("")
-  const [channelJoinInProgress, setChannelJoinInProgress] =
-    React.useState(false)
   const handleChannelToAddInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -37,31 +28,14 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
     setChannelToJoin(value)
   }
   const handleAddChannelToTwitchBot = async () => {
-    setChannelJoinInProgress(true)
-    try {
-      const channelResult = await joinTwitchChannel(channelToJoin)
-      console.log(channelResult)
-      if (channelResult.result === "success") {
-        toast.success(`Twitch bot has joined ${channelToJoin}!`)
+    joinChannelMutation.mutate(channelToJoin, {
+      onSuccess: () => {
         setChannelToJoin("")
-        queryClient.invalidateQueries({ queryKey: ["twitchBotChannels"] })
-      } else if (channelResult.result === "noop") {
-        toast.info(channelResult.message)
-        setChannelToJoin("")
-      } else if (channelResult.result === "error") {
-        toast.error(
-          `Twitch bot failed to join ${channelToJoin}: ${channelResult.message}`
-        )
-      }
-    } catch (err) {
-      toast.error(`Twitch bot failed to join ${channelToJoin}: ${err}`)
-    }
-    setChannelJoinInProgress(false)
+      },
+    })
   }
 
   const [channelToRemove, setChannelToRemove] = React.useState("")
-  const [channelRemoveInProgress, setChannelRemoveInProgress] =
-    React.useState(false)
   const handleChannelToRemoveInputChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -69,22 +43,11 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
     setChannelToRemove(value)
   }
   const handleRemoveChannelFromTwitchBot = async () => {
-    setChannelRemoveInProgress(true)
-    try {
-      const channelResult = await leaveTwitchChannel(channelToRemove)
-      if (channelResult.result === "success") {
-        toast.success(`Twitch bot has left ${channelToRemove}!`)
+    leaveChannelMutation.mutate(channelToRemove, {
+      onSuccess: () => {
         setChannelToRemove("")
-        queryClient.invalidateQueries({ queryKey: ["twitchBotChannels"] })
-      } else if (channelResult.result === "noop") {
-        toast.info(channelResult.message)
-      } else if (channelResult.result === "error") {
-        toast.error(channelResult.message)
-      }
-    } catch (err) {
-      toast.error(`Twitch bot failed to leave ${channelToRemove}: ${err}`)
-    }
-    setChannelRemoveInProgress(false)
+      },
+    })
   }
 
   return (
@@ -111,7 +74,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
             </FloatingLabel>
           </Col>
           <Col>
-            {channelJoinInProgress ? (
+            {joinChannelMutation.isPending ? (
               <Spinner animation="border" role="statues">
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
@@ -120,7 +83,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
                 variant="dark"
                 onClick={handleAddChannelToTwitchBot}
                 size="lg"
-                disabled={channelJoinInProgress}
+                disabled={joinChannelMutation.isPending}
               >
                 <i className="fa-regular fa-square-plus pe-1"></i> Join Channel
               </Button>
@@ -151,7 +114,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
             </FloatingLabel>
           </Col>
           <Col>
-            {channelRemoveInProgress ? (
+            {leaveChannelMutation.isPending ? (
               <Spinner animation="border" role="statues">
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
@@ -160,7 +123,7 @@ const ManageTwitchBot: React.FunctionComponent<ManageTwitchBotProps> = () => {
                 variant="dark"
                 onClick={handleRemoveChannelFromTwitchBot}
                 size="lg"
-                disabled={channelRemoveInProgress}
+                disabled={leaveChannelMutation.isPending}
               >
                 <i className="fa-regular fa-square-minus pe-1"></i> Leave
                 Channel

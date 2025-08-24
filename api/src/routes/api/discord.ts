@@ -1,0 +1,111 @@
+import express, { Request, Response, Router } from "express"
+import guard from "express-jwt-permissions"
+import { requireJwtToken } from "../../lib/utils"
+import {
+  sendSuccess,
+  sendError,
+  sendNoop,
+  handleRouteError,
+} from "../../lib/responseHelpers"
+import { GuildConfig } from "@helpasaur/types"
+import { getConfig, getConfigWithDoc } from "../../types/config"
+
+const router: Router = express.Router()
+const permissionGuard = guard()
+
+// Endpoint: /discord
+
+// GET /api/discord/joinUrl
+// - Returns the URL to join the bot to a guild
+router.get("/joinUrl", async (req: Request, res: Response) => {
+  try {
+    const discordConfig = await getConfig("discord")
+    if (!discordConfig) {
+      throw new Error("Discord configuration not found")
+    }
+    const joinUrl = `https://discord.com/api/oauth2/authorize?client_id=${
+      discordConfig.clientId
+    }&permissions=${
+      discordConfig.oauth.permissions
+    }&scope=${discordConfig.oauth.scopes.join("%20")}`
+
+    sendSuccess(res, { url: joinUrl })
+  } catch (err) {
+    handleRouteError(res, err, "get Discord join URL")
+  }
+})
+
+// POST /api/discord/guild
+// - Creates a new guild
+router.post(
+  "/guild",
+  requireJwtToken,
+  permissionGuard.check(["service"]),
+  async (req: Request, res: Response) => {
+    try {
+      // assume req.body contains a valid guild object
+      // add this to config for discord (guilds array)
+      const result = await getConfigWithDoc("discord")
+      if (!result) {
+        throw new Error("Discord configuration not found")
+      }
+      const { config: discordConfig, doc: configDoc } = result
+      if (discordConfig.guilds.find((g: GuildConfig) => g.id === req.body.id)) {
+        return sendNoop(
+          res,
+          `Already joined guild: ${req.body.name} (${req.body.id})!`
+        )
+      }
+
+      discordConfig.guilds.push(req.body)
+      configDoc.markModified("config")
+      await configDoc.save()
+
+      sendSuccess(res, null, "OK", 201)
+    } catch (err) {
+      handleRouteError(res, err, "create guild")
+    }
+  }
+)
+
+// PATCH /api/discord/guild/:id
+// - Updates an existing guild
+router.patch(
+  "/guild/:id",
+  requireJwtToken,
+  permissionGuard.check(["service"]),
+  async (req: Request, res: Response) => {
+    if (!req.params.id || !req.params.id.match(/\d+/)) {
+      return sendError(res, "Invalid guild id provided!", 400)
+    }
+
+    try {
+      // assume req.body contains a valid patch for a guild object
+      // update this in config for discord (guilds array)
+      const result = await getConfigWithDoc("discord")
+      if (!result) {
+        throw new Error("Discord configuration not found")
+      }
+      const { config: discordConfig, doc: configDoc } = result
+      const index = discordConfig.guilds.findIndex(
+        (g: GuildConfig) => g.id === req.params.id
+      )
+      if (index === -1) {
+        return sendError(res, `Guild not found: ${req.params.id}`, 404)
+      }
+
+      discordConfig.guilds[index] = Object.assign(
+        discordConfig.guilds[index],
+        req.body
+      )
+      configDoc.markModified("config")
+      await configDoc.save()
+
+      sendSuccess(res, null, "OK")
+    } catch (err) {
+      handleRouteError(res, err, "update guild")
+    }
+  }
+)
+
+export default router

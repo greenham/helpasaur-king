@@ -1,0 +1,34 @@
+services:
+  mongo:
+    volumes:
+      - ./docker-entrypoint-initdb.d/db-init.dev.js:/docker-entrypoint-initdb.d/db-init.dev.js:ro
+
+  api-server:
+    volumes:
+      - ./api:/app/api
+      - ./libs:/app/libs
+
+  discord-bot:
+    volumes:
+      - ./discord:/app/discord
+      - ./libs:/app/libs
+
+  twitch-bot:
+    volumes:
+      - ./twitch:/app/twitch
+      - ./libs:/app/libs
+
+  runnerwatcher:
+    volumes:
+      - ./runnerwatcher:/app/runnerwatcher
+      - ./libs:/app/libs
+
+  racebot:
+    volumes:
+      - ./racebot:/app/racebot
+      - ./libs:/app/libs
+
+  ws-relay:
+    volumes:
+      - ./ws-relay:/app/ws-relay
+      - ./libs:/app/libs

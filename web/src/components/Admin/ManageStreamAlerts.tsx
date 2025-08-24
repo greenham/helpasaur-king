@@ -1,11 +1,5 @@
 import * as React from "react"
-import { useToast } from "../../hooks/useToast"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import {
-  addChannelToStreamAlerts,
-  getStreamAlertsChannels,
-  removeChannelFromStreamAlerts,
-} from "../../utils/apiService"
+import { useHelpaApi } from "../../hooks/useHelpaApi"
 import {
   Container,
   Row,
@@ -16,22 +10,23 @@ import {
   Button,
   Badge,
 } from "react-bootstrap"
-import { TwitchUserData } from "../../types/users"
+import { StreamAlertsChannel } from "@helpasaur/types"
 
 interface ManageStreamAlertsProps {}
 const ManageStreamAlerts: React.FunctionComponent<
   ManageStreamAlertsProps
 > = () => {
-  const toast = useToast()
+  const {
+    useStreamAlertsChannels,
+    useAddChannelToStreamAlerts,
+    useRemoveChannelFromStreamAlerts,
+  } = useHelpaApi()
+  const { data: streamAlertsChannels } = useStreamAlertsChannels()
 
-  const { data: streamAlertsChannels } = useQuery({
-    queryKey: ["streamAlertsChannels"],
-    queryFn: getStreamAlertsChannels,
-  })
-  const queryClient = useQueryClient()
+  const addChannelMutation = useAddChannelToStreamAlerts()
+  const removeChannelMutation = useRemoveChannelFromStreamAlerts()
 
   const [channelToAdd, setChannelToAdd] = React.useState("")
-  const [channelAddInProgress, setChannelAddInProgress] = React.useState(false)
   const handleChannelToAddInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -39,29 +34,14 @@ const ManageStreamAlerts: React.FunctionComponent<
     setChannelToAdd(value)
   }
   const handleAddChannelToStreamAlerts = async () => {
-    setChannelAddInProgress(true)
-    try {
-      const { data: channelAddResult } =
-        await addChannelToStreamAlerts(channelToAdd)
-      const channelResult = channelAddResult[0].value
-      if (channelResult.status === "success") {
-        toast.success(`Added ${channelToAdd} to stream alerts!`)
+    addChannelMutation.mutate(channelToAdd, {
+      onSuccess: () => {
         setChannelToAdd("")
-        queryClient.invalidateQueries({ queryKey: ["streamAlertsChannels"] })
-      } else if (channelResult.status === "error") {
-        toast.error(
-          `Failed to add ${channelToAdd} to stream alerts: ${channelResult.message}`
-        )
-      }
-    } catch (err) {
-      toast.error(`Failed to add ${channelToAdd} to stream alerts: ${err}`)
-    }
-    setChannelAddInProgress(false)
+      },
+    })
   }
 
   const [channelToRemove, setChannelToRemove] = React.useState("")
-  const [channelRemoveInProgress, setChannelRemoveInProgress] =
-    React.useState(false)
   const handleChannelToRemoveInputChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -69,24 +49,11 @@ const ManageStreamAlerts: React.FunctionComponent<
     setChannelToRemove(value)
   }
   const handleRemoveChannelFromStreamAlerts = async () => {
-    setChannelRemoveInProgress(true)
-    try {
-      const channelResult = await removeChannelFromStreamAlerts(channelToRemove)
-      if (channelResult.result === "success") {
-        toast.success(`Removed ${channelToRemove} from stream alerts!`)
+    removeChannelMutation.mutate(channelToRemove, {
+      onSuccess: () => {
         setChannelToRemove("")
-        queryClient.invalidateQueries({ queryKey: ["streamAlertsChannels"] })
-      } else if (channelResult.result === "noop") {
-        toast.info(channelResult.message)
-      } else if (channelResult.result === "error") {
-        toast.error(channelResult.message)
-      }
-    } catch (err) {
-      toast.error(
-        `Failed to remove ${channelToRemove} from stream alerts: ${err}`
-      )
-    }
-    setChannelRemoveInProgress(false)
+      },
+    })
   }
 
   return (
@@ -115,7 +82,7 @@ const ManageStreamAlerts: React.FunctionComponent<
             </FloatingLabel>
           </Col>
           <Col>
-            {channelAddInProgress ? (
+            {addChannelMutation.isPending ? (
               <Spinner animation="border" role="statues">
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
@@ -124,7 +91,7 @@ const ManageStreamAlerts: React.FunctionComponent<
                 variant="dark"
                 onClick={handleAddChannelToStreamAlerts}
                 size="lg"
-                disabled={channelAddInProgress}
+                disabled={addChannelMutation.isPending}
               >
                 <i className="fa-regular fa-square-plus pe-1"></i> Add Channel
               </Button>
@@ -146,7 +113,7 @@ const ManageStreamAlerts: React.FunctionComponent<
                 onChange={handleChannelToRemoveInputChange}
               >
                 <option>-</option>
-                {streamAlertsChannels?.map((channel: TwitchUserData) => (
+                {streamAlertsChannels?.map((channel: StreamAlertsChannel) => (
                   <option key={channel.id} value={channel.id}>
                     {channel.display_name}
                   </option>
@@ -155,7 +122,7 @@ const ManageStreamAlerts: React.FunctionComponent<
             </FloatingLabel>
           </Col>
           <Col>
-            {channelRemoveInProgress ? (
+            {removeChannelMutation.isPending ? (
               <Spinner animation="border" role="statues">
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
@@ -164,7 +131,7 @@ const ManageStreamAlerts: React.FunctionComponent<
                 variant="dark"
                 onClick={handleRemoveChannelFromStreamAlerts}
                 size="lg"
-                disabled={channelRemoveInProgress}
+                disabled={removeChannelMutation.isPending}
               >
                 <i className="fa-regular fa-square-minus pe-1"></i> Remove
                 Channel

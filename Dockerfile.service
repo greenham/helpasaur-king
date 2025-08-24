@@ -1,0 +1,39 @@
+# Generic service Dockerfile template for a TypeScript project
+# Usage: docker build --build-arg SERVICE=<service-name> -f Dockerfile.service .
+ARG BASE_IMAGE=helpa-base:dev
+FROM ${BASE_IMAGE} AS base
+
+# Copy source
+FROM base AS app
+ARG SERVICE
+WORKDIR /app/${SERVICE}
+COPY ${SERVICE}/tsconfig.json ./
+COPY ${SERVICE}/src ./src
+
+# Development stage
+FROM app AS dev
+ENV NODE_ENV=development
+CMD ["pnpm", "start:dev"]
+
+# Production build stage
+FROM app AS prod-build
+ARG SERVICE
+ENV NODE_ENV=production
+WORKDIR /app/${SERVICE}
+RUN pnpm build
+# Create clean production deployment with only this service's dependencies
+WORKDIR /app
+RUN pnpm --filter helpa-${SERVICE} --prod deploy --legacy /prod/${SERVICE}
+
+# Production runtime stage - minimal image with only essentials
+FROM node:20-alpine AS prod
+ARG SERVICE
+WORKDIR /app
+# Copy only what's needed for runtime:
+# 1. Compiled JavaScript only (no source files)
+COPY --from=prod-build /app/${SERVICE}/dist ./dist
+# 2. Service-specific production dependencies only  
+COPY --from=prod-build /prod/${SERVICE}/node_modules ./node_modules
+# 3. Package.json for metadata
+COPY --from=prod-build /prod/${SERVICE}/package.json ./package.json
+CMD ["node", "dist/index.js"]

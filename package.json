@@ -3,10 +3,14 @@
   "version": "1.13.0",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
-    "start": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
-    "start:web": "cd web && pnpm start",
+    "build": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.yml build --force-rm",
+    "build:prod": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build",
+    "build:push": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build --push",
+    "start": "docker compose up -d",
+    "start:web": "pnpm --filter helpa-web run start",
+    "start:libs": "pnpm dev:libs",
+    "start:logs": "pnpm start && pnpm logs",
     "stop": "docker compose down",
-    "build": "DOCKER_BUILDKIT=1 docker compose build --force-rm",
     "logs": "pnpm logs:all api-server discord-bot twitch-bot runnerwatcher racebot ws-relay",
     "logs:all": "docker compose logs -f --tail 1000",
     "boom": "pnpm stop && pnpm build && pnpm start --force-recreate && pnpm logs",
@@ -18,14 +22,32 @@
     "monitor:generate": "node monitoring/generate-configs.js",
     "monitor:import": "node monitoring/import-via-api.js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,html}\" --ignore-path .prettierignore",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,html}\" --ignore-path .prettierignore"
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,html}\" --ignore-path .prettierignore",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:check": "eslint . --max-warnings 0",
+    "typecheck": "pnpm run -r build",
+    "typecheck:api": "pnpm --filter helpa-api build",
+    "typecheck:discord": "pnpm --filter helpa-discord build",
+    "typecheck:twitch": "pnpm --filter helpa-twitch build",
+    "typecheck:runnerwatcher": "pnpm --filter helpa-runnerwatcher build",
+    "typecheck:racebot": "pnpm --filter helpa-racebot build",
+    "typecheck:ws-relay": "pnpm --filter helpa-ws-relay build",
+    "typecheck:web": "pnpm --filter helpa-web build",
+    "typecheck:libs": "pnpm --filter '@helpasaur/*' --filter twitch-api-client build",
+    "dev:libs": "concurrently \"pnpm --filter @helpasaur/types run build:watch\" \"pnpm --filter @helpasaur/api-client run build:watch\" \"pnpm --filter @helpasaur/bot-common run build:watch\" \"pnpm --filter twitch-api-client run build:watch\"",
+    "dev": "concurrently --names \"LIBS,DOCKER,WEB\" --prefix-colors \"cyan,green,yellow\" \"pnpm dev:libs\" \"pnpm start:logs\" \"pnpm start:web\""
   },
   "author": "https://github.com/greenham",
   "license": "MIT",
-  "dependencies": {
-    "helpa-api-client": "file:./lib/helpa-api-client"
-  },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "buffer": "^5.5.0||^6.0.0",
+    "concurrently": "^9.2.0",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.0.3"
   }
 }

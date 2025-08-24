@@ -12,8 +12,7 @@ on:
         type: string
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/greenham/helpasaur-king
+  REGISTRY: ghcr.io/greenham/helpasaur-king
 
 jobs:
   build-and-push:
@@ -36,6 +35,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get build metadata
+        id: metadata
+        run: |
+          echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
       - name: Extract version
         id: version
         run: |
@@ -43,113 +48,39 @@ jobs:
             VERSION="${{ github.event.release.tag_name }}"
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ github.event.inputs.custom_tag }}"
+            if [ -z "$VERSION" ]; then
+              echo "No custom_tag provided, using git commit hash"
+              VERSION="${{ steps.metadata.outputs.GIT_COMMIT }}"
+            fi
           else
-            VERSION="latest"
+            VERSION="${{ steps.metadata.outputs.GIT_COMMIT }}"
           fi
-          VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"
 
-      - name: Build and push helpa-base
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./lib/Dockerfile
-          target: builder
-          push: true
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-base:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push API
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./api/Dockerfile
-          target: prod
-          push: true
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-api:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-api:latest
-          build-contexts: |
-            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push Discord Bot
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./discord/Dockerfile
-          target: prod
-          push: true
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-discord:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-discord:latest
-          build-contexts: |
-            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push Twitch Bot
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./twitch/Dockerfile
-          target: prod
-          push: true
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-twitch:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-twitch:latest
-          build-contexts: |
-            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-
-      - name: Build and push Runner Watcher
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./runnerwatcher/Dockerfile
-          target: prod
-          push: true
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-runnerwatcher:latest
-          build-contexts: |
-            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push Racebot
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./racebot/Dockerfile
-          target: prod
-          push: true
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-racebot:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-racebot:latest
-          build-contexts: |
-            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push WS Relay
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./ws-relay/Dockerfile
-          target: prod
-          push: true
-          tags: |
-            ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:${{ steps.version.outputs.VERSION }}
-            ${{ env.IMAGE_PREFIX }}/helpa-ws-relay:latest
-          build-contexts: |
-            helpa-base:latest=docker-image://${{ env.IMAGE_PREFIX }}/helpa-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Build and push base image
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          GIT_COMMIT: ${{ steps.metadata.outputs.GIT_COMMIT }}
+          BUILD_DATE: ${{ steps.metadata.outputs.BUILD_DATE }}
+          DOCKER_BUILDKIT: 1
+        run: |
+          docker compose -f docker-compose.build.prod.yml build helpa-base
+          docker push ${{ env.REGISTRY }}/helpa-base:${{ steps.version.outputs.VERSION }}
+      
+      - name: Build and push service images
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          GIT_COMMIT: ${{ steps.metadata.outputs.GIT_COMMIT }}
+          BUILD_DATE: ${{ steps.metadata.outputs.BUILD_DATE }}
+          DOCKER_BUILDKIT: 1
+        run: |
+          docker compose -f docker-compose.build.prod.yml build api-server discord-bot twitch-bot runnerwatcher racebot ws-relay
+          docker push ${{ env.REGISTRY }}/helpa-api:${{ steps.version.outputs.VERSION }}
+          docker push ${{ env.REGISTRY }}/helpa-discord:${{ steps.version.outputs.VERSION }}
+          docker push ${{ env.REGISTRY }}/helpa-twitch:${{ steps.version.outputs.VERSION }}
+          docker push ${{ env.REGISTRY }}/helpa-runnerwatcher:${{ steps.version.outputs.VERSION }}
+          docker push ${{ env.REGISTRY }}/helpa-racebot:${{ steps.version.outputs.VERSION }}
+          docker push ${{ env.REGISTRY }}/helpa-ws-relay:${{ steps.version.outputs.VERSION }}

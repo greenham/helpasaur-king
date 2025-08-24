@@ -1,11 +1,10 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { Alert, Badge, Container, Spinner } from "react-bootstrap"
-import { filterStreams } from "../utils/utils"
+import { filterStreams } from "../utils"
 import LivestreamsList from "../components/LivestreamsList"
-import { getConfig, getLivestreams } from "../utils/apiService"
-import { TwitchStream } from "../types/streams"
+import { useHelpaApi } from "../hooks/useHelpaApi"
+import { TwitchStream, StreamFilterConfig } from "@helpasaur/types"
 
 interface LivestreamsPageProps {}
 interface FilteredStreams {
@@ -14,31 +13,31 @@ interface FilteredStreams {
 }
 
 const LivestreamsPage: React.FunctionComponent<LivestreamsPageProps> = () => {
-  const configQuery = useQuery({ queryKey: ["config"], queryFn: getConfig })
+  const { useConfig, useLivestreams } = useHelpaApi()
   const {
     data: webConfig,
     isError: configError,
     isLoading: configLoading,
-  } = configQuery
-
-  const streamsQuery = useQuery({
-    queryKey: ["livestreams"],
-    queryFn: getLivestreams,
-    refetchInterval: 1000 * 60,
-  })
+  } = useConfig()
   const {
     data: allStreams,
     isError: streamsError,
     isLoading: streamsLoading,
     isFetching: streamsFetching,
-  } = streamsQuery
+  } = useLivestreams()
 
   const [mergedStreams, setMergedStreams] = useState<Array<TwitchStream>>([])
 
   useEffect(() => {
+    const streamFilterConfig: StreamFilterConfig = webConfig?.streams || {
+      blacklistedUsers: [],
+      channels: [],
+      statusFilters: "",
+    }
+
     const filteredStreams: FilteredStreams = filterStreams(
-      allStreams,
-      webConfig
+      allStreams || [],
+      streamFilterConfig
     )
     setMergedStreams(filteredStreams.featured.concat(filteredStreams.other))
   }, [allStreams])

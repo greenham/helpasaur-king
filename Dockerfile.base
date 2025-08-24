@@ -1,0 +1,66 @@
+# This image serves as a base for app services with common tools pre-installed
+# Services extending this image get:
+# - pnpm@8 and nodemon pre-installed
+# - curl and wget for health checks
+# - Pre-built library packages in /app/libs
+# - Workspace configuration with all package.json files in /app
+
+FROM node:20-alpine as builder
+
+# Install common global packages
+RUN npm install -g pnpm@10.15.0 nodemon
+
+# Install common system dependencies for debugging and health checks
+RUN apk add --no-cache curl wget
+
+# Set up common working directory
+WORKDIR /app
+
+# Copy package management configuration and root TypeScript config
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.json ./
+
+# Copy service packages
+COPY api/package.json ./api/
+COPY discord/package.json ./discord/
+COPY twitch/package.json ./twitch/
+COPY runnerwatcher/package.json ./runnerwatcher/
+COPY ws-relay/package.json ./ws-relay/
+COPY racebot/package.json ./racebot/
+COPY web/package.json ./web/
+
+# Copy library packages
+COPY libs/@helpasaur/api-client/package.json ./libs/@helpasaur/api-client/
+COPY libs/@helpasaur/bot-common/package.json ./libs/@helpasaur/bot-common/
+COPY libs/@helpasaur/types/package.json ./libs/@helpasaur/types/
+COPY libs/twitch-api-client/package.json ./libs/twitch-api-client/
+
+# Install ALL workspace dependencies
+RUN pnpm install --frozen-lockfile
+
+# Build twitch-api-client FIRST (types now depends on it)
+WORKDIR /app/libs/twitch-api-client
+COPY libs/twitch-api-client/src ./src
+COPY libs/twitch-api-client/tsconfig.json ./
+RUN pnpm build
+
+# Build @helpasaur/types (depends on twitch-api-client)
+WORKDIR /app/libs/@helpasaur/types
+COPY libs/@helpasaur/types/src ./src
+COPY libs/@helpasaur/types/tsconfig.json ./
+RUN pnpm build
+
+# Build @helpasaur/api-client
+WORKDIR /app/libs/@helpasaur/api-client
+COPY libs/@helpasaur/api-client/src ./src
+COPY libs/@helpasaur/api-client/tsconfig.json ./
+RUN pnpm build
+
+# Build @helpasaur/bot-common (depends on types and api-client)
+WORKDIR /app/libs/@helpasaur/bot-common
+COPY libs/@helpasaur/bot-common/src ./src
+COPY libs/@helpasaur/bot-common/tsconfig.json ./
+RUN pnpm build
+
+# Re-link workspace dependencies after library builds to ensure proper module resolution
+WORKDIR /app
+RUN pnpm install --frozen-lockfile

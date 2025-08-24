@@ -2,12 +2,245 @@ version: "3.8"
 name: "helpa"
 
 services:
-  helpa-base:
-    build:
-      context: ./lib
-      target: builder
-    image: helpa-base:latest
+  # Application Services
+  api-server:
+    image: helpa-api:${VERSION:-dev}
+    restart: on-failure
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - ${API_SERVER_EXTERNAL_PORT:-3001}:3001
+    environment:
+      SERVICE_NAME: api
+      ALLOWED_SERVICES: discord,twitch,runnerwatcher,racebot,ws-relay,streamAlerts
+      MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-your_mongo_root_password_here}@mongo:27017/${MONGO_DATABASE_NAME:-helpa}?authSource=admin
+      PORT: ${API_SERVER_EXTERNAL_PORT:-3001}
+      API_KEY: ${API_SECRET_KEY:-your_api_secret_key_here}
+      API_CORS_ORIGINS_WHITELIST: ${API_CORS_ORIGINS_WHITELIST:-http://localhost:3450,https://your-domain.com}
+      TWITCH_APP_CLIENT_ID: ${TWITCH_APP_CLIENT_ID:-your_twitch_client_id_here}
+      TWITCH_APP_CLIENT_SECRET: ${TWITCH_APP_CLIENT_SECRET:-your_twitch_app_client_secret_here}
+      TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY:-your_twitch_eventsub_secret_here}
+      TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL:-https://your-webhook-url.com/eventsub}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your_jwt_secret_key_here}
+      JWT_HEADER_COOKIE_NAME: ${JWT_HEADER_COOKIE_NAME:-helpa-jwthp}
+      JWT_FOOTER_COOKIE_NAME: ${JWT_FOOTER_COOKIE_NAME:-helpa-jwts}
+      API_HOST: ${API_HOST:-https://api.your-domain.com}
+      CLIENT_POST_AUTH_REDIRECT_URL: ${CLIENT_POST_AUTH_REDIRECT_URL:-https://your-domain.com}
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      ws-relay:
+        condition: service_healthy
+    networks:
+      - int
+      - ext
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${API_SERVER_EXTERNAL_PORT:-3001}/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
+  discord-bot:
+    image: helpa-discord:${VERSION:-dev}
+    restart: on-failure
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - ${DISCORD_HEALTH_PORT:-3010}:${DISCORD_HEALTH_PORT:-3010}
+    environment:
+      SERVICE_NAME: discord
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT:-3001}
+      API_KEY: ${API_SECRET_KEY:-your_api_secret_key_here}
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
+      DISCORD_HEALTH_PORT: ${DISCORD_HEALTH_PORT:-3010}
+    depends_on:
+      api-server:
+        condition: service_healthy
+    networks:
+      - int
+      - ext
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${DISCORD_HEALTH_PORT:-3010}/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  twitch-bot:
+    image: helpa-twitch:${VERSION:-dev}
+    restart: on-failure
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - ${TWITCH_HEALTH_PORT:-3011}:${TWITCH_HEALTH_PORT:-3011}
+    environment:
+      SERVICE_NAME: twitch
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT:-3001}
+      API_KEY: ${API_SECRET_KEY:-your_api_secret_key_here}
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
+      TWITCH_HEALTH_PORT: ${TWITCH_HEALTH_PORT:-3011}
+    depends_on:
+      api-server:
+        condition: service_healthy
+    networks:
+      - int
+      - ext
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${TWITCH_HEALTH_PORT:-3011}/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  runnerwatcher:
+    image: helpa-runnerwatcher:${VERSION:-dev}
+    restart: on-failure
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - ${TWITCH_WEBHOOK_LISTENER_PORT:-3002}:3002
+    environment:
+      SERVICE_NAME: streamAlerts
+      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT:-3001}
+      API_KEY: ${API_SECRET_KEY:-your_api_secret_key_here}
+      TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY:-your_twitch_eventsub_secret_here}
+      TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL:-https://your-webhook-url.com/eventsub}
+      TWITCH_WEBHOOK_LISTENER_PORT: ${TWITCH_WEBHOOK_LISTENER_PORT:-3002}
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
+    depends_on:
+      api-server:
+        condition: service_healthy
+      ws-relay:
+        condition: service_healthy
+    networks:
+      - int
+      - ext
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${TWITCH_WEBHOOK_LISTENER_PORT:-3002}/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  racebot:
+    image: helpa-racebot:${VERSION:-dev}
+    restart: on-failure
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - ${RACEBOT_HEALTH_PORT:-3012}:${RACEBOT_HEALTH_PORT:-3012}
+    environment:
+      SERVICE_NAME: racebot
+      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
+      RACETIME_BASE_URL: ${RACETIME_BASE_URL:-https://racetime.gg}
+      RACETIME_HOSTNAME: ${RACETIME_HOSTNAME:-racetime.gg}
+      RACETIME_WSS_URL: ${RACETIME_WSS_URL:-wss://racetime.gg}
+      RACETIME_GAME_CATEGORY_SLUG_Z3: ${RACETIME_GAME_CATEGORY_SLUG_Z3:-alttp}
+      RACETIME_BOT_CLIENT_ID: ${RACETIME_BOT_CLIENT_ID:-your_racetime_bot_client_id_here}
+      RACETIME_BOT_CLIENT_SECRET: ${RACETIME_BOT_CLIENT_SECRET:-your_racetime_bot_client_secret_here}
+      RACEBOT_HEALTH_PORT: ${RACEBOT_HEALTH_PORT:-3012}
+    depends_on:
+      ws-relay:
+        condition: service_healthy
+    networks:
+      - int
+      - ext
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${RACEBOT_HEALTH_PORT:-3012}/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  ws-relay:
+    image: helpa-ws-relay:${VERSION:-dev}
+    restart: on-failure
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - ${WEBSOCKET_RELAY_SERVER_PORT:-3003}:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
+    environment:
+      SERVICE_NAME: ws-relay
+      WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT:-3003}
+    networks:
+      - int
+      - ext
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${WEBSOCKET_RELAY_SERVER_PORT:-3003}/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Infrastructure Services
   mongo:
     image: mongo:7-jammy
     restart: on-failure
@@ -17,11 +250,11 @@ services:
         max-size: "20m"
         max-file: "5"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-your_mongo_root_password_here}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME:-helpa}
     ports:
-      - ${MONGO_EXTERNAL_PORT}:27017
+      - ${MONGO_EXTERNAL_PORT:-27019}:27017
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.js:/docker-entrypoint-initdb.d/db-init.js:ro
       - mongodb_data_container:/data/db
@@ -45,12 +278,12 @@ services:
     ports:
       - ${MONGO_EXPRESS_PORT:-8081}:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME:-root}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-your_mongo_root_password_here}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-your_mongo_root_password_here}@mongo:27017
       ME_CONFIG_BASICAUTH: "true"
-      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-your_mongo_express_password_here}
     depends_on:
       mongo:
         condition: service_healthy
@@ -67,144 +300,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
-
-  api-server:
-    image: helpa-api:${VERSION:-${BUILD_TARGET}}
-    build:
-      context: .
-      dockerfile: ./api/Dockerfile
-      target: ${BUILD_TARGET}
-    restart: on-failure
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "3"
-    ports:
-      - ${API_SERVER_EXTERNAL_PORT}:3001
-    environment:
-      SERVICE_NAME: api
-      ALLOWED_SERVICES: discord,twitch,runnerwatcher,racebot,ws-relay,streamAlerts
-      MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/${MONGO_DATABASE_NAME}?authSource=admin
-      PORT: ${API_SERVER_EXTERNAL_PORT}
-      API_KEY: ${API_SECRET_KEY}
-      API_CORS_ORIGINS_WHITELIST: ${API_CORS_ORIGINS_WHITELIST}
-      TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
-      TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      JWT_HEADER_COOKIE_NAME: ${JWT_HEADER_COOKIE_NAME}
-      JWT_FOOTER_COOKIE_NAME: ${JWT_FOOTER_COOKIE_NAME}
-      API_HOST: ${API_HOST}
-      CLIENT_POST_AUTH_REDIRECT_URL: ${CLIENT_POST_AUTH_REDIRECT_URL}
-      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
-    depends_on:
-      mongo:
-        condition: service_healthy
-      ws-relay:
-        condition: service_healthy
-    networks:
-      - int
-      - ext
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:${API_SERVER_EXTERNAL_PORT}/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
-  discord-bot:
-    image: helpa-discord:${VERSION:-${BUILD_TARGET}}
-    build:
-      context: .
-      dockerfile: ./discord/Dockerfile
-      target: ${BUILD_TARGET}
-    restart: on-failure
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "3"
-    ports:
-      - ${DISCORD_HEALTH_PORT}:${DISCORD_HEALTH_PORT}
-    environment:
-      SERVICE_NAME: discord
-      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
-      API_KEY: ${API_SECRET_KEY}
-      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
-      DISCORD_HEALTH_PORT: ${DISCORD_HEALTH_PORT}
-    depends_on:
-      api-server:
-        condition: service_healthy
-      helpa-base:
-        condition: service_completed_successfully
-    networks:
-      - int
-      - ext
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:${DISCORD_HEALTH_PORT}/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
-  twitch-bot:
-    image: helpa-twitch:${VERSION:-${BUILD_TARGET}}
-    build:
-      context: .
-      dockerfile: ./twitch/Dockerfile
-      target: ${BUILD_TARGET}
-    restart: on-failure
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "3"
-    ports:
-      - ${TWITCH_HEALTH_PORT}:${TWITCH_HEALTH_PORT}
-    environment:
-      SERVICE_NAME: twitch
-      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
-      API_KEY: ${API_SECRET_KEY}
-      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
-      TWITCH_HEALTH_PORT: ${TWITCH_HEALTH_PORT}
-    depends_on:
-      api-server:
-        condition: service_healthy
-      helpa-base:
-        condition: service_completed_successfully
-    networks:
-      - int
-      - ext
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:${TWITCH_HEALTH_PORT}/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
   nginx:
     image: nginx:1.21.6
@@ -234,133 +329,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-
-  runnerwatcher:
-    image: helpa-runnerwatcher:${VERSION:-${BUILD_TARGET}}
-    build:
-      context: .
-      dockerfile: ./runnerwatcher/Dockerfile
-      target: ${BUILD_TARGET}
-    restart: on-failure
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "3"
-    ports:
-      - ${TWITCH_WEBHOOK_LISTENER_PORT}:3002
-    environment:
-      SERVICE_NAME: streamAlerts
-      API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT}
-      API_KEY: ${API_SECRET_KEY}
-      TWITCH_EVENTSUB_SECRET_KEY: ${TWITCH_EVENTSUB_SECRET_KEY}
-      TWITCH_EVENTSUB_WEBHOOK_URL: ${TWITCH_EVENTSUB_WEBHOOK_URL}
-      TWITCH_WEBHOOK_LISTENER_PORT: ${TWITCH_WEBHOOK_LISTENER_PORT}
-      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
-    depends_on:
-      api-server:
-        condition: service_healthy
-      ws-relay:
-        condition: service_healthy
-      helpa-base:
-        condition: service_completed_successfully
-    networks:
-      - int
-      - ext
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:${TWITCH_WEBHOOK_LISTENER_PORT}/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 45s
-
-  racebot:
-    image: helpa-racebot:${VERSION:-${BUILD_TARGET}}
-    build:
-      context: .
-      dockerfile: ./racebot/Dockerfile
-      target: ${BUILD_TARGET}
-    restart: on-failure
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "3"
-    ports:
-      - ${RACEBOT_HEALTH_PORT}:${RACEBOT_HEALTH_PORT}
-    environment:
-      SERVICE_NAME: racebot
-      WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT}
-      RACETIME_BASE_URL: ${RACETIME_BASE_URL}
-      RACETIME_HOSTNAME: ${RACETIME_HOSTNAME}
-      RACETIME_WSS_URL: ${RACETIME_WSS_URL}
-      RACETIME_GAME_CATEGORY_SLUG_Z3: ${RACETIME_GAME_CATEGORY_SLUG_Z3}
-      RACETIME_BOT_CLIENT_ID: ${RACETIME_BOT_CLIENT_ID}
-      RACETIME_BOT_CLIENT_SECRET: ${RACETIME_BOT_CLIENT_SECRET}
-      RACEBOT_HEALTH_PORT: ${RACEBOT_HEALTH_PORT}
-    depends_on:
-      ws-relay:
-        condition: service_healthy
-    networks:
-      - int
-      - ext
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:${RACEBOT_HEALTH_PORT}/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
-  ws-relay:
-    image: helpa-ws-relay:${VERSION:-${BUILD_TARGET}}
-    build:
-      context: .
-      dockerfile: ./ws-relay/Dockerfile
-      target: ${BUILD_TARGET}
-    restart: on-failure
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "3"
-    ports:
-      - ${WEBSOCKET_RELAY_SERVER_PORT}:${WEBSOCKET_RELAY_SERVER_PORT}
-    environment:
-      SERVICE_NAME: ws-relay
-      WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT}
-    networks:
-      - int
-      - ext
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:${WEBSOCKET_RELAY_SERVER_PORT}/health",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
 
 volumes:
   mongodb_data_container:

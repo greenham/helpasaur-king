@@ -7,7 +7,8 @@ import { IToast } from "../types/toasts"
 interface ToastProviderProps {
   children: React.ReactNode
 }
-interface ToastContextProps {
+
+export interface ToastContextProps {
   success: (message: string) => void
   warning: (message: string) => void
   info: (message: string) => void

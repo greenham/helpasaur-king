@@ -2,6 +2,7 @@ import * as React from "react"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { useDebounce } from "use-debounce"
+import { UseMutationResult } from "@tanstack/react-query"
 import {
   Alert,
   Badge,
@@ -16,19 +17,35 @@ import {
   Table,
 } from "react-bootstrap"
 import LinkifyText from "./LinkifyText"
-import { Command } from "../types/commands"
+import { Command } from "@helpasaur/types"
 import CommandFormModal from "./CommandFormModal"
 
 interface CommandsListProps {
   commands: Command[]
   userCanEdit: boolean
-  updateCommand: (c: Command) => void
-  createCommand: (c: Command) => void
-  deleteCommand: (c: Command) => void
+  createCommandMutation: UseMutationResult<
+    void,
+    Error,
+    Partial<Command>,
+    unknown
+  >
+  updateCommandMutation: UseMutationResult<
+    void,
+    Error,
+    Partial<Command> & { _id: string },
+    unknown
+  >
+  deleteCommandMutation: UseMutationResult<void, Error, Command, unknown>
 }
 
 const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
-  const { commands, userCanEdit } = props
+  const {
+    commands,
+    userCanEdit,
+    createCommandMutation,
+    updateCommandMutation,
+    deleteCommandMutation,
+  } = props
 
   // Set up searching
   const { hash } = useLocation()
@@ -55,7 +72,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   useEffect(() => {
     setSearchResults(filterCommands(commands, debouncedSearchQuery))
-    window.location.replace("#" + debouncedSearchQuery)
+    window.location.replace(`#${debouncedSearchQuery}`)
   }, [debouncedSearchQuery, commands])
 
   const freshCommand = {
@@ -70,26 +87,31 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const [editCommandModalActive, setEditCommandModalActive] = useState(false)
   const hideEditCommandModal = () => setEditCommandModalActive(false)
   const showEditCommandModal = () => setEditCommandModalActive(true)
-  const [commandToEdit, setCommandToEdit] = useState<Command>(freshCommand)
+  const [commandToEdit, setCommandToEdit] =
+    useState<Partial<Command>>(freshCommand)
 
   const [deleteCommandModalActive, setDeleteCommandModalActive] =
     useState(false)
   const hideDeleteCommandModal = () => setDeleteCommandModalActive(false)
   const showDeleteCommandModal = () => setDeleteCommandModalActive(true)
-  const [commandToDelete, setCommandToDelete] = useState<Command>(freshCommand)
+  const [commandToDelete, setCommandToDelete] = useState<Command>(
+    freshCommand as Command
+  )
 
-  const saveCommand = async (command: Command) => {
+  const saveCommand = async (command: Partial<Command>) => {
     if (command._id !== "") {
-      props.updateCommand(command)
+      updateCommandMutation.mutate(
+        command as Partial<Command> & { _id: string }
+      )
     } else {
-      props.createCommand(command)
+      createCommandMutation.mutate(command)
     }
     hideEditCommandModal()
   }
 
   const handleDeleteConfirm = async () => {
     if (commandToDelete._id !== "") {
-      props.deleteCommand(commandToDelete)
+      deleteCommandMutation.mutate(commandToDelete)
     }
     hideDeleteCommandModal()
   }
@@ -115,7 +137,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               onKeyUp={(e) => {
                 if (e.key === "Escape") {
                   setSearchQuery("")
-                } else if (e.key == "Enter") {
+                } else if (e.key === "Enter") {
                   e.currentTarget.blur()
                 }
               }}
@@ -222,21 +244,43 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           </thead>
           <tbody>
             {searchResults.map((c, index) => {
+              // Check if this command is being updated optimistically
+              const isBeingUpdated =
+                updateCommandMutation.isPending &&
+                updateCommandMutation.variables?._id === c._id
+              const isBeingDeleted =
+                deleteCommandMutation.isPending &&
+                deleteCommandMutation.variables?._id === c._id
+
+              // Use optimistic data if being updated, otherwise use current data
+              const displayCommand = isBeingUpdated
+                ? updateCommandMutation.variables
+                : c
+
+              // Hide row if being deleted
+              if (isBeingDeleted) return null
+
               return (
-                <tr key={`command-${index}`}>
+                <tr
+                  key={`command-${index}`}
+                  style={{ opacity: isBeingUpdated ? 0.6 : 1 }}
+                >
                   <td className="align-middle text-end">
-                    <code className="fs-3">{c.command}</code>
-                    <CommandAliasesStack aliases={c.aliases} />
+                    <code className="fs-3">{displayCommand.command}</code>
+                    <CommandAliasesStack
+                      aliases={displayCommand.aliases || []}
+                    />
                   </td>
                   <td className="align-middle">
                     <div className="lead">
-                      <LinkifyText text={c.response} />
+                      <LinkifyText text={displayCommand.response || ""} />
                     </div>
                   </td>
                   {userCanEdit && (
                     <td>
                       <Button
                         variant="dark"
+                        disabled={isBeingUpdated || isBeingDeleted}
                         onClick={() => {
                           setCommandToEdit(c)
                           showEditCommandModal()
@@ -246,6 +290,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                       </Button>
                       <Button
                         variant="dark"
+                        disabled={isBeingUpdated || isBeingDeleted}
                         onClick={() => {
                           setCommandToDelete(c)
                           showDeleteCommandModal()
@@ -258,6 +303,35 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
                 </tr>
               )
             })}
+
+            {/* Optimistic new command being created */}
+            {createCommandMutation.isPending &&
+              createCommandMutation.variables && (
+                <tr style={{ opacity: 0.6 }}>
+                  <td className="align-middle text-end">
+                    <code className="fs-3">
+                      {createCommandMutation.variables.command}
+                    </code>
+                    <CommandAliasesStack
+                      aliases={createCommandMutation.variables.aliases || []}
+                    />
+                  </td>
+                  <td className="align-middle">
+                    <div className="lead">
+                      <LinkifyText
+                        text={createCommandMutation.variables.response || ""}
+                      />
+                    </div>
+                  </td>
+                  {userCanEdit && (
+                    <td>
+                      <Button variant="dark" disabled>
+                        <i className="fa-solid fa-spinner fa-spin"></i>
+                      </Button>
+                    </td>
+                  )}
+                </tr>
+              )}
           </tbody>
         </Table>
       )}

@@ -62,7 +62,10 @@ const router = createBrowserRouter(
 )
 
 const container = document.getElementById("app")
-const root = createRoot(container!)
+if (!container) {
+  throw new Error("Failed to find app container element")
+}
+const root = createRoot(container)
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />
