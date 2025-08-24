@@ -43,7 +43,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
           run_install: false
 
       - name: Get pnpm store directory
@@ -59,31 +59,31 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        working-directory: ./web
+      - name: Install dependencies (workspace root)
         run: pnpm install
+
+      - name: Build shared libraries
+        run: pnpm --filter '@helpasaur/*' --filter 'twitch-api-client' build
 
       - name: Build web app (with subdirectory)
         if: ${{ !inputs.custom_domain }}
-        working-directory: ./web
         env:
           API_HOST: ${{ secrets.API_HOST }}
           TWITCH_APP_CLIENT_ID: ${{ secrets.TWITCH_APP_CLIENT_ID }}
           PUBLIC_URL: /helpasaur-king
         run: |
-          pnpm clean
-          pnpm build --public-url /helpasaur-king/
+          pnpm --filter helpa-web clean
+          pnpm --filter helpa-web build --public-url /helpasaur-king/
       
       - name: Build web app (with custom domain)
         if: ${{ inputs.custom_domain }}
-        working-directory: ./web
         env:
           API_HOST: ${{ secrets.API_HOST }}
           TWITCH_APP_CLIENT_ID: ${{ secrets.TWITCH_APP_CLIENT_ID }}
           PUBLIC_URL: /
         run: |
-          pnpm clean
-          pnpm build
+          pnpm --filter helpa-web clean
+          pnpm --filter helpa-web build
 
       - name: Add CNAME file
         if: ${{ inputs.custom_domain }}
