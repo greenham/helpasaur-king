@@ -106,7 +106,9 @@ function TopNav() {
                       target={resource.target}
                       rel={resource.rel}
                     >
-                      <i className={`${resource.icon} pe-1`}></i>
+                      {resource.icon && (
+                        <i className={`${resource.icon} pe-1`}></i>
+                      )}
                       {resource.text}
                     </NavDropdown.Item>
                   )

@@ -87,7 +87,7 @@ export interface WebResource {
   href: string
   target: string
   rel: string
-  icon: string
+  icon?: string
   text: string
   divider?: boolean
 }

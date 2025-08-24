@@ -98,6 +98,16 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
     timelineLoading ||
     topChannelsLoading
 
+  // Generate gradient colors for bar chart
+  const generateBarColors = (count: number): string[] => {
+    const colors: string[] = []
+    for (let i = 0; i < count; i++) {
+      const hue = (i * 360) / count + 250 // Start from purple-ish hue
+      colors.push(`hsla(${hue % 360}, 70%, 60%, 0.7)`)
+    }
+    return colors
+  }
+
   // Prepare data for bar chart
   const barChartData = {
     labels: topCommands?.map((cmd) => cmd.command) || [],
@@ -105,8 +115,10 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
       {
         label: "Usage Count",
         data: topCommands?.map((cmd) => cmd.count) || [],
-        backgroundColor: "rgba(136, 132, 216, 0.6)",
-        borderColor: "rgba(136, 132, 216, 1)",
+        backgroundColor: generateBarColors(topCommands?.length || 0),
+        borderColor: generateBarColors(topCommands?.length || 0).map((color) =>
+          color.replace("0.7)", "1)")
+        ),
         borderWidth: 1,
       },
     ],

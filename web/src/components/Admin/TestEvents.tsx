@@ -370,20 +370,6 @@ const TestEvents: React.FunctionComponent<TestEventsProps> = () => {
             )}
           </Button>
         </Form>
-
-        {triggerMutation.isError && (
-          <Alert variant="danger" className="mt-3">
-            <i className="fa-solid fa-triangle-exclamation"></i> Error
-            triggering event: {triggerMutation.error?.message}
-          </Alert>
-        )}
-
-        {triggerMutation.isSuccess && (
-          <Alert variant="success" className="mt-3">
-            <i className="fa-solid fa-check-circle"></i> Test event triggered
-            successfully! Check Discord/Twitch for reactions.
-          </Alert>
-        )}
       </Card.Body>
     </Card>
   )

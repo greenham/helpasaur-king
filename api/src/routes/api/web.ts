@@ -28,32 +28,39 @@ router.get("/config", async (req: Request, res: Response) => {
       // @TODO: Move these into the database and make them editable
       resources: [
         {
-          href: "https://alttp-wiki.net/index.php/Main_Page",
+          href: "https://alttp-wiki.foxlisk.com/index.php/Main_Page",
           target: "_blank",
           rel: "noopener noreferrer",
-          icon: "fa-solid fa-arrow-up-right-from-square",
+          icon: "fa-brands fa-wikipedia-w",
           text: "Speedrun Wiki",
         },
         {
           href: "https://spannerisms.github.io/lttphack/",
           target: "_blank",
           rel: "noopener noreferrer",
-          icon: "fa-solid fa-arrow-up-right-from-square",
+          icon: "fa-solid fa-toolbox",
           text: "Practice Hack",
         },
         {
           href: "https://strats.alttp.run/",
           target: "_blank",
           rel: "noopener noreferrer",
-          icon: "fa-solid fa-arrow-up-right-from-square",
+          icon: "fa-solid fa-file-video",
           text: "Strat Hub",
         },
         {
           href: "http://www.speedrun.com/alttp",
           target: "_blank",
           rel: "noopener noreferrer",
-          icon: "fa-solid fa-arrow-up-right-from-square",
+          icon: "fa-solid fa-table-list",
           text: "Leaderboards",
+        },
+        {
+          href: "https://forevergrind.fm",
+          target: "_blank",
+          rel: "noopener noreferrer",
+          icon: "fa-solid fa-gamepad",
+          text: "ForeverGrind.fm",
         },
         {
           divider: true,

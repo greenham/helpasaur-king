@@ -528,7 +528,9 @@ export const useHelpaApi = () => {
           helpaApiClient.testEvents.triggerTestEvent(payload),
         onSuccess: (data, variables, context) => {
           if (showToast) {
-            toast.success(`Test event ${variables.eventType} triggered!`)
+            toast.success(
+              `Test event triggered! Check Discord/Twitch for reactions.`
+            )
           }
           mutationOptions.onSuccess?.(data, variables, context)
         },
