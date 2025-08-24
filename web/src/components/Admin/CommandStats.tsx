@@ -43,11 +43,22 @@ ChartJS.register(
   Legend
 )
 
-interface CommandStatsProps {}
+interface CommandStatsProps {
+  showTopCommands?: number
+  showTopUsers?: number
+  showTopChannels?: number
+  recentActivityPerPage?: number
+}
 
-const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
+const CommandStats: React.FunctionComponent<CommandStatsProps> = (props) => {
   const [timeRange, setTimeRange] = useState("7d")
   const [recentPage, setRecentPage] = useState(1)
+  const {
+    showTopCommands,
+    showTopUsers,
+    showTopChannels,
+    recentActivityPerPage,
+  } = props
 
   // Helper function to get CSS variable values
   const getCSSVariable = (variable: string): string => {
@@ -85,13 +96,13 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
   const { data: overview, isLoading: overviewLoading } =
     useCommandStatsOverview(timeRange)
   const { data: topCommands, isLoading: topCommandsLoading } = useTopCommands(
-    20,
+    showTopCommands || 15,
     timeRange
   )
   const { data: platformBreakdown, isLoading: platformLoading } =
     usePlatformBreakdown(timeRange)
   const { data: topUsers, isLoading: topUsersLoading } = useTopUsers(
-    10,
+    showTopUsers || 15,
     timeRange
   )
   const { data: timeline, isLoading: timelineLoading } = useCommandTimeline(
@@ -99,9 +110,9 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
     timeRange === "24h" ? "hour" : "day"
   )
   const { data: recentCommands, isLoading: recentCommandsLoading } =
-    useRecentCommands(recentPage, 10)
+    useRecentCommands(recentPage, recentActivityPerPage || 20)
   const { data: topChannels, isLoading: topChannelsLoading } = useTopChannels(
-    10,
+    showTopChannels || 15,
     timeRange,
     undefined
   )
@@ -380,6 +391,7 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                         <tr>
                           <th>Time</th>
                           <th>User</th>
+                          <th>Community</th>
                           <th>Command</th>
                         </tr>
                       </thead>
@@ -394,6 +406,11 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                             <td>
                               <Placeholder as="span" animation="glow">
                                 <Placeholder xs={8} />
+                              </Placeholder>
+                            </td>
+                            <td>
+                              <Placeholder as="span" animation="glow">
+                                <Placeholder xs={7} />
                               </Placeholder>
                             </td>
                             <td>
@@ -418,34 +435,46 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                           <tr>
                             <th>Time</th>
                             <th>User</th>
+                            <th>Community</th>
                             <th>Command</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {recentCommands.logs.map((log) => (
-                            <tr key={log._id}>
-                              <td>
-                                <TimeAgo date={log.createdAt} />
-                              </td>
-                              <td>
-                                <i
-                                  className={`fa-brands fa-${log.source} me-2`}
-                                  style={{
-                                    color:
-                                      log.source === "discord"
-                                        ? "var(--discord-color)"
-                                        : "var(--twitch-color)",
-                                    fontSize: "1.2em",
-                                  }}
-                                  title={log.source}
-                                ></i>
-                                {log.username}
-                              </td>
-                              <td>
-                                <code>{log.command}</code>
-                              </td>
-                            </tr>
-                          ))}
+                          {recentCommands.logs.map((log) => {
+                            const community =
+                              log.source === "discord"
+                                ? (log.metadata?.guild as string)
+                                : (log.metadata?.channel as string)?.replace(
+                                    "#",
+                                    ""
+                                  )
+
+                            return (
+                              <tr key={log._id}>
+                                <td>
+                                  <TimeAgo date={log.createdAt} />
+                                </td>
+                                <td>{log.username}</td>
+                                <td>
+                                  <i
+                                    className={`fa-brands fa-${log.source} me-2`}
+                                    style={{
+                                      color:
+                                        log.source === "discord"
+                                          ? "var(--discord-color)"
+                                          : "var(--twitch-color)",
+                                      fontSize: "1.2em",
+                                    }}
+                                    title={log.source}
+                                  ></i>
+                                  {community || "Unknown"}
+                                </td>
+                                <td>
+                                  <code>{log.command}</code>
+                                </td>
+                              </tr>
+                            )
+                          })}
                         </tbody>
                       </Table>
                       {recentCommands.pagination.pages > 1 && (
@@ -538,7 +567,7 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
               <Card>
                 <Card.Header>
                   <i className="fa-solid fa-hashtag pe-1"></i>
-                  Top Channels/Guilds
+                  Top Communities
                 </Card.Header>
                 <Card.Body className="p-0">
                   {topChannels && topChannels.length > 0 ? (
