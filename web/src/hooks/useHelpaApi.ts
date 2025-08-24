@@ -16,6 +16,13 @@ import {
   DiscordJoinUrl,
   StreamAlertsChannel,
   TestEventPayload,
+  CommandStatsOverview,
+  TopCommand,
+  PlatformBreakdown,
+  TopUser,
+  CommandTimeline,
+  RecentCommandsResponse,
+  TopChannel,
 } from "@helpasaur/types"
 import { useToast } from "./useToast"
 
@@ -157,6 +164,124 @@ export const useHelpaApi = () => {
       useQuery({
         queryKey: ["streamAlertsChannels"],
         queryFn: () => helpaApiClient.streamAlerts.getStreamAlertsChannels(),
+        ...options,
+      }),
+
+    /**
+     * Get command statistics overview
+     */
+    useCommandStatsOverview: (
+      timeRange?: string,
+      options?: Omit<
+        UseQueryOptions<CommandStatsOverview, Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["commandStatsOverview", timeRange],
+        queryFn: () =>
+          helpaApiClient.commands.getCommandStatsOverview(timeRange),
+        ...options,
+      }),
+
+    /**
+     * Get top commands by usage
+     */
+    useTopCommands: (
+      limit?: number,
+      timeRange?: string,
+      options?: Omit<
+        UseQueryOptions<TopCommand[], Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["topCommands", limit, timeRange],
+        queryFn: () => helpaApiClient.commands.getTopCommands(limit, timeRange),
+        ...options,
+      }),
+
+    /**
+     * Get platform breakdown statistics
+     */
+    usePlatformBreakdown: (
+      timeRange?: string,
+      options?: Omit<
+        UseQueryOptions<PlatformBreakdown[], Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["platformBreakdown", timeRange],
+        queryFn: () => helpaApiClient.commands.getPlatformBreakdown(timeRange),
+        ...options,
+      }),
+
+    /**
+     * Get top users by command usage
+     */
+    useTopUsers: (
+      limit?: number,
+      timeRange?: string,
+      options?: Omit<UseQueryOptions<TopUser[], Error>, "queryKey" | "queryFn">
+    ) =>
+      useQuery({
+        queryKey: ["topUsers", limit, timeRange],
+        queryFn: () => helpaApiClient.commands.getTopUsers(limit, timeRange),
+        ...options,
+      }),
+
+    /**
+     * Get command usage timeline
+     */
+    useCommandTimeline: (
+      timeRange?: string,
+      interval?: string,
+      options?: Omit<
+        UseQueryOptions<CommandTimeline[], Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["commandTimeline", timeRange, interval],
+        queryFn: () =>
+          helpaApiClient.commands.getCommandTimeline(timeRange, interval),
+        ...options,
+      }),
+
+    /**
+     * Get recent command logs
+     */
+    useRecentCommands: (
+      page?: number,
+      limit?: number,
+      options?: Omit<
+        UseQueryOptions<RecentCommandsResponse, Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["recentCommands", page, limit],
+        queryFn: () => helpaApiClient.commands.getRecentCommands(page, limit),
+        ...options,
+      }),
+
+    /**
+     * Get top channels/guilds by command usage
+     */
+    useTopChannels: (
+      limit?: number,
+      timeRange?: string,
+      platform?: string,
+      options?: Omit<
+        UseQueryOptions<TopChannel[], Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["topChannels", limit, timeRange, platform],
+        queryFn: () =>
+          helpaApiClient.commands.getTopChannels(limit, timeRange, platform),
         ...options,
       }),
   }

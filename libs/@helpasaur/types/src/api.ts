@@ -221,3 +221,71 @@ export interface TestEventPayload {
   eventType: RelayEvent
   payload: Record<string, unknown>
 }
+
+// Command Statistics Types
+export interface CommandStatsOverview {
+  totalUsage: number
+  uniqueUsers: number
+  uniqueCommands: number
+  platformBreakdown: {
+    discord: number
+    twitch: number
+  }
+}
+
+export interface TopCommand {
+  command: string
+  count: number
+  percentage: string
+}
+
+export interface PlatformBreakdown {
+  platform: string
+  count: number
+  uniqueUsers: number
+  uniqueCommands: number
+}
+
+export interface TopUser {
+  username: string
+  platform: string
+  count: number
+  uniqueCommands: number
+}
+
+export interface CommandTimeline {
+  date: string
+  discord: number
+  twitch: number
+  total: number
+}
+
+export interface RecentCommandLog {
+  _id: string
+  createdAt: Date
+  command: string
+  alias?: string
+  source: string
+  username: string
+  metadata?: Record<string, unknown>
+}
+
+export interface RecentCommandsResponse {
+  logs: RecentCommandLog[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
+}
+
+export interface TopChannel {
+  channel: string
+  platform: "discord" | "twitch"
+  count: number
+  uniqueUsers: number
+  uniqueCommands: number
+  lastUsed: Date
+  percentage: string
+}

@@ -2,6 +2,7 @@ import * as React from "react"
 import { useEffect } from "react"
 import { Alert, Container, Spinner } from "react-bootstrap"
 import { useHelpaApi } from "../hooks/useHelpaApi"
+import CommandStats from "../components/Admin/CommandStats"
 import ManageStreamAlerts from "../components/Admin/ManageStreamAlerts"
 import ManageTwitchBot from "../components/Admin/ManageTwitchBot"
 import TestEvents from "../components/Admin/TestEvents"
@@ -37,6 +38,11 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
       <h1>
         <i className="fa-solid fa-user-tie"></i> Helpa Admin
       </h1>
+      <hr className="my-5" />
+      <h2>
+        <i className="fa-solid fa-chart-simple"></i> Command Statistics
+      </h2>
+      <CommandStats />
       <hr className="my-5" />
       <h2>
         <i className="fa-brands fa-watchman-monitoring"></i> Runnerwatcher

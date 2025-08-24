@@ -1,5 +1,15 @@
 import { ApiBase } from "../base"
-import { Command, CommandLogRequest } from "@helpasaur/types"
+import {
+  Command,
+  CommandLogRequest,
+  CommandStatsOverview,
+  TopCommand,
+  PlatformBreakdown,
+  TopUser,
+  CommandTimeline,
+  RecentCommandsResponse,
+  TopChannel,
+} from "@helpasaur/types"
 import { ROUTES } from "../constants"
 
 /**
@@ -88,5 +98,121 @@ export class CommandRoutes extends ApiBase {
    */
   async deleteCommandById(commandId: string): Promise<void> {
     return this.apiDelete(`${ROUTES.COMMANDS}/${commandId}`)
+  }
+
+  // ======== STATS METHODS ========
+
+  /**
+   * Get command statistics overview
+   * @param timeRange - Optional time range filter (24h, 7d, 30d, 90d, all)
+   * @returns Promise resolving to command statistics overview
+   * @throws Error if the API request fails or user is not admin
+   */
+  async getCommandStatsOverview(
+    timeRange?: string
+  ): Promise<CommandStatsOverview> {
+    const params = timeRange ? `?timeRange=${timeRange}` : ""
+    return this.apiGet(`${ROUTES.COMMANDS}/stats/overview${params}`)
+  }
+
+  /**
+   * Get top commands by usage
+   * @param limit - Maximum number of commands to return (default: 10)
+   * @param timeRange - Optional time range filter (24h, 7d, 30d, 90d, all)
+   * @returns Promise resolving to array of top commands with usage counts
+   * @throws Error if the API request fails or user is not admin
+   */
+  async getTopCommands(
+    limit?: number,
+    timeRange?: string
+  ): Promise<TopCommand[]> {
+    const params = new URLSearchParams()
+    if (limit) params.append("limit", limit.toString())
+    if (timeRange) params.append("timeRange", timeRange)
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return this.apiGet(`${ROUTES.COMMANDS}/stats/top-commands${query}`)
+  }
+
+  /**
+   * Get platform breakdown statistics
+   * @param timeRange - Optional time range filter (24h, 7d, 30d, 90d, all)
+   * @returns Promise resolving to platform breakdown data
+   * @throws Error if the API request fails or user is not admin
+   */
+  async getPlatformBreakdown(timeRange?: string): Promise<PlatformBreakdown[]> {
+    const params = timeRange ? `?timeRange=${timeRange}` : ""
+    return this.apiGet(`${ROUTES.COMMANDS}/stats/platform-breakdown${params}`)
+  }
+
+  /**
+   * Get top users by command usage
+   * @param limit - Maximum number of users to return (default: 10)
+   * @param timeRange - Optional time range filter (24h, 7d, 30d, 90d, all)
+   * @returns Promise resolving to array of top users
+   * @throws Error if the API request fails or user is not admin
+   */
+  async getTopUsers(limit?: number, timeRange?: string): Promise<TopUser[]> {
+    const params = new URLSearchParams()
+    if (limit) params.append("limit", limit.toString())
+    if (timeRange) params.append("timeRange", timeRange)
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return this.apiGet(`${ROUTES.COMMANDS}/stats/top-users${query}`)
+  }
+
+  /**
+   * Get command usage timeline
+   * @param timeRange - Time range for the timeline (24h, 7d, 30d, 90d, all)
+   * @param interval - Interval for grouping (hour, day)
+   * @returns Promise resolving to timeline data
+   * @throws Error if the API request fails or user is not admin
+   */
+  async getCommandTimeline(
+    timeRange?: string,
+    interval?: string
+  ): Promise<CommandTimeline[]> {
+    const params = new URLSearchParams()
+    if (timeRange) params.append("timeRange", timeRange)
+    if (interval) params.append("interval", interval)
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return this.apiGet(`${ROUTES.COMMANDS}/stats/timeline${query}`)
+  }
+
+  /**
+   * Get recent command logs
+   * @param page - Page number for pagination (default: 1)
+   * @param limit - Number of items per page (default: 20)
+   * @returns Promise resolving to recent command logs with pagination
+   * @throws Error if the API request fails or user is not admin
+   */
+  async getRecentCommands(
+    page?: number,
+    limit?: number
+  ): Promise<RecentCommandsResponse> {
+    const params = new URLSearchParams()
+    if (page) params.append("page", page.toString())
+    if (limit) params.append("limit", limit.toString())
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return this.apiGet(`${ROUTES.COMMANDS}/stats/recent${query}`)
+  }
+
+  /**
+   * Get top channels/guilds by command usage
+   * @param limit - Maximum number of channels to return (default: 10)
+   * @param timeRange - Optional time range filter (24h, 7d, 30d, 90d, all)
+   * @param platform - Optional platform filter ('discord', 'twitch', or undefined for both)
+   * @returns Promise resolving to array of top channels with usage counts
+   * @throws Error if the API request fails or user is not admin
+   */
+  async getTopChannels(
+    limit?: number,
+    timeRange?: string,
+    platform?: string
+  ): Promise<TopChannel[]> {
+    const params = new URLSearchParams()
+    if (limit) params.append("limit", limit.toString())
+    if (timeRange) params.append("timeRange", timeRange)
+    if (platform) params.append("platform", platform)
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return this.apiGet(`${ROUTES.COMMANDS}/stats/top-channels${query}`)
   }
 }

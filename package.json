@@ -7,7 +7,7 @@
     "build:prod": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build",
     "build:push": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build --push",
     "start": "docker compose up -d",
-    "start:web": "cd web && pnpm start",
+    "start:web": "pnpm --filter helpa-web run start",
     "start:libs": "pnpm dev:libs",
     "start:logs": "pnpm start && pnpm logs",
     "stop": "docker compose down",

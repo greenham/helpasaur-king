@@ -201,4 +201,414 @@ router.post(
   }
 )
 
+// ======== STATS ENDPOINTS (Admin Only) ========
+
+// Helper function to get date filter based on time range
+const getDateFilter = (timeRange?: string) => {
+  if (!timeRange || timeRange === "all") return {}
+
+  const now = new Date()
+  let startDate = new Date()
+
+  switch (timeRange) {
+    case "24h":
+      startDate.setHours(now.getHours() - 24)
+      break
+    case "7d":
+      startDate.setDate(now.getDate() - 7)
+      break
+    case "30d":
+      startDate.setDate(now.getDate() - 30)
+      break
+    case "90d":
+      startDate.setDate(now.getDate() - 90)
+      break
+    default:
+      return {}
+  }
+
+  return { createdAt: { $gte: startDate } }
+}
+
+// GET /stats/overview -> overall statistics
+router.get(
+  "/stats/overview",
+  requireJwtToken,
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const timeRange = req.query.timeRange as string
+      const dateFilter = getDateFilter(timeRange)
+
+      const [totalUsage, uniqueUsers, uniqueCommands, platformBreakdown] =
+        await Promise.all([
+          CommandLog.countDocuments(dateFilter),
+          CommandLog.distinct("username", dateFilter),
+          CommandLog.distinct("command", dateFilter),
+          CommandLog.aggregate([
+            { $match: dateFilter },
+            { $group: { _id: "$source", count: { $sum: 1 } } },
+          ]),
+        ])
+
+      const platformStats = {
+        discord: 0,
+        twitch: 0,
+      }
+
+      platformBreakdown.forEach((item: { _id: string; count: number }) => {
+        if (item._id === "discord" || item._id === "twitch") {
+          platformStats[item._id] = item.count
+        }
+      })
+
+      sendSuccess(res, {
+        totalUsage,
+        uniqueUsers: uniqueUsers.length,
+        uniqueCommands: uniqueCommands.length,
+        platformBreakdown: platformStats,
+      })
+    } catch (err) {
+      handleRouteError(res, err, "get command stats overview")
+    }
+  }
+)
+
+// GET /stats/top-commands -> most used commands
+router.get(
+  "/stats/top-commands",
+  requireJwtToken,
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10
+      const timeRange = req.query.timeRange as string
+      const dateFilter = getDateFilter(timeRange)
+
+      const topCommands = await CommandLog.aggregate([
+        { $match: dateFilter },
+        { $group: { _id: "$command", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: limit },
+        { $project: { command: "$_id", count: 1, _id: 0 } },
+      ])
+
+      // Calculate percentages
+      const total = await CommandLog.countDocuments(dateFilter)
+      const commandsWithPercentage = topCommands.map((cmd) => ({
+        ...cmd,
+        percentage: total > 0 ? ((cmd.count / total) * 100).toFixed(1) : "0",
+      }))
+
+      sendSuccess(res, commandsWithPercentage)
+    } catch (err) {
+      handleRouteError(res, err, "get top commands")
+    }
+  }
+)
+
+// GET /stats/platform-breakdown -> detailed platform stats
+router.get(
+  "/stats/platform-breakdown",
+  requireJwtToken,
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const timeRange = req.query.timeRange as string
+      const dateFilter = getDateFilter(timeRange)
+
+      const breakdown = await CommandLog.aggregate([
+        { $match: dateFilter },
+        {
+          $group: {
+            _id: "$source",
+            count: { $sum: 1 },
+            uniqueUsers: { $addToSet: "$username" },
+            uniqueCommands: { $addToSet: "$command" },
+          },
+        },
+        {
+          $project: {
+            platform: "$_id",
+            count: 1,
+            uniqueUsers: { $size: "$uniqueUsers" },
+            uniqueCommands: { $size: "$uniqueCommands" },
+            _id: 0,
+          },
+        },
+        {
+          $sort: { platform: 1 }, // Sort alphabetically: discord, twitch
+        },
+      ])
+
+      sendSuccess(res, breakdown)
+    } catch (err) {
+      handleRouteError(res, err, "get platform breakdown")
+    }
+  }
+)
+
+// GET /stats/top-users -> users who use commands most
+router.get(
+  "/stats/top-users",
+  requireJwtToken,
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10
+      const timeRange = req.query.timeRange as string
+      const dateFilter = getDateFilter(timeRange)
+
+      const topUsers = await CommandLog.aggregate([
+        { $match: dateFilter },
+        {
+          $group: {
+            _id: { username: "$username", source: "$source" },
+            count: { $sum: 1 },
+            commands: { $addToSet: "$command" },
+          },
+        },
+        { $sort: { count: -1 } },
+        { $limit: limit },
+        {
+          $project: {
+            username: "$_id.username",
+            platform: "$_id.source",
+            count: 1,
+            uniqueCommands: { $size: "$commands" },
+            _id: 0,
+          },
+        },
+      ])
+
+      sendSuccess(res, topUsers)
+    } catch (err) {
+      handleRouteError(res, err, "get top users")
+    }
+  }
+)
+
+// GET /stats/timeline -> usage over time
+router.get(
+  "/stats/timeline",
+  requireJwtToken,
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const timeRange = (req.query.timeRange as string) || "7d"
+      const interval = (req.query.interval as string) || "day"
+      const dateFilter = getDateFilter(timeRange)
+
+      // Determine date format based on interval
+      let dateFormat: Record<string, unknown>
+      switch (interval) {
+        case "hour":
+          dateFormat = {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
+            hour: { $hour: "$createdAt" },
+          }
+          break
+        case "day":
+        default:
+          dateFormat = {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
+          }
+          break
+      }
+
+      const timeline = await CommandLog.aggregate([
+        { $match: dateFilter },
+        {
+          $group: {
+            _id: {
+              date: dateFormat,
+              source: "$source",
+            },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id.date",
+            platforms: {
+              $push: {
+                source: "$_id.source",
+                count: "$count",
+              },
+            },
+            total: { $sum: "$count" },
+          },
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1, "_id.hour": 1 },
+        },
+        {
+          $project: {
+            date: "$_id",
+            discord: {
+              $reduce: {
+                input: "$platforms",
+                initialValue: 0,
+                in: {
+                  $cond: [
+                    { $eq: ["$$this.source", "discord"] },
+                    "$$this.count",
+                    "$$value",
+                  ],
+                },
+              },
+            },
+            twitch: {
+              $reduce: {
+                input: "$platforms",
+                initialValue: 0,
+                in: {
+                  $cond: [
+                    { $eq: ["$$this.source", "twitch"] },
+                    "$$this.count",
+                    "$$value",
+                  ],
+                },
+              },
+            },
+            total: 1,
+            _id: 0,
+          },
+        },
+      ])
+
+      // Format dates for display
+      const formattedTimeline = timeline.map((item) => {
+        const d = item.date
+        const dateStr =
+          interval === "hour"
+            ? `${d.month}/${d.day} ${String(d.hour).padStart(2, "0")}:00`
+            : `${d.month}/${d.day}`
+
+        return {
+          date: dateStr,
+          discord: item.discord,
+          twitch: item.twitch,
+          total: item.total,
+        }
+      })
+
+      sendSuccess(res, formattedTimeline)
+    } catch (err) {
+      handleRouteError(res, err, "get command timeline")
+    }
+  }
+)
+
+// GET /stats/recent -> recent command usage
+router.get(
+  "/stats/recent",
+  requireJwtToken,
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1
+      const limit = parseInt(req.query.limit as string) || 20
+      const skip = (page - 1) * limit
+
+      const [logs, total] = await Promise.all([
+        CommandLog.find()
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        CommandLog.countDocuments(),
+      ])
+
+      sendSuccess(res, {
+        logs,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      })
+    } catch (err) {
+      handleRouteError(res, err, "get recent command logs")
+    }
+  }
+)
+
+// GET /stats/top-channels -> top Twitch channels/Discord guilds by command usage
+router.get(
+  "/stats/top-channels",
+  requireJwtToken,
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10
+      const timeRange = req.query.timeRange as string
+      const platform = req.query.platform as string // 'discord', 'twitch', or undefined for both
+      const dateFilter = getDateFilter(timeRange)
+
+      // Build match filter
+      const matchFilter: any = { ...dateFilter }
+      if (platform) {
+        matchFilter.source = platform
+      }
+
+      const topChannels = await CommandLog.aggregate([
+        { $match: matchFilter },
+        {
+          $group: {
+            _id: {
+              channel: {
+                $cond: {
+                  if: { $eq: ["$source", "discord"] },
+                  then: "$metadata.guild",
+                  else: {
+                    $ltrim: {
+                      input: "$metadata.channel",
+                      chars: "#",
+                    },
+                  },
+                },
+              },
+              source: "$source",
+            },
+            count: { $sum: 1 },
+            uniqueUsers: { $addToSet: "$username" },
+            uniqueCommands: { $addToSet: "$command" },
+            lastUsed: { $max: "$createdAt" },
+          },
+        },
+        { $sort: { count: -1 } },
+        { $limit: limit },
+        {
+          $project: {
+            channel: "$_id.channel",
+            platform: "$_id.source",
+            count: 1,
+            uniqueUsers: { $size: "$uniqueUsers" },
+            uniqueCommands: { $size: "$uniqueCommands" },
+            lastUsed: 1,
+            _id: 0,
+          },
+        },
+      ])
+
+      // Calculate percentages
+      const total = topChannels.reduce((sum, ch) => sum + ch.count, 0)
+      const channelsWithPercentage = topChannels.map((ch) => ({
+        ...ch,
+        percentage: total > 0 ? ((ch.count / total) * 100).toFixed(1) : "0",
+      }))
+
+      sendSuccess(res, channelsWithPercentage)
+    } catch (err) {
+      handleRouteError(res, err, "get top channels")
+    }
+  }
+)
+
 export default router
