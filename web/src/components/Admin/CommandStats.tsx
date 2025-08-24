@@ -53,12 +53,10 @@ interface CommandStatsProps {
 const CommandStats: React.FunctionComponent<CommandStatsProps> = (props) => {
   const [timeRange, setTimeRange] = useState("7d")
   const [recentPage, setRecentPage] = useState(1)
-  const {
-    showTopCommands,
-    showTopUsers,
-    showTopChannels,
-    recentActivityPerPage,
-  } = props
+  const showTopCommands = props.showTopCommands || 10
+  const showTopUsers = props.showTopUsers || 10
+  const showTopChannels = props.showTopChannels || 10
+  const recentActivityPerPage = props.recentActivityPerPage || 10
 
   // Helper function to get CSS variable values
   const getCSSVariable = (variable: string): string => {
@@ -96,13 +94,13 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = (props) => {
   const { data: overview, isLoading: overviewLoading } =
     useCommandStatsOverview(timeRange)
   const { data: topCommands, isLoading: topCommandsLoading } = useTopCommands(
-    showTopCommands || 15,
+    showTopCommands,
     timeRange
   )
   const { data: platformBreakdown, isLoading: platformLoading } =
     usePlatformBreakdown(timeRange)
   const { data: topUsers, isLoading: topUsersLoading } = useTopUsers(
-    showTopUsers || 15,
+    showTopUsers,
     timeRange
   )
   const { data: timeline, isLoading: timelineLoading } = useCommandTimeline(
@@ -110,9 +108,9 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = (props) => {
     timeRange === "24h" ? "hour" : "day"
   )
   const { data: recentCommands, isLoading: recentCommandsLoading } =
-    useRecentCommands(recentPage, recentActivityPerPage || 20)
+    useRecentCommands(recentPage, recentActivityPerPage)
   const { data: topChannels, isLoading: topChannelsLoading } = useTopChannels(
-    showTopChannels || 15,
+    showTopChannels,
     timeRange,
     undefined
   )
@@ -378,7 +376,7 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = (props) => {
 
           {/* Recent Activity */}
           <Row className="mb-4">
-            <Col lg={12} xl={6} className="mb-4 mb-xl-0">
+            <Col>
               <Card>
                 <Card.Header>
                   <i className="fa-solid fa-clock-rotate-left pe-1"></i>
@@ -396,7 +394,7 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = (props) => {
                         </tr>
                       </thead>
                       <tbody>
-                        {[...Array(10)].map((_, index) => (
+                        {[...Array(recentActivityPerPage)].map((_, index) => (
                           <tr key={`skeleton-${index}`}>
                             <td>
                               <Placeholder as="span" animation="glow">
@@ -510,9 +508,11 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = (props) => {
                 </Card.Body>
               </Card>
             </Col>
+          </Row>
 
-            {/* Top Users Table */}
-            <Col lg={12} xl={6}>
+          {/* Top Users Table */}
+          <Row className="mb-4">
+            <Col>
               <Card>
                 <Card.Header>
                   <i className="fa-solid fa-users pe-1"></i>
