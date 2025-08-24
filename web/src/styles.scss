@@ -11,6 +11,12 @@ $list-group-border-width: "1px";
 @import "../node_modules/bootstrap/scss/bootstrap";
 @import "../node_modules/bootswatch/dist/vapor/bootswatch";
 
+// Platform brand colors
+:root {
+  --discord-color: #5865f2;
+  --twitch-color: #9146ff;
+}
+
 // Admin tabs styling for cohesive interface
 .admin-tabs-container {
   background: transparent;

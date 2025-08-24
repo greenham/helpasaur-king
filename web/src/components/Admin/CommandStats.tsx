@@ -11,6 +11,7 @@ import {
   Button,
   ButtonGroup,
   ToggleButton,
+  Placeholder,
 } from "react-bootstrap"
 import {
   Chart as ChartJS,
@@ -48,6 +49,28 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
   const [timeRange, setTimeRange] = useState("7d")
   const [recentPage, setRecentPage] = useState(1)
 
+  // Helper function to get CSS variable values
+  const getCSSVariable = (variable: string): string => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variable)
+      .trim()
+  }
+
+  // Convert hex to rgba
+  const hexToRgba = (hex: string, alpha: number = 1): string => {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  }
+
+  // Get platform color with optional alpha
+  const getPlatformColor = (platform: string, alpha?: number): string => {
+    const cssVar = platform === "discord" ? "--discord-color" : "--twitch-color"
+    const color = getCSSVariable(cssVar)
+    return alpha !== undefined ? hexToRgba(color, alpha) : color
+  }
+
   const {
     useCommandStatsOverview,
     useTopCommands,
@@ -62,7 +85,7 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
   const { data: overview, isLoading: overviewLoading } =
     useCommandStatsOverview(timeRange)
   const { data: topCommands, isLoading: topCommandsLoading } = useTopCommands(
-    10,
+    20,
     timeRange
   )
   const { data: platformBreakdown, isLoading: platformLoading } =
@@ -75,7 +98,8 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
     timeRange,
     timeRange === "24h" ? "hour" : "day"
   )
-  const { data: recentCommands } = useRecentCommands(recentPage, 10)
+  const { data: recentCommands, isLoading: recentCommandsLoading } =
+    useRecentCommands(recentPage, 10)
   const { data: topChannels, isLoading: topChannelsLoading } = useTopChannels(
     10,
     timeRange,
@@ -158,17 +182,12 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
       {
         data: platformBreakdown?.map((p) => p.count) || [],
         backgroundColor:
-          platformBreakdown?.map(
-            (p) =>
-              p.platform === "discord"
-                ? "rgba(88, 101, 242, 0.8)" // Discord blue (#5865F2)
-                : "rgba(145, 70, 255, 0.8)" // Twitch purple (#9146FF)
+          platformBreakdown?.map((p) =>
+            getPlatformColor(p.platform || "discord", 0.8)
           ) || [],
         borderColor:
           platformBreakdown?.map((p) =>
-            p.platform === "discord"
-              ? "rgba(88, 101, 242, 1)"
-              : "rgba(145, 70, 255, 1)"
+            getPlatformColor(p.platform || "discord", 1)
           ) || [],
         borderWidth: 1,
       },
@@ -204,15 +223,15 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
       {
         label: "Discord",
         data: timeline?.map((t) => t.discord) || [],
-        borderColor: "rgb(88, 101, 242)", // Discord blue (#5865F2)
-        backgroundColor: "rgba(88, 101, 242, 0.1)",
+        borderColor: getPlatformColor("discord"),
+        backgroundColor: getPlatformColor("discord", 0.1),
         tension: 0.1,
       },
       {
         label: "Twitch",
         data: timeline?.map((t) => t.twitch) || [],
-        borderColor: "rgb(145, 70, 255)", // Twitch purple (#9146FF)
-        backgroundColor: "rgba(145, 70, 255, 0.1)",
+        borderColor: getPlatformColor("twitch"),
+        backgroundColor: getPlatformColor("twitch", 0.1),
         tension: 0.1,
       },
       {
@@ -355,7 +374,38 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                   Recent Activity
                 </Card.Header>
                 <Card.Body className="p-0">
-                  {recentCommands && recentCommands.logs.length > 0 ? (
+                  {recentCommandsLoading ? (
+                    <Table striped hover responsive size="sm" className="mb-0">
+                      <thead>
+                        <tr>
+                          <th>Time</th>
+                          <th>User</th>
+                          <th>Command</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...Array(10)].map((_, index) => (
+                          <tr key={`skeleton-${index}`}>
+                            <td>
+                              <Placeholder as="span" animation="glow">
+                                <Placeholder xs={6} />
+                              </Placeholder>
+                            </td>
+                            <td>
+                              <Placeholder as="span" animation="glow">
+                                <Placeholder xs={8} />
+                              </Placeholder>
+                            </td>
+                            <td>
+                              <Placeholder as="span" animation="glow">
+                                <Placeholder xs={5} />
+                              </Placeholder>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  ) : recentCommands && recentCommands.logs.length > 0 ? (
                     <>
                       <Table
                         striped
@@ -369,7 +419,6 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                             <th>Time</th>
                             <th>User</th>
                             <th>Command</th>
-                            <th>Platform</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -378,22 +427,22 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                               <td>
                                 <TimeAgo date={log.createdAt} />
                               </td>
-                              <td>{log.username}</td>
-                              <td>
-                                <code>{log.command}</code>
-                              </td>
                               <td>
                                 <i
-                                  className={`fa-brands fa-${log.source}`}
+                                  className={`fa-brands fa-${log.source} me-2`}
                                   style={{
                                     color:
                                       log.source === "discord"
-                                        ? "#5865F2"
-                                        : "#9146FF",
+                                        ? "var(--discord-color)"
+                                        : "var(--twitch-color)",
                                     fontSize: "1.2em",
                                   }}
                                   title={log.source}
                                 ></i>
+                                {log.username}
+                              </td>
+                              <td>
+                                <code>{log.command}</code>
                               </td>
                             </tr>
                           ))}
@@ -447,7 +496,6 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                         <tr>
                           <th>#</th>
                           <th>Username</th>
-                          <th>Platform</th>
                           <th>Uses</th>
                           <th>Unique Commands</th>
                         </tr>
@@ -456,19 +504,19 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                         {topUsers.map((user, index) => (
                           <tr key={index}>
                             <td>{index + 1}</td>
-                            <td>{user.username}</td>
                             <td>
                               <i
-                                className={`fa-brands fa-${user.platform}`}
+                                className={`fa-brands fa-${user.platform} me-2`}
                                 style={{
                                   color:
                                     user.platform === "discord"
-                                      ? "#5865F2"
-                                      : "#9146FF",
+                                      ? "var(--discord-color)"
+                                      : "var(--twitch-color)",
                                   fontSize: "1.2em",
                                 }}
                                 title={user.platform}
                               ></i>
+                              {user.username}
                             </td>
                             <td>{user.count.toLocaleString()}</td>
                             <td>{user.uniqueCommands}</td>
@@ -498,8 +546,7 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                       <thead>
                         <tr>
                           <th>#</th>
-                          <th>Channel/Guild</th>
-                          <th>Platform</th>
+                          <th>Channel</th>
                           <th>Commands Used</th>
                           <th>Unique Users</th>
                           <th>Unique Commands</th>
@@ -510,19 +557,19 @@ const CommandStats: React.FunctionComponent<CommandStatsProps> = () => {
                         {topChannels.map((channel, index) => (
                           <tr key={index}>
                             <td>{index + 1}</td>
-                            <td>{channel.channel || "Unknown"}</td>
                             <td>
                               <i
-                                className={`fa-brands fa-${channel.platform}`}
+                                className={`fa-brands fa-${channel.platform} me-2`}
                                 style={{
                                   color:
                                     channel.platform === "discord"
-                                      ? "#5865F2"
-                                      : "#9146FF",
+                                      ? "var(--discord-color)"
+                                      : "var(--twitch-color)",
                                   fontSize: "1.2em",
                                 }}
                                 title={channel.platform}
                               ></i>
+                              {channel.channel || "Unknown"}
                             </td>
                             <td>{channel.count.toLocaleString()}</td>
                             <td>{channel.uniqueUsers}</td>
