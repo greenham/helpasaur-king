@@ -50,7 +50,7 @@ export class DiscordBot {
     // Update service config every minute so we pick up guild changes quickly
     setInterval(() => {
       this.refreshConfig()
-    }, 60000)
+    }, 60000) // @TODO Make this configurable
   }
 
   start(): void {
