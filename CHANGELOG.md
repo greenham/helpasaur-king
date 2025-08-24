@@ -1,5 +1,109 @@
 # Changelog
 
+## 2.0.0
+
+_2025-08-24_
+
+### What's Changed
+
+#### 🚀 Major Infrastructure Overhaul - TypeScript Migration
+
+- **Complete TypeScript conversion** by @greenham in https://github.com/greenham/helpasaur-king/pull/97
+  - Migrated entire codebase from JavaScript to TypeScript (189 files changed)
+  - All services now fully typed: API, Discord Bot, Twitch Bot, Runner Watcher, Race Bot, WS Relay, Web App
+  - Comprehensive type safety with strict TypeScript configuration
+  - Eliminated all 'any' types and non-null assertions for maximum type safety
+
+#### 🏗️ Architecture & Build System
+
+- **Docker build system overhaul** by @greenham
+  - Unified Docker base image with shared dependencies (pnpm, nodemon, Node.js 20)
+  - Multi-stage production builds for minimal container sizes  
+  - Templated service Dockerfiles for consistency
+  - Optimized build order and caching for maximum efficiency
+
+- **Monorepo shared libraries system** by @greenham
+  - Created `@helpasaur/api-client`: Common Axios-based API client for all services
+  - Created `@helpasaur/types`: Shared TypeScript types and interfaces
+  - Created `@helpasaur/bot-common`: Common bot functionality and utilities
+  - Created `twitch-api-client`: Twitch API client wrapper with proper types
+  - Hot reloading development workflow for shared libraries
+
+- **Comprehensive ESLint configuration** by @greenham
+  - TypeScript-aware linting across entire monorepo
+  - Service-specific rules for Node.js backends vs React frontend
+  - Automatic code formatting integration with Prettier
+  - Zero-tolerance policy for TypeScript 'any' types
+
+#### 🎨 New Features
+
+- **Command Statistics Dashboard** by @greenham
+  - Comprehensive analytics for bot command usage
+  - Interactive charts with Chart.js integration
+  - Time-based filtering (24h, 7d, 30d, 90d, all time)
+  - Platform-specific breakdowns (Discord vs Twitch)
+  - Command frequency analysis and usage trends
+
+- **Test Events System** by @greenham
+  - Debug and monitoring interface for real-time events
+  - Test stream alerts, race announcements, and bot events
+  - Colorful charts for event visualization
+  - Unified event configuration management
+
+- **Enhanced Admin Interface** by @greenham
+  - Redesigned admin panel with cohesive tabbed interface
+  - Improved responsive layout and table styling
+  - Better UX with loading states and error handling
+  - Streamlined navigation and workflow
+
+#### 🔧 API & Architecture Improvements
+
+- **Complete API standardization** by @greenham
+  - Unified `ApiResponse<T>` wrapper format for all endpoints
+  - Type-safe API error handling with shared error types
+  - Modular API client with route-based organization
+  - Comprehensive JSDoc documentation for all API methods
+  - Eliminated direct Axios usage in favor of typed API wrapper
+
+- **Centralized configuration management** by @greenham
+  - Environment variable handling with proper typing
+  - Shared configuration patterns across all services
+  - Better validation and error handling for missing config
+
+- **Modern dependency upgrades** by @greenham
+  - Upgraded to Node.js 20 across all services
+  - Migrated from Yarn to pnpm 10.x for better performance
+  - Updated to latest Discord.js, Twitch APIs, and React ecosystem
+
+#### 🐛 Bug Fixes & Performance
+
+- **CI/CD pipeline fixes** by @greenham
+  - Resolved pnpm 10.x lockfile compatibility issues
+  - Fixed Docker build context to include `.npmrc` and `package.json`
+  - Improved GitHub Actions workflow for reliability
+
+- **Stream processing improvements** by @greenham
+  - Enhanced Twitch EventSub webhook handling
+  - Better error handling for stream alert payloads
+  - Support for partial user data in stream notifications
+  - Fixed null thumbnail handling in Discord alerts
+
+- **Development experience improvements** by @greenham
+  - Better error messages and debugging capabilities
+  - Improved hot reloading for shared libraries
+  - Standardized health check endpoints across services
+  - Enhanced logging and monitoring capabilities
+
+#### 📚 Documentation & Developer Experience
+
+- **Comprehensive documentation updates** by @greenham
+  - Updated CLAUDE.md with current architecture and TypeScript patterns
+  - Added Chart.js visualization capabilities documentation
+  - Enhanced admin panel functionality documentation
+  - Improved development workflow instructions
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/1.13.0...2.0.0
+
 ## 1.13.0
 
 _2025-08-15_
