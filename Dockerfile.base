@@ -17,7 +17,7 @@ RUN apk add --no-cache curl wget
 WORKDIR /app
 
 # Copy package management configuration and root TypeScript config
-COPY pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.json ./
 
 # Copy service packages
 COPY api/package.json ./api/
