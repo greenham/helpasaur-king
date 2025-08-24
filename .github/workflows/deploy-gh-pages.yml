@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       custom_domain:
-        description: 'Custom domain for GitHub Pages (e.g., preview.helpasaur.com)'
+        description: "Custom domain for GitHub Pages (e.g., preview.helpasaur.com)"
         required: false
         type: string
-        default: ''
-  workflow_call:  # Allow this workflow to be called by other workflows
+        default: "helpasaur.com"
+  workflow_call: # Allow this workflow to be called by other workflows
     inputs:
       custom_domain:
-        description: 'Custom domain for GitHub Pages'
+        description: "Custom domain for GitHub Pages"
         required: false
         type: string
-        default: ''
+        default: ""
 
 permissions:
   contents: read
@@ -74,7 +74,7 @@ jobs:
         run: |
           pnpm --filter helpa-web clean
           pnpm --filter helpa-web build --public-url /helpasaur-king/
-      
+
       - name: Build web app (with custom domain)
         if: ${{ inputs.custom_domain }}
         env:
@@ -94,12 +94,12 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./web/build
-          
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
