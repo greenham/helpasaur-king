@@ -25,11 +25,23 @@ export const getTwitchLoginUrl = () => {
       "API_HOST environment variable is not defined. Please set it during build time."
     )
   }
-  const TWITCH_APP_CLIENT_ID = process.env.TWITCH_APP_CLIENT_ID
-  const TWITCH_APP_OAUTH_REDIRECT_URL = encodeURIComponent(
+  const twitchAppClientId = process.env.TWITCH_APP_CLIENT_ID
+  const redirectUrl = encodeURIComponent(
     String(`${process.env.API_HOST}/auth/twitch`)
   )
-  return `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_APP_CLIENT_ID}&redirect_uri=${TWITCH_APP_OAUTH_REDIRECT_URL}&response_type=code&scope=`
+  return `https://id.twitch.tv/oauth2/authorize?client_id=${twitchAppClientId}&redirect_uri=${redirectUrl}&response_type=code&scope=`
+}
+
+export const getLogoutUrl = (redirect?: string) => {
+  if (!process.env.API_HOST) {
+    throw new Error(
+      "API_HOST environment variable is not defined. Please set it during build time."
+    )
+  }
+  return (
+    `${process.env.API_HOST}/auth/logout` +
+    (redirect ? `?redirect=${encodeURIComponent(redirect)}` : "")
+  )
 }
 
 export const filterStreams = (

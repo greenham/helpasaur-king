@@ -9,7 +9,7 @@ import {
   Popover,
 } from "react-bootstrap"
 import { LinkContainer } from "react-router-bootstrap"
-import { getTwitchLoginUrl } from "../utils/utils"
+import { getTwitchLoginUrl, getLogoutUrl } from "../utils/utils"
 import { useLocation } from "react-router-dom"
 import { useHelpaApi } from "../hooks/useHelpaApi"
 
@@ -43,7 +43,7 @@ const RESOURCES = [
     text: "Leaderboards",
   },
   {
-    divider: true, // Divider element
+    divider: true,
   },
   {
     href: "https://discord.gg/8cskCK4",
@@ -165,11 +165,7 @@ function TopNav() {
                 align="end"
               >
                 <NavDropdown.Item
-                  href={`${
-                    process.env.API_HOST
-                  }/auth/logout?redirect=${encodeURIComponent(
-                    location.pathname
-                  )}`}
+                  href={getLogoutUrl(location.pathname)}
                   rel="noopener noreferrer"
                 >
                   <i className="fa-solid fa-arrow-right-from-bracket"></i>
