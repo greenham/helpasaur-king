@@ -9,6 +9,13 @@ import {
 } from "../../lib/responseHelpers"
 import guard from "express-jwt-permissions"
 
+interface MatchFilter {
+  createdAt?: {
+    $gte: Date
+  }
+  source?: string
+}
+
 const router: Router = express.Router()
 const permissionGuard = guard()
 
@@ -208,7 +215,7 @@ const getDateFilter = (timeRange?: string) => {
   if (!timeRange || timeRange === "all") return {}
 
   const now = new Date()
-  let startDate = new Date()
+  const startDate = new Date()
 
   switch (timeRange) {
     case "24h":
@@ -552,7 +559,7 @@ router.get(
       const dateFilter = getDateFilter(timeRange)
 
       // Build match filter
-      const matchFilter: any = { ...dateFilter }
+      const matchFilter: MatchFilter = { ...dateFilter }
       if (platform) {
         matchFilter.source = platform
       }
