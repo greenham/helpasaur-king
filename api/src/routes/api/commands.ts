@@ -293,7 +293,7 @@ router.get(
       const dateFilter = getDateFilter(timeRange)
 
       const topCommands = await CommandLog.aggregate([
-        { $match: dateFilter },
+        { $match: { ...dateFilter, command: { $ne: "commands" } } },
         { $group: { _id: "$command", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: limit },
