@@ -143,7 +143,7 @@ export interface TwitchWebhookEvent {
 // Stream Alert Payload for WebSocket relay
 export interface StreamAlertPayload extends TwitchStreamData {
   eventType: TwitchStreamEventType
-  user: TwitchUserData
+  user: Partial<TwitchUserData>
   lastAlertedAt?: number
 }
 

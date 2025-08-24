@@ -181,7 +181,7 @@ const readyEvent: DiscordEvent<"clientReady"> = {
             .setTitle(`Now live on Twitch!`)
             .setURL(`https://twitch.tv/${stream.user.login}`)
             .setAuthor({
-              name: stream.user.display_name,
+              name: stream.user.display_name as string,
               iconURL: stream.user.profile_image_url,
               url: `https://twitch.tv/${stream.user.login}`,
             })
