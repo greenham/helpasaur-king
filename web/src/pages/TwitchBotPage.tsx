@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap"
 import { useEffect, useState, useMemo } from "react"
 import { useToast } from "../hooks/useToast"
-import { getTwitchLoginUrl } from "../utils/utils"
+import { getTwitchLoginUrl } from "../utils"
 import { useHelpaApi } from "../hooks/useHelpaApi"
 import { ApiUser, TwitchBotConfig } from "@helpasaur/types"
 

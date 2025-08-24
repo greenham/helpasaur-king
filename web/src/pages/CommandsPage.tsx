@@ -2,7 +2,7 @@ import * as React from "react"
 import { useEffect } from "react"
 import { Alert, Container, Spinner } from "react-bootstrap"
 import CommandsList from "../components/CommandsList"
-import { sortCommandsAlpha } from "../utils/utils"
+import { sortCommandsAlpha } from "../utils"
 import { useHelpaApi } from "../hooks/useHelpaApi"
 
 interface CommandsPageProps {}

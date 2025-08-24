@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Alert, Badge, Container, Spinner } from "react-bootstrap"
-import { filterStreams } from "../utils/utils"
+import { filterStreams } from "../utils"
 import LivestreamsList from "../components/LivestreamsList"
 import { useHelpaApi } from "../hooks/useHelpaApi"
 import { TwitchStream, StreamFilterConfig } from "@helpasaur/types"

@@ -38,10 +38,9 @@ export const getLogoutUrl = (redirect?: string) => {
       "API_HOST environment variable is not defined. Please set it during build time."
     )
   }
-  return (
-    `${process.env.API_HOST}/auth/logout` +
-    (redirect ? `?redirect=${encodeURIComponent(redirect)}` : "")
-  )
+  return `${process.env.API_HOST}/auth/logout${
+    redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""
+  }`
 }
 
 export const filterStreams = (

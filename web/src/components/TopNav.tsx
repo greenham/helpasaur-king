@@ -9,7 +9,7 @@ import {
   Popover,
 } from "react-bootstrap"
 import { LinkContainer } from "react-router-bootstrap"
-import { getTwitchLoginUrl, getLogoutUrl } from "../utils/utils"
+import { getTwitchLoginUrl, getLogoutUrl } from "../utils"
 import { useLocation } from "react-router-dom"
 import { useHelpaApi } from "../hooks/useHelpaApi"
 

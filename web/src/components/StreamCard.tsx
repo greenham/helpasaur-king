@@ -5,7 +5,7 @@ import Badge from "react-bootstrap/Badge"
 import Button from "react-bootstrap/Button"
 import Stack from "react-bootstrap/Stack"
 import TimeAgo from "react-timeago"
-import { sizeStreamThumbnail, getTwitchUrl } from "../utils/utils"
+import { sizeStreamThumbnail, getTwitchUrl } from "../utils"
 
 interface StreamCardProps {
   stream: TwitchStream
