@@ -8,7 +8,7 @@
 FROM node:20-alpine as builder
 
 # Install common global packages
-RUN npm install -g pnpm@8 nodemon
+RUN npm install -g pnpm@10.15.0 nodemon
 
 # Install common system dependencies for debugging and health checks
 RUN apk add --no-cache curl wget
