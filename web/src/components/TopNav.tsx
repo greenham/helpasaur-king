@@ -13,47 +13,6 @@ import { getTwitchLoginUrl, getLogoutUrl } from "../utils"
 import { useLocation } from "react-router-dom"
 import { useHelpaApi } from "../hooks/useHelpaApi"
 
-const RESOURCES = [
-  {
-    href: "https://alttp-wiki.net/index.php/Main_Page",
-    target: "_blank",
-    rel: "noopener noreferrer",
-    icon: "fa-solid fa-arrow-up-right-from-square",
-    text: "Speedrun Wiki",
-  },
-  {
-    href: "https://spannerisms.github.io/lttphack/",
-    target: "_blank",
-    rel: "noopener noreferrer",
-    icon: "fa-solid fa-arrow-up-right-from-square",
-    text: "Practice Hack",
-  },
-  {
-    href: "https://strats.alttp.run/",
-    target: "_blank",
-    rel: "noopener noreferrer",
-    icon: "fa-solid fa-arrow-up-right-from-square",
-    text: "Strat Hub",
-  },
-  {
-    href: "http://www.speedrun.com/alttp",
-    target: "_blank",
-    rel: "noopener noreferrer",
-    icon: "fa-solid fa-arrow-up-right-from-square",
-    text: "Leaderboards",
-  },
-  {
-    divider: true,
-  },
-  {
-    href: "https://discord.gg/8cskCK4",
-    target: "_blank",
-    rel: "noopener noreferrer",
-    icon: "fa-brands fa-discord",
-    text: "ALttP Discord",
-  },
-]
-
 const popover = (
   <Popover placement="bottom" id="helpa-popover">
     <Popover.Header as="h3">Hello!</Popover.Header>
@@ -65,7 +24,8 @@ const popover = (
 )
 
 function TopNav() {
-  const { data: user } = useHelpaApi().useUser()
+  const { data: user, isPending: userIsPending } = useHelpaApi().useUser()
+  const { data: config, isPending: configIsPending } = useHelpaApi().useConfig()
   const logo = new URL("../img/logo.png", import.meta.url).toString()
   const location = useLocation()
 
@@ -122,6 +82,7 @@ function TopNav() {
             >
               <i className="fa-brands fa-github pe-1"></i>GitHub
             </Nav.Link>
+
             <NavDropdown
               title={
                 <>
@@ -131,25 +92,29 @@ function TopNav() {
               id="resources-dropdown"
               align="end"
             >
-              {RESOURCES.map((resource, index) =>
-                resource.divider ? (
-                  <NavDropdown.Divider key={index} />
-                ) : (
-                  <NavDropdown.Item
-                    key={index}
-                    href={resource.href}
-                    target={resource.target}
-                    rel={resource.rel}
-                  >
-                    <i className={`${resource.icon} pe-1`}></i>
-                    {resource.text}
-                  </NavDropdown.Item>
-                )
-              )}
+              {!configIsPending &&
+                config &&
+                config.resources &&
+                config.resources.length > 0 &&
+                config.resources.map((resource, index) =>
+                  resource.divider ? (
+                    <NavDropdown.Divider key={index} />
+                  ) : (
+                    <NavDropdown.Item
+                      key={index}
+                      href={resource.href}
+                      target={resource.target}
+                      rel={resource.rel}
+                    >
+                      <i className={`${resource.icon} pe-1`}></i>
+                      {resource.text}
+                    </NavDropdown.Item>
+                  )
+                )}
             </NavDropdown>
           </Nav>
           <Nav className="justify-content-end">
-            {user ? (
+            {!userIsPending && user && (
               <NavDropdown
                 title={
                   <Image
@@ -168,11 +133,12 @@ function TopNav() {
                   href={getLogoutUrl(location.pathname)}
                   rel="noopener noreferrer"
                 >
-                  <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                  Log Out
+                  <i className="fa-solid fa-arrow-right-from-bracket"></i> Log
+                  Out
                 </NavDropdown.Item>
               </NavDropdown>
-            ) : (
+            )}
+            {!userIsPending && !user && (
               <Nav.Link href={getTwitchLoginUrl()} rel="noopener noreferrer">
                 <Button variant="primary">
                   <i className="fa-solid fa-key pe-1"></i>Log in with Twitch

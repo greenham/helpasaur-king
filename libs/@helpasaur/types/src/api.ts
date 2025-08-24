@@ -83,11 +83,21 @@ export interface StreamFilterConfig {
   statusFilters: string
 }
 
+export interface WebResource {
+  href: string
+  target: string
+  rel: string
+  icon: string
+  text: string
+  divider?: boolean
+}
+
 export interface WebConfig {
   streams: StreamFilterConfig
   twitch: {
     commandPrefixes: string[]
   }
+  resources: WebResource[]
 }
 
 export interface TwitchStream {
