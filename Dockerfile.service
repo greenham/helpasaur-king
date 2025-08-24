@@ -23,7 +23,7 @@ WORKDIR /app/${SERVICE}
 RUN pnpm build
 # Create clean production deployment with only this service's dependencies
 WORKDIR /app
-RUN pnpm --filter helpa-${SERVICE} --prod deploy /prod/${SERVICE}
+RUN pnpm --filter helpa-${SERVICE} --prod deploy --legacy /prod/${SERVICE}
 
 # Production runtime stage - minimal image with only essentials
 FROM node:20-alpine AS prod
