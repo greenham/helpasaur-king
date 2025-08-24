@@ -19,7 +19,7 @@ const guildDeleteEvent: DiscordEvent<"guildDelete"> = {
       return
     }
 
-    console.log(`Removing config for guild ${guild.name} (${guild.id})`)
+    console.log(`De-activating guild ${guild.name} (${guild.id})...`)
 
     // De-activate this guild via the API
     try {
@@ -31,7 +31,7 @@ const guildDeleteEvent: DiscordEvent<"guildDelete"> = {
       client.config.guilds[guildConfigIndex].active = false
     } catch (err) {
       console.error(
-        `Error deleting guild ${guild.name} (${guild.id}) via API:`,
+        `Error de-activating guild ${guild.name} (${guild.id}) via API:`,
         err instanceof Error ? err.message : err
       )
     }
