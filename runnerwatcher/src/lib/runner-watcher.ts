@@ -100,6 +100,7 @@ class RunnerWatcher extends EventEmitter {
       const stream: StreamAlertPayload = {
         ...streamResult[0],
         eventType,
+        user,
       }
 
       // Replace some stream data from API if this is an update event
