@@ -6,6 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
+    "clean": "npx rimraf build",
     "start": "parcel src/index.html -p 3000 --dist-dir build",
     "build": "parcel build src/index.html --dist-dir build"
   },
