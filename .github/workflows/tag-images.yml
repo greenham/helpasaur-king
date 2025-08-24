@@ -1,0 +1,80 @@
+name: Tag Docker Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_tag:
+        description: "Source tag to retag (e.g., 2.0.0, 1.9.1)"
+        required: true
+        type: string
+      target_tag:
+        description: "New tag to apply (e.g., latest, stable, beta)"
+        required: true
+        type: string
+        default: "latest"
+
+env:
+  REGISTRY: ghcr.io/greenham/helpasaur-king
+
+jobs:
+  tag-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate inputs
+        run: |
+          echo "Retagging images from '${{ github.event.inputs.source_tag }}' to '${{ github.event.inputs.target_tag }}'"
+          echo "Registry: ${{ env.REGISTRY }}"
+
+      - name: Tag and push images
+        run: |
+          # Define all images to retag
+          IMAGES="helpa-base helpa-api helpa-discord helpa-twitch helpa-runnerwatcher helpa-racebot helpa-ws-relay"
+
+          echo "Starting retag operation..."
+
+          # Pull, tag, and push each image
+          for image in $IMAGES; do
+            echo "Processing $image..."
+            
+            # Pull the source image
+            docker pull ${{ env.REGISTRY }}/$image:${{ github.event.inputs.source_tag }}
+            
+            # Tag with the new tag
+            docker tag ${{ env.REGISTRY }}/$image:${{ github.event.inputs.source_tag }} ${{ env.REGISTRY }}/$image:${{ github.event.inputs.target_tag }}
+            
+            # Push the new tag
+            docker push ${{ env.REGISTRY }}/$image:${{ github.event.inputs.target_tag }}
+            
+            echo "✅ 🏷️ Tagged $image:${{ github.event.inputs.source_tag }} -> $image:${{ github.event.inputs.target_tag }}"
+          done
+
+          echo "🎉 All images successfully retagged!"
+
+      - name: Summary
+        run: |
+          echo "## Retagging Complete! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Source Tag:** \`${{ github.event.inputs.source_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Target Tag:** \`${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Images Tagged:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`helpa-base:${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`helpa-api:${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`helpa-discord:${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`helpa-twitch:${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`helpa-runnerwatcher:${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`helpa-racebot:${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`helpa-ws-relay:${{ github.event.inputs.target_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Your images are now ready to deploy with the new tag!" >> $GITHUB_STEP_SUMMARY

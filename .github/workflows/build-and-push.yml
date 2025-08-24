@@ -78,9 +78,11 @@ jobs:
           DOCKER_BUILDKIT: 1
         run: |
           docker compose -f docker-compose.build.prod.yml build api-server discord-bot twitch-bot runnerwatcher racebot ws-relay
-          docker push ${{ env.REGISTRY }}/helpa-api:${{ steps.version.outputs.VERSION }}
-          docker push ${{ env.REGISTRY }}/helpa-discord:${{ steps.version.outputs.VERSION }}
-          docker push ${{ env.REGISTRY }}/helpa-twitch:${{ steps.version.outputs.VERSION }}
-          docker push ${{ env.REGISTRY }}/helpa-runnerwatcher:${{ steps.version.outputs.VERSION }}
-          docker push ${{ env.REGISTRY }}/helpa-racebot:${{ steps.version.outputs.VERSION }}
-          docker push ${{ env.REGISTRY }}/helpa-ws-relay:${{ steps.version.outputs.VERSION }}
+          
+          # Define service list
+          SERVICES="helpa-api helpa-discord helpa-twitch helpa-runnerwatcher helpa-racebot helpa-ws-relay"
+          
+          # Push all service images
+          for service in $SERVICES; do
+            docker push ${{ env.REGISTRY }}/$service:${{ steps.version.outputs.VERSION }}
+          done
