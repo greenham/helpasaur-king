@@ -38,6 +38,10 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
   }
 
   const { data: user, isLoading: userLoading } = useHelpaApi().useUser()
+  const { data: streamAlertsChannels, isLoading: streamAlertsChannelsLoading } =
+    useHelpaApi().useStreamAlertsChannels()
+  const { data: twitchBotChannels, isLoading: twitchBotChannelsLoading } =
+    useHelpaApi().useTwitchBotChannels()
 
   if (userLoading)
     return (
@@ -92,6 +96,20 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
                 <>
                   <i className="fa-brands fa-watchman-monitoring me-2"></i>
                   Stream Alerts
+                  {streamAlertsChannelsLoading ? (
+                    <Spinner
+                      size="sm"
+                      className="ms-2"
+                      animation="border"
+                      style={{ width: "0.8rem", height: "0.8rem" }}
+                    />
+                  ) : (
+                    streamAlertsChannels && (
+                      <span className="badge bg-primary ms-2">
+                        {streamAlertsChannels.length}
+                      </span>
+                    )
+                  )}
                 </>
               }
               className="p-5"
@@ -105,6 +123,20 @@ const AdminPage: React.FunctionComponent<AdminPageProps> = () => {
                 <>
                   <i className="fa-solid fa-robot me-2"></i>
                   Twitch Bot
+                  {twitchBotChannelsLoading ? (
+                    <Spinner
+                      size="sm"
+                      className="ms-2"
+                      animation="border"
+                      style={{ width: "0.8rem", height: "0.8rem" }}
+                    />
+                  ) : (
+                    twitchBotChannels && (
+                      <span className="badge bg-primary ms-2">
+                        {twitchBotChannels.length}
+                      </span>
+                    )
+                  )}
                 </>
               }
               className="p-5"
