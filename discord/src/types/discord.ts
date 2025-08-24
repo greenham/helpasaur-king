@@ -19,6 +19,7 @@ export interface DiscordEvent<
   once?: boolean
   helpaApi?: HelpaApi
   execute: (...args: ClientEvents[K]) => Awaitable<void>
+  filePath?: string
 }
 
 // Command builder types
@@ -32,6 +33,7 @@ export interface DiscordCommand {
   data: CommandBuilder
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
   helpaApi?: HelpaApi
+  filePath?: string
 }
 
 export interface ExtendedClient extends Client {

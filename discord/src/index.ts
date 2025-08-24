@@ -35,7 +35,7 @@ async function init() {
     const bot = new DiscordBot(discordConfig, helpaApiClient)
 
     // Listen for ready event to track bot status
-    bot.discordClient.once("ready", () => {
+    bot.discordClient.once("clientReady", () => {
       // Start health check server after bot is ready
       const healthApp = express()
 

@@ -11,7 +11,7 @@ import * as fs from "node:fs"
 import * as path from "node:path"
 import { HelpaApi } from "@helpasaur/api-client"
 import { DiscordConfig } from "./types/config"
-import { DiscordCommand, ExtendedClient } from "./types"
+import { DiscordCommand, DiscordEvent, ExtendedClient } from "./types"
 
 export class DiscordBot {
   public discordClient: ExtendedClient
@@ -41,7 +41,7 @@ export class DiscordBot {
       if (this.discordClient.user) {
         this.discordClient.user.setActivity(activity, {
           type: ActivityType.Streaming,
-          url: `https://twitch.tv/helpasaurking`,
+          url: `https://twitch.tv/helpasaurking`, // @TODO Pull from config/env
         })
       }
     }
@@ -78,59 +78,54 @@ export class DiscordBot {
       })
   }
 
-  handleEvents(): void {
-    // Read in events to be handled
-    const eventsPath = path.join(__dirname, "events")
-    const eventFiles = fs
-      .readdirSync(eventsPath)
-      .filter((file) => file.endsWith(".js") || file.endsWith(".ts"))
-
-    for (const file of eventFiles) {
-      const filePath = path.join(eventsPath, file)
-      const event = require(filePath) as {
-        name: string
-        once?: boolean
-        execute: (...args: unknown[]) => void | Promise<void>
-      }
-      // Create a new object with helpaApi instead of mutating the imported one
-      const eventWithApi = { ...event, helpaApi: this.helpaApi }
-      if (eventWithApi.once) {
-        this.discordClient.once(eventWithApi.name, (...args) =>
-          eventWithApi.execute(...args)
-        )
-      } else {
-        this.discordClient.on(eventWithApi.name, (...args) =>
-          eventWithApi.execute(...args)
-        )
-      }
-    }
-  }
-
-  handleCommands(): void {
-    // Read in commands to be handled
-    const commandsPath = path.join(__dirname, "commands")
-    const commandFiles = fs
-      .readdirSync(commandsPath)
+  /**
+   * Load module files from a directory and inject helpaApi
+   * @param directory - The directory name to load modules from
+   * @returns Array of modules with helpaApi injected
+   */
+  private loadModulesFromDirectory<T>(directory: string): T[] {
+    const dirPath = path.join(__dirname, directory)
+    const moduleFiles = fs
+      .readdirSync(dirPath)
       .filter(
         (file) =>
           !file.endsWith(".d.ts") &&
           (file.endsWith(".js") || file.endsWith(".ts"))
       )
 
-    for (const file of commandFiles) {
-      const filePath = path.join(commandsPath, file)
-      const command: DiscordCommand = require(filePath)
+    return moduleFiles.map((file) => {
+      const filePath = path.join(dirPath, file)
+      const module = require(filePath) as T
       // Create a new object with helpaApi instead of mutating the imported one
-      const commandWithApi = { ...command, helpaApi: this.helpaApi }
+      return { ...module, helpaApi: this.helpaApi, filePath }
+    })
+  }
+
+  handleEvents(): void {
+    // Read in events to be handled
+    const events = this.loadModulesFromDirectory<DiscordEvent>("events")
+
+    for (const event of events) {
+      if (event.once) {
+        this.discordClient.once(event.name, (...args) => event.execute(...args))
+      } else {
+        this.discordClient.on(event.name, (...args) => event.execute(...args))
+      }
+    }
+  }
+
+  handleCommands(): void {
+    // Read in commands to be handled
+    const commands = this.loadModulesFromDirectory<DiscordCommand>("commands")
+
+    for (const command of commands) {
       // Set a new item in the Collection with the key as the command name and the value as the exported module
-      if ("data" in commandWithApi && "execute" in commandWithApi) {
-        this.discordClient.commands.set(
-          commandWithApi.data.name,
-          commandWithApi
-        )
+      const { filePath } = command
+      if ("data" in command && "execute" in command) {
+        this.discordClient.commands.set(command.data.name, command)
       } else {
         console.log(
-          `⚠ The command at ${filePath} is missing a required "data" or "execute" property.`
+          `⚠️ The command at ${filePath} is missing a required "data" or "execute" property.`
         )
       }
     }

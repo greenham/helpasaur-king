@@ -19,8 +19,8 @@ const WEEKLY_ALERT_OFFSET_MINUTES = 60
 const WEEKLY_ALERT_MESSAGE =
   "The weekly Any% NMG Race is starting #startsIn# on <https://racetime.gg> | Create an account (or log in) here: <https://racetime.gg/account/auth> | ALttP races can be found here: <https://racetime.gg/alttp>"
 
-const readyEvent: DiscordEvent<"ready"> = {
-  name: "ready",
+const readyEvent: DiscordEvent<"clientReady"> = {
+  name: "clientReady",
   once: true,
   execute(client) {
     const extClient = client as ExtendedClient
