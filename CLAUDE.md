@@ -11,7 +11,7 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 - **API** (`/api/`): Express.js REST API with MongoDB, JWT auth, Socket.io, Twitch EventSub webhooks
 - **Discord Bot** (`/discord/`): Discord.js v14 bot for commands, go-live notifications, race announcements
 - **Twitch Bot** (`/twitch/`): tmi.js bot for Twitch chat commands
-- **Web App** (`/web/`): React 18 + TypeScript frontend with Parcel, Bootstrap 5, TanStack Query (hosted on GitHub Pages)
+- **Web App** (`/web/`): React 18 + TypeScript frontend with Parcel, Bootstrap 5, TanStack Query, Chart.js for data visualization (hosted on GitHub Pages)
 - **Race Bot** (`/racebot/`): TypeScript service for weekly racetime.gg race creation (Sundays 11:30 AM PT)
 - **Runner Watcher** (`/runnerwatcher/`): Stream monitoring via Twitch EventSub
 - **WebSocket Relay** (`/ws-relay/`): Socket.io hub for inter-service communication
@@ -47,6 +47,8 @@ pnpm format:check       # Check code formatting without making changes
 pnpm lint               # Check code for ESLint issues
 pnpm lint:fix           # Auto-fix ESLint issues where possible
 pnpm lint:check         # Check ESLint with zero tolerance for warnings
+pnpm typecheck          # Type check all services and libraries
+pnpm typecheck:libs     # Type check only shared libraries
 
 # Monitoring Stack Commands (local development only)
 pnpm monitor:start      # Start Uptime Kuma monitoring locally
@@ -171,7 +173,11 @@ graph TD
 - `/commands`: Command directory
 - `/streams`: ALttP stream directory
 - `/twitch`: Twitch bot management
-- `/admin`: Admin panel (requires auth)
+- `/admin`: Admin panel with tabbed interface (requires auth)
+  - Command statistics and analytics dashboards
+  - Stream alert management
+  - Twitch bot configuration
+  - Test event functionality
 
 ### Real-time Features
 
@@ -239,8 +245,10 @@ graph TD
 1. React components in `/web/src/components/`
 2. API calls use TanStack Query hooks
 3. Bootstrap theme customization in `/web/src/scss/`
-4. Run locally with `pnpm start:web` (not in Docker)
-5. Deployed to GitHub Pages on production
+4. Data visualization with Chart.js and react-chartjs-2
+5. Admin panel includes command statistics and analytics dashboards
+6. Run locally with `pnpm start:web` (not in Docker)
+7. Deployed to GitHub Pages on production
 
 ### Setting up monitoring (local only)
 
