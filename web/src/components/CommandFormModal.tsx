@@ -1,7 +1,11 @@
 import * as React from "react"
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap"
 import { Command } from "@helpasaur/types"
-type CommandFormModel = Partial<Command> & { aliasesText?: string }
+import { useHelpaApi } from "../hooks/useHelpaApi"
+type CommandFormModel = Partial<Command> & {
+  aliasesText?: string
+  tagsText?: string
+}
 
 interface CommandFormModalProps {
   command: CommandFormModel
@@ -18,9 +22,14 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
     response: props.command.response || "",
     aliases: props.command.aliases || [],
     aliasesText: props.command.aliases ? props.command.aliases.join(", ") : "",
+    tags: props.command.tags || [],
+    tagsText: props.command.tags ? props.command.tags.join(", ") : "",
     ...props.command,
   }))
   const { show, onHide, onSubmit } = props
+  const { data: existingTags = [] } = useHelpaApi().useTags({
+    enabled: show, // Only fetch when modal is shown
+  })
 
   React.useEffect(() => {
     setCommand({
@@ -30,11 +39,15 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
       aliasesText: props.command.aliases
         ? props.command.aliases.join(", ")
         : "",
+      tags: props.command.tags || [],
+      tagsText: props.command.tags ? props.command.tags.join(", ") : "",
       ...props.command,
     })
   }, [props.command])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const key = e.target.name
     const value = e.target.value
 
@@ -49,6 +62,15 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
     command.aliases = command.aliasesText
       ? command.aliasesText.replace(/\s+/g, "").split(",")
       : []
+
+    // translate tagsText to tags
+    command.tags = command.tagsText
+      ? command.tagsText
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0)
+      : []
+
     onSubmit(command)
   }
 
@@ -99,6 +121,19 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
             value={command.aliasesText || ""}
             onChange={handleChange}
           />
+        </FloatingLabel>
+        <FloatingLabel controlId="commandTags" label="Tags" className="mb-3">
+          <Form.Control
+            type="text"
+            placeholder="tutorial, glitch, route (comma-separated)"
+            name="tagsText"
+            value={command.tagsText || ""}
+            onChange={handleChange}
+          />
+          <Form.Text className="text-muted">
+            Separate multiple tags with commas. Existing tags:{" "}
+            {existingTags.join(", ")}
+          </Form.Text>
         </FloatingLabel>
       </Modal.Body>
       <Modal.Footer>

@@ -5,7 +5,8 @@ export interface ICommand {
   command: string
   aliases?: string[]
   response: string
-  category?: string
+  category?: string // Keep for backward compatibility during migration
+  tags?: string[] // New tagging system
   enabled: boolean
   deleted?: boolean
 }

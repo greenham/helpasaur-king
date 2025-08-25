@@ -5,7 +5,8 @@ const CommandSchema = new Schema<ICommandDocument>({
   command: { type: String, required: true, trim: true },
   aliases: [String],
   response: { type: String, required: true, trim: true },
-  category: String,
+  category: String, // Keep for backward compatibility during migration
+  tags: [String], // New tagging system
   enabled: Boolean,
   deleted: Boolean,
 })

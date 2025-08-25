@@ -7,18 +7,23 @@ import {
   Alert,
   Badge,
   Button,
+  ButtonGroup,
   Card,
   Col,
   Form,
   InputGroup,
   Modal,
+  OverlayTrigger,
   Row,
   Stack,
   Table,
+  ToggleButton,
+  Tooltip,
 } from "react-bootstrap"
 import LinkifyText from "./LinkifyText"
 import { Command } from "@helpasaur/types"
 import CommandFormModal from "./CommandFormModal"
+import { useHelpaApi } from "../hooks/useHelpaApi"
 
 interface CommandsListProps {
   commands: Command[]
@@ -47,22 +52,77 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     deleteCommandMutation,
   } = props
 
-  // Set up searching
+  // Set up searching and filtering
   const { hash } = useLocation()
   const [searchQuery, setSearchQuery] = useState(hash.replace("#", ""))
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500)
-  const [searchResults, setSearchResults] = useState<Array<Command>>([])
-  const filterCommands = (commandsToFilter: Command[], query: string) => {
-    if (query.length === 0) return commandsToFilter
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
+  const [selectedLetter, setSelectedLetter] = useState<string>("all")
+  const [filteredResults, setFilteredResults] = useState<Array<Command>>([])
 
-    return commandsToFilter.filter(
-      (c) =>
-        c.command.toLowerCase().includes(query.toLowerCase()) ||
-        c.aliases.some((alias) =>
-          alias.toLowerCase().includes(query.toLowerCase())
-        ) ||
-        c.response.toLowerCase().includes(query.toLowerCase())
-    )
+  // Get tags for filtering
+  const { data: tagStats = [] } = useHelpaApi().useTagStats()
+  const { data: untaggedCount = 0 } = useHelpaApi().useUntaggedCount()
+
+  const filterCommands = (
+    commandsToFilter: Command[],
+    query: string,
+    tags: Set<string>,
+    letter: string
+  ) => {
+    let filtered = commandsToFilter
+
+    // Apply text search filter
+    if (query.length > 0) {
+      filtered = filtered.filter(
+        (c) =>
+          c.command.toLowerCase().includes(query.toLowerCase()) ||
+          c.aliases.some((alias) =>
+            alias.toLowerCase().includes(query.toLowerCase())
+          ) ||
+          c.response.toLowerCase().includes(query.toLowerCase()) ||
+          (c.tags &&
+            c.tags.some((tag) =>
+              tag.toLowerCase().includes(query.toLowerCase())
+            ))
+      )
+    }
+
+    // Apply tag filter
+    if (tags.size > 0) {
+      if (tags.has("untagged")) {
+        // Show commands without tags if "untagged" is selected
+        const otherTags = new Set(tags)
+        otherTags.delete("untagged")
+
+        if (otherTags.size === 0) {
+          // Only "untagged" selected
+          filtered = filtered.filter((c) => !c.tags || c.tags.length === 0)
+        } else {
+          // "untagged" + other tags selected
+          filtered = filtered.filter(
+            (c) =>
+              !c.tags ||
+              c.tags.length === 0 ||
+              (c.tags && c.tags.some((tag) => otherTags.has(tag)))
+          )
+        }
+      } else {
+        // Filter by selected tags
+        filtered = filtered.filter(
+          (c) => c.tags && c.tags.some((tag) => tags.has(tag))
+        )
+      }
+    }
+
+    // Apply alphabetical filter
+    if (letter !== "all") {
+      filtered = filtered.filter((c) =>
+        c.command.toLowerCase().startsWith(letter.toLowerCase())
+      )
+    }
+
+    return filtered
   }
 
   // Handle updates to the location hash
@@ -71,9 +131,29 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   }, [hash])
 
   useEffect(() => {
-    setSearchResults(filterCommands(commands, debouncedSearchQuery))
-    window.location.replace(`#${debouncedSearchQuery}`)
-  }, [debouncedSearchQuery, commands])
+    const filtered = filterCommands(
+      commands,
+      debouncedSearchQuery,
+      selectedTags,
+      selectedLetter
+    )
+    setFilteredResults(filtered)
+
+    // Update URL with search query (preserve existing behavior)
+    if (debouncedSearchQuery) {
+      window.location.replace(`#${debouncedSearchQuery}`)
+    }
+  }, [debouncedSearchQuery, commands, selectedTags, selectedLetter])
+
+  // Generate alphabet for alpha index
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+
+  // Get count for each letter (for alpha index)
+  const getLetterCount = (letter: string) => {
+    return commands.filter((c) =>
+      c.command.toLowerCase().startsWith(letter.toLowerCase())
+    ).length
+  }
 
   const freshCommand = {
     _id: "",
@@ -169,29 +249,159 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Button>
       )}
 
-      {searchResults.length === 0 && (
+      {/* Tag Filter */}
+      <Row className="mb-4">
+        <Col>
+          <h5>Filter by Tags</h5>
+          <ButtonGroup className="mb-3 flex-wrap">
+            <Button
+              variant={selectedTags.size === 0 ? "primary" : "outline-primary"}
+              onClick={() => setSelectedTags(new Set())}
+            >
+              All ({commands.length})
+            </Button>
+            {tagStats.map((stat) => (
+              <ToggleButton
+                key={stat.tag}
+                id={`tag-${stat.tag}`}
+                type="checkbox"
+                variant="outline-primary"
+                name="tags"
+                value={stat.tag}
+                checked={selectedTags.has(stat.tag)}
+                onChange={(e) => {
+                  const newTags = new Set(selectedTags)
+                  if (e.currentTarget.checked) {
+                    newTags.add(stat.tag)
+                  } else {
+                    newTags.delete(stat.tag)
+                  }
+                  setSelectedTags(newTags)
+                }}
+              >
+                {stat.tag} ({stat.count})
+              </ToggleButton>
+            ))}
+            {untaggedCount > 0 && (
+              <ToggleButton
+                key="untagged"
+                id="tag-untagged"
+                type="checkbox"
+                variant="outline-secondary"
+                name="tags"
+                value="untagged"
+                checked={selectedTags.has("untagged")}
+                onChange={(e) => {
+                  const newTags = new Set(selectedTags)
+                  if (e.currentTarget.checked) {
+                    newTags.add("untagged")
+                  } else {
+                    newTags.delete("untagged")
+                  }
+                  setSelectedTags(newTags)
+                }}
+              >
+                Untagged ({untaggedCount})
+              </ToggleButton>
+            )}
+          </ButtonGroup>
+        </Col>
+      </Row>
+
+      {/* Alpha Index */}
+      <Row className="mb-4">
+        <Col>
+          <h5>Jump to Letter</h5>
+          <ButtonGroup className="mb-3 flex-wrap">
+            <ToggleButton
+              key="all-letters"
+              id="letter-all"
+              type="radio"
+              variant="outline-secondary"
+              name="letter"
+              value="all"
+              checked={selectedLetter === "all"}
+              onChange={(e) => setSelectedLetter(e.currentTarget.value)}
+            >
+              All
+            </ToggleButton>
+            {alphabet.map((letter) => {
+              const count = getLetterCount(letter)
+              const letterButton = (
+                <ToggleButton
+                  key={letter}
+                  id={`letter-${letter}`}
+                  type="radio"
+                  variant="outline-secondary"
+                  name="letter"
+                  value={letter}
+                  checked={selectedLetter === letter}
+                  onChange={(e) => setSelectedLetter(e.currentTarget.value)}
+                  disabled={count === 0}
+                  style={{
+                    fontSize: "1.2rem",
+                    fontWeight: "bold",
+                    minWidth: "3rem",
+                    opacity: count === 0 ? 0.3 : 1,
+                  }}
+                >
+                  {letter}
+                </ToggleButton>
+              )
+
+              return count > 0 ? (
+                <OverlayTrigger
+                  key={letter}
+                  placement="top"
+                  overlay={
+                    <Tooltip id={`tooltip-${letter}`}>
+                      {count} command{count !== 1 ? "s" : ""} starting with "
+                      {letter}"
+                    </Tooltip>
+                  }
+                >
+                  {letterButton}
+                </OverlayTrigger>
+              ) : (
+                letterButton
+              )
+            })}
+          </ButtonGroup>
+        </Col>
+      </Row>
+
+      {filteredResults.length === 0 && (
         <Alert>
           No results found
-          {searchQuery.length > 0 ? (
+          {searchQuery.length > 0 && (
             <span>
               &nbsp; for <strong>{searchQuery}</strong>
             </span>
-          ) : (
-            ""
+          )}
+          {selectedTags.size > 0 && (
+            <span>
+              &nbsp; with tags{" "}
+              <strong>{Array.from(selectedTags).join(", ")}</strong>
+            </span>
+          )}
+          {selectedLetter !== "all" && (
+            <span>
+              &nbsp; starting with <strong>{selectedLetter}</strong>
+            </span>
           )}
           .
         </Alert>
       )}
 
-      {searchResults.length > 0 && (
+      {filteredResults.length > 0 && (
         <Alert variant="dark">
-          <strong>{searchResults.length}</strong> command
-          {searchResults.length !== 1 ? "s" : ""} found.
+          <strong>{filteredResults.length}</strong> command
+          {filteredResults.length !== 1 ? "s" : ""} found.
         </Alert>
       )}
 
       <Stack gap={5} className="d-xl-none">
-        {searchResults.map((c, idx) => (
+        {filteredResults.map((c, idx) => (
           <Card key={idx}>
             <Card.Header>
               <Stack direction="horizontal">
@@ -233,7 +443,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         ))}
       </Stack>
 
-      {searchResults.length > 0 && (
+      {filteredResults.length > 0 && (
         <Table striped bordered hover className="d-none d-xl-block">
           <thead>
             <tr>
@@ -243,7 +453,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
             </tr>
           </thead>
           <tbody>
-            {searchResults.map((c, index) => {
+            {filteredResults.map((c, index) => {
               // Check if this command is being updated optimistically
               const isBeingUpdated =
                 updateCommandMutation.isPending &&
