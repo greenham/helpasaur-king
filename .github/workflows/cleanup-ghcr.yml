@@ -1,18 +1,18 @@
 name: Cleanup GHCR Images
 
 on:
-  schedule:
-    # Run every Sunday at 2 AM UTC
-    - cron: '0 2 * * 0'
+  # schedule:
+  # Run every Sunday at 2 AM UTC
+  # - cron: '0 2 * * 0'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run (show what would be deleted without deleting)'
+        description: "Dry run (show what would be deleted without deleting)"
         required: false
         type: boolean
         default: true
       keep_count:
-        description: 'Number of recent images to keep per service'
+        description: "Number of recent images to keep per service"
         required: false
         type: number
         default: 5
@@ -23,21 +23,30 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     strategy:
       matrix:
-        service: [helpasaur-king/helpa-base, helpasaur-king/helpa-api, helpasaur-king/helpa-discord, helpasaur-king/helpa-twitch, helpasaur-king/helpa-runnerwatcher, helpasaur-king/helpa-racebot, helpasaur-king/helpa-ws-relay]
-    
+        service:
+          [
+            helpasaur-king/helpa-base,
+            helpasaur-king/helpa-api,
+            helpasaur-king/helpa-discord,
+            helpasaur-king/helpa-twitch,
+            helpasaur-king/helpa-runnerwatcher,
+            helpasaur-king/helpa-racebot,
+            helpasaur-king/helpa-ws-relay,
+          ]
+
     steps:
       - name: Dry run - List packages for ${{ matrix.service }}
-        if: ${{ github.event.inputs.dry_run == true }}
+        if: ${{ github.event.inputs.dry_run == 'true' }}
         run: |
           echo "🔍 DRY RUN: Would delete old versions of ${{ matrix.service }}"
           echo "Would keep most recent ${{ github.event.inputs.keep_count || 5 }} versions"
-          
+
           # URL encode the package name for API call
           ENCODED_PACKAGE=$(echo "${{ matrix.service }}" | sed 's/\//%2F/g')
-          
+
           # Show what would be deleted
           gh api "/user/packages/container/$ENCODED_PACKAGE/versions" \
             --jq 'length as $total | (${{ github.event.inputs.keep_count || 5 }}) as $keep | if $total > $keep then .[$keep:] | .[] | "Would delete: " + (.metadata.container.tags[0] // .name[7:19]) + " (created: " + .created_at + ")" else "✅ No versions would be deleted (only " + ($total | tostring) + " versions exist, keeping " + ($keep | tostring) + ")" end'
@@ -45,12 +54,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Delete old images for ${{ matrix.service }}
-        if: ${{ github.event.inputs.dry_run != true }}
+        if: ${{ github.event.inputs.dry_run != 'true' }}
         uses: actions/delete-package-versions@v4
         with:
           owner: ${{ github.repository_owner }}
           package-name: ${{ matrix.service }}
-          package-type: 'container'
+          package-type: "container"
           min-versions-to-keep: ${{ github.event.inputs.keep_count || 5 }}
           delete-only-untagged-versions: false
           token: ${{ secrets.GITHUB_TOKEN }}
