@@ -26,7 +26,7 @@ jobs:
     
     strategy:
       matrix:
-        service: [helpa-base, helpa-api, helpa-discord, helpa-twitch, helpa-runnerwatcher, helpa-racebot, helpa-ws-relay]
+        service: [helpasaur-king/helpa-base, helpasaur-king/helpa-api, helpasaur-king/helpa-discord, helpasaur-king/helpa-twitch, helpasaur-king/helpa-runnerwatcher, helpasaur-king/helpa-racebot, helpasaur-king/helpa-ws-relay]
     
     steps:
       - name: Dry run - List packages for ${{ matrix.service }}
@@ -34,10 +34,13 @@ jobs:
         run: |
           echo "🔍 DRY RUN: Would delete old versions of ${{ matrix.service }}"
           echo "Would keep most recent ${{ github.event.inputs.keep_count || 5 }} versions"
-          # Use GitHub CLI to list current versions
-          gh api repos/${{ github.repository }}/packages/container/${{ matrix.service }}/versions \
-            --jq '.[] | select(.metadata.container.tags | length == 0 or (.[0] | test("^[0-9]+\\.[0-9]+\\.[0-9]+") | not)) | "Would delete: " + .name + " (created: " + .created_at + ")"' \
-            | head -20 || echo "No versions found or error accessing package"
+          
+          # URL encode the package name for API call
+          ENCODED_PACKAGE=$(echo "${{ matrix.service }}" | sed 's/\//%2F/g')
+          
+          # Show what would be deleted
+          gh api "/user/packages/container/$ENCODED_PACKAGE/versions" \
+            --jq 'length as $total | (${{ github.event.inputs.keep_count || 5 }}) as $keep | if $total > $keep then .[$keep:] | .[] | "Would delete: " + (.metadata.container.tags[0] // .name[7:19]) + " (created: " + .created_at + ")" else "✅ No versions would be deleted (only " + ($total | tostring) + " versions exist, keeping " + ($keep | tostring) + ")" end'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -45,6 +48,7 @@ jobs:
         if: ${{ github.event.inputs.dry_run != true }}
         uses: actions/delete-package-versions@v4
         with:
+          owner: ${{ github.repository_owner }}
           package-name: ${{ matrix.service }}
           package-type: 'container'
           min-versions-to-keep: ${{ github.event.inputs.keep_count || 5 }}
