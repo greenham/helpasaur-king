@@ -422,6 +422,8 @@ export const useHelpaApi = () => {
           helpaApiClient.commands.createCommand(command),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          queryClient.invalidateQueries({ queryKey: ["tagStats"] })
+          queryClient.invalidateQueries({ queryKey: ["untaggedCount"] })
           if (showToast) {
             toast.success(`Command '${variables.command}' created!`)
           }
@@ -453,6 +455,8 @@ export const useHelpaApi = () => {
           helpaApiClient.commands.updateCommand(command),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          queryClient.invalidateQueries({ queryKey: ["tagStats"] })
+          queryClient.invalidateQueries({ queryKey: ["untaggedCount"] })
           if (showToast) {
             toast.success(`Command '${variables.command}' updated!`)
           }
@@ -480,6 +484,8 @@ export const useHelpaApi = () => {
           helpaApiClient.commands.deleteCommand(command),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          queryClient.invalidateQueries({ queryKey: ["tagStats"] })
+          queryClient.invalidateQueries({ queryKey: ["untaggedCount"] })
           if (showToast) {
             toast.success(`Command '${variables.command}' deleted!`)
           }

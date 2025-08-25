@@ -2,10 +2,10 @@ import * as React from "react"
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap"
 import { Command } from "@helpasaur/types"
 import { useHelpaApi } from "../hooks/useHelpaApi"
-type CommandFormModel = Partial<Command> & {
-  aliasesText?: string
-  tagsText?: string
-}
+import TagInput from "./TagInput"
+import AliasInput from "./AliasInput"
+
+type CommandFormModel = Partial<Command>
 
 interface CommandFormModalProps {
   command: CommandFormModel
@@ -21,32 +21,31 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
     command: props.command.command || "",
     response: props.command.response || "",
     aliases: props.command.aliases || [],
-    aliasesText: props.command.aliases ? props.command.aliases.join(", ") : "",
     tags: props.command.tags || [],
-    tagsText: props.command.tags ? props.command.tags.join(", ") : "",
     ...props.command,
   }))
   const { show, onHide, onSubmit } = props
-  const { data: existingTags = [] } = useHelpaApi().useTags({
+  const { data: tagStats = [] } = useHelpaApi().useTagStats({
     enabled: show, // Only fetch when modal is shown
   })
+
+  // Extract tag names from stats (this is working in CommandsList)
+  const existingTags = tagStats.map((stat) => stat.tag)
 
   React.useEffect(() => {
     setCommand({
       command: props.command.command || "",
       response: props.command.response || "",
       aliases: props.command.aliases || [],
-      aliasesText: props.command.aliases
-        ? props.command.aliases.join(", ")
-        : "",
       tags: props.command.tags || [],
-      tagsText: props.command.tags ? props.command.tags.join(", ") : "",
       ...props.command,
     })
   }, [props.command])
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const key = e.target.name
     const value = e.target.value
@@ -58,19 +57,6 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
   }
 
   const handleSubmit = () => {
-    // translate aliasesText to aliases
-    command.aliases = command.aliasesText
-      ? command.aliasesText.replace(/\s+/g, "").split(",")
-      : []
-
-    // translate tagsText to tags
-    command.tags = command.tagsText
-      ? command.tagsText
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0)
-      : []
-
     onSubmit(command)
   }
 
@@ -109,32 +95,25 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
             onChange={handleChange}
           />
         </FloatingLabel>
-        <FloatingLabel
-          controlId="commandAliases"
-          label="Command aliases"
+
+        {/* Aliases Input with Badge UI */}
+        <AliasInput
+          aliases={command.aliases || []}
+          onChange={(aliases) => setCommand((prev) => ({ ...prev, aliases }))}
+          placeholder="Type alias and press Enter..."
+          label="Command Aliases"
           className="mb-3"
-        >
-          <Form.Control
-            type="text"
-            placeholder="alias1, alias2, etc."
-            name="aliasesText"
-            value={command.aliasesText || ""}
-            onChange={handleChange}
-          />
-        </FloatingLabel>
-        <FloatingLabel controlId="commandTags" label="Tags" className="mb-3">
-          <Form.Control
-            type="text"
-            placeholder="tutorial, glitch, route (comma-separated)"
-            name="tagsText"
-            value={command.tagsText || ""}
-            onChange={handleChange}
-          />
-          <Form.Text className="text-muted">
-            Separate multiple tags with commas. Existing tags:{" "}
-            {existingTags.join(", ")}
-          </Form.Text>
-        </FloatingLabel>
+        />
+
+        {/* Tags Input with Typeahead */}
+        <TagInput
+          tags={command.tags || []}
+          existingTags={existingTags}
+          onChange={(tags) => setCommand((prev) => ({ ...prev, tags }))}
+          placeholder="Type to search existing tags or add new ones..."
+          label="Tags"
+          className="mb-3"
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={onHide}>
