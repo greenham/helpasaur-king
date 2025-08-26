@@ -56,18 +56,17 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   const { hash } = useLocation()
   const [searchQuery, setSearchQuery] = useState(hash.replace("#", ""))
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500)
-  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
+  const [selectedTag, setSelectedTag] = useState<string>("all")
   const [selectedLetter, setSelectedLetter] = useState<string>("all")
   const [filteredResults, setFilteredResults] = useState<Array<Command>>([])
 
   // Get tags for filtering
   const { data: tagStats = [] } = useHelpaApi().useTagStats()
-  const { data: untaggedCount = 0 } = useHelpaApi().useUntaggedCount()
 
   const filterCommands = (
     commandsToFilter: Command[],
     query: string,
-    tags: Set<string>,
+    tag: string,
     letter: string
   ) => {
     let filtered = commandsToFilter
@@ -88,31 +87,9 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
       )
     }
 
-    // Apply tag filter
-    if (tags.size > 0) {
-      if (tags.has("untagged")) {
-        // Show commands without tags if "untagged" is selected
-        const otherTags = new Set(tags)
-        otherTags.delete("untagged")
-
-        if (otherTags.size === 0) {
-          // Only "untagged" selected
-          filtered = filtered.filter((c) => !c.tags || c.tags.length === 0)
-        } else {
-          // "untagged" + other tags selected
-          filtered = filtered.filter(
-            (c) =>
-              !c.tags ||
-              c.tags.length === 0 ||
-              (c.tags && c.tags.some((tag) => otherTags.has(tag)))
-          )
-        }
-      } else {
-        // Filter by selected tags
-        filtered = filtered.filter(
-          (c) => c.tags && c.tags.some((tag) => tags.has(tag))
-        )
-      }
+    // Apply tag filter (single tag selection)
+    if (tag !== "all") {
+      filtered = filtered.filter((c) => c.tags && c.tags.includes(tag))
     }
 
     // Apply alphabetical filter
@@ -134,7 +111,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     const filtered = filterCommands(
       commands,
       debouncedSearchQuery,
-      selectedTags,
+      selectedTag,
       selectedLetter
     )
     setFilteredResults(filtered)
@@ -143,7 +120,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     if (debouncedSearchQuery) {
       window.location.replace(`#${debouncedSearchQuery}`)
     }
-  }, [debouncedSearchQuery, commands, selectedTags, selectedLetter])
+  }, [debouncedSearchQuery, commands, selectedTag, selectedLetter])
 
   // Generate alphabet for alpha index
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
@@ -238,86 +215,56 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Col>
       </Row>
 
-      {userCanEdit && (
-        <Button
-          onClick={handleNewCommandClick}
-          variant="primary"
-          className="mb-3 mx-auto d-block"
-          size="lg"
-        >
-          <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
-        </Button>
-      )}
-
-      {/* Tag Filter */}
-      <Row className="mb-4">
-        <Col>
-          <h5>Filter by Tags</h5>
-          <ButtonGroup className="mb-3 flex-wrap">
-            <Button
-              variant={selectedTags.size === 0 ? "primary" : "outline-primary"}
-              onClick={() => setSelectedTags(new Set())}
-            >
-              All ({commands.length})
-            </Button>
-            {tagStats.map((stat) => (
+      {/* Tag Filter - only show if there are tags */}
+      {tagStats.length > 0 && (
+        <Row className="mb-4">
+          <Col>
+            {/* <h5 className="text-center">Filter by Tags</h5> */}
+            <ButtonGroup className="mb-3 flex-wrap d-flex justify-content-center">
               <ToggleButton
-                key={stat.tag}
-                id={`tag-${stat.tag}`}
-                type="checkbox"
+                key="all-tags"
+                id="tag-all"
+                type="radio"
                 variant="outline-primary"
-                name="tags"
-                value={stat.tag}
-                checked={selectedTags.has(stat.tag)}
-                onChange={(e) => {
-                  const newTags = new Set(selectedTags)
-                  if (e.currentTarget.checked) {
-                    newTags.add(stat.tag)
-                  } else {
-                    newTags.delete(stat.tag)
-                  }
-                  setSelectedTags(newTags)
-                }}
+                name="tag"
+                value="all"
+                checked={selectedTag === "all"}
+                onChange={(e) => setSelectedTag(e.currentTarget.value)}
               >
-                {stat.tag} ({stat.count})
+                All ({commands.length})
               </ToggleButton>
-            ))}
-            {untaggedCount > 0 && (
-              <ToggleButton
-                key="untagged"
-                id="tag-untagged"
-                type="checkbox"
-                variant="outline-secondary"
-                name="tags"
-                value="untagged"
-                checked={selectedTags.has("untagged")}
-                onChange={(e) => {
-                  const newTags = new Set(selectedTags)
-                  if (e.currentTarget.checked) {
-                    newTags.add("untagged")
-                  } else {
-                    newTags.delete("untagged")
-                  }
-                  setSelectedTags(newTags)
-                }}
-              >
-                Untagged ({untaggedCount})
-              </ToggleButton>
-            )}
-          </ButtonGroup>
-        </Col>
-      </Row>
+              {tagStats.map((stat) => (
+                <ToggleButton
+                  key={stat.tag}
+                  id={`tag-${stat.tag}`}
+                  type="radio"
+                  variant="outline-primary"
+                  name="tag"
+                  value={stat.tag}
+                  checked={selectedTag === stat.tag}
+                  onChange={(e) => setSelectedTag(e.currentTarget.value)}
+                >
+                  {stat.tag} ({stat.count})
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
+          </Col>
+        </Row>
+      )}
 
       {/* Alpha Index */}
       <Row className="mb-4">
         <Col>
-          <h5 className="text-center">Jump to Letter</h5>
-          <div 
+          {/* <h5 className="text-center">Jump to Letter</h5> */}
+          <div
             className="mb-3 d-flex flex-wrap justify-content-center"
             style={{ gap: "0.25rem" }}
           >
             {/* First row on mobile: "All" + first 13 letters (A-M) */}
-            <div className="d-flex flex-wrap justify-content-center w-100" style={{ gap: "0.25rem" }}>
+            <div
+              className="d-flex flex-wrap justify-content-center w-100"
+              style={{ gap: "0.25rem" }}
+            >
               <ToggleButton
                 key="all-letters"
                 id="letter-all"
@@ -378,7 +325,10 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               })}
             </div>
             {/* Second row on mobile: last 13 letters (N-Z) */}
-            <div className="d-flex flex-wrap justify-content-center w-100" style={{ gap: "0.25rem" }}>
+            <div
+              className="d-flex flex-wrap justify-content-center w-100"
+              style={{ gap: "0.25rem" }}
+            >
               {alphabet.slice(13).map((letter) => {
                 const count = getLetterCount(letter)
                 const letterButton = (
@@ -433,10 +383,9 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
               &nbsp; for <strong>{searchQuery}</strong>
             </span>
           )}
-          {selectedTags.size > 0 && (
+          {selectedTag !== "all" && (
             <span>
-              &nbsp; with tags{" "}
-              <strong>{Array.from(selectedTags).join(", ")}</strong>
+              &nbsp; tagged with <strong>{selectedTag}</strong>
             </span>
           )}
           {selectedLetter !== "all" && (
@@ -446,6 +395,17 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           )}
           .
         </Alert>
+      )}
+
+      {userCanEdit && (
+        <Button
+          onClick={handleNewCommandClick}
+          variant="primary"
+          className="mb-3 mx-auto d-block"
+          size="lg"
+        >
+          <i className="fa-solid fa-circle-plus px-1"></i> Add a new command
+        </Button>
       )}
 
       {filteredResults.length > 0 && (
