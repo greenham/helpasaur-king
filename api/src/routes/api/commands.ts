@@ -19,6 +19,20 @@ interface MatchFilter {
 const router: Router = express.Router()
 const permissionGuard = guard()
 
+// Cache for tag statistics
+interface TagStatsCache {
+  data: Array<{ tag: string; count: number }>
+  timestamp: number
+}
+
+let tagStatsCache: TagStatsCache | null = null
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+
+// Helper function to invalidate tag stats cache
+const invalidateTagStatsCache = () => {
+  tagStatsCache = null
+}
+
 // Endpoint: /commands
 
 // ======== PUBLIC ENDPOINTS ========
@@ -46,9 +60,15 @@ router.get("/tags", async (req: Request, res: Response) => {
   }
 })
 
-// GET /tags/stats - returns tag usage statistics
+// GET /tags/stats - returns tag usage statistics (with caching)
 router.get("/tags/stats", async (req: Request, res: Response) => {
   try {
+    // Check if we have valid cached data
+    if (tagStatsCache && Date.now() - tagStatsCache.timestamp < CACHE_DURATION) {
+      return sendSuccess(res, tagStatsCache.data)
+    }
+
+    // No valid cache, run the aggregation
     const tagStats = await Command.aggregate([
       {
         $match: {
@@ -77,6 +97,12 @@ router.get("/tags/stats", async (req: Request, res: Response) => {
         },
       },
     ])
+
+    // Cache the results
+    tagStatsCache = {
+      data: tagStats,
+      timestamp: Date.now(),
+    }
 
     sendSuccess(res, tagStats)
   } catch (err) {
@@ -155,6 +181,7 @@ router.post(
       }
 
       const command = await Command.create(req.body)
+      invalidateTagStatsCache() // Invalidate cache after creating command
       sendSuccess(res, command, "Command created successfully", 201)
     } catch (err) {
       // Handle MongoDB validation errors
@@ -216,6 +243,7 @@ router.patch(
         ;(command as unknown as Record<string, unknown>)[key] = req.body[key]
       }
       await command.save()
+      invalidateTagStatsCache() // Invalidate cache after updating command
 
       sendSuccess(res, command, "Command updated successfully")
     } catch (err) {
@@ -257,6 +285,7 @@ router.delete(
     try {
       // @TODO: Make this a soft delete?
       await Command.deleteOne({ _id: req.params.id })
+      invalidateTagStatsCache() // Invalidate cache after deleting command
       sendSuccess(res, undefined, "Command deleted successfully")
     } catch (err) {
       handleRouteError(res, err, "delete command")

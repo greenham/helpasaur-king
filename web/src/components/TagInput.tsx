@@ -23,6 +23,7 @@ const TagInput: React.FunctionComponent<TagInputProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
+  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Filter existing tags based on input and exclude already selected tags
   const filteredSuggestions = existingTags
@@ -43,6 +44,15 @@ const TagInput: React.FunctionComponent<TagInputProps> = ({
     )
     setHighlightedIndex(-1)
   }, [inputValue, filteredSuggestions.length, existingTags])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const addTag = (tag: string) => {
     const trimmedTag = tag.trim()
@@ -174,7 +184,17 @@ const TagInput: React.FunctionComponent<TagInputProps> = ({
               (filteredSuggestions.length > 0 || canCreateNew)
           )
         }}
-        onBlur={() => setTimeout(() => setShowSuggestions(false), 150)} // Delay to allow click
+        onBlur={() => {
+          // Clear any existing timeout
+          if (blurTimeoutRef.current) {
+            clearTimeout(blurTimeoutRef.current)
+          }
+          // Set new timeout with cleanup reference
+          blurTimeoutRef.current = setTimeout(() => {
+            setShowSuggestions(false)
+            blurTimeoutRef.current = null
+          }, 150)
+        }}
         placeholder={placeholder}
       />
 
@@ -189,7 +209,14 @@ const TagInput: React.FunctionComponent<TagInputProps> = ({
             <Dropdown.Item
               key={tag}
               active={index === highlightedIndex}
-              onClick={() => addTag(tag)}
+              onClick={() => {
+                // Clear blur timeout when clicking suggestion
+                if (blurTimeoutRef.current) {
+                  clearTimeout(blurTimeoutRef.current)
+                  blurTimeoutRef.current = null
+                }
+                addTag(tag)
+              }}
               className="d-flex justify-content-between align-items-center"
             >
               <span>{highlightMatch(tag, inputValue)}</span>

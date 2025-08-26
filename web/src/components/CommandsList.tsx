@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { useDebounce } from "use-debounce"
 import { UseMutationResult } from "@tanstack/react-query"
@@ -7,23 +7,21 @@ import {
   Alert,
   Badge,
   Button,
-  ButtonGroup,
   Card,
   Col,
   Form,
   InputGroup,
   Modal,
-  OverlayTrigger,
   Row,
   Stack,
   Table,
-  ToggleButton,
-  Tooltip,
 } from "react-bootstrap"
 import LinkifyText from "./LinkifyText"
 import { Command } from "@helpasaur/types"
 import CommandFormModal from "./CommandFormModal"
 import { useHelpaApi } from "../hooks/useHelpaApi"
+import TagFilter from "./TagFilter"
+import AlphabetFilter from "./AlphabetFilter"
 
 interface CommandsListProps {
   commands: Command[]
@@ -63,44 +61,53 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   // Get tags for filtering
   const { data: tagStats = [] } = useHelpaApi().useTagStats()
 
-  const filterCommands = (
-    commandsToFilter: Command[],
-    query: string,
-    tag: string,
-    letter: string
-  ) => {
-    let filtered = commandsToFilter
+  const filterCommands = useCallback(
+    (
+      commandsToFilter: Command[],
+      query: string,
+      tag: string,
+      letter: string
+    ) => {
+      let filtered = commandsToFilter
 
-    // Apply text search filter
-    if (query.length > 0) {
-      filtered = filtered.filter(
-        (c) =>
-          c.command.toLowerCase().includes(query.toLowerCase()) ||
-          c.aliases.some((alias) =>
-            alias.toLowerCase().includes(query.toLowerCase())
-          ) ||
-          c.response.toLowerCase().includes(query.toLowerCase()) ||
-          (c.tags &&
-            c.tags.some((tag) =>
-              tag.toLowerCase().includes(query.toLowerCase())
-            ))
-      )
-    }
+      // Apply text search filter
+      if (query.length > 0) {
+        filtered = filtered.filter(
+          (c) =>
+            c.command.toLowerCase().includes(query.toLowerCase()) ||
+            c.aliases.some((alias) =>
+              alias.toLowerCase().includes(query.toLowerCase())
+            ) ||
+            c.response.toLowerCase().includes(query.toLowerCase()) ||
+            (c.tags &&
+              c.tags.some((tag) =>
+                tag.toLowerCase().includes(query.toLowerCase())
+              ))
+        )
+      }
 
-    // Apply tag filter (single tag selection)
-    if (tag !== "all") {
-      filtered = filtered.filter((c) => c.tags && c.tags.includes(tag))
-    }
+      // Apply tag filter (single tag selection)
+      if (tag !== "all") {
+        filtered = filtered.filter((c) => c.tags && c.tags.includes(tag))
+      }
 
-    // Apply alphabetical filter
-    if (letter !== "all") {
-      filtered = filtered.filter((c) =>
-        c.command.toLowerCase().startsWith(letter.toLowerCase())
-      )
-    }
+      // Apply alphabetical filter
+      if (letter !== "all") {
+        if (letter === "0-9") {
+          // Filter for commands starting with numbers
+          filtered = filtered.filter((c) => /^[0-9]/.test(c.command))
+        } else {
+          // Filter for commands starting with a specific letter
+          filtered = filtered.filter((c) =>
+            c.command.toLowerCase().startsWith(letter.toLowerCase())
+          )
+        }
+      }
 
-    return filtered
-  }
+      return filtered
+    },
+    [] // No dependencies, function logic doesn't depend on any external values
+  )
 
   // Handle updates to the location hash
   useEffect(() => {
@@ -122,11 +129,13 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     }
   }, [debouncedSearchQuery, commands, selectedTag, selectedLetter])
 
-  // Generate alphabet for alpha index
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
-
-  // Get count for each letter (for alpha index)
+  // Get count for each letter or number (for alpha index)
   const getLetterCount = (letter: string) => {
+    // Check if it's a single digit number
+    if (/^[0-9]$/.test(letter)) {
+      return commands.filter((c) => c.command.startsWith(letter)).length
+    }
+    // For letters, use case-insensitive matching
     return commands.filter((c) =>
       c.command.toLowerCase().startsWith(letter.toLowerCase())
     ).length
@@ -216,164 +225,19 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
       </Row>
 
       {/* Tag Filter - only show if there are tags */}
-      {tagStats.length > 0 && (
-        <Row className="mb-4">
-          <Col>
-            {/* <h5 className="text-center">Filter by Tags</h5> */}
-            <ButtonGroup className="mb-3 flex-wrap d-flex justify-content-center">
-              <ToggleButton
-                key="all-tags"
-                id="tag-all"
-                type="radio"
-                variant="outline-primary"
-                name="tag"
-                value="all"
-                checked={selectedTag === "all"}
-                onChange={(e) => setSelectedTag(e.currentTarget.value)}
-              >
-                All ({commands.length})
-              </ToggleButton>
-              {tagStats.map((stat) => (
-                <ToggleButton
-                  key={stat.tag}
-                  id={`tag-${stat.tag}`}
-                  type="radio"
-                  variant="outline-primary"
-                  name="tag"
-                  value={stat.tag}
-                  checked={selectedTag === stat.tag}
-                  onChange={(e) => setSelectedTag(e.currentTarget.value)}
-                >
-                  {stat.tag} ({stat.count})
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          </Col>
-        </Row>
-      )}
+      <TagFilter
+        tagStats={tagStats}
+        selectedTag={selectedTag}
+        onTagChange={setSelectedTag}
+        totalCommands={commands.length}
+      />
 
       {/* Alpha Index */}
-      <Row className="mb-4">
-        <Col>
-          {/* <h5 className="text-center">Jump to Letter</h5> */}
-          <div
-            className="mb-3 d-flex flex-wrap justify-content-center"
-            style={{ gap: "0.25rem" }}
-          >
-            {/* First row on mobile: "All" + first 13 letters (A-M) */}
-            <div
-              className="d-flex flex-wrap justify-content-center w-100"
-              style={{ gap: "0.25rem" }}
-            >
-              <ToggleButton
-                key="all-letters"
-                id="letter-all"
-                type="radio"
-                variant="outline-secondary"
-                name="letter"
-                value="all"
-                checked={selectedLetter === "all"}
-                onChange={(e) => setSelectedLetter(e.currentTarget.value)}
-                style={{
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  minWidth: "3rem",
-                }}
-              >
-                All
-              </ToggleButton>
-              {alphabet.slice(0, 13).map((letter) => {
-                const count = getLetterCount(letter)
-                const letterButton = (
-                  <ToggleButton
-                    key={letter}
-                    id={`letter-${letter}`}
-                    type="radio"
-                    variant="outline-secondary"
-                    name="letter"
-                    value={letter}
-                    checked={selectedLetter === letter}
-                    onChange={(e) => setSelectedLetter(e.currentTarget.value)}
-                    disabled={count === 0}
-                    style={{
-                      fontSize: "1.2rem",
-                      fontWeight: "bold",
-                      minWidth: "3rem",
-                      opacity: count === 0 ? 0.3 : 1,
-                    }}
-                  >
-                    {letter}
-                  </ToggleButton>
-                )
-
-                return count > 0 ? (
-                  <OverlayTrigger
-                    key={letter}
-                    placement="top"
-                    overlay={
-                      <Tooltip id={`tooltip-${letter}`}>
-                        {count} command{count !== 1 ? "s" : ""} starting with "
-                        {letter}"
-                      </Tooltip>
-                    }
-                  >
-                    {letterButton}
-                  </OverlayTrigger>
-                ) : (
-                  letterButton
-                )
-              })}
-            </div>
-            {/* Second row on mobile: last 13 letters (N-Z) */}
-            <div
-              className="d-flex flex-wrap justify-content-center w-100"
-              style={{ gap: "0.25rem" }}
-            >
-              {alphabet.slice(13).map((letter) => {
-                const count = getLetterCount(letter)
-                const letterButton = (
-                  <ToggleButton
-                    key={letter}
-                    id={`letter-${letter}`}
-                    type="radio"
-                    variant="outline-secondary"
-                    name="letter"
-                    value={letter}
-                    checked={selectedLetter === letter}
-                    onChange={(e) => setSelectedLetter(e.currentTarget.value)}
-                    disabled={count === 0}
-                    style={{
-                      fontSize: "1.2rem",
-                      fontWeight: "bold",
-                      minWidth: "3rem",
-                      opacity: count === 0 ? 0.3 : 1,
-                    }}
-                  >
-                    {letter}
-                  </ToggleButton>
-                )
-
-                return count > 0 ? (
-                  <OverlayTrigger
-                    key={letter}
-                    placement="top"
-                    overlay={
-                      <Tooltip id={`tooltip-${letter}`}>
-                        {count} command{count !== 1 ? "s" : ""} starting with "
-                        {letter}"
-                      </Tooltip>
-                    }
-                  >
-                    {letterButton}
-                  </OverlayTrigger>
-                ) : (
-                  letterButton
-                )
-              })}
-            </div>
-          </div>
-        </Col>
-      </Row>
+      <AlphabetFilter
+        selectedLetter={selectedLetter}
+        onLetterChange={setSelectedLetter}
+        getLetterCount={getLetterCount}
+      />
 
       {filteredResults.length === 0 && (
         <Alert>
