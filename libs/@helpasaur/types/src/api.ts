@@ -40,8 +40,8 @@ export interface Command {
   command: string
   aliases: string[]
   response: string
-  category?: string // Keep for backward compatibility during migration
-  tags?: string[] // New tagging system
+  category?: string
+  tags?: string[]
   enabled: boolean
   deleted?: boolean
 }
