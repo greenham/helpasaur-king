@@ -215,4 +215,31 @@ export class CommandRoutes extends ApiBase {
     const query = params.toString() ? `?${params.toString()}` : ""
     return this.apiGet(`${ROUTES.COMMANDS}/stats/top-channels${query}`)
   }
+
+  /**
+   * Get all unique tags currently in use
+   * @returns Promise resolving to array of tag names
+   * @throws Error if the API request fails
+   */
+  async getTags(): Promise<string[]> {
+    return this.apiGet(`${ROUTES.COMMANDS}/tags`)
+  }
+
+  /**
+   * Get tag usage statistics
+   * @returns Promise resolving to array of tag stats with counts
+   * @throws Error if the API request fails
+   */
+  async getTagStats(): Promise<Array<{ tag: string; count: number }>> {
+    return this.apiGet(`${ROUTES.COMMANDS}/tags/stats`)
+  }
+
+  /**
+   * Get count of commands without tags
+   * @returns Promise resolving to untagged command count
+   * @throws Error if the API request fails
+   */
+  async getUntaggedCount(): Promise<number> {
+    return this.apiGet(`${ROUTES.COMMANDS}/untagged-count`)
+  }
 }

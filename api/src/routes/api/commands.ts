@@ -19,6 +19,20 @@ interface MatchFilter {
 const router: Router = express.Router()
 const permissionGuard = guard()
 
+// Cache for tag statistics
+interface TagStatsCache {
+  data: Array<{ tag: string; count: number }>
+  timestamp: number
+}
+
+let tagStatsCache: TagStatsCache | null = null
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+
+// Helper function to invalidate tag stats cache
+const invalidateTagStatsCache = () => {
+  tagStatsCache = null
+}
+
 // Endpoint: /commands
 
 // ======== PUBLIC ENDPOINTS ========
@@ -29,6 +43,89 @@ router.get("/", async (req: Request, res: Response) => {
     sendSuccess(res, commands)
   } catch (err) {
     handleRouteError(res, err, "get commands")
+  }
+})
+
+// GET /tags - returns all unique tags in use
+router.get("/tags", async (req: Request, res: Response) => {
+  try {
+    const tags = await Command.distinct("tags", {
+      deleted: { $ne: true },
+      tags: { $exists: true, $ne: [] },
+    })
+
+    sendSuccess(res, tags.sort())
+  } catch (err) {
+    handleRouteError(res, err, "get tags")
+  }
+})
+
+// GET /tags/stats - returns tag usage statistics (with caching)
+router.get("/tags/stats", async (req: Request, res: Response) => {
+  try {
+    // Check if we have valid cached data
+    if (tagStatsCache && Date.now() - tagStatsCache.timestamp < CACHE_DURATION) {
+      return sendSuccess(res, tagStatsCache.data)
+    }
+
+    // No valid cache, run the aggregation
+    const tagStats = await Command.aggregate([
+      {
+        $match: {
+          deleted: { $ne: true },
+          enabled: { $ne: false },
+          tags: { $exists: true, $ne: [] },
+        },
+      },
+      {
+        $unwind: "$tags",
+      },
+      {
+        $group: {
+          _id: "$tags",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $project: {
+          tag: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ])
+
+    // Cache the results
+    tagStatsCache = {
+      data: tagStats,
+      timestamp: Date.now(),
+    }
+
+    sendSuccess(res, tagStats)
+  } catch (err) {
+    handleRouteError(res, err, "get tag stats")
+  }
+})
+
+// GET /untagged-count - returns count of commands without tags
+router.get("/untagged-count", async (req: Request, res: Response) => {
+  try {
+    const untaggedCount = await Command.countDocuments({
+      deleted: { $ne: true },
+      enabled: { $ne: false },
+      $or: [
+        { tags: { $exists: false } },
+        { tags: { $size: 0 } },
+        { tags: null },
+      ],
+    })
+
+    sendSuccess(res, untaggedCount)
+  } catch (err) {
+    handleRouteError(res, err, "get untagged count")
   }
 })
 
@@ -84,6 +181,7 @@ router.post(
       }
 
       const command = await Command.create(req.body)
+      invalidateTagStatsCache() // Invalidate cache after creating command
       sendSuccess(res, command, "Command created successfully", 201)
     } catch (err) {
       // Handle MongoDB validation errors
@@ -145,6 +243,7 @@ router.patch(
         ;(command as unknown as Record<string, unknown>)[key] = req.body[key]
       }
       await command.save()
+      invalidateTagStatsCache() // Invalidate cache after updating command
 
       sendSuccess(res, command, "Command updated successfully")
     } catch (err) {
@@ -186,6 +285,7 @@ router.delete(
     try {
       // @TODO: Make this a soft delete?
       await Command.deleteOne({ _id: req.params.id })
+      invalidateTagStatsCache() // Invalidate cache after deleting command
       sendSuccess(res, undefined, "Command deleted successfully")
     } catch (err) {
       handleRouteError(res, err, "delete command")
