@@ -32,6 +32,77 @@ router.get("/", async (req: Request, res: Response) => {
   }
 })
 
+// GET /tags - returns all unique tags in use
+router.get("/tags", async (req: Request, res: Response) => {
+  try {
+    const tags = await Command.distinct("tags", {
+      deleted: { $ne: true },
+      tags: { $exists: true, $ne: [] },
+    })
+
+    sendSuccess(res, tags.sort())
+  } catch (err) {
+    handleRouteError(res, err, "get tags")
+  }
+})
+
+// GET /tags/stats - returns tag usage statistics
+router.get("/tags/stats", async (req: Request, res: Response) => {
+  try {
+    const tagStats = await Command.aggregate([
+      {
+        $match: {
+          deleted: { $ne: true },
+          enabled: { $ne: false },
+          tags: { $exists: true, $ne: [] },
+        },
+      },
+      {
+        $unwind: "$tags",
+      },
+      {
+        $group: {
+          _id: "$tags",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $project: {
+          tag: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ])
+
+    sendSuccess(res, tagStats)
+  } catch (err) {
+    handleRouteError(res, err, "get tag stats")
+  }
+})
+
+// GET /untagged-count - returns count of commands without tags
+router.get("/untagged-count", async (req: Request, res: Response) => {
+  try {
+    const untaggedCount = await Command.countDocuments({
+      deleted: { $ne: true },
+      enabled: { $ne: false },
+      $or: [
+        { tags: { $exists: false } },
+        { tags: { $size: 0 } },
+        { tags: null },
+      ],
+    })
+
+    sendSuccess(res, untaggedCount)
+  } catch (err) {
+    handleRouteError(res, err, "get untagged count")
+  }
+})
+
 // GET /:id -> returns command by ID
 router.get("/:id", async (req: Request, res: Response) => {
   try {
@@ -617,78 +688,5 @@ router.get(
     }
   }
 )
-
-// ======== TAGS ENDPOINTS ========
-
-// GET /tags - returns all unique tags in use
-router.get("/tags", async (req: Request, res: Response) => {
-  try {
-    const tags = await Command.distinct("tags", {
-      deleted: { $ne: true },
-      tags: { $exists: true, $ne: [] },
-    })
-
-    sendSuccess(res, tags.sort())
-  } catch (err) {
-    handleRouteError(res, err, "get tags")
-  }
-})
-
-// GET /tags/stats - returns tag usage statistics
-router.get("/tags/stats", async (req: Request, res: Response) => {
-  try {
-    const tagStats = await Command.aggregate([
-      {
-        $match: {
-          deleted: { $ne: true },
-          enabled: { $ne: false },
-          tags: { $exists: true, $ne: [] },
-        },
-      },
-      {
-        $unwind: "$tags",
-      },
-      {
-        $group: {
-          _id: "$tags",
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $sort: { count: -1 },
-      },
-      {
-        $project: {
-          tag: "$_id",
-          count: 1,
-          _id: 0,
-        },
-      },
-    ])
-
-    sendSuccess(res, tagStats)
-  } catch (err) {
-    handleRouteError(res, err, "get tag stats")
-  }
-})
-
-// GET /untagged-count - returns count of commands without tags
-router.get("/untagged-count", async (req: Request, res: Response) => {
-  try {
-    const untaggedCount = await Command.countDocuments({
-      deleted: { $ne: true },
-      enabled: { $ne: false },
-      $or: [
-        { tags: { $exists: false } },
-        { tags: { $size: 0 } },
-        { tags: null },
-      ],
-    })
-
-    sendSuccess(res, untaggedCount)
-  } catch (err) {
-    handleRouteError(res, err, "get untagged count")
-  }
-})
 
 export default router

@@ -311,62 +311,117 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
       {/* Alpha Index */}
       <Row className="mb-4">
         <Col>
-          <h5>Jump to Letter</h5>
-          <ButtonGroup className="mb-3 flex-wrap">
-            <ToggleButton
-              key="all-letters"
-              id="letter-all"
-              type="radio"
-              variant="outline-secondary"
-              name="letter"
-              value="all"
-              checked={selectedLetter === "all"}
-              onChange={(e) => setSelectedLetter(e.currentTarget.value)}
-            >
-              All
-            </ToggleButton>
-            {alphabet.map((letter) => {
-              const count = getLetterCount(letter)
-              const letterButton = (
-                <ToggleButton
-                  key={letter}
-                  id={`letter-${letter}`}
-                  type="radio"
-                  variant="outline-secondary"
-                  name="letter"
-                  value={letter}
-                  checked={selectedLetter === letter}
-                  onChange={(e) => setSelectedLetter(e.currentTarget.value)}
-                  disabled={count === 0}
-                  style={{
-                    fontSize: "1.2rem",
-                    fontWeight: "bold",
-                    minWidth: "3rem",
-                    opacity: count === 0 ? 0.3 : 1,
-                  }}
-                >
-                  {letter}
-                </ToggleButton>
-              )
+          <h5 className="text-center">Jump to Letter</h5>
+          <div 
+            className="mb-3 d-flex flex-wrap justify-content-center"
+            style={{ gap: "0.25rem" }}
+          >
+            {/* First row on mobile: "All" + first 13 letters (A-M) */}
+            <div className="d-flex flex-wrap justify-content-center w-100" style={{ gap: "0.25rem" }}>
+              <ToggleButton
+                key="all-letters"
+                id="letter-all"
+                type="radio"
+                variant="outline-secondary"
+                name="letter"
+                value="all"
+                checked={selectedLetter === "all"}
+                onChange={(e) => setSelectedLetter(e.currentTarget.value)}
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                  minWidth: "3rem",
+                }}
+              >
+                All
+              </ToggleButton>
+              {alphabet.slice(0, 13).map((letter) => {
+                const count = getLetterCount(letter)
+                const letterButton = (
+                  <ToggleButton
+                    key={letter}
+                    id={`letter-${letter}`}
+                    type="radio"
+                    variant="outline-secondary"
+                    name="letter"
+                    value={letter}
+                    checked={selectedLetter === letter}
+                    onChange={(e) => setSelectedLetter(e.currentTarget.value)}
+                    disabled={count === 0}
+                    style={{
+                      fontSize: "1.2rem",
+                      fontWeight: "bold",
+                      minWidth: "3rem",
+                      opacity: count === 0 ? 0.3 : 1,
+                    }}
+                  >
+                    {letter}
+                  </ToggleButton>
+                )
 
-              return count > 0 ? (
-                <OverlayTrigger
-                  key={letter}
-                  placement="top"
-                  overlay={
-                    <Tooltip id={`tooltip-${letter}`}>
-                      {count} command{count !== 1 ? "s" : ""} starting with "
-                      {letter}"
-                    </Tooltip>
-                  }
-                >
-                  {letterButton}
-                </OverlayTrigger>
-              ) : (
-                letterButton
-              )
-            })}
-          </ButtonGroup>
+                return count > 0 ? (
+                  <OverlayTrigger
+                    key={letter}
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-${letter}`}>
+                        {count} command{count !== 1 ? "s" : ""} starting with "
+                        {letter}"
+                      </Tooltip>
+                    }
+                  >
+                    {letterButton}
+                  </OverlayTrigger>
+                ) : (
+                  letterButton
+                )
+              })}
+            </div>
+            {/* Second row on mobile: last 13 letters (N-Z) */}
+            <div className="d-flex flex-wrap justify-content-center w-100" style={{ gap: "0.25rem" }}>
+              {alphabet.slice(13).map((letter) => {
+                const count = getLetterCount(letter)
+                const letterButton = (
+                  <ToggleButton
+                    key={letter}
+                    id={`letter-${letter}`}
+                    type="radio"
+                    variant="outline-secondary"
+                    name="letter"
+                    value={letter}
+                    checked={selectedLetter === letter}
+                    onChange={(e) => setSelectedLetter(e.currentTarget.value)}
+                    disabled={count === 0}
+                    style={{
+                      fontSize: "1.2rem",
+                      fontWeight: "bold",
+                      minWidth: "3rem",
+                      opacity: count === 0 ? 0.3 : 1,
+                    }}
+                  >
+                    {letter}
+                  </ToggleButton>
+                )
+
+                return count > 0 ? (
+                  <OverlayTrigger
+                    key={letter}
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-${letter}`}>
+                        {count} command{count !== 1 ? "s" : ""} starting with "
+                        {letter}"
+                      </Tooltip>
+                    }
+                  >
+                    {letterButton}
+                  </OverlayTrigger>
+                ) : (
+                  letterButton
+                )
+              })}
+            </div>
+          </div>
         </Col>
       </Row>
 
