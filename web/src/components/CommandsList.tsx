@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { useDebounce } from "use-debounce"
 import { UseMutationResult } from "@tanstack/react-query"
@@ -19,6 +19,9 @@ import {
 import LinkifyText from "./LinkifyText"
 import { Command } from "@helpasaur/types"
 import CommandFormModal from "./CommandFormModal"
+import { useHelpaApi } from "../hooks/useHelpaApi"
+import TagFilter from "./TagFilter"
+import AlphabetFilter from "./AlphabetFilter"
 
 interface CommandsListProps {
   commands: Command[]
@@ -47,23 +50,64 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
     deleteCommandMutation,
   } = props
 
-  // Set up searching
+  // Set up searching and filtering
   const { hash } = useLocation()
   const [searchQuery, setSearchQuery] = useState(hash.replace("#", ""))
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500)
-  const [searchResults, setSearchResults] = useState<Array<Command>>([])
-  const filterCommands = (commandsToFilter: Command[], query: string) => {
-    if (query.length === 0) return commandsToFilter
+  const [selectedTag, setSelectedTag] = useState<string>("all")
+  const [selectedLetter, setSelectedLetter] = useState<string>("all")
+  const [filteredResults, setFilteredResults] = useState<Array<Command>>([])
 
-    return commandsToFilter.filter(
-      (c) =>
-        c.command.toLowerCase().includes(query.toLowerCase()) ||
-        c.aliases.some((alias) =>
-          alias.toLowerCase().includes(query.toLowerCase())
-        ) ||
-        c.response.toLowerCase().includes(query.toLowerCase())
-    )
-  }
+  // Get tags for filtering
+  const { data: tagStats = [] } = useHelpaApi().useTagStats()
+
+  const filterCommands = useCallback(
+    (
+      commandsToFilter: Command[],
+      query: string,
+      tag: string,
+      letter: string
+    ) => {
+      let filtered = commandsToFilter
+
+      // Apply text search filter
+      if (query.length > 0) {
+        filtered = filtered.filter(
+          (c) =>
+            c.command.toLowerCase().includes(query.toLowerCase()) ||
+            c.aliases.some((alias) =>
+              alias.toLowerCase().includes(query.toLowerCase())
+            ) ||
+            c.response.toLowerCase().includes(query.toLowerCase()) ||
+            (c.tags &&
+              c.tags.some((tag) =>
+                tag.toLowerCase().includes(query.toLowerCase())
+              ))
+        )
+      }
+
+      // Apply tag filter (single tag selection)
+      if (tag !== "all") {
+        filtered = filtered.filter((c) => c.tags && c.tags.includes(tag))
+      }
+
+      // Apply alphabetical filter
+      if (letter !== "all") {
+        if (letter === "0-9") {
+          // Filter for commands starting with numbers
+          filtered = filtered.filter((c) => /^[0-9]/.test(c.command))
+        } else {
+          // Filter for commands starting with a specific letter
+          filtered = filtered.filter((c) =>
+            c.command.toLowerCase().startsWith(letter.toLowerCase())
+          )
+        }
+      }
+
+      return filtered
+    },
+    [] // No dependencies, function logic doesn't depend on any external values
+  )
 
   // Handle updates to the location hash
   useEffect(() => {
@@ -71,9 +115,31 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
   }, [hash])
 
   useEffect(() => {
-    setSearchResults(filterCommands(commands, debouncedSearchQuery))
-    window.location.replace(`#${debouncedSearchQuery}`)
-  }, [debouncedSearchQuery, commands])
+    const filtered = filterCommands(
+      commands,
+      debouncedSearchQuery,
+      selectedTag,
+      selectedLetter
+    )
+    setFilteredResults(filtered)
+
+    // Update URL with search query (preserve existing behavior)
+    if (debouncedSearchQuery) {
+      window.location.replace(`#${debouncedSearchQuery}`)
+    }
+  }, [debouncedSearchQuery, commands, selectedTag, selectedLetter])
+
+  // Get count for each letter or number (for alpha index)
+  const getLetterCount = (letter: string) => {
+    // Check if it's a single digit number
+    if (/^[0-9]$/.test(letter)) {
+      return commands.filter((c) => c.command.startsWith(letter)).length
+    }
+    // For letters, use case-insensitive matching
+    return commands.filter((c) =>
+      c.command.toLowerCase().startsWith(letter.toLowerCase())
+    ).length
+  }
 
   const freshCommand = {
     _id: "",
@@ -123,6 +189,15 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   return (
     <>
+      {/* Tag Filter - only show if there are tags */}
+      <TagFilter
+        tagStats={tagStats}
+        selectedTag={selectedTag}
+        onTagChange={setSelectedTag}
+        totalCommands={commands.length}
+      />
+
+      {/* Search Input */}
       <Row
         className="sticky-top my-5 justify-content-center"
         style={{ top: "60px" }}
@@ -158,6 +233,35 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Col>
       </Row>
 
+      {/* Alpha Index */}
+      <AlphabetFilter
+        selectedLetter={selectedLetter}
+        onLetterChange={setSelectedLetter}
+        getLetterCount={getLetterCount}
+      />
+
+      {filteredResults.length === 0 && (
+        <Alert>
+          No results found
+          {searchQuery.length > 0 && (
+            <span>
+              &nbsp; for <strong>{searchQuery}</strong>
+            </span>
+          )}
+          {selectedTag !== "all" && (
+            <span>
+              &nbsp; tagged with <strong>{selectedTag}</strong>
+            </span>
+          )}
+          {selectedLetter !== "all" && (
+            <span>
+              &nbsp; starting with <strong>{selectedLetter}</strong>
+            </span>
+          )}
+          .
+        </Alert>
+      )}
+
       {userCanEdit && (
         <Button
           onClick={handleNewCommandClick}
@@ -169,29 +273,15 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         </Button>
       )}
 
-      {searchResults.length === 0 && (
-        <Alert>
-          No results found
-          {searchQuery.length > 0 ? (
-            <span>
-              &nbsp; for <strong>{searchQuery}</strong>
-            </span>
-          ) : (
-            ""
-          )}
-          .
-        </Alert>
-      )}
-
-      {searchResults.length > 0 && (
+      {filteredResults.length > 0 && (
         <Alert variant="dark">
-          <strong>{searchResults.length}</strong> command
-          {searchResults.length !== 1 ? "s" : ""} found.
+          <strong>{filteredResults.length}</strong> command
+          {filteredResults.length !== 1 ? "s" : ""} found.
         </Alert>
       )}
 
       <Stack gap={5} className="d-xl-none">
-        {searchResults.map((c, idx) => (
+        {filteredResults.map((c, idx) => (
           <Card key={idx}>
             <Card.Header>
               <Stack direction="horizontal">
@@ -233,7 +323,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
         ))}
       </Stack>
 
-      {searchResults.length > 0 && (
+      {filteredResults.length > 0 && (
         <Table striped bordered hover className="d-none d-xl-block">
           <thead>
             <tr>
@@ -243,7 +333,7 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
             </tr>
           </thead>
           <tbody>
-            {searchResults.map((c, index) => {
+            {filteredResults.map((c, index) => {
               // Check if this command is being updated optimistically
               const isBeingUpdated =
                 updateCommandMutation.isPending &&

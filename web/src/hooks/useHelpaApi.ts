@@ -284,6 +284,45 @@ export const useHelpaApi = () => {
           helpaApiClient.commands.getTopChannels(limit, timeRange, platform),
         ...options,
       }),
+
+    /**
+     * Get all unique tags currently in use
+     */
+    useTags: (
+      options?: Omit<UseQueryOptions<string[], Error>, "queryKey" | "queryFn">
+    ) =>
+      useQuery({
+        queryKey: ["tags"],
+        queryFn: () => helpaApiClient.commands.getTags(),
+        ...options,
+      }),
+
+    /**
+     * Get tag usage statistics
+     */
+    useTagStats: (
+      options?: Omit<
+        UseQueryOptions<Array<{ tag: string; count: number }>, Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["tagStats"],
+        queryFn: () => helpaApiClient.commands.getTagStats(),
+        ...options,
+      }),
+
+    /**
+     * Get count of untagged commands
+     */
+    useUntaggedCount: (
+      options?: Omit<UseQueryOptions<number, Error>, "queryKey" | "queryFn">
+    ) =>
+      useQuery({
+        queryKey: ["untaggedCount"],
+        queryFn: () => helpaApiClient.commands.getUntaggedCount(),
+        ...options,
+      }),
   }
 
   // Mutation hooks for write operations
@@ -383,6 +422,8 @@ export const useHelpaApi = () => {
           helpaApiClient.commands.createCommand(command),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          queryClient.invalidateQueries({ queryKey: ["tagStats"] })
+          queryClient.invalidateQueries({ queryKey: ["untaggedCount"] })
           if (showToast) {
             toast.success(`Command '${variables.command}' created!`)
           }
@@ -414,6 +455,8 @@ export const useHelpaApi = () => {
           helpaApiClient.commands.updateCommand(command),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          queryClient.invalidateQueries({ queryKey: ["tagStats"] })
+          queryClient.invalidateQueries({ queryKey: ["untaggedCount"] })
           if (showToast) {
             toast.success(`Command '${variables.command}' updated!`)
           }
@@ -441,6 +484,8 @@ export const useHelpaApi = () => {
           helpaApiClient.commands.deleteCommand(command),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({ queryKey: ["commands"] })
+          queryClient.invalidateQueries({ queryKey: ["tagStats"] })
+          queryClient.invalidateQueries({ queryKey: ["untaggedCount"] })
           if (showToast) {
             toast.success(`Command '${variables.command}' deleted!`)
           }
