@@ -189,6 +189,15 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
 
   return (
     <>
+      {/* Tag Filter - only show if there are tags */}
+      <TagFilter
+        tagStats={tagStats}
+        selectedTag={selectedTag}
+        onTagChange={setSelectedTag}
+        totalCommands={commands.length}
+      />
+
+      {/* Search Input */}
       <Row
         className="sticky-top my-5 justify-content-center"
         style={{ top: "60px" }}
@@ -223,14 +232,6 @@ const CommandsList: React.FunctionComponent<CommandsListProps> = (props) => {
           </InputGroup>
         </Col>
       </Row>
-
-      {/* Tag Filter - only show if there are tags */}
-      <TagFilter
-        tagStats={tagStats}
-        selectedTag={selectedTag}
-        onTagChange={setSelectedTag}
-        totalCommands={commands.length}
-      />
 
       {/* Alpha Index */}
       <AlphabetFilter
