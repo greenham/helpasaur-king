@@ -1,5 +1,46 @@
 # Changelog
 
+## 2.1.0
+
+_2025-08-31_
+
+### What's Changed
+
+#### Features
+
+- feat: add automated GHCR image cleanup workflow by @greenham in fdf56e5
+  - Automatically removes old container images from GitHub Container Registry
+  - Keeps the 5 most recent versions of each service
+  - Runs daily at 1 AM UTC to maintain registry storage
+  
+- feat: add channel counts to Stream Alerts and Twitch Bot admin tabs by @greenham in 57420e5
+  - Display total channel counts in admin interface
+  - Better visibility into bot usage across channels
+  
+- feat: add separate Docker image tagging workflow by @greenham in d49b19a
+  - Improved CI/CD pipeline with dedicated tagging workflow
+  - Better image management and versioning
+
+#### Bug Fixes
+
+- fix: set NODE_ENV=production in Docker runtime stage by @greenham in fa2805f
+  - Ensures production optimizations are enabled in containers
+  
+- fix: correct GHCR cleanup workflow with proper package names and API endpoints by @greenham in 92d8ad8, ecee3cf
+  - Resolved issues with automated cleanup process
+  
+- fix: resolve GitHub Pages deployment build failures by @greenham in 2634d03
+  - Fixed web app deployment issues
+
+#### Improvements
+
+- improve: filter out 'commands' command from top commands statistics by @greenham in 8ab0ca7
+  - More accurate command usage analytics
+  
+- docs: update README with current architecture and features by @greenham in 1639f48
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/2.0.0...2.1.0
+
 ## 2.0.0
 
 _2025-08-24_
