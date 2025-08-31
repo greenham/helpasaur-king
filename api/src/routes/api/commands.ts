@@ -33,6 +33,25 @@ const invalidateTagStatsCache = () => {
   tagStatsCache = null
 }
 
+// Helper function to normalize tags for consistency and URL safety
+const normalizeTags = (tags?: string[]): string[] => {
+  if (!tags || !Array.isArray(tags)) return []
+  
+  return tags
+    .filter(tag => tag !== null && tag !== undefined && typeof tag === 'string')  // Filter out null/undefined/non-strings
+    .map(tag => 
+      tag
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')  // Replace spaces with hyphens
+        .replace(/[^a-z0-9-]/g, '')  // Remove special characters except hyphens
+        .replace(/-+/g, '-')  // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, '')  // Remove leading/trailing hyphens
+    )
+    .filter(tag => tag.length > 0)  // Remove empty tags
+    .filter((tag, index, self) => self.indexOf(tag) === index)  // Remove duplicates
+}
+
 // Endpoint: /commands
 
 // ======== PUBLIC ENDPOINTS ========
@@ -180,8 +199,18 @@ router.post(
         )
       }
 
+      // Normalize tags before creating
+      if (req.body.tags) {
+        req.body.tags = normalizeTags(req.body.tags)
+      }
+
       const command = await Command.create(req.body)
-      invalidateTagStatsCache() // Invalidate cache after creating command
+      
+      // Only invalidate cache if the new command has tags
+      if (command.tags && command.tags.length > 0) {
+        invalidateTagStatsCache()
+      }
+      
       sendSuccess(res, command, "Command created successfully", 201)
     } catch (err) {
       // Handle MongoDB validation errors
@@ -239,11 +268,24 @@ router.patch(
         return sendError(res, "Command response is required", 400)
       }
 
+      // Store original tags for comparison
+      const originalTags = JSON.stringify(command.tags || [])
+      
+      // Normalize tags before updating
+      if (req.body.tags) {
+        req.body.tags = normalizeTags(req.body.tags)
+      }
+
       for (const key in req.body) {
         ;(command as unknown as Record<string, unknown>)[key] = req.body[key]
       }
       await command.save()
-      invalidateTagStatsCache() // Invalidate cache after updating command
+      
+      // Only invalidate cache if tags actually changed
+      const newTags = JSON.stringify(command.tags || [])
+      if (originalTags !== newTags) {
+        invalidateTagStatsCache()
+      }
 
       sendSuccess(res, command, "Command updated successfully")
     } catch (err) {
@@ -283,9 +325,18 @@ router.delete(
   permissionGuard.check("admin"),
   async (req: Request, res: Response) => {
     try {
+      // Check if the command being deleted has tags before invalidating cache
+      const command = await Command.findById(req.params.id)
+      const hadTags = command && command.tags && command.tags.length > 0
+      
       // @TODO: Make this a soft delete?
       await Command.deleteOne({ _id: req.params.id })
-      invalidateTagStatsCache() // Invalidate cache after deleting command
+      
+      // Only invalidate cache if the deleted command had tags
+      if (hadTags) {
+        invalidateTagStatsCache()
+      }
+      
       sendSuccess(res, undefined, "Command deleted successfully")
     } catch (err) {
       handleRouteError(res, err, "delete command")

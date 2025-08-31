@@ -15,7 +15,8 @@ CommandSchema.index({ command: 1 }, { unique: true })
 CommandSchema.index({ aliases: 1 })
 // Indexes for tag queries and aggregations
 CommandSchema.index({ tags: 1 })
-CommandSchema.index({ tags: 1, deleted: 1, enabled: 1 })
+// Optimized compound index - boolean fields first for better selectivity
+CommandSchema.index({ deleted: 1, enabled: 1, tags: 1 })
 CommandSchema.index({ deleted: 1, enabled: 1 })
 
 CommandSchema.statics.findByNameOrAlias = async function (command: string) {
