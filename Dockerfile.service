@@ -28,6 +28,7 @@ RUN pnpm --filter helpa-${SERVICE} --prod deploy --legacy /prod/${SERVICE}
 # Production runtime stage - minimal image with only essentials
 FROM node:20-alpine AS prod
 ARG SERVICE
+ENV NODE_ENV=production
 WORKDIR /app
 # Copy only what's needed for runtime:
 # 1. Compiled JavaScript only (no source files)
