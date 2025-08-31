@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client"
 import * as tmi from "tmi.js"
 import * as crypto from "crypto"
 import { HelpaApi, ApiError } from "@helpasaur/api-client"
-import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
+import { getCachedCommand, CachableCommand } from "@helpasaur/common"
 import {
   ActiveChannelList,
   RelayEvent,

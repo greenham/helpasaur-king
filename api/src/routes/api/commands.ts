@@ -8,6 +8,7 @@ import {
   handleRouteError,
 } from "../../lib/responseHelpers"
 import guard from "express-jwt-permissions"
+import { normalizeTags } from "@helpasaur/common"
 
 interface MatchFilter {
   createdAt?: {
@@ -31,25 +32,6 @@ const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 // Helper function to invalidate tag stats cache
 const invalidateTagStatsCache = () => {
   tagStatsCache = null
-}
-
-// Helper function to normalize tags for consistency and URL safety
-const normalizeTags = (tags?: string[]): string[] => {
-  if (!tags || !Array.isArray(tags)) return []
-  
-  return tags
-    .filter(tag => tag !== null && tag !== undefined && typeof tag === 'string')  // Filter out null/undefined/non-strings
-    .map(tag => 
-      tag
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')  // Replace spaces with hyphens
-        .replace(/[^a-z0-9-]/g, '')  // Remove special characters except hyphens
-        .replace(/-+/g, '-')  // Replace multiple hyphens with single hyphen
-        .replace(/^-|-$/g, '')  // Remove leading/trailing hyphens
-    )
-    .filter(tag => tag.length > 0)  // Remove empty tags
-    .filter((tag, index, self) => self.indexOf(tag) === index)  // Remove duplicates
 }
 
 // Endpoint: /commands

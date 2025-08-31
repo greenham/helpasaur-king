@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@helpasaur/api-client": "workspace:*",
+    "@helpasaur/common": "workspace:*",
     "@helpasaur/types": "workspace:*",
     "@popperjs/core": "^2.11.8",
     "@tanstack/react-query": "^5.12.2",

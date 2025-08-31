@@ -18,7 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@helpasaur/api-client": ["libs/@helpasaur/api-client/dist/index.d.ts"],
-      "@helpasaur/bot-common": ["libs/@helpasaur/bot-common/dist/index.d.ts"],
+      "@helpasaur/common": ["libs/@helpasaur/common/dist/index.d.ts"],
       "@helpasaur/types": ["libs/@helpasaur/types/dist/index.d.ts"],
       "twitch-api-client": ["libs/twitch-api-client/dist/index.d.ts"]
     }

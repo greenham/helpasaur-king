@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Badge, Button, Dropdown, Form, Stack } from "react-bootstrap"
+import { normalizeTag } from "@helpasaur/common"
 
 interface TagInputProps {
   tags: string[]
@@ -55,9 +56,9 @@ const TagInput: React.FunctionComponent<TagInputProps> = ({
   }, [])
 
   const addTag = (tag: string) => {
-    const trimmedTag = tag.trim()
-    if (trimmedTag && !tags.includes(trimmedTag)) {
-      onChange([...tags, trimmedTag])
+    const normalizedTag = normalizeTag(tag)
+    if (normalizedTag && !tags.includes(normalizedTag)) {
+      onChange([...tags, normalizedTag])
     }
     setInputValue("")
     setShowSuggestions(false)
@@ -76,7 +77,7 @@ const TagInput: React.FunctionComponent<TagInputProps> = ({
     if (value.includes(",")) {
       const newTags = value
         .split(",")
-        .map((tag) => tag.trim())
+        .map((tag) => normalizeTag(tag))
         .filter((tag) => tag.length > 0)
       const uniqueNewTags = newTags.filter((tag) => !tags.includes(tag))
       if (uniqueNewTags.length > 0) {

@@ -1,5 +1,5 @@
 {
-  "name": "@helpasaur/bot-common",
+  "name": "@helpasaur/common",
   "version": "2.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

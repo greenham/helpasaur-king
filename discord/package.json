@@ -13,7 +13,7 @@
     "discord.js": "^14.14.1",
     "express": "^4.19.2",
     "@helpasaur/api-client": "workspace:*",
-    "@helpasaur/bot-common": "workspace:*",
+    "@helpasaur/common": "workspace:*",
     "@helpasaur/types": "workspace:*",
     "ms": "^2.1.3",
     "node-schedule": "^2.1.1",

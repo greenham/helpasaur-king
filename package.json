@@ -35,7 +35,7 @@
     "typecheck:ws-relay": "pnpm --filter helpa-ws-relay build",
     "typecheck:web": "pnpm --filter helpa-web build",
     "typecheck:libs": "pnpm --filter '@helpasaur/*' --filter twitch-api-client build",
-    "dev:libs": "concurrently \"pnpm --filter @helpasaur/types run build:watch\" \"pnpm --filter @helpasaur/api-client run build:watch\" \"pnpm --filter @helpasaur/bot-common run build:watch\" \"pnpm --filter twitch-api-client run build:watch\"",
+    "dev:libs": "concurrently \"pnpm --filter @helpasaur/types run build:watch\" \"pnpm --filter @helpasaur/api-client run build:watch\" \"pnpm --filter @helpasaur/common run build:watch\" \"pnpm --filter twitch-api-client run build:watch\"",
     "dev": "concurrently --names \"LIBS,DOCKER,WEB\" --prefix-colors \"cyan,green,yellow\" \"pnpm dev:libs\" \"pnpm start:logs\" \"pnpm start:web\""
   },
   "author": "https://github.com/greenham",
