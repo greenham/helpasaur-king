@@ -21,7 +21,6 @@ const TagFilter: React.FunctionComponent<TagFilterProps> = ({
   return (
     <Row className="mb-4">
       <Col>
-        {/* <h5 className="text-center">Filter by Tags</h5> */}
         <ButtonGroup className="mb-3 flex-wrap d-flex justify-content-center">
           <ToggleButton
             key="all-tags"
