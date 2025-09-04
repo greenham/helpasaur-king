@@ -1,5 +1,35 @@
 # Changelog
 
+## 2.2.0
+
+_2025-09-04_
+
+### What's Changed
+
+#### Features
+
+- feat: Enhanced commands list UI with comprehensive tagging and filtering system by @greenham in https://github.com/greenham/helpasaur-king/pull/98
+  - Added alphabet filter component for browsing commands by letter
+  - Implemented tag-based filtering with single-selection radio buttons
+  - Advanced alias management with typeahead search and badge UI
+  - Improved command form modal with better user experience
+  - Added new React components: AlphabetFilter, TagFilter, TagInput, AliasInput
+  - Support for number filtering in alphabet navigation
+
+#### Performance
+
+- perf: Optimize tag system with better indexing and caching by @greenham in 71e0ada
+  - Improved command search and filtering performance
+  - Better caching strategies for tag data
+
+#### Refactor
+
+- refactor: Rename bot-common library to common for broader usage by @greenham in 98a7e10
+  - Created shared tag normalization utilities
+  - Better organization of shared functionality across services
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/2.1.0...2.2.0
+
 ## 2.1.0
 
 _2025-08-31_
