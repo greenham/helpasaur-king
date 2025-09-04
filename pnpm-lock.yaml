@@ -36,6 +36,9 @@ importers:
 
   api:
     dependencies:
+      '@helpasaur/common':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/common
       '@helpasaur/types':
         specifier: workspace:*
         version: link:../libs/@helpasaur/types
@@ -115,9 +118,9 @@ importers:
       '@helpasaur/api-client':
         specifier: workspace:*
         version: link:../libs/@helpasaur/api-client
-      '@helpasaur/bot-common':
+      '@helpasaur/common':
         specifier: workspace:*
-        version: link:../libs/@helpasaur/bot-common
+        version: link:../libs/@helpasaur/common
       '@helpasaur/types':
         specifier: workspace:*
         version: link:../libs/@helpasaur/types
@@ -181,7 +184,7 @@ importers:
         specifier: ^5.2.2
         version: 5.9.2
 
-  libs/@helpasaur/bot-common:
+  libs/@helpasaur/common:
     dependencies:
       '@helpasaur/api-client':
         specifier: workspace:*
@@ -332,9 +335,9 @@ importers:
       '@helpasaur/api-client':
         specifier: workspace:*
         version: link:../libs/@helpasaur/api-client
-      '@helpasaur/bot-common':
+      '@helpasaur/common':
         specifier: workspace:*
-        version: link:../libs/@helpasaur/bot-common
+        version: link:../libs/@helpasaur/common
       '@helpasaur/types':
         specifier: workspace:*
         version: link:../libs/@helpasaur/types
@@ -378,6 +381,9 @@ importers:
       '@helpasaur/api-client':
         specifier: workspace:*
         version: link:../libs/@helpasaur/api-client
+      '@helpasaur/common':
+        specifier: workspace:*
+        version: link:../libs/@helpasaur/common
       '@helpasaur/types':
         specifier: workspace:*
         version: link:../libs/@helpasaur/types

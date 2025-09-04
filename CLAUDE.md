@@ -18,7 +18,7 @@ Helpasaur King is a microservices-based application for the A Link to the Past (
 - **Shared Libraries** (`/libs/`):
   - `@helpasaur/api-client`: Common Axios-based API client for all services
   - `@helpasaur/types`: Shared TypeScript types and interfaces
-  - `@helpasaur/bot-common`: Common bot functionality and utilities
+  - `@helpasaur/common`: Common utilities and functionality for all services
   - `twitch-api-client`: Twitch API client wrapper
 - **Monitoring** (`/monitoring/`): Uptime Kuma monitoring stack (separate from main application)
 

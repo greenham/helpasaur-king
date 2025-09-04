@@ -1,5 +1,5 @@
 import { EmbedBuilder, Message } from "discord.js"
-import { getCachedCommand, CachableCommand } from "@helpasaur/bot-common"
+import { getCachedCommand, CachableCommand } from "@helpasaur/common"
 import { defaultGuildConfig } from "../constants"
 import { DiscordEvent, ExtendedClient } from "../types"
 import { GuildConfig } from "@helpasaur/types"

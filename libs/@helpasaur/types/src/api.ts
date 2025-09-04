@@ -40,7 +40,8 @@ export interface Command {
   command: string
   aliases: string[]
   response: string
-  category: string
+  category?: string
+  tags?: string[]
   enabled: boolean
   deleted?: boolean
 }

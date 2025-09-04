@@ -1,7 +1,11 @@
 import * as React from "react"
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap"
 import { Command } from "@helpasaur/types"
-type CommandFormModel = Partial<Command> & { aliasesText?: string }
+import { useHelpaApi } from "../hooks/useHelpaApi"
+import TagInput from "./TagInput"
+import AliasInput from "./AliasInput"
+
+type CommandFormModel = Partial<Command>
 
 interface CommandFormModalProps {
   command: CommandFormModel
@@ -17,24 +21,32 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
     command: props.command.command || "",
     response: props.command.response || "",
     aliases: props.command.aliases || [],
-    aliasesText: props.command.aliases ? props.command.aliases.join(", ") : "",
+    tags: props.command.tags || [],
     ...props.command,
   }))
   const { show, onHide, onSubmit } = props
+  const { data: tagStats = [] } = useHelpaApi().useTagStats({
+    enabled: show, // Only fetch when modal is shown
+  })
+
+  // Extract tag names from stats (this is working in CommandsList)
+  const existingTags = tagStats.map((stat) => stat.tag)
 
   React.useEffect(() => {
     setCommand({
       command: props.command.command || "",
       response: props.command.response || "",
       aliases: props.command.aliases || [],
-      aliasesText: props.command.aliases
-        ? props.command.aliases.join(", ")
-        : "",
+      tags: props.command.tags || [],
       ...props.command,
     })
   }, [props.command])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const key = e.target.name
     const value = e.target.value
 
@@ -45,10 +57,6 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
   }
 
   const handleSubmit = () => {
-    // translate aliasesText to aliases
-    command.aliases = command.aliasesText
-      ? command.aliasesText.replace(/\s+/g, "").split(",")
-      : []
     onSubmit(command)
   }
 
@@ -87,19 +95,25 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
             onChange={handleChange}
           />
         </FloatingLabel>
-        <FloatingLabel
-          controlId="commandAliases"
-          label="Command aliases"
+
+        {/* Aliases Input with Badge UI */}
+        <AliasInput
+          aliases={command.aliases || []}
+          onChange={(aliases) => setCommand((prev) => ({ ...prev, aliases }))}
+          placeholder="Type alias and press Enter..."
+          label="Command Aliases"
           className="mb-3"
-        >
-          <Form.Control
-            type="text"
-            placeholder="alias1, alias2, etc."
-            name="aliasesText"
-            value={command.aliasesText || ""}
-            onChange={handleChange}
-          />
-        </FloatingLabel>
+        />
+
+        {/* Tags Input with Typeahead */}
+        <TagInput
+          tags={command.tags || []}
+          existingTags={existingTags}
+          onChange={(tags) => setCommand((prev) => ({ ...prev, tags }))}
+          placeholder="Type to search existing tags or add new ones..."
+          label="Tags"
+          className="mb-3"
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={onHide}>

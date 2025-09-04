@@ -6,12 +6,18 @@ const CommandSchema = new Schema<ICommandDocument>({
   aliases: [String],
   response: { type: String, required: true, trim: true },
   category: String,
+  tags: [String],
   enabled: Boolean,
   deleted: Boolean,
 })
 
 CommandSchema.index({ command: 1 }, { unique: true })
 CommandSchema.index({ aliases: 1 })
+// Indexes for tag queries and aggregations
+CommandSchema.index({ tags: 1 })
+// Optimized compound index - boolean fields first for better selectivity
+CommandSchema.index({ deleted: 1, enabled: 1, tags: 1 })
+CommandSchema.index({ deleted: 1, enabled: 1 })
 
 CommandSchema.statics.findByNameOrAlias = async function (command: string) {
   return await this.findOne({

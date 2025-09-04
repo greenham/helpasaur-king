@@ -6,6 +6,7 @@ export interface ICommand {
   aliases?: string[]
   response: string
   category?: string
+  tags?: string[]
   enabled: boolean
   deleted?: boolean
 }
