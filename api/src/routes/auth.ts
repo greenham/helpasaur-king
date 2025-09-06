@@ -26,6 +26,8 @@ const router: Router = express.Router()
 router.get(`/twitch`, async (req: Request, res: Response) => {
   // Validate authorization code from Twitch
   const authCode = (req.query.code as string) || false
+  const state = (req.query.state as string) || ""
+  
   if (!authCode) {
     return res.redirect(`${clientPostAuthRedirectUrl}?error=missing_code`)
   }
@@ -145,8 +147,11 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
     maxAge,
   })
 
-  // Redirect to client
-  res.redirect(clientPostAuthRedirectUrl)
+  // Redirect to client with optional redirect parameter
+  const redirectUrl = state 
+    ? `${clientPostAuthRedirectUrl}?redirect=${encodeURIComponent(state)}`
+    : clientPostAuthRedirectUrl
+  res.redirect(redirectUrl)
 })
 
 // Endpoint: GET /auth/service

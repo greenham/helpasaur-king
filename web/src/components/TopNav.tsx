@@ -141,7 +141,7 @@ function TopNav() {
               </NavDropdown>
             )}
             {!userIsPending && !user && (
-              <Nav.Link href={getTwitchLoginUrl()} rel="noopener noreferrer">
+              <Nav.Link href={getTwitchLoginUrl(location.pathname)} rel="noopener noreferrer">
                 <Button variant="primary">
                   <i className="fa-solid fa-key pe-1"></i>Log in with Twitch
                 </Button>

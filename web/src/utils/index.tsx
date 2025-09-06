@@ -14,7 +14,7 @@ export const getTwitchUrl = (username: string) => {
   return `https://twitch.tv/${username}`
 }
 
-export const getTwitchLoginUrl = () => {
+export const getTwitchLoginUrl = (redirectPath?: string) => {
   if (!process.env.TWITCH_APP_CLIENT_ID) {
     throw new Error(
       "TWITCH_APP_CLIENT_ID environment variable is not defined. Please set it during build time."
@@ -29,7 +29,13 @@ export const getTwitchLoginUrl = () => {
   const redirectUrl = encodeURIComponent(
     String(`${process.env.API_HOST}/auth/twitch`)
   )
-  return `https://id.twitch.tv/oauth2/authorize?client_id=${twitchAppClientId}&redirect_uri=${redirectUrl}&response_type=code&scope=`
+  let url = `https://id.twitch.tv/oauth2/authorize?client_id=${twitchAppClientId}&redirect_uri=${redirectUrl}&response_type=code&scope=`
+  
+  if (redirectPath) {
+    url += `&state=${encodeURIComponent(redirectPath)}`
+  }
+  
+  return url
 }
 
 export const getLogoutUrl = (redirect?: string) => {
