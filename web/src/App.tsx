@@ -13,7 +13,7 @@ import TopNav from "./components/TopNav"
 
 interface AppLayoutProps {}
 const AppLayout: React.FunctionComponent<AppLayoutProps> = () => {
-  // Handle auth redirect
+  // Handle auth redirect!
   useAuthRedirect()
   
   return (
