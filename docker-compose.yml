@@ -1,4 +1,3 @@
-version: "3.8"
 name: "helpa"
 
 services:
@@ -11,8 +10,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - ${API_SERVER_EXTERNAL_PORT:-3001}:3001
     environment:
       SERVICE_NAME: api
       ALLOWED_SERVICES: discord,twitch,runnerwatcher,racebot,ws-relay,streamAlerts
@@ -61,8 +58,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - ${DISCORD_HEALTH_PORT:-3010}:${DISCORD_HEALTH_PORT:-3010}
     environment:
       SERVICE_NAME: discord
       API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT:-3001}
@@ -98,8 +93,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - ${TWITCH_HEALTH_PORT:-3011}:${TWITCH_HEALTH_PORT:-3011}
     environment:
       SERVICE_NAME: twitch
       API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT:-3001}
@@ -135,8 +128,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - ${TWITCH_WEBHOOK_LISTENER_PORT:-3002}:3002
     environment:
       SERVICE_NAME: streamAlerts
       API_HOST: http://api-server:${API_SERVER_EXTERNAL_PORT:-3001}
@@ -176,8 +167,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - ${RACEBOT_HEALTH_PORT:-3012}:${RACEBOT_HEALTH_PORT:-3012}
     environment:
       SERVICE_NAME: racebot
       WEBSOCKET_RELAY_SERVER: http://ws-relay:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
@@ -217,8 +206,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - ${WEBSOCKET_RELAY_SERVER_PORT:-3003}:${WEBSOCKET_RELAY_SERVER_PORT:-3003}
     environment:
       SERVICE_NAME: ws-relay
       WEBSOCKET_RELAY_SERVER_PORT: ${WEBSOCKET_RELAY_SERVER_PORT:-3003}
@@ -253,8 +240,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-your_mongo_root_password_here}
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME:-helpa}
-    ports:
-      - ${MONGO_EXTERNAL_PORT:-27019}:27017
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.js:/docker-entrypoint-initdb.d/db-init.js:ro
       - mongodb_data_container:/data/db
@@ -275,8 +260,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - ${MONGO_EXPRESS_PORT:-8081}:8081
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME:-root}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-your_mongo_root_password_here}

@@ -60,7 +60,7 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   twitchAuthData.expires_at = Date.now() + twitchAuthData.expires_in * 1000
   delete twitchAuthData.expires_in
 
-  console.log(`Received access token for user: ${userAccessToken}`)
+  console.log(`Received access token for Twitch user`)
 
   // Get user data from Twitch with the user's access token
   const twitchApiUser = getUserTwitchApiClient(userAccessToken, [])
@@ -128,20 +128,25 @@ router.get(`/twitch`, async (req: Request, res: Response) => {
   )
 
   // Set cookies on the client with the JWT
-  // Split out the header, payload, and signature
-  // We're going to store these in separate cookies for security reasons I guess?
-  // I don't really know what the point is, but it's what the docs say to do
+  // Split into header+payload (readable by JS for client-side auth checks)
+  // and signature (httpOnly, not accessible to JS)
   const idParts = idToken.split(".")
 
   const headerAndPayload = [idParts[0], idParts[1]].join(".")
   const signature = idParts[2]
   const maxAge = ms(loginExpirationLength)
+  const isProduction = apiHost?.startsWith("https")
 
   res.cookie(jwtHeaderCookieName, headerAndPayload, {
     httpOnly: false,
+    secure: isProduction,
+    sameSite: "lax",
     maxAge,
   })
   res.cookie(jwtFooterCookieName, signature, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax",
     maxAge,
   })
 
@@ -179,10 +184,16 @@ router.get(`/logout`, async (req: Request, res: Response) => {
   res.cookie(jwtHeaderCookieName, "")
   res.cookie(jwtFooterCookieName, "")
 
-  const redirectPath = req.query.redirect || "/"
+  // Validate redirect path to prevent open redirect attacks
+  // Only allow relative paths that start with /
+  const redirectPath = String(req.query.redirect || "/")
+  const safePath =
+    redirectPath.startsWith("/") && !redirectPath.startsWith("//")
+      ? redirectPath
+      : "/"
 
   // Redirect to client
-  res.redirect((clientPostAuthRedirectUrl || "/") + redirectPath)
+  res.redirect((clientPostAuthRedirectUrl || "") + safePath)
 })
 
 export default router

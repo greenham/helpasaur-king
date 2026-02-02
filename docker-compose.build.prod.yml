@@ -1,4 +1,3 @@
-version: "3.8"
 name: "helpa-build-prod"
 
 # Production/CI build configuration

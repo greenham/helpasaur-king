@@ -1,7 +1,8 @@
 services:
   # Production-specific configurations with ghcr.io images
-  
-  # Application services use ghcr.io registry images
+  # No port mappings needed - base compose no longer exposes ports,
+  # and only nginx (below) binds to 80/443 for public traffic.
+
   api-server:
     image: ghcr.io/greenham/helpasaur-king/helpa-api:${VERSION:-latest}
 
@@ -24,6 +25,11 @@ services:
   mongo:
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.prod.js:/docker-entrypoint-initdb.d/db-init.prod.js:ro
+
+  # Disable Mongo Express in production
+  mongo-express:
+    deploy:
+      replicas: 0
 
   nginx:
     ports:
