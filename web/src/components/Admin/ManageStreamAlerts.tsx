@@ -10,7 +10,7 @@ import {
   Button,
   Badge,
 } from "react-bootstrap"
-import { StreamAlertsChannel } from "@helpasaur/types"
+import { StreamAlertsChannel, EventSubSubscription } from "@helpasaur/types"
 
 interface ManageStreamAlertsProps {}
 const ManageStreamAlerts: React.FunctionComponent<
@@ -20,11 +20,22 @@ const ManageStreamAlerts: React.FunctionComponent<
     useStreamAlertsChannels,
     useAddChannelToStreamAlerts,
     useRemoveChannelFromStreamAlerts,
+    useEventSubSubscriptions,
+    useClearAllSubscriptions,
+    useResubscribeAllChannels,
   } = useHelpaApi()
   const { data: streamAlertsChannels } = useStreamAlertsChannels()
 
   const addChannelMutation = useAddChannelToStreamAlerts()
   const removeChannelMutation = useRemoveChannelFromStreamAlerts()
+
+  const {
+    data: subscriptions,
+    refetch: refetchSubscriptions,
+    isFetching: isLoadingSubscriptions,
+  } = useEventSubSubscriptions()
+  const clearAllMutation = useClearAllSubscriptions()
+  const resubscribeMutation = useResubscribeAllChannels()
 
   const [channelToAdd, setChannelToAdd] = React.useState("")
   const handleChannelToAddInputChange = (
@@ -135,6 +146,104 @@ const ManageStreamAlerts: React.FunctionComponent<
               >
                 <i className="fa-regular fa-square-minus pe-1"></i> Remove
                 Channel
+              </Button>
+            )}
+          </Col>
+        </Row>
+      </Container>
+
+      <hr />
+
+      <h4>
+        EventSub Subscriptions{" "}
+        <Button
+          variant="outline-secondary"
+          size="sm"
+          onClick={() => refetchSubscriptions()}
+          disabled={isLoadingSubscriptions}
+        >
+          {isLoadingSubscriptions ? (
+            <Spinner animation="border" size="sm" />
+          ) : (
+            <i className="fa-solid fa-arrows-rotate"></i>
+          )}{" "}
+          Refresh
+        </Button>
+      </h4>
+
+      {subscriptions && (
+        <p>
+          <Badge bg="primary">Total: {subscriptions.length}</Badge>{" "}
+          <Badge bg="success">
+            Enabled:{" "}
+            {
+              subscriptions.filter(
+                (s: EventSubSubscription) => s.status === "enabled"
+              ).length
+            }
+          </Badge>{" "}
+          {subscriptions.filter(
+            (s: EventSubSubscription) => s.status !== "enabled"
+          ).length > 0 && (
+            <Badge bg="warning">
+              Other:{" "}
+              {
+                subscriptions.filter(
+                  (s: EventSubSubscription) => s.status !== "enabled"
+                ).length
+              }
+            </Badge>
+          )}
+        </p>
+      )}
+
+      <Container>
+        <Row>
+          <Col>
+            {clearAllMutation.isPending ? (
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            ) : (
+              <Button
+                variant="danger"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to clear ALL EventSub subscriptions?"
+                    )
+                  ) {
+                    clearAllMutation.mutate()
+                  }
+                }}
+                disabled={clearAllMutation.isPending}
+              >
+                <i className="fa-solid fa-trash pe-1"></i> Clear All
+                Subscriptions
+              </Button>
+            )}
+          </Col>
+          <Col>
+            {resubscribeMutation.isPending ? (
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            ) : (
+              <Button
+                variant="success"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to re-subscribe all watched channels?"
+                    )
+                  ) {
+                    resubscribeMutation.mutate()
+                  }
+                }}
+                disabled={resubscribeMutation.isPending}
+              >
+                <i className="fa-solid fa-rotate pe-1"></i> Re-subscribe All
+                Channels
               </Button>
             )}
           </Col>
