@@ -1,5 +1,37 @@
 # Changelog
 
+## 2.3.0
+
+_2026-02-11_
+
+### What's Changed
+
+#### Features
+
+- feat: Add EventSub subscription management UI and API by @greenham in https://github.com/greenham/helpasaur-king/pull/101
+  - New admin interface for managing Twitch EventSub subscriptions
+  - API endpoints for listing, creating, and deleting subscriptions
+
+#### Bug Fixes
+
+- fix: Expose MongoDB port to host and fix getSubscriptions return value by @greenham in 5fed201
+
+#### Infrastructure
+
+- chore: Hoist nodemon to root and fix Docker dev environment by @greenham in bb0c04d
+- chore: Restore DOCKER_BUILDKIT flag by @greenham in 07e31dd
+- docs: Init setup documentation by @greenham in 472d58f
+
+#### Security
+
+- Security hardening by @greenham in cf3c97c
+
+#### Dependencies
+
+- chore(deps): Bump axios from 1.11.0 to 1.13.5 by @dependabot in https://github.com/greenham/helpasaur-king/pull/100
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/2.2.0...2.3.0
+
 ## 2.2.0
 
 _2025-09-04_
