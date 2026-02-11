@@ -23,7 +23,6 @@
     "@types/node-schedule": "^2.1.2",
     "@types/uuid": "^9.0.6",
     "@types/ws": "^8.5.9",
-    "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

@@ -15,6 +15,7 @@ services:
     volumes:
       - ./api:/app/api
       - ./libs:/app/libs
+      - /app/api/node_modules
 
   discord-bot:
     ports:
@@ -22,6 +23,7 @@ services:
     volumes:
       - ./discord:/app/discord
       - ./libs:/app/libs
+      - /app/discord/node_modules
 
   twitch-bot:
     ports:
@@ -29,6 +31,7 @@ services:
     volumes:
       - ./twitch:/app/twitch
       - ./libs:/app/libs
+      - /app/twitch/node_modules
 
   runnerwatcher:
     ports:
@@ -36,6 +39,7 @@ services:
     volumes:
       - ./runnerwatcher:/app/runnerwatcher
       - ./libs:/app/libs
+      - /app/runnerwatcher/node_modules
 
   racebot:
     ports:
@@ -43,6 +47,7 @@ services:
     volumes:
       - ./racebot:/app/racebot
       - ./libs:/app/libs
+      - /app/racebot/node_modules
 
   ws-relay:
     ports:
@@ -50,3 +55,4 @@ services:
     volumes:
       - ./ws-relay:/app/ws-relay
       - ./libs:/app/libs
+      - /app/ws-relay/node_modules

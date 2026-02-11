@@ -3,9 +3,9 @@
   "version": "2.2.0",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
-    "build": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.yml build --force-rm",
-    "build:prod": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build",
-    "build:push": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build --push",
+    "build": "docker compose -f docker-compose.build.yml build --force-rm",
+    "build:prod": "docker compose -f docker-compose.build.prod.yml build",
+    "build:push": "docker compose -f docker-compose.build.prod.yml build --push",
     "start": "docker compose up -d",
     "start:web": "pnpm --filter helpa-web run start",
     "start:libs": "pnpm dev:libs",
@@ -48,6 +48,7 @@
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "nodemon": "^3.0.2",
     "prettier": "^3.0.3"
   }
 }
