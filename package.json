@@ -3,9 +3,9 @@
   "version": "2.2.0",
   "repository": "git@github.com:greenham/helpasaur-king.git",
   "scripts": {
-    "build": "docker compose -f docker-compose.build.yml build --force-rm",
-    "build:prod": "docker compose -f docker-compose.build.prod.yml build",
-    "build:push": "docker compose -f docker-compose.build.prod.yml build --push",
+    "build": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.yml build --force-rm",
+    "build:prod": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build",
+    "build:push": "DOCKER_BUILDKIT=1 docker compose -f docker-compose.build.prod.yml build --push",
     "start": "docker compose up -d",
     "start:web": "pnpm --filter helpa-web run start",
     "start:libs": "pnpm dev:libs",
