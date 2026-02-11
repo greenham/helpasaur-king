@@ -43,8 +43,8 @@ importers:
         specifier: workspace:*
         version: link:../libs/@helpasaur/types
       axios:
-        specifier: ^1.8.2
-        version: 1.11.0
+        specifier: ^1.13.5
+        version: 1.13.5
       cookie-parser:
         specifier: ^1.4.6
         version: 1.4.7
@@ -171,11 +171,11 @@ importers:
         specifier: workspace:*
         version: link:../types
       axios:
-        specifier: ^1.8.2
-        version: 1.11.0
+        specifier: ^1.13.5
+        version: 1.13.5
       axios-retry:
         specifier: ^4.5.0
-        version: 4.5.0(axios@1.11.0)
+        version: 4.5.0(axios@1.13.5)
     devDependencies:
       '@types/node':
         specifier: ^20.8.10
@@ -247,8 +247,8 @@ importers:
         specifier: workspace:*
         version: link:../libs/@helpasaur/types
       axios:
-        specifier: ^1.7.4
-        version: 1.11.0
+        specifier: ^1.13.5
+        version: 1.13.5
       express:
         specifier: ^4.19.2
         version: 4.21.2
@@ -1627,8 +1627,8 @@ packages:
     peerDependencies:
       axios: 0.x || 1.x
 
-  axios@1.11.0:
-    resolution: {integrity: sha512-1Lx3WLFQWm3ooKDYZD1eXmoGO9fxYQjrycfHFC8P0sCfQVXyROp0p9PFWBehewBOdCwHc+f/b8I0fMto5eSfwA==}
+  axios@1.13.5:
+    resolution: {integrity: sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2077,8 +2077,8 @@ packages:
       debug:
         optional: true
 
-  form-data@4.0.4:
-    resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
+  form-data@4.0.5:
+    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
 
   forwarded@0.2.0:
@@ -4525,15 +4525,15 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios-retry@4.5.0(axios@1.11.0):
+  axios-retry@4.5.0(axios@1.13.5):
     dependencies:
-      axios: 1.11.0
+      axios: 1.13.5
       is-retry-allowed: 2.2.0
 
-  axios@1.11.0:
+  axios@1.13.5:
     dependencies:
       follow-redirects: 1.15.11
-      form-data: 4.0.4
+      form-data: 4.0.5
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -5066,7 +5066,7 @@ snapshots:
 
   follow-redirects@1.15.11: {}
 
-  form-data@4.0.4:
+  form-data@4.0.5:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
