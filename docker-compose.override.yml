@@ -1,7 +1,10 @@
 services:
   mongo:
     ports:
-      - ${MONGO_EXTERNAL_PORT:-27019}:27017
+      - ${MONGO_EXTERNAL_PORT:-27017}:27017
+    networks:
+      - int
+      - ext
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.dev.js:/docker-entrypoint-initdb.d/db-init.dev.js:ro
 
