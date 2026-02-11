@@ -219,8 +219,8 @@ router.delete(
   async (req: Request, res: Response) => {
     const twitchApiClient = getTwitchApiClient()
     try {
-      const results = await twitchApiClient.clearSubscriptions()
-      sendSuccess(res, results)
+      await twitchApiClient.clearSubscriptions()
+      sendSuccess(res, { message: "All subscriptions cleared" })
     } catch (err) {
       console.error("error from clearSubscriptions")
       handleRouteError(res, err, "clear subscriptions")

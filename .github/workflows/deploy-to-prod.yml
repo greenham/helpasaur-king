@@ -40,6 +40,7 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
+          command_timeout: 30m
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
 

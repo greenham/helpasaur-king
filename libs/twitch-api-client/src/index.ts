@@ -51,34 +51,22 @@ export class TwitchApiClient {
   async getSubscriptions(
     params?: GetSubscriptionOptions
   ): Promise<HelixEventSubSubscription[]> {
-    let subscriptions
-
-    // Use the appropriate Twurple method based on params
+    // Use paginated methods to fetch all pages of results
     if (params?.status) {
-      // Use getSubscriptionsForStatus when filtering by status
-      subscriptions = await this.apiClient.eventSub.getSubscriptionsForStatus(
-        params.status
-      )
+      return this.apiClient.eventSub
+        .getSubscriptionsForStatusPaginated(params.status)
+        .getAll()
     } else if (params?.type) {
-      // Use getSubscriptionsForType when filtering by type
-      subscriptions = await this.apiClient.eventSub.getSubscriptionsForType(
-        params.type
-      )
+      return this.apiClient.eventSub
+        .getSubscriptionsForTypePaginated(params.type)
+        .getAll()
     } else if (params?.user_id) {
-      // Use getSubscriptionsForUser when filtering by user
-      subscriptions = await this.apiClient.eventSub.getSubscriptionsForUser(
-        params.user_id
-      )
+      return this.apiClient.eventSub
+        .getSubscriptionsForUserPaginated(params.user_id)
+        .getAll()
     } else {
-      // Get all subscriptions when no filters
-      subscriptions = await this.apiClient.eventSub.getSubscriptions()
+      return this.apiClient.eventSub.getSubscriptionsPaginated().getAll()
     }
-
-    if (!subscriptions || !subscriptions.data) {
-      return []
-    }
-
-    return subscriptions.data
   }
 
   async createSubscription(
@@ -123,22 +111,9 @@ export class TwitchApiClient {
     }
   }
 
-  async clearSubscriptions(): Promise<
-    PromiseSettledResult<{ success: true }>[]
-  > {
+  async clearSubscriptions(): Promise<void> {
     try {
-      const subscriptions = await this.getSubscriptions()
-      console.log(`Found ${subscriptions.length} subscriptions to delete...`)
-
-      if (subscriptions.length === 0) {
-        return []
-      }
-
-      const deletions = subscriptions.map((s: HelixEventSubSubscription) => {
-        return this.deleteSubscription(s.id)
-      })
-
-      return await Promise.allSettled(deletions)
+      await this.apiClient.eventSub.deleteAllSubscriptions()
     } catch (error) {
       console.error(error)
       throw error
