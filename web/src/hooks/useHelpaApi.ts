@@ -15,6 +15,7 @@ import {
   ConfigUpdatePayload,
   DiscordJoinUrl,
   StreamAlertsChannel,
+  EventSubSubscription,
   TestEventPayload,
   CommandStatsOverview,
   TopCommand,
@@ -164,6 +165,22 @@ export const useHelpaApi = () => {
       useQuery({
         queryKey: ["streamAlertsChannels"],
         queryFn: () => helpaApiClient.streamAlerts.getStreamAlertsChannels(),
+        ...options,
+      }),
+
+    /**
+     * Get EventSub subscriptions
+     */
+    useEventSubSubscriptions: (
+      options?: Omit<
+        UseQueryOptions<EventSubSubscription[], Error>,
+        "queryKey" | "queryFn"
+      >
+    ) =>
+      useQuery({
+        queryKey: ["eventSubSubscriptions"],
+        queryFn: () => helpaApiClient.streamAlerts.getEventSubSubscriptions(),
+        enabled: false, // No auto-refetch, manual only
         ...options,
       }),
 
@@ -553,6 +570,68 @@ export const useHelpaApi = () => {
           if (showToast) {
             toast.error(
               `Failed to remove ${variables} from stream alerts: ${error.message}`
+            )
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
+
+    /**
+     * Clear all EventSub subscriptions
+     */
+    useClearAllSubscriptions: (
+      options?: MutationOptionsWithToast<void, Error, void>
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
+        mutationFn: () =>
+          helpaApiClient.streamAlerts.clearAllSubscriptions(),
+        onSuccess: (data, variables, context) => {
+          queryClient.invalidateQueries({
+            queryKey: ["eventSubSubscriptions"],
+          })
+          if (showToast) {
+            toast.success("All subscriptions cleared!")
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
+        },
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(
+              `Failed to clear subscriptions: ${error.message}`
+            )
+          }
+          mutationOptions.onError?.(error, variables, context)
+        },
+        ...mutationOptions,
+      })
+    },
+
+    /**
+     * Re-subscribe all currently watched channels
+     */
+    useResubscribeAllChannels: (
+      options?: MutationOptionsWithToast<unknown, Error, void>
+    ) => {
+      const { showToast = true, ...mutationOptions } = options || {}
+      return useMutation({
+        mutationFn: () =>
+          helpaApiClient.streamAlerts.resubscribeAllChannels(),
+        onSuccess: (data, variables, context) => {
+          queryClient.invalidateQueries({
+            queryKey: ["eventSubSubscriptions"],
+          })
+          if (showToast) {
+            toast.success("Re-subscribed all channels!")
+          }
+          mutationOptions.onSuccess?.(data, variables, context)
+        },
+        onError: (error, variables, context) => {
+          if (showToast) {
+            toast.error(
+              `Failed to re-subscribe channels: ${error.message}`
             )
           }
           mutationOptions.onError?.(error, variables, context)

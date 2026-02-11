@@ -78,7 +78,7 @@ export class TwitchApiClient {
       return []
     }
 
-    return subscriptions
+    return subscriptions.data
   }
 
   async createSubscription(

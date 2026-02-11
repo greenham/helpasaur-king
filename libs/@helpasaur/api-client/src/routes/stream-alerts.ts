@@ -1,5 +1,5 @@
 import { ApiBase } from "../base"
-import { StreamAlertsChannel } from "@helpasaur/types"
+import { StreamAlertsChannel, EventSubSubscription } from "@helpasaur/types"
 import { ROUTES } from "../constants"
 
 /**
@@ -36,5 +36,29 @@ export class StreamAlertsRoutes extends ApiBase {
    */
   async removeChannelFromStreamAlerts(twitchUserId: string): Promise<void> {
     return this.apiDelete(`${ROUTES.STREAM_ALERTS}/channels/${twitchUserId}`)
+  }
+
+  /**
+   * Get current EventSub subscriptions
+   * @returns Promise resolving to array of EventSub subscriptions
+   */
+  async getEventSubSubscriptions(): Promise<EventSubSubscription[]> {
+    return this.apiGet(`${ROUTES.STREAM_ALERTS}/subscriptions`)
+  }
+
+  /**
+   * Clear all EventSub subscriptions
+   * @returns Promise resolving when all subscriptions are cleared
+   */
+  async clearAllSubscriptions(): Promise<void> {
+    return this.apiDelete(`${ROUTES.STREAM_ALERTS}/subscriptions/all`)
+  }
+
+  /**
+   * Re-subscribe all currently watched channels
+   * @returns Promise resolving with per-channel results
+   */
+  async resubscribeAllChannels(): Promise<unknown> {
+    return this.apiPost(`${ROUTES.STREAM_ALERTS}/subscriptions/resubscribe`, {})
   }
 }

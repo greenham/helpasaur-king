@@ -124,6 +124,16 @@ export interface TwitchStream {
 // StreamAlertsChannel is just a TwitchUserData (channels in stream alerts are full user objects)
 export type StreamAlertsChannel = TwitchUserData
 
+// EventSub Subscription (serialized Twitch subscription)
+export interface EventSubSubscription {
+  id: string
+  status: string
+  type: string
+  condition: Record<string, string>
+  created_at: string
+  cost: number
+}
+
 // Concrete data types for API responses
 export interface DiscordJoinUrl {
   url?: string

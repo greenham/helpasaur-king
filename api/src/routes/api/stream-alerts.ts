@@ -228,6 +228,49 @@ router.delete(
   }
 )
 
+// POST /subscriptions/resubscribe -> re-subscribe all currently watched channels
+router.post(
+  "/subscriptions/resubscribe",
+  permissionGuard.check("admin"),
+  async (req: Request, res: Response) => {
+    try {
+      const streamAlertsConfig = await getConfig("streamAlerts")
+      if (!streamAlertsConfig) {
+        throw new Error("Stream alerts configuration not found")
+      }
+
+      const twitchApiClient = getTwitchApiClient()
+      console.log(
+        `Re-subscribing ${streamAlertsConfig.channels.length} channels...`
+      )
+
+      const results = await Promise.allSettled(
+        streamAlertsConfig.channels.map(async (channel) => {
+          const subscriptionResults =
+            await twitchApiClient.subscribeToStreamEvents({
+              channel: channel.login,
+              userId: channel.id,
+              events: [
+                TwitchStreamEventType.STREAM_ONLINE,
+                TwitchStreamEventType.CHANNEL_UPDATE,
+              ],
+            })
+
+          return {
+            status: "success",
+            channel: channel.login,
+            subscriptionResults,
+          }
+        })
+      )
+
+      sendSuccess(res, results, "Re-subscribed all channels")
+    } catch (err) {
+      handleRouteError(res, err, "resubscribe all channels")
+    }
+  }
+)
+
 // @TODO DRY this out into something that can do basic list management / user querying
 router.post(
   "/channels/blacklist",
