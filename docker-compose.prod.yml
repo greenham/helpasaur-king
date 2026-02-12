@@ -23,6 +23,11 @@ services:
 
   # Infrastructure overrides
   mongo:
+    ports:
+      - 127.0.0.1:27017:27017
+    networks:
+      - int
+      - ext
     volumes:
       - ./docker-entrypoint-initdb.d/db-init.prod.js:/docker-entrypoint-initdb.d/db-init.prod.js:ro
 
