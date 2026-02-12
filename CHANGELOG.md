@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.3.1
+
+_2026-02-11_
+
+### What's Changed
+
+#### Bug Fixes
+
+- fix: Use paginated Twurple methods for EventSub subscriptions by @greenham in 1ed74de
+  - `getSubscriptions()` now fetches all pages instead of only the first page
+  - `clearSubscriptions()` now uses Twurple's built-in `deleteAllSubscriptions()`
+
+#### Infrastructure
+
+- Increase deploy workflow SSH command timeout from 10m to 30m by @greenham in 1ed74de
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/2.3.0...2.3.1
+
 ## 2.3.0
 
 _2026-02-11_

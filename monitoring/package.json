@@ -1,6 +1,6 @@
 {
   "name": "monitoring",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Helpasaur uses Uptime Kuma as a separate monitoring stack to ensure continuous monitoring even during application deployments.",
   "main": "generate-configs.js",
   "scripts": {
