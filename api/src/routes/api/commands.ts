@@ -65,7 +65,10 @@ router.get("/tags", async (req: Request, res: Response) => {
 router.get("/tags/stats", async (req: Request, res: Response) => {
   try {
     // Check if we have valid cached data
-    if (tagStatsCache && Date.now() - tagStatsCache.timestamp < CACHE_DURATION) {
+    if (
+      tagStatsCache &&
+      Date.now() - tagStatsCache.timestamp < CACHE_DURATION
+    ) {
       return sendSuccess(res, tagStatsCache.data)
     }
 
@@ -155,7 +158,7 @@ router.post("/find", async (req: Request, res: Response) => {
 router.post(
   "/",
   requireJwtToken,
-  permissionGuard.check("admin"),
+  permissionGuard.check([["admin"], ["command_manager"]]),
   async (req: Request, res: Response) => {
     try {
       delete req.body._id
@@ -187,12 +190,12 @@ router.post(
       }
 
       const command = await Command.create(req.body)
-      
+
       // Only invalidate cache if the new command has tags
       if (command.tags && command.tags.length > 0) {
         invalidateTagStatsCache()
       }
-      
+
       sendSuccess(res, command, "Command created successfully", 201)
     } catch (err) {
       // Handle MongoDB validation errors
@@ -228,7 +231,7 @@ router.post(
 router.patch(
   "/:id",
   requireJwtToken,
-  permissionGuard.check("admin"),
+  permissionGuard.check([["admin"], ["command_manager"]]),
   async (req: Request, res: Response) => {
     try {
       const command = await Command.findById(req.params.id)
@@ -252,7 +255,7 @@ router.patch(
 
       // Store original tags for comparison
       const originalTags = JSON.stringify(command.tags || [])
-      
+
       // Normalize tags before updating
       if (req.body.tags) {
         req.body.tags = normalizeTags(req.body.tags)
@@ -262,7 +265,7 @@ router.patch(
         ;(command as unknown as Record<string, unknown>)[key] = req.body[key]
       }
       await command.save()
-      
+
       // Only invalidate cache if tags actually changed
       const newTags = JSON.stringify(command.tags || [])
       if (originalTags !== newTags) {
@@ -304,21 +307,21 @@ router.patch(
 router.delete(
   "/:id",
   requireJwtToken,
-  permissionGuard.check("admin"),
+  permissionGuard.check([["admin"], ["command_manager"]]),
   async (req: Request, res: Response) => {
     try {
       // Check if the command being deleted has tags before invalidating cache
       const command = await Command.findById(req.params.id)
       const hadTags = command && command.tags && command.tags.length > 0
-      
+
       // @TODO: Make this a soft delete?
       await Command.deleteOne({ _id: req.params.id })
-      
+
       // Only invalidate cache if the deleted command had tags
       if (hadTags) {
         invalidateTagStatsCache()
       }
-      
+
       sendSuccess(res, undefined, "Command deleted successfully")
     } catch (err) {
       handleRouteError(res, err, "delete command")
