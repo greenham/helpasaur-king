@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.4.0
+
+_2026-02-14_
+
+### What's Changed
+
+#### Features
+
+- feat: Add `command_manager` role for granular RBAC by @greenham in https://github.com/greenham/helpasaur-king/pull/102
+  - New `Permission` enum and `hasAnyPermission` helper in shared types library
+  - `command_manager` permission allows users to create, edit, and delete commands without full admin access
+  - Admin panel and command statistics remain admin-only
+
+#### Infrastructure
+
+- fix: Expose MongoDB port to localhost for SSH tunnel access by @greenham in 6c78bc4
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/2.3.1...2.4.0
+
 ## 2.3.1
 
 _2026-02-11_
