@@ -6,6 +6,25 @@
 // User Types
 import { TwitchPrivilegedUserData, TwitchUserData } from "twitch-api-client"
 
+// Permission Types
+export enum Permission {
+  ADMIN = "admin",
+  SERVICE = "service",
+  COMMAND_MANAGER = "command_manager",
+}
+
+export const hasAnyPermission = (
+  userPermissions: string[],
+  requiredPermissions: Permission[]
+): boolean => {
+  return requiredPermissions.some((p) => userPermissions.includes(p))
+}
+
+export const COMMAND_EDIT_PERMISSIONS: Permission[] = [
+  Permission.ADMIN,
+  Permission.COMMAND_MANAGER,
+]
+
 export enum ApiResult {
   SUCCESS = "success",
   ERROR = "error",

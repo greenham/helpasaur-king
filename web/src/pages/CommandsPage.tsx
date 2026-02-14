@@ -4,6 +4,7 @@ import { Alert, Container, Spinner } from "react-bootstrap"
 import CommandsList from "../components/CommandsList"
 import { sortCommandsAlpha } from "../utils"
 import { useHelpaApi } from "../hooks/useHelpaApi"
+import { hasAnyPermission, COMMAND_EDIT_PERMISSIONS } from "@helpasaur/types"
 
 interface CommandsPageProps {}
 
@@ -52,7 +53,11 @@ const CommandsPage: React.FunctionComponent<CommandsPageProps> = () => {
       {!commandsError && !commandsLoading && (
         <CommandsList
           commands={sortCommandsAlpha(commands || [])}
-          userCanEdit={user ? user.permissions.includes("admin") : false}
+          userCanEdit={
+            user
+              ? hasAnyPermission(user.permissions, COMMAND_EDIT_PERMISSIONS)
+              : false
+          }
           createCommandMutation={createCommandMutation}
           updateCommandMutation={updateCommandMutation}
           deleteCommandMutation={deleteCommandMutation}
