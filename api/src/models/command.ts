@@ -1,10 +1,16 @@
 import mongoose, { Schema } from "mongoose"
 import { ICommandDocument, ICommandModel } from "../types/models"
+import { TWITCH_MAX_MESSAGE_LENGTH } from "@helpasaur/common"
 
 const CommandSchema = new Schema<ICommandDocument>({
   command: { type: String, required: true, trim: true },
   aliases: [String],
-  response: { type: String, required: true, trim: true },
+  response: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: TWITCH_MAX_MESSAGE_LENGTH,
+  },
   category: String,
   tags: [String],
   enabled: Boolean,

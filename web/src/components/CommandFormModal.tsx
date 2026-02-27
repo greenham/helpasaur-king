@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap"
 import { Command } from "@helpasaur/types"
+import { TWITCH_MAX_MESSAGE_LENGTH } from "@helpasaur/common"
 import { useHelpaApi } from "../hooks/useHelpaApi"
 import TagInput from "./TagInput"
 import AliasInput from "./AliasInput"
@@ -56,6 +57,9 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
     }))
   }
 
+  const responseLength = (command.response || "").length
+  const isOverLimit = responseLength > TWITCH_MAX_MESSAGE_LENGTH
+
   const handleSubmit = () => {
     onSubmit(command)
   }
@@ -93,7 +97,11 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
             name="response"
             value={command.response || ""}
             onChange={handleChange}
+            isInvalid={isOverLimit}
           />
+          <Form.Text className={isOverLimit ? "text-danger" : "text-muted"}>
+            {responseLength}/{TWITCH_MAX_MESSAGE_LENGTH}
+          </Form.Text>
         </FloatingLabel>
 
         {/* Aliases Input with Badge UI */}
@@ -119,7 +127,7 @@ const CommandFormModal: React.FunctionComponent<CommandFormModalProps> = (
         <Button variant="primary" onClick={onHide}>
           Cancel
         </Button>
-        <Button variant="dark" onClick={handleSubmit}>
+        <Button variant="dark" onClick={handleSubmit} disabled={isOverLimit}>
           <i className="fa-regular fa-floppy-disk px-1"></i> Save Changes
         </Button>
       </Modal.Footer>
