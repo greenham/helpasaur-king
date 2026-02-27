@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.5.0
+
+_2026-02-27_
+
+### What's Changed
+
+#### Features
+
+- feat: Validate command response length against Twitch 500-char limit by @greenham in https://github.com/greenham/helpasaur-king/pull/103
+  - New `TWITCH_MAX_MESSAGE_LENGTH` constant in `@helpasaur/common` shared library
+  - API enforces 500-character limit on command create and update endpoints
+  - Mongoose schema `maxlength` validation as defense-in-depth
+  - Command form modal now shows a live character counter and disables save when over the limit
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/2.4.0...2.5.0
+
 ## 2.4.0
 
 _2026-02-14_
