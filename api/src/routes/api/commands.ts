@@ -8,7 +8,7 @@ import {
   handleRouteError,
 } from "../../lib/responseHelpers"
 import guard from "express-jwt-permissions"
-import { normalizeTags } from "@helpasaur/common"
+import { normalizeTags, TWITCH_MAX_MESSAGE_LENGTH } from "@helpasaur/common"
 
 interface MatchFilter {
   createdAt?: {
@@ -170,6 +170,13 @@ router.post(
       if (!req.body.response || !req.body.response.trim()) {
         return sendError(res, "Command response is required", 400)
       }
+      if (req.body.response.length > TWITCH_MAX_MESSAGE_LENGTH) {
+        return sendError(
+          res,
+          `Command response must be ${TWITCH_MAX_MESSAGE_LENGTH} characters or less (Twitch limit)`,
+          400
+        )
+      }
 
       // Ensure command name and alias uniqueness
       const isUnique = await Command.isUnique(
@@ -251,6 +258,16 @@ router.patch(
         (!req.body.response || !req.body.response.trim())
       ) {
         return sendError(res, "Command response is required", 400)
+      }
+      if (
+        req.body.response &&
+        req.body.response.length > TWITCH_MAX_MESSAGE_LENGTH
+      ) {
+        return sendError(
+          res,
+          `Command response must be ${TWITCH_MAX_MESSAGE_LENGTH} characters or less (Twitch limit)`,
+          400
+        )
       }
 
       // Store original tags for comparison

@@ -4,4 +4,5 @@
  */
 
 export * from "./command-cache"
+export * from "./constants"
 export * from "./utils/tagUtils"
