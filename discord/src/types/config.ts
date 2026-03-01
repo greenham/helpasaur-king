@@ -29,4 +29,5 @@ export interface DiscordGuildConfig {
   enableWeeklyRaceRoomAlert: boolean
   weeklyRaceAlertChannelId: string | null
   weeklyRaceAlertRoleId: string | null
+  weeklyRaceRoomAlertRoleId: string | null
 }

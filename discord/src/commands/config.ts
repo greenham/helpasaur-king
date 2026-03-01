@@ -120,8 +120,21 @@ const configCommand: DiscordCommand = {
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("weekly-alerts-role")
-        .setDescription("Sets the role to be pinged for weekly alerts")
+        .setName("weekly-one-hour-warning-role")
+        .setDescription("Sets the role to be pinged for the 1 hour warning")
+        .addRoleOption((option) =>
+          option
+            .setName("role")
+            .setDescription(
+              "The role to ping (or leave blank to not ping any role)"
+            )
+            .setRequired(false)
+        )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("weekly-race-room-alert-role")
+        .setDescription("Sets the role to be pinged for race room creation")
         .addRoleOption((option) =>
           option
             .setName("role")
@@ -211,12 +224,22 @@ const configCommand: DiscordCommand = {
         },
       ],
       [
-        "weekly-alerts-role",
+        "weekly-one-hour-warning-role",
         {
           typeFn: "getRole",
           key: "role",
           valueProperty: "id",
           guildConfigKey: "weeklyRaceAlertRoleId",
+          valueOnNull: null,
+        },
+      ],
+      [
+        "weekly-race-room-alert-role",
+        {
+          typeFn: "getRole",
+          key: "role",
+          valueProperty: "id",
+          guildConfigKey: "weeklyRaceRoomAlertRoleId",
           valueOnNull: null,
         },
       ],

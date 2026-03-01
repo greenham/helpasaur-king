@@ -219,6 +219,7 @@ export interface GuildConfig {
   enableWeeklyRaceRoomAlert?: boolean
   weeklyRaceAlertChannelId?: string | null
   weeklyRaceAlertRoleId?: string | null
+  weeklyRaceRoomAlertRoleId?: string | null
   createdAt?: Date
   lastUpdated?: Date
 }
@@ -235,6 +236,7 @@ export interface GuildConfigUpdate {
   enableWeeklyRaceRoomAlert?: boolean
   weeklyRaceAlertChannelId?: string | null
   weeklyRaceAlertRoleId?: string | null
+  weeklyRaceRoomAlertRoleId?: string | null
 }
 
 // WebSocket Relay Event Types

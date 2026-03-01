@@ -91,12 +91,21 @@ const commandGroups = [
         defaultValue: "None",
       },
       {
-        title: "Role to Ping",
+        title: "One Hour Warning Role",
         command: "/helpa-config",
-        subcommand: "weekly-alerts-role",
+        subcommand: "weekly-one-hour-warning-role",
         argument: "role",
         description:
-          "(Optional) The role to ping when sending the alerts -- send this command without the role argument to clear the current role",
+          "(Optional) The role to ping for the 1 hour warning -- send this command without the role argument to clear the current role",
+        defaultValue: "None",
+      },
+      {
+        title: "Race Room Alert Role",
+        command: "/helpa-config",
+        subcommand: "weekly-race-room-alert-role",
+        argument: "role",
+        description:
+          "(Optional) The role to ping when the race room is created -- send this command without the role argument to clear the current role",
         defaultValue: "None",
       },
     ],

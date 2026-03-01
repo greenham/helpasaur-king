@@ -242,7 +242,7 @@ const readyEvent: DiscordEvent<"clientReady"> = {
           .map((g: GuildConfig) => {
             return {
               channelId: g.weeklyRaceAlertChannelId,
-              roleId: g.weeklyRaceAlertRoleId,
+              roleId: g.weeklyRaceRoomAlertRoleId,
             }
           })
 
