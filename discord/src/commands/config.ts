@@ -78,7 +78,7 @@ const configCommand: DiscordCommand = {
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("weekly-one-hour-warning")
+        .setName("weekly-warning")
         .setDescription(
           "Enable/disable alert for one hour prior to the weekly race"
         )
@@ -86,14 +86,14 @@ const configCommand: DiscordCommand = {
           option
             .setName("enable")
             .setDescription(
-              "Be sure to set the weekly-alerts-channel if you enable this!"
+              "Be sure to set the weekly-channel if you enable this!"
             )
             .setRequired(true)
         )
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("weekly-race-room-alert")
+        .setName("weekly-room-alert")
         .setDescription(
           "Enable/disable weekly race room creation notifications"
         )
@@ -101,14 +101,14 @@ const configCommand: DiscordCommand = {
           option
             .setName("enable")
             .setDescription(
-              "Be sure to set the weekly-alerts-channel if you enable this!"
+              "Be sure to set the weekly-channel if you enable this!"
             )
             .setRequired(true)
         )
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("weekly-alerts-channel")
+        .setName("weekly-channel")
         .setDescription("Sets the channel to be used for weekly alerts")
         .addChannelOption((option) =>
           option
@@ -120,7 +120,7 @@ const configCommand: DiscordCommand = {
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("weekly-one-hour-warning-role")
+        .setName("weekly-warning-role")
         .setDescription("Sets the role to be pinged for the 1 hour warning")
         .addRoleOption((option) =>
           option
@@ -133,7 +133,7 @@ const configCommand: DiscordCommand = {
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("weekly-race-room-alert-role")
+        .setName("weekly-room-role")
         .setDescription("Sets the role to be pinged for race room creation")
         .addRoleOption((option) =>
           option
@@ -199,7 +199,7 @@ const configCommand: DiscordCommand = {
         },
       ],
       [
-        "weekly-one-hour-warning",
+        "weekly-warning",
         {
           typeFn: "getBoolean",
           key: "enable",
@@ -207,7 +207,7 @@ const configCommand: DiscordCommand = {
         },
       ],
       [
-        "weekly-race-room-alert",
+        "weekly-room-alert",
         {
           typeFn: "getBoolean",
           key: "enable",
@@ -215,7 +215,7 @@ const configCommand: DiscordCommand = {
         },
       ],
       [
-        "weekly-alerts-channel",
+        "weekly-channel",
         {
           typeFn: "getChannel",
           key: "channel",
@@ -224,7 +224,7 @@ const configCommand: DiscordCommand = {
         },
       ],
       [
-        "weekly-one-hour-warning-role",
+        "weekly-warning-role",
         {
           typeFn: "getRole",
           key: "role",
@@ -234,7 +234,7 @@ const configCommand: DiscordCommand = {
         },
       ],
       [
-        "weekly-race-room-alert-role",
+        "weekly-room-role",
         {
           typeFn: "getRole",
           key: "role",

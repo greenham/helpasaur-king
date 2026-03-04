@@ -67,7 +67,7 @@ const commandGroups = [
       {
         title: "One Hour Warning",
         command: "/helpa-config",
-        subcommand: "weekly-one-hour-warning",
+        subcommand: "weekly-warning",
         argument: "enable",
         description:
           "Enable or disable the 1 hour warning before the race starts",
@@ -76,7 +76,7 @@ const commandGroups = [
       {
         title: "Race Room Alert",
         command: "/helpa-config",
-        subcommand: "weekly-race-room-alert",
+        subcommand: "weekly-room-alert",
         argument: "enable",
         description:
           "Enable or disable the alert with the link to the race room once created",
@@ -85,7 +85,7 @@ const commandGroups = [
       {
         title: "Channel",
         command: "/helpa-config",
-        subcommand: "weekly-alerts-channel",
+        subcommand: "weekly-channel",
         argument: "channel",
         description: "The text channel where weekly alerts will be posted",
         defaultValue: "None",
@@ -93,7 +93,7 @@ const commandGroups = [
       {
         title: "One Hour Warning Role",
         command: "/helpa-config",
-        subcommand: "weekly-one-hour-warning-role",
+        subcommand: "weekly-warning-role",
         argument: "role",
         description:
           "(Optional) The role to ping for the 1 hour warning -- send this command without the role argument to clear the current role",
@@ -102,7 +102,7 @@ const commandGroups = [
       {
         title: "Race Room Alert Role",
         command: "/helpa-config",
-        subcommand: "weekly-race-room-alert-role",
+        subcommand: "weekly-room-role",
         argument: "role",
         description:
           "(Optional) The role to ping when the race room is created -- send this command without the role argument to clear the current role",
