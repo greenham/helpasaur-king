@@ -586,8 +586,7 @@ export const useHelpaApi = () => {
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
-        mutationFn: () =>
-          helpaApiClient.streamAlerts.clearAllSubscriptions(),
+        mutationFn: () => helpaApiClient.streamAlerts.clearAllSubscriptions(),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({
             queryKey: ["eventSubSubscriptions"],
@@ -599,9 +598,7 @@ export const useHelpaApi = () => {
         },
         onError: (error, variables, context) => {
           if (showToast) {
-            toast.error(
-              `Failed to clear subscriptions: ${error.message}`
-            )
+            toast.error(`Failed to clear subscriptions: ${error.message}`)
           }
           mutationOptions.onError?.(error, variables, context)
         },
@@ -617,8 +614,7 @@ export const useHelpaApi = () => {
     ) => {
       const { showToast = true, ...mutationOptions } = options || {}
       return useMutation({
-        mutationFn: () =>
-          helpaApiClient.streamAlerts.resubscribeAllChannels(),
+        mutationFn: () => helpaApiClient.streamAlerts.resubscribeAllChannels(),
         onSuccess: (data, variables, context) => {
           queryClient.invalidateQueries({
             queryKey: ["eventSubSubscriptions"],
@@ -630,9 +626,7 @@ export const useHelpaApi = () => {
         },
         onError: (error, variables, context) => {
           if (showToast) {
-            toast.error(
-              `Failed to re-subscribe channels: ${error.message}`
-            )
+            toast.error(`Failed to re-subscribe channels: ${error.message}`)
           }
           mutationOptions.onError?.(error, variables, context)
         },
