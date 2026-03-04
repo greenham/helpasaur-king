@@ -38,14 +38,25 @@ if [ ! -f .env ]; then
 fi
 echo -e "${GREEN}   ✓ .env file found${NC}"
 
-# Pull the new images from ghcr.io
-echo -e "\n${YELLOW}📦 Pulling images from GitHub Container Registry...${NC}"
-if VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml pull; then
-  echo -e "${GREEN}   ✓ Images pulled successfully${NC}"
-else
-  echo -e "${RED}   ❌ Failed to pull images${NC}"
-  exit 1
+# Clean up old images to free resources before pulling
+echo -e "\n${YELLOW}🧹 Pruning unused Docker images...${NC}"
+if docker image prune -f > /dev/null 2>&1; then
+  echo -e "${GREEN}   ✓ Pruned unused images${NC}"
 fi
+
+# Pull new images one at a time to avoid CPU spikes
+COMPOSE_CMD="VERSION=$VERSION docker compose -f docker-compose.yml -f docker-compose.prod.yml"
+SERVICES=$(eval $COMPOSE_CMD config --services)
+echo -e "\n${YELLOW}📦 Pulling images from GitHub Container Registry...${NC}"
+for SERVICE in $SERVICES; do
+  echo -e "${CYAN}   ↓ Pulling $SERVICE...${NC}"
+  if eval $COMPOSE_CMD pull "$SERVICE" 2>/dev/null; then
+    echo -e "${GREEN}   ✓ $SERVICE${NC}"
+  else
+    echo -e "${YELLOW}   ⊘ $SERVICE (using existing image)${NC}"
+  fi
+done
+echo -e "${GREEN}   ✓ All images ready${NC}"
 
 # Start production services with version-tagged images
 echo -e "\n${YELLOW}🔄 Starting services with --force-recreate...${NC}"
