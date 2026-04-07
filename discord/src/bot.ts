@@ -6,6 +6,8 @@ import {
   GatewayIntentBits,
   Partials,
   MessageFlags,
+  REST,
+  Routes,
 } from "discord.js"
 import * as fs from "node:fs"
 import * as path from "node:path"
@@ -61,6 +63,29 @@ export class DiscordBot {
     // @TODO: Make sure the login succeeds before proceeding
     this.handleEvents()
     this.handleCommands()
+    this.deployCommands()
+  }
+
+  deployCommands(): void {
+    const { clientId, token } = this.discordClient.config
+    const commands = this.discordClient.commands.map((cmd) => cmd.data.toJSON())
+
+    const rest = new REST().setToken(token)
+
+    console.log(
+      `Registering ${commands.length} application (/) commands with Discord...`
+    )
+
+    rest
+      .put(Routes.applicationCommands(clientId), { body: commands })
+      .then((data) => {
+        console.log(
+          `✅ Successfully registered ${(data as unknown[]).length} application (/) commands`
+        )
+      })
+      .catch((error) => {
+        console.error("❌ Failed to register application commands:", error)
+      })
   }
 
   refreshConfig(): void {

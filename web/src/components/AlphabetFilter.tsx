@@ -1,5 +1,11 @@
 import * as React from "react"
-import { Col, OverlayTrigger, Row, ToggleButton, Tooltip } from "react-bootstrap"
+import {
+  Col,
+  OverlayTrigger,
+  Row,
+  ToggleButton,
+  Tooltip,
+} from "react-bootstrap"
 
 interface AlphabetFilterProps {
   selectedLetter: string
@@ -88,7 +94,10 @@ const AlphabetFilter: React.FunctionComponent<AlphabetFilterProps> = ({
             </ToggleButton>
             {(() => {
               // Count commands starting with any number
-              const numberCount = numbers.reduce((sum, num) => sum + getLetterCount(num), 0)
+              const numberCount = numbers.reduce(
+                (sum, num) => sum + getLetterCount(num),
+                0
+              )
               const numberButton = (
                 <ToggleButton
                   key="numbers"
@@ -116,7 +125,8 @@ const AlphabetFilter: React.FunctionComponent<AlphabetFilterProps> = ({
                   placement="top"
                   overlay={
                     <Tooltip id="tooltip-numbers">
-                      {numberCount} command{numberCount !== 1 ? "s" : ""} starting with numbers
+                      {numberCount} command{numberCount !== 1 ? "s" : ""}{" "}
+                      starting with numbers
                     </Tooltip>
                   }
                 >

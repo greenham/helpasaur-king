@@ -10,4 +10,5 @@ export const defaultGuildConfig: DiscordGuildConfig = {
   enableWeeklyRaceRoomAlert: false,
   weeklyRaceAlertChannelId: null,
   weeklyRaceAlertRoleId: null,
+  weeklyRaceRoomAlertRoleId: null,
 }

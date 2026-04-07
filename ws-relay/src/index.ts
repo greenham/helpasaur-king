@@ -87,7 +87,7 @@ wss.on("connection", (socket: Socket) => {
     )
   })
 
-  Object.values(RelayEvent).forEach((event) => {
+  Object.values(RelayEvent).forEach((event: string) => {
     socket.on(event, (data: unknown) => {
       console.log(`Received ${event} event:`, data)
       messagesRelayed++
