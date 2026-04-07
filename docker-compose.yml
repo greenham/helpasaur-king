@@ -230,6 +230,7 @@ services:
   # Infrastructure Services
   mongo:
     image: mongo:7-jammy
+    pull_policy: if_not_present
     restart: on-failure
     logging:
       driver: local
@@ -254,6 +255,7 @@ services:
 
   mongo-express:
     image: mongo-express
+    pull_policy: if_not_present
     restart: on-failure
     logging:
       driver: local
@@ -286,6 +288,7 @@ services:
 
   nginx:
     image: nginx:1.21.6
+    pull_policy: if_not_present
     restart: always
     logging:
       driver: local
