@@ -1,5 +1,34 @@
 # Changelog
 
+## 2.6.0
+
+_2026-04-07_
+
+### What's Changed
+
+#### Features
+
+- feat: Split weekly race ping role into per-alert settings by @greenham in https://github.com/greenham/helpasaur-king/pull/105
+  - Replaces shared `weeklyRaceAlertRoleId` with independent role settings per alert type
+  - New `/helpa-config weekly-warning-role` for the 1-hour warning ping
+  - New `/helpa-config weekly-room-role` for the race room creation ping
+  - Existing one-hour warning configs are preserved; race room pings default to off until configured
+  - Discord bot page updated to document both new role commands
+- feat: Register slash commands automatically on bot startup by @greenham
+  - Discord bot now deploys all slash commands on startup via the Discord REST API
+  - Removes the need to manually run `deploy-commands` on the production server
+
+#### Bug Fixes
+
+- fix: Pull Docker images sequentially during deploy to prevent CPU exhaustion by @greenham in https://github.com/greenham/helpasaur-king/pull/104
+
+#### Infrastructure
+
+- chore: Add `.gitattributes` to enforce LF line endings by @greenham
+  - Prevents CRLF/LF mismatches on Windows that caused Prettier to rewrite every file
+
+**Full Changelog**: https://github.com/greenham/helpasaur-king/compare/2.5.0...2.6.0
+
 ## 2.5.0
 
 _2026-02-27_
