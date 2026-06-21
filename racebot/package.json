@@ -14,7 +14,7 @@
     "node-schedule": "^2.1.1",
     "socket.io-client": "^4.7.2",
     "uuid": "^9.0.1",
-    "ws": "^8.14.2",
+    "ws": "^8.21.0",
     "@helpasaur/types": "workspace:*"
   },
   "devDependencies": {
